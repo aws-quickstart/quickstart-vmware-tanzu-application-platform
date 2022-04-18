@@ -4,45 +4,6 @@ Description: >-
   Application Platform (TAP). In addition to the EC2 instance, a single EKS cluster, ECR instance and S3 bucket will also be deployed
   to the VPC to support the installation of the TAP software. **WARNING** This template creates AWS resources. You will be billed for the AWS
   resources used if you create a stack from this template.
-Metadata:
-  QuickStartDocumentation:
-    EntrypointName: 'Launch a New VPC'
-  AWS::CloudFormation::Interface:
-    ParameterGroups:
-      - Label:
-          default: Network Configuration
-        Parameters:
-          VPCCIDR
-          VPCTenancy
-          BootstrapSubnetCIDR
-          TAPSubnetCIDR
-      - Label: 
-          default: Bootstrap Configuration
-        Parameters:
-          BootstrapSize
-      - Label:
-          default: EKS/ECR/S3 Configuration
-        Parameters:
-          NodeSize
-          ECRName
-      - Label: 
-          default: TAP Install
-        Parameters:
-          TanzuNetID
-          TanzuNetKey
-    ParameterLabels:
-      VPCCIDR:
-        default: VPC CIDR
-      VPCTenancy:
-        default: VPC Tenancy
-      BootstrapSubnetCIDR:
-        default: CIDR for Bootstrap Subnet
-      TAPSubnetCIDR:
-        default: CIDR for TAP Cluster Subnet
-      TanzuNetID:
-        default: Application ID or Email Address for authenticating against VMWare's Tanzu Net
-      TanzuNeyKey:
-        default: Application Key for authenticating against VMWare's Tanzu Net
 Parameters:
   VPCCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
@@ -77,33 +38,36 @@ Parameters:
     Description: The authentication Key for authenticating to VMWare's Tanzu Net
     Type: String
     Default: xxxxxxx
-Conditions:
-  NVirginiaRegionCondition: !Equals [!Ref 'AWS::Region', us-east-1]
 Resources:
   DHCPOptions:
     Type: AWS::EC2::DHCPOptions
     Properties:
-      DomainName: !If [NVirginiaRegionCondition, ec2.internal, !Sub '${AWS::Region}.compute.internal']
       DomainNameServers:
         - AmazonProvidedDNS
       Tags:
         - Key: Name
-          Value: !Join ['', ['dhcpoptions-tap-vpc', !Ref 'AWS::StackName']]
+          Value: !Join 
+                    - ''
+                    - - 'dhcpoptions-tap-vpc'
+                      - !Ref 'AWS::StackName'
   VPC:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: !Ref 'VPCCIDR'
-      InstanceTenancy: !Ref 'VPCTenancy'
+      CidrBlock: !Ref VPCCIDR
+      InstanceTenancy: !Ref VPCTenancy
       EnableDnsSupport: true
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: !Join ['', ['vpc-tap', !Ref 'AWS::StackName']]
+          Value: !Join 
+                    - ''
+                    - - 'tap-vpc'
+                      - !Ref 'AWS::StackName'
   VPCDHCPOptionsAssociation:
     Type: AWS::EC2::VPCDHCPOptionsAssociation
     Properties:
-      VpcId: !Ref 'VPC'
-      DhcpOptionsId: !Ref 'DHCPOptions'
+      VpcId: !Ref VPC
+      DhcpOptionsId: !Ref DHCPOptions
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
@@ -115,14 +79,11 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
-      Tags:
-        - Key: Name
-          Value: !Ref 'AWS::StackName'
   BootstrapSubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref 'VPC'
-      CidrBlock: !Ref 'BootstrapSubnetCIDR'
+      VpcId: !Ref VPC
+      CidrBlock: !Ref BootstrapSubnetCIDR
       Tags:
         - Key: Name
           Value: Bootstrap Subnet
@@ -130,8 +91,8 @@ Resources:
   ClusterSubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref 'VPC'
-      CidrBlock: !Ref 'TAPSubnetCIDR'
+      VpcId: !Ref VPC
+      CidrBlock: !Ref TAPSubnetCIDR
       Tags:
         - Key: Name
           Value: TAP Cluster Subnet
@@ -139,26 +100,26 @@ Resources:
   PublicSubnetRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref 'VPC'
+      VpcId: !Ref VPC
       Tags:
         - Key: Name
           Value: Public Subnet Route Table
   PublicSubnetRoute:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref 'PublicSubnetRouteTable'
+      RouteTableId: !Ref PublicSubnetRouteTable
       DestinationCidrBlock: '0.0.0.0/0'
-      GatewayId: !Ref 'InternetGateway'
+      GatewayId: !Ref InternetGateway
   BootstrapSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref BootstrapSubnet
-      RouteTableId: !Ref 'PublicSubnetRouteTable'
+      RouteTableId: !Ref PublicSubnetRouteTable
   TAPSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref ClusterSubnet
-      RouteTableId: !Ref 'PublicSubnetRouteTable'
+      RouteTableId: !Ref PublicSubnetRouteTable
   BootstrapSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
@@ -171,8 +132,8 @@ Resources:
           CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: tcp
-          FromPort: -1
-          ToPort: -1
+          FromPort: 0
+          ToPort: 0
           CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
