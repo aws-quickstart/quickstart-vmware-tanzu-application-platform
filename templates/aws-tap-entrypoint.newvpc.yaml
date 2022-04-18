@@ -19,9 +19,12 @@ Metadata:
       - Label: 
           default: Bootstrap Configuration
         Parameters:
+          BootstrapSize
       - Label:
           default: EKS/ECR/S3 Configuration
         Parameters:
+          NodeSize
+          ECRName
       - Label: 
           default: TAP Install
         Parameters:
@@ -40,6 +43,7 @@ Metadata:
         default: Application ID or Email Address for authenticating against VMWare's Tanzu Net
       TanzuNeyKey:
         default: Application Key for authenticating against VMWare's Tanzu Net
+Parameters:
   VPCCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-24
@@ -68,9 +72,11 @@ Metadata:
   TanzuNetID:
     Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net
     Type: String
+    Default: xxxxxxx
   TanzuNetKey:
     Description: The authentication Key for authenticating to VMWare's Tanzu Net
     Type: String
+    Default: xxxxxxx
 Conditions:
   NVirginiaRegionCondition: !Equals [!Ref 'AWS::Region', us-east-1]
 Resources:
@@ -104,13 +110,16 @@ Resources:
       Tags:
         - Key: Name
           Value: !Ref 'AWS::StackName'
-  BoostrapSubnet:
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+      Tags:
+        - Key: Name
+          Value: !Ref 'AWS::StackName'
+  BootstrapSubnet:
     Type: AWS::EC2::Subnet
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: W33
-            reason: "(W33) EC2 Subnet should not have MapPublicIpOnLaunch set to true"
     Properties:
       VpcId: !Ref 'VPC'
       CidrBlock: !Ref 'BootstrapSubnetCIDR'
@@ -120,11 +129,6 @@ Resources:
       MapPublicIpOnLaunch: true
   ClusterSubnet:
     Type: AWS::EC2::Subnet
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: W33
-            reason: "(W33) EC2 Subnet should not have MapPublicIpOnLaunch set to true"
     Properties:
       VpcId: !Ref 'VPC'
       CidrBlock: !Ref 'TAPSubnetCIDR'
@@ -140,21 +144,20 @@ Resources:
         - Key: Name
           Value: Public Subnet Route Table
   PublicSubnetRoute:
-    DependsOn: VPCGatewayAttachment
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref 'PublicSubnetRouteTable'
       DestinationCidrBlock: '0.0.0.0/0'
       GatewayId: !Ref 'InternetGateway'
-  PublicSubnet1RouteTableAssociation:
+  BootstrapSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref 'PublicSubnet1'
+      SubnetId: !Ref BootstrapSubnet
       RouteTableId: !Ref 'PublicSubnetRouteTable'
-  PublicSubnet2RouteTableAssociation:
+  TAPSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref 'PublicSubnet2'
+      SubnetId: !Ref ClusterSubnet
       RouteTableId: !Ref 'PublicSubnetRouteTable'
   BootstrapSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
@@ -168,8 +171,8 @@ Resources:
           CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: tcp
-          FromPort: *
-          ToPort: *
+          FromPort: -1
+          ToPort: -1
           CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
@@ -181,8 +184,8 @@ Resources:
       Description: This secret will store the Tanzu Net UserName and Password being passed in by the consumer
       SecretString: !Join 
                       - ''
-                      - '{"username":'
-                      - !Ref TanzuNetID 
-                      - ',"password":'
-                      - !Ref TanzuNetKey
-                      - '}'
+                      - - '{"username":'
+                        - !Ref TanzuNetID 
+                        - ',"password":'
+                        - !Ref TanzuNetKey
+                        - '}'
