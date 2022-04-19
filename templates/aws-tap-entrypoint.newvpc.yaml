@@ -160,7 +160,7 @@ Resources:
         BootstrapSubnet
         BootstrapSecurityGroup
     Properties:
-      TemplateURL: aws-tap.bootstrap.yaml
+      TemplateURL: 'https://github.com/brharr/quickstart-vmware-tanzu-application-platform/aws-tap.bootstrap.yaml'
     Parameters:
       BootstrapSubnet: !Ref BootstrapSubnet
       BootstrapSecurityGroup: !Ref BootstrapSecurityGroup
