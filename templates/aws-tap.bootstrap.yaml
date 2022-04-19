@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  This template is a child template to both the aws-tap-entrypoint.newvpc and aws-tap-entrypoint.existingvpc templates with all parameters being passed from
+  those parent templates. This template will focus on the creation of an EC2 instance that can be used to Bootstrap the install and configure TAP. 
+  The EC2 instance will contain a large script that will install all of the CLI components necessary and then perform all of the installation steps
+  as defined within the TAP Installation guide for deploying into AWS. It will also make sure that all of the images used for TAP are stored within ECR.
+Parameters:
+  BootstrapSubnet:
+    Description: AWS ID for the Subnet that the Bootstrap EC2 will be placed into
+    Type: String
+  BootstrapSecurityGroup:
+    Description: AWS ID for the Security Group that will attached to the Bootstrap EC2
+    Type: String
+  BootstrapOS:
+    Description: Preferred OS for the Bootstrap EC2 instance based on available values
+    Type: String
+    Default: Ubuntu
+    AllowedValues:
+      - Ubuntu
+  BootstrapKeyName: 
+    Description: The name of the SSH Key that will be used to access the Bootstrap VM when it is created
+    Type: String
+  TanzuNetID:
+    Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net
+    Type: String
+  TanzuNetKey:
+    Description: The authentication Key for authenticating to VMWare's Tanzu Net
+    Type: String
+Resources:
+  BootstrapInstance: 
+    Type: AWS::EC2::Instance
+    Properties: 
+      InstanceType: m5.large
+      ImageId: ami-80861296
+      KeyName: !Ref BootstrapKeyName
+      Monitoring: true
+      BlockDeviceMappings:
+        - DeviceName: "/dev/sda1"
+          Ebs:
+            VolumeSize: 50
+            VolumeType: gp2
+      NetworkInterfaces: 
+      - AssociatePublicIpAddress: true
+        DeviceIndex: 0
+        GroupSet: 
+          - !Ref: BootstrapSecurityGroup
+        SubnetId: 
+          - !Ref: BootstrapSubnet
+    Tags:
+      - Key: Name
+        Value: BootstrapEC2
+  BootstrapEIP:
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref BootstrapInstance
+    Tags:
+      - Key: Name
+        Value: BootstrapEIP
