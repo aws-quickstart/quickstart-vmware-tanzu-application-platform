@@ -1,0 +1,152 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  This template creates a Single-AZ, multi-subnet VPC infrastructure that will include an EC2 instance for Bootstrapping an install of VMWare's Tanzu
+  Application Platform (TAP). In addition to the EC2 instance, a single EKS cluster, ECR instance and S3 bucket will also be deployed
+  to the VPC to support the installation of the TAP software. **WARNING** This template creates AWS resources. You will be billed for the AWS
+  resources used if you create a stack from this template.
+Parameters:
+  VPCCIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-24
+    Default: 10.0.0.0/16
+    Description: CIDR block for the VPC
+    Type: String
+  VPCTenancy:
+    AllowedValues:
+      - default
+      - dedicated
+    Default: default
+    Description: The allowed tenancy of instances launched into the VPC
+    Type: String
+  BootstrapSubnetCIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-24
+    Default: 10.0.0.0/24
+    Description: CIDR block for the Bootstrap Subnet
+    Type: String
+  TAPSubnetCIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-24
+    Default: 10.0.1.0/24
+    Description: CIDR block for the Subnet where the TAP Cluster will be deployed
+    Type: String
+  TanzuNetID:
+    Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net
+    Type: String
+    Default: xxxxxxx
+  TanzuNetKey:
+    Description: The authentication Key for authenticating to VMWare's Tanzu Net
+    Type: String
+    Default: xxxxxxx
+Resources:
+  DHCPOptions:
+    Type: AWS::EC2::DHCPOptions
+    Properties:
+      DomainNameServers:
+        - AmazonProvidedDNS
+      Tags:
+        - Key: Name
+          Value: !Join 
+                    - ''
+                    - - 'dhcpoptions-tap-vpc'
+                      - !Ref 'AWS::StackName'
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VPCCIDR
+      InstanceTenancy: !Ref VPCTenancy
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Join 
+                    - ''
+                    - - 'tap-vpc'
+                      - !Ref 'AWS::StackName'
+  VPCDHCPOptionsAssociation:
+    Type: AWS::EC2::VPCDHCPOptionsAssociation
+    Properties:
+      VpcId: !Ref VPC
+      DhcpOptionsId: !Ref DHCPOptions
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref 'AWS::StackName'
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+  BootstrapSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref BootstrapSubnetCIDR
+      Tags:
+        - Key: Name
+          Value: Bootstrap Subnet
+      MapPublicIpOnLaunch: true
+  ClusterSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref TAPSubnetCIDR
+      Tags:
+        - Key: Name
+          Value: TAP Cluster Subnet
+      MapPublicIpOnLaunch: true
+  PublicSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: Public Subnet Route Table
+  PublicSubnetRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref InternetGateway
+  BootstrapSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref BootstrapSubnet
+      RouteTableId: !Ref PublicSubnetRouteTable
+  TAPSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref ClusterSubnet
+      RouteTableId: !Ref PublicSubnetRouteTable
+  BootstrapSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Enables SSH Access to Bootstrap VM
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 0
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: BootstrapSecurityGroup
+  TanzuNetSecret:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name: TanzuNetSecret
+      Description: This secret will store the Tanzu Net UserName and Password being passed in by the consumer
+      SecretString: !Join 
+                      - ''
+                      - - '{"username":'
+                        - !Ref TanzuNetID 
+                        - ',"password":'
+                        - !Ref TanzuNetKey
+                        - '}'
