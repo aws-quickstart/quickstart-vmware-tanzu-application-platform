@@ -31,29 +31,25 @@ Resources:
     Type: AWS::EC2::Instance
     Properties: 
       InstanceType: m5.large
-      ImageId: ami-80861296
+      ImageId: ami-0892d3c7ee96c0bf7
       KeyName: !Ref BootstrapKeyName
       Monitoring: true
+      SecurityGroupIds:
+        - !Ref BootstrapSecurityGroup
+      SubnetId: !Ref BootstrapSubnet
       BlockDeviceMappings:
         - DeviceName: "/dev/sda1"
           Ebs:
             VolumeSize: 50
             VolumeType: gp2
-      NetworkInterfaces: 
-      - AssociatePublicIpAddress: true
-        DeviceIndex: 0
-        GroupSet: 
-          - !Ref: BootstrapSecurityGroup
-        SubnetId: 
-          - !Ref: BootstrapSubnet
-    Tags:
-      - Key: Name
-        Value: BootstrapEC2
+      Tags:
+        - Key: Name
+          Value: BootstrapEC2
   BootstrapEIP:
     Type: 'AWS::EC2::EIP'
     Properties:
       Domain: vpc
       InstanceId: !Ref BootstrapInstance
-    Tags:
-      - Key: Name
-        Value: BootstrapEIP
+      Tags:
+        - Key: Name
+          Value: BootstrapEIP
