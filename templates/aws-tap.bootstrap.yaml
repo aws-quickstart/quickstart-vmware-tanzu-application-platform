@@ -26,6 +26,9 @@ Parameters:
   TanzuNetKey:
     Description: The authentication Key for authenticating to VMWare's Tanzu Net
     Type: String
+  TanzuNetToken:
+    Description: The authentication token required for certain TAP installation utilities within the Bootstrap
+    Type: String
 Resources:
   BootstrapInstance: 
     Type: AWS::EC2::Instance
