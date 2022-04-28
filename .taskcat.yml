@@ -1,0 +1,10 @@
+project:
+  name: quickstart-vmware-tanzu-application-platform
+  owner: quickstart-eng@amazon.com
+  template: templates/
+  parameters:
+  regions:
+tests:
+  default:
+    regions:
+      - us-east-1
