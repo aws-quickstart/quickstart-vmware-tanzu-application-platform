@@ -5,6 +5,9 @@ Description: >-
   to the VPC to support the installation of the TAP software. **WARNING** This template creates AWS resources. You will be billed for the AWS
   resources used if you create a stack from this template.
 Parameters:
+  S3BucketName:
+    Description: Name of the S3 bucket where the QuickStart scripts are uploaded
+    Type: String
   VPCCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-24
@@ -27,6 +30,18 @@ Parameters:
   BootstrapKeyName:
     Description: The name of the SSH Key that will be used to access the Bootstrap VM when it is created
     Type: AWS::EC2::KeyPair::KeyName
+  BootstrapEgressFromPort:
+    Description: Start of Port range for outbound access of the Bootstrap VM (Default 0)
+    Type: Integer
+    Default: 0
+  BoostrapEgressToPort:
+    Description: End of Port range for outbound access of the Bootstrap VM (Default 65535)
+    Type: Integer
+    Default: 65535
+  BootstrapEgressCIDR:
+    Description: IP range for outbound access of the Bootstrap VM (Default is full and open to guarantee installation success)
+    Type: String
+    Default: 0.0.0.0/0
   TAPSubnetCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-24
@@ -36,15 +51,15 @@ Parameters:
   TanzuNetID:
     Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net
     Type: String
-    Default: xxxxxxx
+    NoEcho: true
   TanzuNetKey:
     Description: The authentication Key for authenticating to VMWare's Tanzu Net
     Type: String
-    Default: xxxxxxx
+    NoEcho: true
   TanzuNetToken:
     Description: The authentication token required for certain TAP installation utilities within the Bootstrap
     Type: String
-    Default: xxxxxxx
+    NoEcho: true
 Resources:
   DHCPOptions:
     Type: AWS::EC2::DHCPOptions
@@ -216,9 +231,9 @@ Resources:
           CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: tcp
-          FromPort: 0
-          ToPort: 65535
-          CidrIp: 0.0.0.0/0
+          FromPort: !Ref BootstrapEgressFromPort
+          ToPort: !Ref BootstrapEgressToPort
+          CidrIp: !Ref BootstrapEgressCIDR
       Tags:
         - Key: Name
           Value: BootstrapSecurityGroup
@@ -234,7 +249,7 @@ Resources:
                         - ',"password":'
                         - !Ref TanzuNetKey
                         - '}'
-  TanzuNetSecret:
+  TanzuNetToken:
     Type: 'AWS::SecretsManager::Secret'
     Properties:
       Name: TanzuNetToken
@@ -247,7 +262,9 @@ Resources:
         BootstrapSubnet
         BootstrapSecurityGroup
     Properties:
-      TemplateURL: 'https://subtemplates-tapqs.s3.us-west-2.amazonaws.com/aws-tap.bootstrap.yaml'
+      TemplateURL: !Sub
+                     - https://${S3Bucket}.s3.${AWS::Region}.${AWS::URLSuffix}/aws-tap-bootstrap.yaml
+                     - S3Bucket: !Ref S3BucketName
       Parameters:
         BootstrapSubnet: !Ref BootstrapSubnet
         BootstrapSecurityGroup: !Ref BootstrapSecurityGroup

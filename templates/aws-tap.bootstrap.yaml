@@ -19,16 +19,19 @@ Parameters:
       - Ubuntu
   BootstrapKeyName: 
     Description: The name of the SSH Key that will be used to access the Bootstrap VM when it is created
-    Type: String
+    Type: AWS::EC2::KeyPair::KeyName
   TanzuNetID:
     Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net
     Type: String
+    NoEcho: true
   TanzuNetKey:
     Description: The authentication Key for authenticating to VMWare's Tanzu Net
     Type: String
+    NoEcho: true
   TanzuNetToken:
     Description: The authentication token required for certain TAP installation utilities within the Bootstrap
     Type: String
+    NoEcho: true
 Resources:
   BootstrapInstance: 
     Type: AWS::EC2::Instance
