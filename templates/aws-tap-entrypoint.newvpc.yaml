@@ -32,11 +32,11 @@ Parameters:
     Type: AWS::EC2::KeyPair::KeyName
   BootstrapEgressFromPort:
     Description: Start of Port range for outbound access of the Bootstrap VM (Default 0)
-    Type: Integer
+    Type: Number
     Default: 0
-  BoostrapEgressToPort:
+  BootstrapEgressToPort:
     Description: End of Port range for outbound access of the Bootstrap VM (Default 65535)
-    Type: Integer
+    Type: Number
     Default: 65535
   BootstrapEgressCIDR:
     Description: IP range for outbound access of the Bootstrap VM (Default is full and open to guarantee installation success)
@@ -237,7 +237,7 @@ Resources:
       Tags:
         - Key: Name
           Value: BootstrapSecurityGroup
-  TanzuNetSecret:
+  TanzuNetSecretUser:
     Type: 'AWS::SecretsManager::Secret'
     Properties:
       Name: TanzuNetUserSecret
@@ -249,7 +249,7 @@ Resources:
                         - ',"password":'
                         - !Ref TanzuNetKey
                         - '}'
-  TanzuNetToken:
+  TanzuNetSecretToken:
     Type: 'AWS::SecretsManager::Secret'
     Properties:
       Name: TanzuNetToken
