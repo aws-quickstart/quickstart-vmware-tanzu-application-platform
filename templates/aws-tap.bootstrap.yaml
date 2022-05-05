@@ -32,6 +32,14 @@ Parameters:
     Description: The authentication token required for certain TAP installation utilities within the Bootstrap
     Type: String
     NoEcho: true
+  AWSCLIToken:
+    Description: AWS Token ID used when authenticating with the AWS CLI
+    Type: String
+    NoEcho: true
+  AWSCLIKey:
+    Description: AWS Token Key used when authenticating with the AwS CLI
+    Type: String
+    NoEcho: true
 Resources:
   BootstrapInstance: 
     Type: AWS::EC2::Instance

@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  This template is a child template to both the aws-tap-entrypoint.newvpc and aws-tap-entrypoint.existingvpc templates with all parameters being passed from
+  those parent templates. This template will focus on the creation of any shared services that are being leveraged within the scope of the TAP deployment
+  such as S3, ECR and any other services that would be considered as PaaS services and will exist outside of the scope of the VPC where TAP is deployed.
+Parameters:
+  ECRPrincipal:
+    Description: The IAM principal that will be used in the automation to push the TAP images into ECR
+    Type: String
+    NoEcho: true
+  TanzuNetID:
+    Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net
+    Type: String
+    NoEcho: true
+  TanzuNetKey:
+    Description: The authentication Key for authenticating to VMWare's Tanzu Net
+    Type: String
+    NoEcho: true
+  TanzuNetToken:
+    Description: The authentication token required for certain TAP installation utilities within the Bootstrap
+    Type: String
+    NoEcho: true
+  S3BucketName:
+    Description: An S3 bucket where configuration files are stored in an encrypted way for security purposes.
+    Type: String
+Resources:
+  TanzuNetSecretUser:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name: TanzuNetUserSecret
+      Description: This secret will store the Tanzu Net UserName and Password being passed in by the consumer
+      SecretString: !Join 
+                      - ''
+                      - - '{"username":'
+                        - !Ref TanzuNetID 
+                        - ',"password":'
+                        - !Ref TanzuNetKey
+                        - '}'
+  TanzuNetSecretToken:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name: TanzuNetToken
+      Description: This secret will store the Tanzu Net API Token being passed in by the consumer
+      SecretString: !Ref TanzuNetToken
+  S3Bucket:
+    Type: 'AWS::S3::Bucket'
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Ref S3BucketName
+      AccessControl: Private
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: 'AES256'
+            BucketKeyEnabled: true
+  TAPImageRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: tap/tap_ecr_registry
+      RepositoryPolicyText: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Sid: AllowPushPull
+            Effect: Allow
+            Principal: 
+              AWS: 
+                - !Sub
+                  - arn:${AWS::Partition}:sts::${AWS::AccountId}:assumed-role/PowerUser/cloudgate@${Principal}
+                  - Principal: !Ref ECRPrincipal
+            Action: 
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:BatchGetImage"
+              - "ecr:BatchCheckLayerAvailability"
+              - "ecr:PutImage"
+              - "ecr:InitiateLayerUpload"
+              - "ecr:UploadLayerPart"
+              - "ecr:CompleteLayerUpload"
+  TAPImageRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: tap/container_workload_ecr_registry
+      RepositoryPolicyText: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Sid: AllowPushPull
+            Effect: Allow
+            Principal: 
+              AWS: 
+                - !Sub
+                  - arn:${AWS::Partition}:sts::${AWS::AccountId}:assumed-role/PowerUser/cloudgate@${Principal}
+                  - Principal: !Ref ECRPrincipal
+            Action: 
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:BatchGetImage"
+              - "ecr:BatchCheckLayerAvailability"
+              - "ecr:PutImage"
+              - "ecr:InitiateLayerUpload"
+              - "ecr:UploadLayerPart"
+              - "ecr:CompleteLayerUpload"
+  TAPImageRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: tap/container_tbs_ecr_registry
+      RepositoryPolicyText: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Sid: AllowPushPull
+            Effect: Allow
+            Principal: 
+              AWS: 
+                - !Sub
+                  - arn:${AWS::Partition}:sts::${AWS::AccountId}:assumed-role/PowerUser/cloudgate@${Principal}
+                  - Principal: !Ref ECRPrincipal
+            Action: 
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:BatchGetImage"
+              - "ecr:BatchCheckLayerAvailability"
+              - "ecr:PutImage"
+              - "ecr:InitiateLayerUpload"
+              - "ecr:UploadLayerPart"
+              - "ecr:CompleteLayerUpload"
