@@ -4,8 +4,8 @@
 ## Documentation
   I have created these documents in this repo to illustrate the TAP installation process. For a complete guide with details instructions, search on VMware Docs.
 
-1. [TAP-Installation-Tanzu-Specifics-Guide.md](docs/TAP-Installation-Tanzu-Specifics-Guide.md) – This is to capture the details of the TAP Basic Supply Chain
-1. [TAP-Installation-Tanzu-SCC-specifics-Guide.md](docs/TAP-Installation-Tanzu-SCC-specifics-Guide.md) – This is to capture the details of the TAP Testing_Scanning Supply Chain
+1. [TAP-Installation-Tanzu-Specifics-Guide.md](docs-tap/TAP-Installation-Tanzu-Specifics-Guide.md) – This is to capture the details of the TAP Basic Supply Chain
+1. [TAP-Installation-Tanzu-SCC-specifics-Guide.md](docs-tap/TAP-Installation-Tanzu-SCC-specifics-Guide.md) – This is to capture the details of the TAP Testing_Scanning Supply Chain
 
 
 ## Build Commands
@@ -62,7 +62,7 @@ Step-1:
   ```
 
 Step-2:
-  mount /tmp/inputs into the and work in $PWD dir
+  mount /tmp/inputs into the and execute "docker run"
 
 
 - tap install
@@ -85,8 +85,11 @@ Step-2:
   docker run --name=tap-boot-image -v "/tmp/inputs:/tmp/inputs" -e cmd="install" -e file="user-input-values.yaml" -e skipinit="true" username/tap-test
   ```
 
+
+Above "docker run" commands are called from the Bootstrap Cloud VM.
+
 ## Troubleshoot
-  Troubleshoot or Run AWS or Tanzu CLI in container
+  Run AWS or Tanzu CLI in the container
 
   To get inside the container & play with scripts, modify the Dockerfile to add the tail CMD.
   
@@ -99,9 +102,11 @@ Step-2:
   CMD tail -f /dev/null
   ```
  
+  Get inside the container
   ```
   docker exec -it tap-boot-image /bin/bash
-  cd /home/user/code/src
+
+  cd /home/user/src
   ./tap-main.sh install  /tmp/inputs/user-input-values.yaml
   ./tap-main.sh install  /tmp/inputs/user-input-values.yaml skipinit
 
