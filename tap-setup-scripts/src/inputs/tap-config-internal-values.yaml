@@ -1,0 +1,16 @@
+#@data/values
+---
+# below variable are optional for user to specify
+workload:
+  name: tanzu-java-web-app-workload
+  namespace: tap-workload
+
+tap:
+  name: tap
+  namespace: tap-install
+  version: 1.1.0
+  install_bundle: registry.tanzu.vmware.com/tanzu-cluster-essentials/cluster-essentials-bundle@sha256:ab0a3539da241a6ea59c75c0743e9058511d7c56312ea3906178ec0f3491f51d
+
+tap_gui:
+  catalog_url: https://github.com/user-name/tap-gui/blob/main/yelb-catalog/catalog-info.yaml
+# append mandatory variable here
