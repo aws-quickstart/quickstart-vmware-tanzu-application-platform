@@ -10,13 +10,16 @@ Parameters:
     Type: String
   BootstrapSecurityGroup:
     Description: AWS ID for the Security Group that will attached to the Bootstrap EC2
-    Type: String
+    Type: AWS::EC2::SecurityGroup::Id
   BootstrapOS:
     Description: Preferred OS for the Bootstrap EC2 instance based on available values
     Type: String
     Default: Ubuntu
     AllowedValues:
       - Ubuntu
+  BootstrapIP:
+    Description: AWS ID for the Elastic IP that will be associated with the Bootstrap EC2
+    Type: String
   BootstrapKeyName: 
     Description: The name of the SSH Key that will be used to access the Bootstrap VM when it is created
     Type: AWS::EC2::KeyPair::KeyName
@@ -59,11 +62,8 @@ Resources:
       Tags:
         - Key: Name
           Value: BootstrapEC2
-  BootstrapEIP:
-    Type: 'AWS::EC2::EIP'
+  BootstrapEIPAssoc:
+    Type: AWS::EC2::EIPAssociation
     Properties:
-      Domain: vpc
       InstanceId: !Ref BootstrapInstance
-      Tags:
-        - Key: Name
-          Value: BootstrapEIP
+      AllocationId: !Ref BootstrapIP

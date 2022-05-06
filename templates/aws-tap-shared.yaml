@@ -57,68 +57,13 @@ Resources:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: tap/tap_ecr_registry
-      RepositoryPolicyText: 
-        Version: "2012-10-17"
-        Statement: 
-          - 
-            Sid: AllowPushPull
-            Effect: Allow
-            Principal: 
-              AWS: 
-                - !Sub
-                  - arn:${AWS::Partition}:sts::${AWS::AccountId}:assumed-role/PowerUser/cloudgate@${Principal}
-                  - Principal: !Ref ECRPrincipal
-            Action: 
-              - "ecr:GetDownloadUrlForLayer"
-              - "ecr:BatchGetImage"
-              - "ecr:BatchCheckLayerAvailability"
-              - "ecr:PutImage"
-              - "ecr:InitiateLayerUpload"
-              - "ecr:UploadLayerPart"
-              - "ecr:CompleteLayerUpload"
-  TAPImageRepo:
+      EncryptionConfiguration:
+        EncryptionType: AES256
+  TAPWorkloadRepo:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: tap/container_workload_ecr_registry
-      RepositoryPolicyText: 
-        Version: "2012-10-17"
-        Statement: 
-          - 
-            Sid: AllowPushPull
-            Effect: Allow
-            Principal: 
-              AWS: 
-                - !Sub
-                  - arn:${AWS::Partition}:sts::${AWS::AccountId}:assumed-role/PowerUser/cloudgate@${Principal}
-                  - Principal: !Ref ECRPrincipal
-            Action: 
-              - "ecr:GetDownloadUrlForLayer"
-              - "ecr:BatchGetImage"
-              - "ecr:BatchCheckLayerAvailability"
-              - "ecr:PutImage"
-              - "ecr:InitiateLayerUpload"
-              - "ecr:UploadLayerPart"
-              - "ecr:CompleteLayerUpload"
-  TAPImageRepo:
+  TAPTBSRepo:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: tap/container_tbs_ecr_registry
-      RepositoryPolicyText: 
-        Version: "2012-10-17"
-        Statement: 
-          - 
-            Sid: AllowPushPull
-            Effect: Allow
-            Principal: 
-              AWS: 
-                - !Sub
-                  - arn:${AWS::Partition}:sts::${AWS::AccountId}:assumed-role/PowerUser/cloudgate@${Principal}
-                  - Principal: !Ref ECRPrincipal
-            Action: 
-              - "ecr:GetDownloadUrlForLayer"
-              - "ecr:BatchGetImage"
-              - "ecr:BatchCheckLayerAvailability"
-              - "ecr:PutImage"
-              - "ecr:InitiateLayerUpload"
-              - "ecr:UploadLayerPart"
-              - "ecr:CompleteLayerUpload"
