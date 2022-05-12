@@ -3,9 +3,9 @@
 profile: full
 ceip_policy_disclosed: true # Installation fails if this is set to 'false'
 buildservice:
-  kp_default_repository: #@ "{}/{}/build-service".format(data.values.container_tbs_ecr_registry.hostname, data.values.container_tbs_ecr_registry.repository)
-  kp_default_repository_username: #@ data.values.container_tbs_ecr_registry.username
-  kp_default_repository_password: #@ data.values.container_tbs_ecr_registry.password
+  kp_default_repository: #@ "{}/{}".format(data.values.tbs_ecr_registry.hostname, data.values.tbs_ecr_registry.repository)
+  kp_default_repository_username: #@ data.values.tbs_ecr_registry.username
+  kp_default_repository_password: #@ data.values.tbs_ecr_registry.password
   tanzunet_username: #@ data.values.tanzunet.username
   tanzunet_password: #@ data.values.tanzunet.password
   enable_automatic_dependency_updates: false
@@ -15,13 +15,16 @@ supply_chain: testing_scanning
 
 ootb_supply_chain_testing_scanning:
   registry:
-    server: #@ data.values.container_workload_ecr_registry.hostname
-    repository: #@ data.values.container_workload_ecr_registry.repository
+    server: #@ data.values.ootb_ecr_registry.hostname
+    repository: #@ data.values.ootb_ecr_registry.repository
   gitops:
     ssh_secret: ""
 
 learningcenter:
   ingressDomain: #@ "learning-center.{}".format(data.values.aws.domain)
+
+ootb_delivery_basic:
+  service_account: default
 
 tap_gui:
   ingressEnabled: true
