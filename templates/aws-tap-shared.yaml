@@ -26,15 +26,15 @@ Metadata:
         default: Token
 Parameters:
   TanzuNetID:
-    Description: The authentication ID or email address for authenticating to VMware's Tanzu Net
+    Description: The authentication ID or email address for authenticating to VMware's Tanzu Net.
     Type: String
     NoEcho: true
   TanzuNetKey:
-    Description: The authentication Key for authenticating to VMware's Tanzu Net
+    Description: The authentication key for authenticating to VMware's Tanzu Net.
     Type: String
     NoEcho: true
   TanzuNetToken:
-    Description: The authentication token required for certain TAP installation utilities within the Bootstrap
+    Description: The authentication token required for certain TAP installation utilities within the Bootstrap.
     Type: String
     NoEcho: true
   S3BucketName:
