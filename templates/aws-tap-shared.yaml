@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: 2010-09-09
 Description: >-
   This template is a child template to both the aws-tap-entrypoint.newvpc and aws-tap-entrypoint.existingvpc templates with all parameters being passed from
   those parent templates. This template will focus on the creation of any shared services that are being leveraged within the scope of the TAP deployment
@@ -42,7 +42,7 @@ Parameters:
     Type: String
 Resources:
   TanzuNetSecretUser:
-    Type: 'AWS::SecretsManager::Secret'
+    Type: AWS::SecretsManager::Secret
     Properties:
       Name: TanzuNetUserSecret
       Description: This secret will store the Tanzu Net UserName and Password being passed in by the consumer
@@ -52,13 +52,13 @@ Resources:
           "password": "${TanzuNetKey}"
         }
   TanzuNetSecretToken:
-    Type: 'AWS::SecretsManager::Secret'
+    Type: AWS::SecretsManager::Secret
     Properties:
       Name: TanzuNetToken
-      Description: This secret will store the Tanzu Net API Token being passed in by the consumer
+      Description: This secret will store the Tanzu Net API token being passed in by the consumer
       SecretString: !Ref TanzuNetToken
   S3Bucket:
-    Type: 'AWS::S3::Bucket'
+    Type: AWS::S3::Bucket
     DeletionPolicy: Delete
     Properties:
       BucketName: !Ref S3BucketName
@@ -66,7 +66,7 @@ Resources:
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
-              SSEAlgorithm: 'AES256'
+              SSEAlgorithm: AES256
             BucketKeyEnabled: true
   TAPImageRepo:
     Type: AWS::ECR::Repository
