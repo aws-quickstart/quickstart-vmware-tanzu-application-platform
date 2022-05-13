@@ -1,12 +1,12 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  This template creates a Single-AZ, multi-subnet VPC infrastructure that will include an EC2 instance for Bootstrapping an install of VMWare's Tanzu
+  This template creates a Single-AZ, multi-subnet VPC infrastructure that will include an EC2 instance for Bootstrapping an install of VMware's Tanzu
   Application Platform (TAP). In addition to the EC2 instance, a single EKS cluster, ECR instance and S3 bucket will also be deployed
   to the VPC to support the installation of the TAP software. **WARNING** This template creates AWS resources. You will be billed for the AWS
   resources used if you create a stack from this template.
 Metadata:
   QuickStartDocumentation:
-    EntrypointName: "Launch into a new VPC"
+    EntrypointName: Launch into a new VPC
     Order: Index a
   SentenceCaseExclude:
     - Bootstrap
@@ -87,8 +87,8 @@ Parameters:
   NumberOfAZs:
     Description: Number of Availability Zones to use in the VPC. This must match the value entered for the AvailabilityZones parameter.
     Type: String
-    AllowedValues: ["2", "3"]
-    Default: "3"
+    AllowedValues: [2, 3]
+    Default: 3
   AvailabilityZones:
     Description: List of Availability Zones to use for the subnets in the VPC. Three
       Availability Zones are used for this deployment.
@@ -193,10 +193,10 @@ Parameters:
   #  Type: String
   #  NoEcho: true
 Conditions:
-  3AZDeployment: !Equals [!Ref NumberOfAZs, "3"]
+  3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
   2AZDeployment: !Or
-    - !Equals [!Ref NumberOfAZs, "2"]
-    - !Equals [!Ref NumberOfAZs, "3"]
+    - !Equals [!Ref NumberOfAZs, 2]
+    - !Equals [!Ref NumberOfAZs, 3]
 Resources:
   SharedStack:
     Type: AWS::CloudFormation::Stack
@@ -285,7 +285,7 @@ Resources:
         NodeInstanceType: !Ref NodeInstanceType
         NodeInstanceFamily: Standard
         NodeGroupType: Managed
-        NodeGroupOS: 'Amazon Linux 2'
+        NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Ref EKSClusterName
         ClusterAutoScaler: Enabled
         ProvisionBastionHost: Disabled
