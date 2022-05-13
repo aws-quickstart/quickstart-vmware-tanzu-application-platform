@@ -1,9 +1,9 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  This template creates a Single-AZ, multi-subnet VPC infrastructure that will include an EC2 instance for Bootstrapping an install of VMware's Tanzu
-  Application Platform (TAP). In addition to the EC2 instance, a single EKS cluster, ECR instance and S3 bucket will also be deployed
+  This template creates a Single-AZ, multi-subnet VPC infrastructure that will include an EC2 instance for bootstrapping an install of VMware's Tanzu
+  Application Platform (TAP). In addition to the EC2 instance, a single EKS cluster, ECR instance, and S3 bucket will also be deployed
   to the VPC to support the installation of the TAP software. **WARNING** This template creates AWS resources. You will be billed for the AWS
-  resources used if you create a stack from this template.
+  resources used if you create a stack from this template. (qs-1t1t2psqo)
 Metadata:
   QuickStartDocumentation:
     EntrypointName: Launch into a new VPC
@@ -11,6 +11,7 @@ Metadata:
   SentenceCaseExclude:
     - Bootstrap
     - Net
+    - Tanzu
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
@@ -163,7 +164,7 @@ Parameters:
     MinValue: 3
     MaxValue: 450
   MaxNumberOfNodes:
-    Description: The maximum number of nodes that will be available in an autoscaling scenario for the TAP EKS cluster.
+    Description: The maximum number of nodes that will be available in an auto scaling scenario for the TAP EKS cluster.
     Type: Number
     Default: 6
     MinValue: 3
