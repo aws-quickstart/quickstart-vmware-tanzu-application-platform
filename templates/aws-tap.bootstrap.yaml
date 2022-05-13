@@ -4,6 +4,7 @@ Description: >-
   those parent templates. This template will focus on the creation of an EC2 instance that can be used to Bootstrap the install and configure TAP. 
   The EC2 instance will contain a large script that will install all of the CLI components necessary and then perform all of the installation steps
   as defined within the TAP Installation guide for deploying into AWS. It will also make sure that all of the images used for TAP are stored within ECR.
+  (qs-1t1t2pssu)
 Parameters:
   VPC:
     Description: AWS ID for the VPC where the Internet Gateway will be attached
