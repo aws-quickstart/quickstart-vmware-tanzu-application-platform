@@ -73,13 +73,13 @@ Metadata:
         default: Maximum number of nodes
 Parameters:
   S3TemplateBucketName:
-    Description: Name of the S3 bucket where the QuickStart scripts are uploaded
+    Description: Name of the S3 bucket where the QuickStart scripts are uploaded.
     Type: String
   S3TAPConfigBucketName:
-    Description: TAP requires an S3 bucket to store encrypted configuration information, this bucket name will be associated with a newly created S3 bucket for that purpose
+    Description: TAP requires an S3 bucket to store encrypted configuration information, this bucket name will be associated with a newly created S3 bucket for that purpose.
     Type: String
   TAPDomainName:
-    Description: Dummy domain name that can be used for access to TAP and its corresponding project URLs. Available within a Private DNS Zone
+    Description: Dummy domain name that can be used for access to TAP and its corresponding project URLs. Available within a Private DNS Zone.
     Type: String
   NumberOfAZs:
     Description: Number of Availability Zones to use in the VPC. This must match the value entered for the AvailabilityZones parameter.
@@ -136,25 +136,25 @@ Parameters:
       Zone 3.
     Type: String
   KeyName:
-    Description: The name of the SSH Key that will be used to access the Bootstrap VM and Cluster Nodes
+    Description: The name of the SSH Key that will be used to access the Bootstrap VM and Cluster Nodes.
     Type: AWS::EC2::KeyPair::KeyName
   EKSClusterName:
-    Description: The name of the Cluster that will be created to contain the TAP deployment
+    Description: The name of the Cluster that will be created to contain the TAP deployment.
     Type: String
   NumberOfNodes:
-    Description: The number of nodes that will be the minimum and created for the TAP EKS Cluster
+    Description: The number of nodes that will be the minimum and created for the TAP EKS Cluster.
     Type: Number
     Default: 4
     MinValue: 3
     MaxValue: 450
   MaxNumberOfNodes:
-    Description: The maximum number of nodes that will be available in an autoscaling scenario for the TAP EKS Cluster
+    Description: The maximum number of nodes that will be available in an autoscaling scenario for the TAP EKS Cluster.
     Type: Number
     Default: 6
     MinValue: 3
     MaxValue: 450
   NodeInstanceType:
-    Description: AWS EC2 Instance size for each of the Nodes deployed within the EKS Cluster for TAP
+    Description: AWS EC2 Instance size for each of the Nodes deployed within the EKS Cluster for TAP.
     Type: String
     Default: m5.xlarge
   # BootstrapEgressFromPort:
@@ -170,23 +170,23 @@ Parameters:
   #   Type: String
   #   Default: 0.0.0.0/0
   TanzuNetID:
-    Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net
+    Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net.
     Type: String
     NoEcho: true
   TanzuNetKey:
-    Description: The authentication Key for authenticating to VMWare's Tanzu Net
+    Description: The authentication Key for authenticating to VMWare's Tanzu Net.
     Type: String
     NoEcho: true
   TanzuNetToken:
-    Description: The authentication token required for certain TAP installation utilities within the Bootstrap
+    Description: The authentication token required for certain TAP installation utilities within the Bootstrap.
     Type: String
     NoEcho: true
   AWSCLIToken:
-    Description: AWS Token ID used when authenticating with the AWS CLI
+    Description: AWS Token ID used when authenticating with the AWS CLI.
     Type: String
     NoEcho: true
   AWSCLIKey:
-    Description: AWS Token Key used when authenticating with the AwS CLI
+    Description: AWS Token Key used when authenticating with the AwS CLI.
     Type: String
     NoEcho: true
 Conditions:
