@@ -26,13 +26,11 @@ Resources:
     Properties:
       Name: TanzuNetUserSecret
       Description: This secret will store the Tanzu Net UserName and Password being passed in by the consumer
-      SecretString: !Join 
-                      - ''
-                      - - '{"username":'
-                        - !Ref TanzuNetID 
-                        - ',"password":'
-                        - !Ref TanzuNetKey
-                        - '}'
+      SecretString: !Sub >-
+        {
+          "username": "${TanzuNetID}",
+          "password": "${TanzuNetKey}"
+        }
   TanzuNetSecretToken:
     Type: 'AWS::SecretsManager::Secret'
     Properties:
