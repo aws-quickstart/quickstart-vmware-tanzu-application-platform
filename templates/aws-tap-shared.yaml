@@ -4,13 +4,33 @@ Description: >-
   those parent templates. This template will focus on the creation of any shared services that are being leveraged within the scope of the TAP deployment
   such as S3, ECR and any other services that would be considered as PaaS services and will exist outside of the scope of the VPC where TAP is deployed.
   (qs-1t1t2pssn)
+Metadata:
+  SentenceCaseExclude:
+    - Bootstrap
+    - Net
+    - Tanzu
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: VMware Tanzu Net authentication configuration
+        Parameters:
+          - TanzuNetID
+          - TanzuNetToken
+          - TanzuNetKey
+    ParameterLabels:
+      TanzuNetID:
+        default: ID
+      TanzuNetKey:
+        default: Key
+      TanzuNetToken:
+        default: Token
 Parameters:
   TanzuNetID:
-    Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net
+    Description: The authentication ID or email address for authenticating to VMware's Tanzu Net
     Type: String
     NoEcho: true
   TanzuNetKey:
-    Description: The authentication Key for authenticating to VMWare's Tanzu Net
+    Description: The authentication Key for authenticating to VMware's Tanzu Net
     Type: String
     NoEcho: true
   TanzuNetToken:
