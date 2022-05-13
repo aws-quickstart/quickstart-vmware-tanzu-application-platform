@@ -8,6 +8,9 @@ Metadata:
   QuickStartDocumentation:
     EntrypointName: "Launch into a new VPC"
     Order: Index a
+  SentenceCaseExclude:
+    - Bootstrap
+    - Net
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
@@ -79,7 +82,7 @@ Parameters:
     Description: TAP requires an S3 bucket to store encrypted configuration information, this bucket name will be associated with a newly created S3 bucket for that purpose.
     Type: String
   #TAPDomainName:
-  #  Description: Dummy domain name that can be used for access to TAP and its corresponding project URLs. Available within a Private DNS Zone.
+  #  Description: Dummy domain name that can be used for access to TAP and its corresponding project URLs. Available within a private DNS Zone.
   #  Type: String
   NumberOfAZs:
     Description: Number of Availability Zones to use in the VPC. This must match the value entered for the AvailabilityZones parameter.
@@ -136,25 +139,25 @@ Parameters:
       Zone 3.
     Type: String
   KeyName:
-    Description: The name of the SSH Key that will be used to access the Bootstrap VM and Cluster Nodes.
+    Description: The name of the SSH key that will be used to access the Bootstrap VM and cluster nodes.
     Type: AWS::EC2::KeyPair::KeyName
   EKSClusterName:
-    Description: The name of the Cluster that will be created to contain the TAP deployment.
+    Description: The name of the cluster that will be created to contain the TAP deployment.
     Type: String
   NumberOfNodes:
-    Description: The number of nodes that will be the minimum and created for the TAP EKS Cluster.
+    Description: The number of nodes that will be the minimum and created for the TAP EKS cluster.
     Type: Number
     Default: 4
     MinValue: 3
     MaxValue: 450
   MaxNumberOfNodes:
-    Description: The maximum number of nodes that will be available in an autoscaling scenario for the TAP EKS Cluster.
+    Description: The maximum number of nodes that will be available in an autoscaling scenario for the TAP EKS cluster.
     Type: Number
     Default: 6
     MinValue: 3
     MaxValue: 450
   NodeInstanceType:
-    Description: AWS EC2 Instance size for each of the Nodes deployed within the EKS Cluster for TAP.
+    Description: AWS EC2 instance type for each of the nodes deployed within the EKS cluster for TAP.
     Type: String
     Default: m5.xlarge
   # BootstrapEgressFromPort:
@@ -170,11 +173,11 @@ Parameters:
   #   Type: String
   #   Default: 0.0.0.0/0
   TanzuNetID:
-    Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net.
+    Description: The authentication ID or email address for authenticating to VMware's Tanzu Net.
     Type: String
     NoEcho: true
   TanzuNetKey:
-    Description: The authentication Key for authenticating to VMWare's Tanzu Net.
+    Description: The authentication key for authenticating to VMware's Tanzu Net.
     Type: String
     NoEcho: true
   TanzuNetToken:
@@ -182,11 +185,11 @@ Parameters:
     Type: String
     NoEcho: true
   #AWSCLIToken:
-  #  Description: AWS Token ID used when authenticating with the AWS CLI.
+  #  Description: AWS token ID used when authenticating with the AWS CLI.
   #  Type: String
   #  NoEcho: true
   #AWSCLIKey:
-  #  Description: AWS Token Key used when authenticating with the AwS CLI.
+  #  Description: AWS token key used when authenticating with the AWS CLI.
   #  Type: String
   #  NoEcho: true
 Conditions:
