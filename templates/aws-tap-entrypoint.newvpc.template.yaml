@@ -7,7 +7,7 @@ Description: >-
 Metadata:
   QuickStartDocumentation:
     EntrypointName: Launch into a new VPC
-    Order: Index a
+    Order: 1
   SentenceCaseExclude:
     - Bootstrap
     - Net
@@ -36,6 +36,12 @@ Metadata:
           - NodeInstanceType
           - NumberOfNodes
           - MaxNumberOfNodes
+      - Label:
+          default: VMware Tanzu Net authentication configuration
+        Parameters:
+          - TanzuNetID
+          - TanzuNetToken
+          - TanzuNetKey
       - Label:
           default: S3 Configuration
         Parameters:
@@ -74,6 +80,12 @@ Metadata:
         default: Number of nodes
       MaxNumberOfNodes:
         default: Maximum number of nodes
+      TanzuNetID:
+        default: ID
+      TanzuNetKey:
+        default: Key
+      TanzuNetToken:
+        default: Token
 Parameters:
   S3TemplateBucketName:
     Description: Name of the S3 bucket where the QuickStart scripts are uploaded.
