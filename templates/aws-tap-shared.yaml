@@ -3,6 +3,7 @@ Description: >-
   This template is a child template to both the aws-tap-entrypoint.newvpc and aws-tap-entrypoint.existingvpc templates with all parameters being passed from
   those parent templates. This template will focus on the creation of any shared services that are being leveraged within the scope of the TAP deployment
   such as S3, ECR and any other services that would be considered as PaaS services and will exist outside of the scope of the VPC where TAP is deployed.
+  (qs-1t1t2pssn)
 Parameters:
   TanzuNetID:
     Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net
