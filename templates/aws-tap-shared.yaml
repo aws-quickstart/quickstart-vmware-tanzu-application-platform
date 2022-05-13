@@ -17,6 +17,10 @@ Metadata:
           - TanzuNetID
           - TanzuNetToken
           - TanzuNetKey
+      - Label:
+          default: S3 config file bucket configuration
+        Parameters:
+          - S3BucketName
     ParameterLabels:
       TanzuNetID:
         default: ID
@@ -24,6 +28,8 @@ Metadata:
         default: Key
       TanzuNetToken:
         default: Token
+      S3BucketName:
+        default: Name
 Parameters:
   TanzuNetID:
     Description: The authentication ID or email address for authenticating to VMware's Tanzu Net.
