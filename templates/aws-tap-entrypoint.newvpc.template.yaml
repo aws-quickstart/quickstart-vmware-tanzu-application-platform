@@ -1,0 +1,300 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  This template creates a Single-AZ, multi-subnet VPC infrastructure that will include an EC2 instance for Bootstrapping an install of VMWare's Tanzu
+  Application Platform (TAP). In addition to the EC2 instance, a single EKS cluster, ECR instance and S3 bucket will also be deployed
+  to the VPC to support the installation of the TAP software. **WARNING** This template creates AWS resources. You will be billed for the AWS
+  resources used if you create a stack from this template.
+Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Launch into a new VPC"
+    Order: Index a
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Basic configuration
+        Parameters:
+          - AvailabilityZones
+          - NumberOfAZs
+          - KeyName
+      - Label:
+          default: VPC network configuration
+        Parameters:
+          - VPCCIDR
+          - PrivateSubnet1CIDR
+          - PrivateSubnet2CIDR
+          - PrivateSubnet3CIDR
+          - PublicSubnet1CIDR
+          - PublicSubnet2CIDR
+          - PublicSubnet3CIDR
+      - Label:
+          default: Amazon EKS configuration
+        Parameters:
+          - EKSClusterName
+          - NodeInstanceType
+          - NumberOfNodes
+          - MaxNumberOfNodes
+      - Label:
+          default: S3 Configuration
+        Parameters:
+          - S3TemplateBucketName
+          - S3TAPConfigBucketName
+    ParameterLabels:
+      AvailabilityZones:
+        default: Availability Zones
+      NumberOfAZs:
+        default: Number of Availability Zones
+      KeyName:
+        default: SSH key name
+      VPCCIDR:
+        default: VPC CIDR
+      PrivateSubnet1CIDR:
+        default: Private subnet 1 CIDR
+      PrivateSubnet2CIDR:
+        default: Private subnet 2 CIDR
+      PrivateSubnet3CIDR:
+        default: Private subnet 3 CIDR
+      PublicSubnet1CIDR:
+        default: Public subnet 1 CIDR
+      PublicSubnet2CIDR:
+        default: Public subnet 2 CIDR
+      PublicSubnet3CIDR:
+        default: Public subnet 3 CIDR
+      S3TemplateBucketName:
+        default: Bucket Name for QuickStart
+      S3TAPConfigBucketName:
+        default: Bucket Name for TAP Config
+      EKSClusterName:
+        default: EKS cluster name
+      NodeInstanceType:
+        default: Instance type
+      NumberOfNodes:
+        default: Number of nodes
+      MaxNumberOfNodes:
+        default: Maximum number of nodes
+Parameters:
+  S3TemplateBucketName:
+    Description: Name of the S3 bucket where the QuickStart scripts are uploaded
+    Type: String
+  S3TAPConfigBucketName:
+    Description: TAP requires an S3 bucket to store encrypted configuration information, this bucket name will be associated with a newly created S3 bucket for that purpose
+    Type: String
+  TAPDomainName:
+    Description: Dummy domain name that can be used for access to TAP and its corresponding project URLs. Available within a Private DNS Zone
+    Type: String
+  NumberOfAZs:
+    Description: Number of Availability Zones to use in the VPC. This must match the value entered for the AvailabilityZones parameter.
+    Type: String
+    AllowedValues: ["2", "3"]
+    Default: "3"
+  AvailabilityZones:
+    Description: List of Availability Zones to use for the subnets in the VPC. Three
+      Availability Zones are used for this deployment.
+    Type: List<AWS::EC2::AvailabilityZone::Name>
+  VPCCIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16–28
+    Default: 10.0.0.0/16
+    Description: CIDR block for the VPC.
+    Type: String
+  PrivateSubnet1CIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16–28
+    Default: 10.0.0.0/19
+    Description: CIDR block for private subnet 1, located in Availability Zone 1.
+    Type: String
+  PrivateSubnet2CIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16–28
+    Default: 10.0.32.0/19
+    Description: CIDR block for private subnet 2, located in Availability Zone 2.
+    Type: String
+  PrivateSubnet3CIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16–28
+    Default: 10.0.64.0/19
+    Description: CIDR block for private subnet 3, located in Availability Zone 3.
+    Type: String
+  PublicSubnet1CIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16–28
+    Default: 10.0.128.0/20
+    Description: CIDR block for the public (DMZ) subnet 1, located in Availability
+      Zone 1.
+    Type: String
+  PublicSubnet2CIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16–28
+    Default: 10.0.144.0/20
+    Description: CIDR block for the public (DMZ) subnet 2, located in Availability
+      Zone 2.
+    Type: String
+  PublicSubnet3CIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16–28
+    Default: 10.0.160.0/20
+    Description: CIDR block for the public (DMZ) subnet 3, located in Availability
+      Zone 3.
+    Type: String
+  KeyName:
+    Description: The name of the SSH Key that will be used to access the Bootstrap VM and Cluster Nodes
+    Type: AWS::EC2::KeyPair::KeyName
+  EKSClusterName:
+    Description: The name of the Cluster that will be created to contain the TAP deployment
+    Type: String
+  NumberOfNodes:
+    Description: The number of nodes that will be the minimum and created for the TAP EKS Cluster
+    Type: Number
+    Default: 4
+    MinValue: 3
+    MaxValue: 450
+  MaxNumberOfNodes:
+    Description: The maximum number of nodes that will be available in an autoscaling scenario for the TAP EKS Cluster
+    Type: Number
+    Default: 6
+    MinValue: 3
+    MaxValue: 450
+  NodeInstanceType:
+    Description: AWS EC2 Instance size for each of the Nodes deployed within the EKS Cluster for TAP
+    Type: String
+    Default: m5.xlarge
+  # BootstrapEgressFromPort:
+  #   Description: Start of Port range for outbound access of the Bootstrap VM (Default 0)
+  #   Type: Number
+  #   Default: 0
+  # BootstrapEgressToPort:
+  #   Description: End of Port range for outbound access of the Bootstrap VM (Default 65535)
+  #   Type: Number
+  #   Default: 65535
+  # BootstrapEgressCIDR:
+  #   Description: IP range for outbound access of the Bootstrap VM (Default is full and open to guarantee installation success)
+  #   Type: String
+  #   Default: 0.0.0.0/0
+  TanzuNetID:
+    Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net
+    Type: String
+    NoEcho: true
+  TanzuNetKey:
+    Description: The authentication Key for authenticating to VMWare's Tanzu Net
+    Type: String
+    NoEcho: true
+  TanzuNetToken:
+    Description: The authentication token required for certain TAP installation utilities within the Bootstrap
+    Type: String
+    NoEcho: true
+  AWSCLIToken:
+    Description: AWS Token ID used when authenticating with the AWS CLI
+    Type: String
+    NoEcho: true
+  AWSCLIKey:
+    Description: AWS Token Key used when authenticating with the AwS CLI
+    Type: String
+    NoEcho: true
+Conditions:
+  3AZDeployment: !Equals [!Ref NumberOfAZs, "3"]
+  2AZDeployment: !Or
+    - !Equals [!Ref NumberOfAZs, "2"]
+    - !Equals [!Ref NumberOfAZs, "3"]
+Resources:
+  SharedStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+                     - https://${S3Bucket}.s3.${AWS::Region}.${AWS::URLSuffix}/aws-tap-shared.yaml
+                     - S3Bucket: !Ref S3TemplateBucketName
+      Parameters:
+        S3BucketName: !Ref S3TAPConfigBucketName
+        TanzuNetID: !Ref TanzuNetID
+        TanzuNetKey: !Ref TanzuNetKey
+        TanzuNetToken: !Ref TanzuNetToken
+  VPCStack:
+    Type: AWS::CloudFormation::Stack
+    Metadata:
+      cfn-lint: { config: { ignore_checks: [ W9901 ] } }
+    Properties:
+      TemplateURL: https://aws-quickstart.s3.amazonaws.com/quickstart-aws-vpc/templates/aws-vpc.template.yaml
+      Parameters:
+        AvailabilityZones: !Join [ ',', !Ref 'AvailabilityZones' ]
+        NumberOfAZs: !Ref NumberOfAZs
+        CreateNATGateways: false
+        PrivateSubnet1ACIDR: !Ref PrivateSubnet1CIDR
+        PrivateSubnet2ACIDR: !Ref PrivateSubnet2CIDR
+        PrivateSubnet3ACIDR: !Ref PrivateSubnet3CIDR
+        PrivateSubnetATag2: "kubernetes.io/role/internal-elb="
+        PublicSubnet1CIDR: !Ref PublicSubnet1CIDR
+        PublicSubnet2CIDR: !Ref PublicSubnet2CIDR
+        PublicSubnet3CIDR: !Ref PublicSubnet3CIDR
+        PublicSubnetTag2: "kubernetes.io/role/elb="
+        VPCCIDR: !Ref VPCCIDR
+  # EC2Stack:
+  #   Type: AWS::CloudFormation::Stack
+  #   DependsOn:
+  #     - VPCStack
+  #     - SharedStack
+  #     - EKSQSStack
+  #   Properties:
+  #     TemplateURL: !Sub
+  #                    - https://${S3Bucket}.s3.${AWS::Region}.${AWS::URLSuffix}/aws-tap-bootstrap.yaml
+  #                    - S3Bucket: !Ref S3TemplateBucketName
+  #     Parameters:
+  #       VPC: !GetAtt VPCStack.Outputs.VPCID
+  #       BootstrapSubnet: !GetAtt VPCStack.Outputs.PublicSubnet1ID
+  #       BootstrapOS: Ubuntu
+  #       BootstrapEgressFromPort: !Ref BootstrapEgressFromPort
+  #       BootstrapEgressToPort: !Ref BootstrapEgressToPort
+  #       BootstrapEgressCIDR: !Ref BootstrapEgressCIDR
+  #       BootstrapKeyName: !Ref KeyName
+  #       TanzuNetID: !Ref TanzuNetID
+  #       TanzuNetKey: !Ref TanzuNetKey
+  #       TanzuNetToken: !Ref TanzuNetToken
+  #       AWSCLIToken: !Ref AWSCLIToken
+  #       AWSCLIKey: !Ref AWSCLIKey
+  EKSQSStack:
+    Type: AWS::CloudFormation::Stack
+    Metadata:
+      cfn-lint: { config: { ignore_checks: [ W9901, E9902 ] } }
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/aws-quickstart/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
+      Parameters:
+        VPCID: !GetAtt VPCStack.Outputs.VPCID
+        PrivateSubnet1ID: !GetAtt VPCStack.Outputs.PrivateSubnet1AID
+        PrivateSubnet2ID: !If
+          - 2AZDeployment
+          - !GetAtt VPCStack.Outputs.PrivateSubnet2AID
+          - !Ref AWS::NoValue
+        PrivateSubnet3ID: !If
+          - 3AZDeployment
+          - !GetAtt VPCStack.Outputs.PrivateSubnet3AID
+          - !Ref AWS::NoValue
+        PublicSubnet1ID: !GetAtt VPCStack.Outputs.PublicSubnet1ID
+        PublicSubnet2ID: !If
+          - 2AZDeployment
+          - !GetAtt VPCStack.Outputs.PublicSubnet2ID
+          - !Ref AWS::NoValue
+        PublicSubnet3ID: !If
+          - 3AZDeployment
+          - !GetAtt VPCStack.Outputs.PublicSubnet3ID
+          - !Ref AWS::NoValue
+        RemoteAccessCIDR: 0.0.0.0/0
+        EKSPublicAccessEndpoint: Enabled
+        KeyPairName: !Ref KeyName
+        NumberOfNodes: !Ref NumberOfNodes
+        MaxNumberOfNodes: !Ref MaxNumberOfNodes
+        NodeInstanceType: !Ref NodeInstanceType
+        NodeInstanceFamily: Standard
+        NodeGroupType: Managed
+        NodeGroupOS: 'Amazon Linux 2'
+        EKSClusterName: !Ref EKSClusterName
+        ClusterAutoScaler: Enabled
+        ProvisionBastionHost: Disabled
+        SnykIntegration: Disabled
+        NewRelicIntegration: Disabled
+        CalicoIntegration: Disabled
+        RafaySysIntegration: Disabled
+        GrafanaIntegration: Disabled
+        PrometheusIntegration: Disabled
+        VaultIntegration: Disabled
+        ConsulIntegration: Disabled
+        RancherIntegration: Disabled
+        MonitoringStack: None
+        ALBIngressController: Enabled
+        EfsStorageClass: Disabled
