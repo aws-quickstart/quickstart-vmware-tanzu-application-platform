@@ -78,9 +78,9 @@ Parameters:
   S3TAPConfigBucketName:
     Description: TAP requires an S3 bucket to store encrypted configuration information, this bucket name will be associated with a newly created S3 bucket for that purpose.
     Type: String
-  TAPDomainName:
-    Description: Dummy domain name that can be used for access to TAP and its corresponding project URLs. Available within a Private DNS Zone.
-    Type: String
+  #TAPDomainName:
+  #  Description: Dummy domain name that can be used for access to TAP and its corresponding project URLs. Available within a Private DNS Zone.
+  #  Type: String
   NumberOfAZs:
     Description: Number of Availability Zones to use in the VPC. This must match the value entered for the AvailabilityZones parameter.
     Type: String
@@ -181,14 +181,14 @@ Parameters:
     Description: The authentication token required for certain TAP installation utilities within the Bootstrap.
     Type: String
     NoEcho: true
-  AWSCLIToken:
-    Description: AWS Token ID used when authenticating with the AWS CLI.
-    Type: String
-    NoEcho: true
-  AWSCLIKey:
-    Description: AWS Token Key used when authenticating with the AwS CLI.
-    Type: String
-    NoEcho: true
+  #AWSCLIToken:
+  #  Description: AWS Token ID used when authenticating with the AWS CLI.
+  #  Type: String
+  #  NoEcho: true
+  #AWSCLIKey:
+  #  Description: AWS Token Key used when authenticating with the AwS CLI.
+  #  Type: String
+  #  NoEcho: true
 Conditions:
   3AZDeployment: !Equals [!Ref NumberOfAZs, "3"]
   2AZDeployment: !Or
