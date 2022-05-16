@@ -37,6 +37,7 @@ Metadata:
           - NodeInstanceType
           - NumberOfNodes
           - MaxNumberOfNodes
+          - RemoteAccessCIDR
       - Label:
           default: VMware Tanzu Net authentication configuration
         Parameters:
@@ -96,6 +97,8 @@ Metadata:
         default: Name
       QSS3KeyPrefix:
         default: Key prefix
+      RemoteAccessCIDR:
+        default: Remote Access CIDR
 Parameters:
   S3TAPConfigBucketName:
     Description: TAP requires an S3 bucket to store encrypted configuration information, this bucket name will be associated with a newly created S3 bucket for that purpose.
@@ -179,6 +182,9 @@ Parameters:
     Description: AWS EC2 instance type for each of the nodes deployed within the EKS cluster for TAP.
     Type: String
     Default: m5.xlarge
+  RemoteAccessCIDR:
+    Description: IP Range that will be allowed to access the EKS Cluster once deployed
+    Type: String
   # BootstrapEgressFromPort:
   #   Description: Start of Port range for outbound access of the Bootstrap VM (Default 0)
   #   Type: Number
@@ -346,7 +352,7 @@ Resources:
           - 3AZDeployment
           - !GetAtt VPCStack.Outputs.PublicSubnet3ID
           - !Ref AWS::NoValue
-        RemoteAccessCIDR: 0.0.0.0/0
+        RemoteAccessCIDR: !Ref RemoteAccessCIDR
         EKSPublicAccessEndpoint: Enabled
         KeyPairName: !Ref KeyName
         NumberOfNodes: !Ref NumberOfNodes

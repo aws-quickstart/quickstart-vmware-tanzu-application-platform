@@ -33,6 +33,12 @@ Parameters:
     Description: IP range for outbound access of the Bootstrap VM (Default is full and open to guarantee installation success)
     Type: String
     Default: 0.0.0.0/0
+  BootstrapSSHPort:
+    Description: Port number to be used for SSH connectivity to the Bootstrap VM
+    Type: Number
+  BoostrapIngressCIDR:
+    Description: IP Range to allow inbound access to the Bootstrap VM
+    Type: String
   TanzuNetID:
     Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net
     Type: String
@@ -167,9 +173,9 @@ Resources:
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
+          FromPort: !Ref BootstrapSSHPort
+          ToPort: !Ref BootstrapSSHPort
+          CidrIp: !Ref BootstrapIngressCIDR
       SecurityGroupEgress:
         - IpProtocol: tcp
           FromPort: !Ref BootstrapEgressFromPort
