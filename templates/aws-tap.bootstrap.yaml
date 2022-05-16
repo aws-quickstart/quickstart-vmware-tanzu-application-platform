@@ -4,46 +4,193 @@ Description: >-
   those parent templates. This template will focus on the creation of an EC2 instance that can be used to Bootstrap the install and configure TAP. 
   The EC2 instance will contain a large script that will install all of the CLI components necessary and then perform all of the installation steps
   as defined within the TAP Installation guide for deploying into AWS. It will also make sure that all of the images used for TAP are stored within ECR.
+  (qs-1t1t2pssu)
 Parameters:
-  BootstrapSubnet:
-    Description: AWS ID for the Subnet that the Bootstrap EC2 will be placed into
+  VPC:
+    Description: AWS ID for the VPC where the Internet Gateway will be attached.
     Type: String
-  BootstrapSecurityGroup:
-    Description: AWS ID for the Security Group that will attached to the Bootstrap EC2
-    Type: AWS::EC2::SecurityGroup::Id
+  BootstrapSubnet:
+    Description: AWS ID for the Subnet that the Bootstrap EC2 will be placed into.
+    Type: String
   BootstrapOS:
-    Description: Preferred OS for the Bootstrap EC2 instance based on available values
+    Description: Preferred OS for the Bootstrap EC2 instance based on available values.
     Type: String
     Default: Ubuntu
     AllowedValues:
       - Ubuntu
-  BootstrapIP:
-    Description: AWS ID for the Elastic IP that will be associated with the Bootstrap EC2
-    Type: String
   BootstrapKeyName: 
-    Description: The name of the SSH Key that will be used to access the Bootstrap VM when it is created
+    Description: The name of the SSH Key that will be used to access the Bootstrap VM when it is created.
     Type: AWS::EC2::KeyPair::KeyName
+  BootstrapEgressFromPort:
+    Description: Start of Port range for outbound access of the Bootstrap VM (Default 0).
+    Type: Number
+    Default: 0
+  BootstrapEgressToPort:
+    Description: End of Port range for outbound access of the Bootstrap VM (Default 65535).
+    Type: Number
+    Default: 65535
+  BootstrapEgressCIDR:
+    Description: IP range for outbound access of the Bootstrap VM (Default is full and open to guarantee installation success).
+    Type: String
+    Default: 0.0.0.0/0
+  BootstrapSSHPort:
+    Description: Port number to be used for SSH connectivity to the Bootstrap VM.
+    Type: Number
+  BootstrapIngressCIDR:
+    Description: IP Range to allow inbound access to the Bootstrap VM.
+    Type: String
   TanzuNetID:
-    Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net
+    Description: The authentication ID or email address for authenticating to VMware's Tanzu Net.
     Type: String
     NoEcho: true
   TanzuNetKey:
-    Description: The authentication Key for authenticating to VMWare's Tanzu Net
+    Description: The authentication Key for authenticating to VMware's Tanzu Net.
     Type: String
     NoEcho: true
   TanzuNetToken:
-    Description: The authentication token required for certain TAP installation utilities within the Bootstrap
+    Description: The authentication token required for certain TAP installation utilities within the Bootstrap.
     Type: String
     NoEcho: true
   AWSCLIToken:
-    Description: AWS Token ID used when authenticating with the AWS CLI
+    Description: AWS Token ID used when authenticating with the AWS CLI.
     Type: String
     NoEcho: true
   AWSCLIKey:
-    Description: AWS Token Key used when authenticating with the AwS CLI
+    Description: AWS Token Key used when authenticating with the AWS CLI.
     Type: String
     NoEcho: true
 Resources:
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref 'AWS::StackName'
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+  PublicSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: Public Subnet Route Table
+  PublicSubnetRoute:
+    DependsOn: AttachGateway
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref InternetGateway
+  BootstrapSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref BootstrapSubnet
+      RouteTableId: !Ref PublicSubnetRouteTable
+  ClusterSubnetACL:
+    Type: AWS::EC2::NetworkAcl
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: TAPClusterACL
+  InboundRuleSSH:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref ClusterSubnetACL
+      RuleNumber: 100
+      RuleAction: allow
+      CidrBlock: 0.0.0.0/0
+      Protocol: 6
+      PortRange:
+        From: 22
+        To: 22
+  InboundRuleK8S:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref ClusterSubnetACL
+      RuleNumber: 110
+      RuleAction: allow
+      CidrBlock: 0.0.0.0/0
+      Protocol: 6
+      PortRange:
+        From: 6443
+        To: 6443
+  InboundRuleUI:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref ClusterSubnetACL
+      RuleNumber: 120
+      RuleAction: allow
+      CidrBlock: 0.0.0.0/0
+      Protocol: 6
+      PortRange:
+        From: 443
+        To: 443
+  OutboundRuleSSH:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref ClusterSubnetACL
+      RuleNumber: 100
+      RuleAction: allow
+      Egress: true
+      CidrBlock: 0.0.0.0/0
+      Protocol: 6
+      PortRange:
+        From: 22
+        To: 22
+  OutboundRuleK8S:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref ClusterSubnetACL
+      RuleNumber: 110
+      RuleAction: allow
+      Egress: true
+      CidrBlock: 0.0.0.0/0
+      Protocol: 6
+      PortRange:
+        From: 6443
+        To: 6443
+  OutboundRuleUI:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref ClusterSubnetACL
+      RuleNumber: 120
+      RuleAction: allow
+      Egress: true
+      CidrBlock: 0.0.0.0/0
+      Protocol: 6
+      PortRange:
+        From: 443
+        To: 443
+  BootstrapSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enables SSH Access to Bootstrap VM
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref BootstrapSSHPort
+          ToPort: !Ref BootstrapSSHPort
+          CidrIp: !Ref BootstrapIngressCIDR
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: !Ref BootstrapEgressFromPort
+          ToPort: !Ref BootstrapEgressToPort
+          CidrIp: !Ref BootstrapEgressCIDR
+      Tags:
+        - Key: Name
+          Value: BootstrapSecurityGroup
+  BootstrapEIP:
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: BootstrapEIP
   BootstrapInstance: 
     Type: AWS::EC2::Instance
     Properties: 
@@ -66,4 +213,4 @@ Resources:
     Type: AWS::EC2::EIPAssociation
     Properties:
       InstanceId: !Ref BootstrapInstance
-      AllocationId: !Ref BootstrapIP
+      AllocationId: !GetAtt BootstrapEIP.AllocationId

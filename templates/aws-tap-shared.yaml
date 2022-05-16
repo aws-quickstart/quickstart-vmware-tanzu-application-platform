@@ -1,23 +1,46 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: 2010-09-09
 Description: >-
   This template is a child template to both the aws-tap-entrypoint.newvpc and aws-tap-entrypoint.existingvpc templates with all parameters being passed from
   those parent templates. This template will focus on the creation of any shared services that are being leveraged within the scope of the TAP deployment
   such as S3, ECR and any other services that would be considered as PaaS services and will exist outside of the scope of the VPC where TAP is deployed.
+  (qs-1t1t2pssn)
+Metadata:
+  SentenceCaseExclude:
+    - Bootstrap
+    - Net
+    - Tanzu
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: VMware Tanzu Net authentication configuration
+        Parameters:
+          - TanzuNetID
+          - TanzuNetToken
+          - TanzuNetKey
+      - Label:
+          default: S3 config file bucket configuration
+        Parameters:
+          - S3BucketName
+    ParameterLabels:
+      TanzuNetID:
+        default: ID
+      TanzuNetKey:
+        default: Key
+      TanzuNetToken:
+        default: Token
+      S3BucketName:
+        default: Name
 Parameters:
-  ECRPrincipal:
-    Description: The IAM principal that will be used in the automation to push the TAP images into ECR
-    Type: String
-    NoEcho: true
   TanzuNetID:
-    Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net
+    Description: The authentication ID or email address for authenticating to VMware's Tanzu Net.
     Type: String
     NoEcho: true
   TanzuNetKey:
-    Description: The authentication Key for authenticating to VMWare's Tanzu Net
+    Description: The authentication key for authenticating to VMware's Tanzu Net.
     Type: String
     NoEcho: true
   TanzuNetToken:
-    Description: The authentication token required for certain TAP installation utilities within the Bootstrap
+    Description: The authentication token required for certain TAP installation utilities within the Bootstrap.
     Type: String
     NoEcho: true
   S3BucketName:
@@ -25,33 +48,31 @@ Parameters:
     Type: String
 Resources:
   TanzuNetSecretUser:
-    Type: 'AWS::SecretsManager::Secret'
+    Type: AWS::SecretsManager::Secret
     Properties:
       Name: TanzuNetUserSecret
       Description: This secret will store the Tanzu Net UserName and Password being passed in by the consumer
-      SecretString: !Join 
-                      - ''
-                      - - '{"username":'
-                        - !Ref TanzuNetID 
-                        - ',"password":'
-                        - !Ref TanzuNetKey
-                        - '}'
+      SecretString: !Sub >-
+        {
+          "username": "${TanzuNetID}",
+          "password": "${TanzuNetKey}"
+        }
   TanzuNetSecretToken:
-    Type: 'AWS::SecretsManager::Secret'
+    Type: AWS::SecretsManager::Secret
     Properties:
       Name: TanzuNetToken
-      Description: This secret will store the Tanzu Net API Token being passed in by the consumer
+      Description: This secret will store the Tanzu Net API token being passed in by the consumer
       SecretString: !Ref TanzuNetToken
   S3Bucket:
-    Type: 'AWS::S3::Bucket'
-    DeletionPolicy: Retain
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
     Properties:
       BucketName: !Ref S3BucketName
       AccessControl: Private
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
-              SSEAlgorithm: 'AES256'
+              SSEAlgorithm: AES256
             BucketKeyEnabled: true
   TAPImageRepo:
     Type: AWS::ECR::Repository
