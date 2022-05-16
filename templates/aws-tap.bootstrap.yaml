@@ -40,11 +40,11 @@ Parameters:
     Description: IP Range to allow inbound access to the Bootstrap VM.
     Type: String
   TanzuNetID:
-    Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net.
+    Description: The authentication ID or email address for authenticating to VMware's Tanzu Net.
     Type: String
     NoEcho: true
   TanzuNetKey:
-    Description: The authentication Key for authenticating to VMWare's Tanzu Net.
+    Description: The authentication Key for authenticating to VMware's Tanzu Net.
     Type: String
     NoEcho: true
   TanzuNetToken:
@@ -56,7 +56,7 @@ Parameters:
     Type: String
     NoEcho: true
   AWSCLIKey:
-    Description: AWS Token Key used when authenticating with the AwS CLI.
+    Description: AWS Token Key used when authenticating with the AWS CLI.
     Type: String
     NoEcho: true
 Resources:
