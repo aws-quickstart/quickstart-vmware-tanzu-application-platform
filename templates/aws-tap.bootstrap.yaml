@@ -7,56 +7,56 @@ Description: >-
   (qs-1t1t2pssu)
 Parameters:
   VPC:
-    Description: AWS ID for the VPC where the Internet Gateway will be attached
+    Description: AWS ID for the VPC where the Internet Gateway will be attached.
     Type: String
   BootstrapSubnet:
-    Description: AWS ID for the Subnet that the Bootstrap EC2 will be placed into
+    Description: AWS ID for the Subnet that the Bootstrap EC2 will be placed into.
     Type: String
   BootstrapOS:
-    Description: Preferred OS for the Bootstrap EC2 instance based on available values
+    Description: Preferred OS for the Bootstrap EC2 instance based on available values.
     Type: String
     Default: Ubuntu
     AllowedValues:
       - Ubuntu
   BootstrapKeyName: 
-    Description: The name of the SSH Key that will be used to access the Bootstrap VM when it is created
+    Description: The name of the SSH Key that will be used to access the Bootstrap VM when it is created.
     Type: AWS::EC2::KeyPair::KeyName
   BootstrapEgressFromPort:
-    Description: Start of Port range for outbound access of the Bootstrap VM (Default 0)
+    Description: Start of Port range for outbound access of the Bootstrap VM (Default 0).
     Type: Number
     Default: 0
   BootstrapEgressToPort:
-    Description: End of Port range for outbound access of the Bootstrap VM (Default 65535)
+    Description: End of Port range for outbound access of the Bootstrap VM (Default 65535).
     Type: Number
     Default: 65535
   BootstrapEgressCIDR:
-    Description: IP range for outbound access of the Bootstrap VM (Default is full and open to guarantee installation success)
+    Description: IP range for outbound access of the Bootstrap VM (Default is full and open to guarantee installation success).
     Type: String
     Default: 0.0.0.0/0
   BootstrapSSHPort:
-    Description: Port number to be used for SSH connectivity to the Bootstrap VM
+    Description: Port number to be used for SSH connectivity to the Bootstrap VM.
     Type: Number
   BootstrapIngressCIDR:
-    Description: IP Range to allow inbound access to the Bootstrap VM
+    Description: IP Range to allow inbound access to the Bootstrap VM.
     Type: String
   TanzuNetID:
-    Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net
+    Description: The authentication ID or email address for authenticating to VMWare's Tanzu Net.
     Type: String
     NoEcho: true
   TanzuNetKey:
-    Description: The authentication Key for authenticating to VMWare's Tanzu Net
+    Description: The authentication Key for authenticating to VMWare's Tanzu Net.
     Type: String
     NoEcho: true
   TanzuNetToken:
-    Description: The authentication token required for certain TAP installation utilities within the Bootstrap
+    Description: The authentication token required for certain TAP installation utilities within the Bootstrap.
     Type: String
     NoEcho: true
   AWSCLIToken:
-    Description: AWS Token ID used when authenticating with the AWS CLI
+    Description: AWS Token ID used when authenticating with the AWS CLI.
     Type: String
     NoEcho: true
   AWSCLIKey:
-    Description: AWS Token Key used when authenticating with the AwS CLI
+    Description: AWS Token Key used when authenticating with the AwS CLI.
     Type: String
     NoEcho: true
 Resources:
