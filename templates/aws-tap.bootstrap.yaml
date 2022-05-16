@@ -36,7 +36,7 @@ Parameters:
   BootstrapSSHPort:
     Description: Port number to be used for SSH connectivity to the Bootstrap VM
     Type: Number
-  BoostrapIngressCIDR:
+  BootstrapIngressCIDR:
     Description: IP Range to allow inbound access to the Bootstrap VM
     Type: String
   TanzuNetID:
