@@ -98,7 +98,7 @@ Metadata:
       QSS3KeyPrefix:
         default: Key prefix
       RemoteAccessCIDR:
-        default: Remote Access CIDR
+        default: Remote access CIDR
 Parameters:
   S3TAPConfigBucketName:
     Description: TAP requires an S3 bucket to store encrypted configuration information, this bucket name will be associated with a newly created S3 bucket for that purpose.
