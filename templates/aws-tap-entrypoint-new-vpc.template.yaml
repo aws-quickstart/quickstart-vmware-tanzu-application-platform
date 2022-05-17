@@ -103,6 +103,12 @@ Parameters:
   S3TAPConfigBucketName:
     Description: TAP requires an S3 bucket to store encrypted configuration information, this bucket name will be associated with a newly created S3 bucket for that purpose.
     Type: String
+    MinLength: 3
+    MaxLength: 63
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription:
+      The TAP bucket name can include numbers, lowercase letters, uppercase
+      letters, and hyphens (-). It cannot start or end with a hyphen (-).
   #TAPDomainName:
   #  Description: Dummy domain name that can be used for access to TAP and its corresponding project URLs. Available within a private DNS Zone.
   #  Type: String
