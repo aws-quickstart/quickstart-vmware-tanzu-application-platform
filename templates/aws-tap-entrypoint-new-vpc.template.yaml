@@ -172,6 +172,12 @@ Parameters:
   EKSClusterName:
     Description: The name of the cluster that will be created to contain the TAP deployment.
     Type: String
+    MinLength: 1
+    MaxLength: 100
+    AllowedPattern: ^[0-9A-Za-z][A-Za-z0-9\-_]*
+    ConstraintDescription: >-
+      Minimum length of 1. Maximum length of 100. Must start with a letter or
+      number.
   NumberOfNodes:
     Description: The number of nodes that will be the minimum and created for the TAP EKS cluster.
     Type: Number
