@@ -1,0 +1,8 @@
+[submodule "submodules/quickstart-aws-vpc"]
+	path = submodules/quickstart-aws-vpc
+	url = https://github.com/aws-quickstart/quickstart-aws-vpc.git
+	branch = main
+[submodule "submodules/quickstart-amazon-eks"]
+	path = submodules/quickstart-amazon-eks
+	url = https://github.com/aws-quickstart/quickstart-amazon-eks.git
+	branch = main
