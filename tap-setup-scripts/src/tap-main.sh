@@ -1,15 +1,12 @@
 #!/bin/bash
 set -e
 
-export GITHUB_HOME=$HOME/tap-setup-scripts
-
-source "$GITHUB_HOME/src/functions.sh"
+source "src/functions.sh"
 
 function tapInstallMain {
   banner "TAP Install..."
   readUserInputs
   readTAPInternalValues
-  setupAWSConfig
   verifyK8ClusterAccess
   parseUserInputs
 
@@ -26,7 +23,6 @@ function tapInstallMain {
   fi
   echo "Installing TAP & Sample Workload ..."
   tapInstallFull
-  # createDnsRecord
   tapWorkloadInstallFull
   printOutputParams
   echo "TAP Install Done ..."
@@ -38,13 +34,11 @@ function tapUninstallMain {
   banner "TAP Uninstall..."
   readUserInputs
   readTAPInternalValues
-  setupAWSConfig
   verifyK8ClusterAccess
   parseUserInputs
 
   echo "Uninstalling TAP & Sample Workload ..."
   tapWorkloadUninstallFull
-  # deleteDnsRecord
   tapUninstallFull
   deleteTapRegistrySecret
   deletePackageRepository
@@ -59,7 +53,6 @@ function tapRelocateMain {
   banner "TAP Relocate..."
   readUserInputs
   readTAPInternalValues
-  setupAWSConfig
   verifyK8ClusterAccess
   parseUserInputs
   relocateTAPPackages
@@ -97,12 +90,13 @@ EOT
   exit 1
 fi
 
-echo COMMAND=$cmd FILENAME=$file SKIPINIT=$skipinit
+export GITHUB_HOME=$PWD
+echo COMMAND=$cmd FILENAME=$file SKIPINIT=$skipinit GITHUB_HOME=$GITHUB_HOME
 
-export GITHUB_HOME=$HOME/tap-setup-scripts/
-cd $GITHUB_HOME/src
-rm -rf inputs/user-input-values.yaml
-cp  $file  inputs/user-input-values.yaml
+export DOWNLOADS=$GITHUB_HOME/downloads
+export INPUTS=$GITHUB_HOME/src/inputs
+export GENERATED=$GITHUB_HOME/generated
+export RESOURCES=$GITHUB_HOME/src/resources
 
 case $cmd in
 "install")
