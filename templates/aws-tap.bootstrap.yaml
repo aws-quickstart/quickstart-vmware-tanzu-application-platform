@@ -53,31 +53,31 @@ Parameters:
     Type: String
     Description: >-
       IP Range to allow inbound access to the Bootstrap VM.
-  TanzuNetID:
-    Type: String
-    Description: >-
-      The authentication ID or email address for authenticating to
-      VMware's Tanzu Net.
-    NoEcho: true
-  TanzuNetKey:
-    Type: String
-    Description: >-
-      The authentication Key for authenticating to VMware's Tanzu Net.
-    NoEcho: true
-  TanzuNetToken:
-    Type: String
-    Description: >-
-      The authentication token required for certain TAP installation utilities
-      within the Bootstrap VM.
-    NoEcho: true
-  AWSCLIToken:
-    Type: String
-    Description: AWS Token ID used when authenticating with the AWS CLI.
-    NoEcho: true
-  AWSCLIKey:
-    Description: AWS Token Key used when authenticating with the AWS CLI.
-    Type: String
-    NoEcho: true
+  # TanzuNetID:
+  #   Type: String
+  #   Description: >-
+  #     The authentication ID or email address for authenticating to
+  #     VMware's Tanzu Net.
+  #   NoEcho: true
+  # TanzuNetKey:
+  #   Type: String
+  #   Description: >-
+  #     The authentication Key for authenticating to VMware's Tanzu Net.
+  #   NoEcho: true
+  # TanzuNetToken:
+  #   Type: String
+  #   Description: >-
+  #     The authentication token required for certain TAP installation utilities
+  #     within the Bootstrap VM.
+  #   NoEcho: true
+  # AWSCLIToken:
+  #   Type: String
+  #   Description: AWS Token ID used when authenticating with the AWS CLI.
+  #   NoEcho: true
+  # AWSCLIKey:
+  #   Description: AWS Token Key used when authenticating with the AWS CLI.
+  #   Type: String
+  #   NoEcho: true
 Resources:
   InternetGateway:
     Type: AWS::EC2::InternetGateway
