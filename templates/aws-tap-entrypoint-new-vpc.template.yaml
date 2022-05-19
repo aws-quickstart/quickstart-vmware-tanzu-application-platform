@@ -1,9 +1,12 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  This template creates a Single-AZ, multi-subnet VPC infrastructure that will include an EC2 instance for bootstrapping an install of VMware's Tanzu
-  Application Platform (TAP). In addition to the EC2 instance, a single EKS cluster, ECR instance, and S3 bucket will also be deployed
-  to the VPC to support the installation of the TAP software. **WARNING** This template creates AWS resources. You will be billed for the AWS
-  resources used if you create a stack from this template. (qs-1t1t2psqo)
+  This template creates a Single-AZ, multi-subnet VPC infrastructure that will
+  include an EC2 instance for bootstrapping an install of
+  VMware's Tanzu Application Platform (TAP). In addition to the EC2 instance, a
+  single EKS cluster, ECR instance, and S3 bucket will also be deployed to the
+  VPC to support the installation of the TAP software.
+  **WARNING** This template creates AWS resources. You will be billed for the
+  AWS resources used if you create a stack from this template. (qs-1t1t2psqo)
 Metadata:
   QuickStartDocumentation:
     EntrypointName: Launch into a new VPC
@@ -101,7 +104,6 @@ Metadata:
         default: Remote access CIDR
 Parameters:
   S3TAPConfigBucketName:
-    Description: TAP requires an S3 bucket to store encrypted configuration information, this bucket name will be associated with a newly created S3 bucket for that purpose.
     Type: String
     MinLength: 3
     MaxLength: 63
@@ -109,69 +111,89 @@ Parameters:
     ConstraintDescription:
       The TAP bucket name can include numbers, lowercase letters, uppercase
       letters, and hyphens (-). It cannot start or end with a hyphen (-).
+    Description: >-
+      TAP requires an S3 bucket to store encrypted configuration information,
+      this bucket name will be associated with a newly created S3 bucket for
+      that purpose.
   #TAPDomainName:
-  #  Description: Dummy domain name that can be used for access to TAP and its corresponding project URLs. Available within a private DNS Zone.
   #  Type: String
+  #  Description: >-
+  #    Dummy domain name that can be used for access to TAP and its
+  #    corresponding project URLs. Available within a private DNS Zone.
   NumberOfAZs:
-    Description: Number of Availability Zones to use in the VPC. This must match the value entered for the AvailabilityZones parameter.
     Type: String
+    Description: >-
+      Number of Availability Zones to use in the VPC. This must match the value
+      entered for the AvailabilityZones parameter.
     AllowedValues: [2, 3]
     Default: 3
   AvailabilityZones:
-    Description: List of Availability Zones to use for the subnets in the VPC. Three
-      Availability Zones are used for this deployment.
     Type: List<AWS::EC2::AvailabilityZone::Name>
+    Description: >-
+      List of Availability Zones to use for the subnets in the VPC. Three
+      Availability Zones are used for this deployment.
   VPCCIDR:
-    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16–28
-    Default: 10.0.0.0/16
+    Type: String
     Description: CIDR block for the VPC.
-    Type: String
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.0.0/16
   PrivateSubnet1CIDR:
+    Type: String
+    Description: >-
+      CIDR block for private subnet 1, located in Availability Zone 1.
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16–28
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
     Default: 10.0.0.0/19
-    Description: CIDR block for private subnet 1, located in Availability Zone 1.
-    Type: String
   PrivateSubnet2CIDR:
+    Type: String
+    Description: >-
+      CIDR block for private subnet 2, located in Availability Zone 2.
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16–28
+    ConstraintDescription: >-
+      CIDR block parameter must be in the form x.x.x.x/16-28.
     Default: 10.0.32.0/19
-    Description: CIDR block for private subnet 2, located in Availability Zone 2.
-    Type: String
   PrivateSubnet3CIDR:
+    Type: String
+    Description: >-
+      CIDR block for private subnet 3, located in Availability Zone 3.
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16–28
+    ConstraintDescription: >-
+      CIDR block parameter must be in the form x.x.x.x/16-28.
     Default: 10.0.64.0/19
-    Description: CIDR block for private subnet 3, located in Availability Zone 3.
-    Type: String
   PublicSubnet1CIDR:
+    Type: String
+    Description: >-
+      CIDR block for the public (DMZ) subnet 1, located in Availability Zone 1.
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16–28
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
     Default: 10.0.128.0/20
-    Description: CIDR block for the public (DMZ) subnet 1, located in Availability
-      Zone 1.
-    Type: String
   PublicSubnet2CIDR:
+    Type: String
+    Description: >-
+      CIDR block for the public (DMZ) subnet 2, located in Availability Zone 2.
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16–28
+    ConstraintDescription: >-
+      CIDR block parameter must be in the form x.x.x.x/16-28.
     Default: 10.0.144.0/20
-    Description: CIDR block for the public (DMZ) subnet 2, located in Availability
-      Zone 2.
-    Type: String
   PublicSubnet3CIDR:
+    Type: String
+    Description: >-
+      CIDR block for the public (DMZ) subnet 3, located in Availability Zone 3.
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16–28
+    ConstraintDescription: >-
+      CIDR block parameter must be in the form x.x.x.x/16-28.
     Default: 10.0.160.0/20
-    Description: CIDR block for the public (DMZ) subnet 3, located in Availability
-      Zone 3.
-    Type: String
   KeyPairName:
-    Description: The name of the SSH key that will be used to access the Bootstrap VM and cluster nodes.
     Type: AWS::EC2::KeyPair::KeyName
+    Description: >-
+      The name of the SSH key that will be used to access the Bootstrap VM and
+      cluster nodes.
   EKSClusterName:
-    Description: The name of the cluster that will be created to contain the TAP deployment.
     Type: String
+    Description: >-
+      The name of the cluster that will be created to contain the TAP
+      deployment.
     MinLength: 1
     MaxLength: 100
     AllowedPattern: ^[0-9A-Za-z][A-Za-z0-9\-_]*
@@ -179,74 +201,95 @@ Parameters:
       Minimum length of 1. Maximum length of 100. Must start with a letter or
       number.
   NumberOfNodes:
-    Description: The number of nodes that will be the minimum and created for the TAP EKS cluster.
     Type: Number
+    Description: >-
+      The number of nodes that will be the minimum and created for the TAP EKS
+      cluster.
+    MinValue: 3
+    MaxValue: 450
     Default: 4
-    MinValue: 3
-    MaxValue: 450
   MaxNumberOfNodes:
-    Description: The maximum number of nodes that will be available in an auto scaling scenario for the TAP EKS cluster.
     Type: Number
-    Default: 6
+    Description: >-
+      The maximum number of nodes that will be available in an auto scaling
+      scenario for the TAP EKS cluster.
     MinValue: 3
     MaxValue: 450
+    Default: 6
   NodeInstanceType:
-    Description: AWS EC2 instance type for each of the nodes deployed within the EKS cluster for TAP.
     Type: String
+    Description: >-
+      AWS EC2 instance type for each of the nodes deployed within the EKS
+      cluster for TAP.
     Default: m5.xlarge
   RemoteAccessCIDR:
-    Description: IP Range that will be allowed to access the EKS Cluster once deployed
     Type: String
+    Description: >-
+      IP range that will be allowed to access the EKS cluster once deployed.
   # BootstrapEgressFromPort:
-  #   Description: Start of Port range for outbound access of the Bootstrap VM (Default 0)
   #   Type: Number
+  #   Description: >-
+  #     Start of port range for outbound access of the Bootstrap VM (default 0).
   #   Default: 0
   # BootstrapEgressToPort:
-  #   Description: End of Port range for outbound access of the Bootstrap VM (Default 65535)
+  #   Description: >-
+  #     End of port range for outbound access of the Bootstrap VM
+  #     (default 65535).
   #   Type: Number
   #   Default: 65535
   # BootstrapEgressCIDR:
-  #   Description: IP range for outbound access of the Bootstrap VM (Default is full and open to guarantee installation success)
   #   Type: String
+  #   Description: >-
+  #     IP range for outbound access of the Bootstrap VM (default is full and
+  #     open to guarantee installation success).
   #   Default: 0.0.0.0/0
   TanzuNetID:
-    Description: The authentication ID or email address for authenticating to VMware's Tanzu Net.
     Type: String
+    Description: >-
+      The authentication ID or email address for authenticating to VMware's
+      Tanzu Net.
     NoEcho: true
   TanzuNetKey:
-    Description: The authentication key for authenticating to VMware's Tanzu Net.
     Type: String
+    Description: >-
+      The authentication key for authenticating to VMware's Tanzu Net.
     NoEcho: true
   TanzuNetToken:
-    Description: The authentication token required for certain TAP installation utilities within the Bootstrap.
     Type: String
+    Description: >-
+      The authentication token required for certain TAP installation utilities
+      within the Bootstrap.
     NoEcho: true
   #AWSCLIToken:
-  #  Description: AWS token ID used when authenticating with the AWS CLI.
   #  Type: String
+  #  Description: >-
+  #    AWS token ID used when authenticating with the AWS CLI.
   #  NoEcho: true
   #AWSCLIKey:
-  #  Description: AWS token key used when authenticating with the AWS CLI.
   #  Type: String
+  #  Description: >-
+  #    AWS token key used when authenticating with the AWS CLI.
   #  NoEcho: true
   QSS3BucketName:
-    Description: Name of the S3 bucket for your copy of the Quick Start assets.
+    Type: String
+    Description: >-
+      Name of the S3 bucket for your copy of the Quick Start assets.
       Keep the default name unless you are customizing the template.
       Changing the name updates code references to point to a new Quick
       Start location. This name can include numbers, lowercase letters,
       uppercase letters, and hyphens, but do not start or end with a hyphen (-).
       See https://aws-quickstart.github.io/option1.html.
-    Type: String
     MinLength: 3
     MaxLength: 63
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
-    ConstraintDescription:
+    ConstraintDescription: >-
       The Quick Start bucket name can include numbers, lowercase
       letters, uppercase letters, and hyphens (-). It cannot start or end with a
       hyphen (-).
     Default: aws-quickstart
   QSS3KeyPrefix:
-    Description:
+    Type: String
+    Description: >-
       S3 key prefix that is used to simulate a directory for your copy of the
       Quick Start assets. Keep the default prefix unless you are customizing
       the template. Changing this prefix updates code references to point to
@@ -255,20 +298,19 @@ Parameters:
       with a forward slash.
       See https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
       and https://aws-quickstart.github.io/option1.html.
-    Type: String
     AllowedPattern: ^([0-9a-zA-Z-.]+/)*$
     ConstraintDescription:
       The Quick Start S3 key prefix can include numbers, lowercase letters,
       uppercase letters, hyphens (-), and forward slashes (/).
     Default: quickstart-vmware-tanzu-application-platform/
   QSS3BucketRegion:
+    Type: String
     Description: >-
       AWS Region where the Quick Start S3 bucket (QSS3BucketName) is
       hosted. Keep the default Region unless you are customizing the template.
       Changing this Region updates code references to point to a new
       Quick Start location. When using your own bucket, specify the Region.
       See https://aws-quickstart.github.io/option1.html.
-    Type: String
     Default: us-east-1
 Conditions:
   3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
