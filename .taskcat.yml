@@ -8,7 +8,7 @@ project:
     NumberOfAZs: 3
     KeyName: --override--
     RemoteAccessCIDR: --override--
-    S3TAPConfigBucketName: $[taskcat_autobucket]
+    S3TAPConfigBucketName: $[taskcat_random-string]-$[taskcat_current_region]
     EKSClusterName: $[taskcat_random-string]
     NumberOfNodes: 3
     MaxNumberOfNodes: 3
