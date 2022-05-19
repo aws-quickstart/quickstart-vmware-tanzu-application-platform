@@ -1,59 +1,78 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >-
-  This template is a child template to both the aws-tap-entrypoint.newvpc and aws-tap-entrypoint.existingvpc templates with all parameters being passed from
-  those parent templates. This template will focus on the creation of an EC2 instance that can be used to Bootstrap the install and configure TAP. 
-  The EC2 instance will contain a large script that will install all of the CLI components necessary and then perform all of the installation steps
-  as defined within the TAP Installation guide for deploying into AWS. It will also make sure that all of the images used for TAP are stored within ECR.
+  This template is a child template to both the aws-tap-entrypoint.newvpc and
+  aws-tap-entrypoint.existingvpc templates with all parameters being passed
+  from those parent templates. This template will focus on the creation of an
+  EC2 instance that can be used to Bootstrap the install and configure TAP. The
+  EC2 instance will contain a large script that will install all of the CLI
+  components necessary and then perform all of the installation steps as
+  defined within the TAP Installation guide for deploying into AWS. It will
+  also make sure that all of the images used for TAP are stored within ECR.
   (qs-1t1t2pssu)
 Parameters:
   VPC:
-    Description: AWS ID for the VPC where the Internet Gateway will be attached.
     Type: String
+    Description: >-
+      AWS ID for the VPC where the Internet Gateway will be attached.
   BootstrapSubnet:
-    Description: AWS ID for the Subnet that the Bootstrap EC2 will be placed into.
     Type: String
-  BootstrapOS:
-    Description: Preferred OS for the Bootstrap EC2 instance based on available values.
-    Type: String
-    Default: Ubuntu
-    AllowedValues:
-      - Ubuntu
-  BootstrapKeyName: 
-    Description: The name of the SSH Key that will be used to access the Bootstrap VM when it is created.
+    Description: >-
+      AWS ID for the Subnet that the Bootstrap EC2 will be placed into.
+  # BootstrapOS:
+  #   Type: String
+  #   Description: >-
+  #     Preferred OS for the Bootstrap EC2 instance based on available values.
+  #   AllowedValues:
+  #     - Ubuntu
+  #   Default: Ubuntu
+  BootstrapKeyName:
     Type: AWS::EC2::KeyPair::KeyName
+    Description: The name of the SSH Key that will be used to access the Bootstrap VM when it is created.
   BootstrapEgressFromPort:
-    Description: Start of Port range for outbound access of the Bootstrap VM (Default 0).
     Type: Number
+    Description: >-
+      Start of port range for outbound access of the Bootstrap VM (default 0).
     Default: 0
   BootstrapEgressToPort:
-    Description: End of Port range for outbound access of the Bootstrap VM (Default 65535).
     Type: Number
+    Description: >-
+      End of port range for outbound access of the Bootstrap VM
+      (default 65535).
     Default: 65535
   BootstrapEgressCIDR:
-    Description: IP range for outbound access of the Bootstrap VM (Default is full and open to guarantee installation success).
     Type: String
+    Description: >-
+      IP range for outbound access of the Bootstrap VM
+      (default is full and open to guarantee installation success).
     Default: 0.0.0.0/0
   BootstrapSSHPort:
-    Description: Port number to be used for SSH connectivity to the Bootstrap VM.
     Type: Number
+    Description: >-
+      Port number to be used for SSH connectivity to the Bootstrap VM.
   BootstrapIngressCIDR:
-    Description: IP Range to allow inbound access to the Bootstrap VM.
     Type: String
+    Description: >-
+      IP Range to allow inbound access to the Bootstrap VM.
   TanzuNetID:
-    Description: The authentication ID or email address for authenticating to VMware's Tanzu Net.
     Type: String
+    Description: >-
+      The authentication ID or email address for authenticating to
+      VMware's Tanzu Net.
     NoEcho: true
   TanzuNetKey:
-    Description: The authentication Key for authenticating to VMware's Tanzu Net.
     Type: String
+    Description: >-
+      The authentication Key for authenticating to VMware's Tanzu Net.
     NoEcho: true
   TanzuNetToken:
-    Description: The authentication token required for certain TAP installation utilities within the Bootstrap.
     Type: String
+    Description: >-
+      The authentication token required for certain TAP installation utilities
+      within the Bootstrap VM.
     NoEcho: true
   AWSCLIToken:
-    Description: AWS Token ID used when authenticating with the AWS CLI.
     Type: String
+    Description: AWS Token ID used when authenticating with the AWS CLI.
     NoEcho: true
   AWSCLIKey:
     Description: AWS Token Key used when authenticating with the AWS CLI.
