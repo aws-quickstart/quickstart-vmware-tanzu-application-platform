@@ -19,7 +19,7 @@ Metadata:
         Parameters:
           - AvailabilityZones
           - NumberOfAZs
-          - KeyName
+          - KeyPairName
       - Label:
           default: VPC network configuration
         Parameters:
@@ -59,7 +59,7 @@ Metadata:
         default: Availability Zones
       NumberOfAZs:
         default: Number of Availability Zones
-      KeyName:
+      KeyPairName:
         default: SSH key name
       VPCCIDR:
         default: VPC CIDR
@@ -166,7 +166,7 @@ Parameters:
     Description: CIDR block for the public (DMZ) subnet 3, located in Availability
       Zone 3.
     Type: String
-  KeyName:
+  KeyPairName:
     Description: The name of the SSH key that will be used to access the Bootstrap VM and cluster nodes.
     Type: AWS::EC2::KeyPair::KeyName
   EKSClusterName:
@@ -329,7 +329,7 @@ Resources:
   #       BootstrapEgressFromPort: !Ref BootstrapEgressFromPort
   #       BootstrapEgressToPort: !Ref BootstrapEgressToPort
   #       BootstrapEgressCIDR: !Ref BootstrapEgressCIDR
-  #       BootstrapKeyName: !Ref KeyName
+  #       BootstrapKeyName: !Ref KeyPairName
   #       TanzuNetID: !Ref TanzuNetID
   #       TanzuNetKey: !Ref TanzuNetKey
   #       TanzuNetToken: !Ref TanzuNetToken
@@ -366,7 +366,7 @@ Resources:
           - !Ref AWS::NoValue
         RemoteAccessCIDR: !Ref RemoteAccessCIDR
         EKSPublicAccessEndpoint: Enabled
-        KeyPairName: !Ref KeyName
+        KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
         NodeInstanceType: !Ref NodeInstanceType
