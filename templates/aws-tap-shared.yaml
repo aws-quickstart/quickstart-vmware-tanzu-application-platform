@@ -1,9 +1,12 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  This template is a child template to both the aws-tap-entrypoint.newvpc and aws-tap-entrypoint.existingvpc templates with all parameters being passed from
-  those parent templates. This template will focus on the creation of any shared services that are being leveraged within the scope of the TAP deployment
-  such as S3, ECR and any other services that would be considered as PaaS services and will exist outside of the scope of the VPC where TAP is deployed.
-  (qs-1t1t2pssn)
+  This template is a child template to both the aws-tap-entrypoint.newvpc and
+  aws-tap-entrypoint.existingvpc templates with all parameters being passed
+  from those parent templates. This template will focus on the creation of any
+  shared services that are being leveraged within the scope of the TAP
+  deployment such as S3, ECR and any other services that would be considered as
+  PaaS services and will exist outside of the scope of the VPC where TAP is
+  deployed. (qs-1t1t2pssn)
 Metadata:
   SentenceCaseExclude:
     - Bootstrap
@@ -32,20 +35,27 @@ Metadata:
         default: Name
 Parameters:
   TanzuNetID:
-    Description: The authentication ID or email address for authenticating to VMware's Tanzu Net.
     Type: String
+    Description: >-
+      The authentication ID or email address for authenticating to
+      VMware's Tanzu Net.
     NoEcho: true
   TanzuNetKey:
-    Description: The authentication key for authenticating to VMware's Tanzu Net.
     Type: String
+    Description: >-
+      The authentication key for authenticating to VMware's Tanzu Net.
     NoEcho: true
   TanzuNetToken:
-    Description: The authentication token required for certain TAP installation utilities within the Bootstrap.
     Type: String
+    Description: >-
+      The authentication token required for certain TAP installation utilities
+      within the Bootstrap.
     NoEcho: true
   S3BucketName:
-    Description: An S3 bucket where configuration files are stored in an encrypted way for security purposes.
     Type: String
+    Description: >-
+      An S3 bucket where configuration files are stored in an encrypted way for
+      security purposes.
 Resources:
   TanzuNetSecretUser:
     Type: AWS::SecretsManager::Secret
