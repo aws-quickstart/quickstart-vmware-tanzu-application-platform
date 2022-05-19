@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: 2010-09-09
 Description: >-
   This template is a child template to both the aws-tap-entrypoint.newvpc and
   aws-tap-entrypoint.existingvpc templates with all parameters being passed
@@ -84,7 +84,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Ref 'AWS::StackName'
+          Value: !Ref AWS::StackName
   AttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
@@ -102,7 +102,7 @@ Resources:
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PublicSubnetRouteTable
-      DestinationCidrBlock: '0.0.0.0/0'
+      DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
   BootstrapSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -204,7 +204,7 @@ Resources:
         - Key: Name
           Value: BootstrapSecurityGroup
   BootstrapEIP:
-    Type: 'AWS::EC2::EIP'
+    Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
       Tags:
@@ -221,7 +221,7 @@ Resources:
         - !Ref BootstrapSecurityGroup
       SubnetId: !Ref BootstrapSubnet
       BlockDeviceMappings:
-        - DeviceName: "/dev/sda1"
+        - DeviceName: /dev/sda1
           Ebs:
             VolumeSize: 50
             VolumeType: gp2
