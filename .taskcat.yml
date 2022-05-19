@@ -1,6 +1,7 @@
 project:
   name: quickstart-vmware-tanzu-application-platform
   owner: quickstart-eng@amazon.com
+  s3_regional_buckets: true
   template: templates/aws-tap-entrypoint-new-vpc.template.yaml
   parameters:
     AvailabilityZones: $[taskcat_genaz_3]
