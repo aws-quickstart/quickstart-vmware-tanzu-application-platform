@@ -9,6 +9,59 @@ Description: >-
   defined within the TAP Installation guide for deploying into AWS. It will
   also make sure that all of the images used for TAP are stored within ECR.
   (qs-1t1t2pssu)
+Metadata:
+  SentenceCaseExclude:
+    - Bootstrap
+    - Net
+    - Tanzu
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: VPC network configuration
+        Parameters:
+          - VpcId
+          - SubnetId
+      - Label:
+          default: Bootstrap EC2 instance configuration
+        Parameters:
+          - OS
+          - KeyPairName
+          - SshPort
+          - IngressCidr
+          - EgressFromPort
+          - EgressToPort
+          - EgressCidr
+      # - Label:
+      #     default: VMware Tanzu Net authentication configuration
+      #   Parameters:
+      #     - TanzuNetID
+      #     - TanzuNetToken
+      #     - TanzuNetKey
+    ParameterLabels:
+      VpcId:
+        default: VPC ID
+      SubnetId:
+        default: Subnet ID
+      OS:
+        default: OS
+      KeyPairName:
+        default: SSH key name
+      SshPort:
+        default: SSH port
+      IngressCidr:
+        default: Ingress CIDR
+      EgressFromPort:
+        default: Egress from port
+      EgressToPort:
+        default: Egress to port
+      EgressCidr:
+        default: Egress CIDR
+      # TanzuNetID:
+      #   default: ID
+      # TanzuNetKey:
+      #   default: Key
+      # TanzuNetToken:
+      #   default: Token
 Parameters:
   VpcId:
     Type: AWS::EC2::VPC::Id
