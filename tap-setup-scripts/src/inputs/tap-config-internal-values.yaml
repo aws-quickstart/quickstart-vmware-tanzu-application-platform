@@ -13,6 +13,6 @@ cluster_essentials_bundle:
 tap:
   name: tap
   namespace: tap-install
-  version: 1.1.0
+  version: 1.1.1
 
 # append mandatory variable here

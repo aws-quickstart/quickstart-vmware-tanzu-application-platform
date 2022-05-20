@@ -92,6 +92,7 @@ function installTools {
   sudo groupadd docker || true
   USER=`whoami`
   sudo usermod -aG docker ${USER}  || true
+  newgrp docker
 
   # aws-iam-authenticator
   curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.12.7/2019-03-27/bin/linux/amd64/aws-iam-authenticator
@@ -102,8 +103,6 @@ function installTools {
 
 
 function installTanzuCLI {
-  requireValue TAP_VERSION
-
   banner "Downloading kapp, secretgen configuration bundle & tanzu cli"
 
   mkdir -p $DOWNLOADS
@@ -123,7 +122,7 @@ function installTanzuCLI {
   then
     pivnet login --api-token="$PIVNET_TOKEN"
 
-    ESSENTIALS_VERSION=$TAP_VERSION
+    ESSENTIALS_VERSION=1.1.0
     ESSENTIALS_FILE_NAME=tanzu-cluster-essentials-linux-amd64-$ESSENTIALS_VERSION.tgz
     ESSENTIALS_FILE_ID=1191987
 
@@ -235,8 +234,11 @@ function readUserInputs {
   DEVELOPER_NAMESPACE=$(yq .workload.namespace $INPUTS/user-input-values.yaml)
   SAMPLE_APP_NAME=$(yq .workload.name $INPUTS/user-input-values.yaml)
 
-  AWS_REGION=$(yq .aws.region $INPUTS/user-input-values.yaml)
-  AWS_ACCOUNT=$(yq .aws.account $INPUTS/user-input-values.yaml)
+  # AWS_REGION=$(yq .aws.region $INPUTS/user-input-values.yaml)
+  # AWS_ACCOUNT=$(yq .aws.account $INPUTS/user-input-values.yaml)
+  AWS_REGION=`curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region`
+  AWS_ACCOUNT=`curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .accountId`
+  
   AWS_ROLE=$(yq .aws.role $INPUTS/user-input-values.yaml)
   AWS_ACCESS_KEY_ID=$(yq .aws.access_key $INPUTS/user-input-values.yaml)
   AWS_SECRET_ACCESS_KEY=$(yq .aws.secret_key $INPUTS/user-input-values.yaml)
@@ -408,18 +410,29 @@ function tapInstallFull {
   fi
 
   banner "Checking state of all packages"
+  local RETRIES=10
+  local DELAY=15
+  local EXIT="false"
 
-  tanzu package installed list --namespace $TAP_NAMESPACE  -o json | \
-    jq -r '.[] | (.name + " " + .status)' | \
-    while read package status
-    do
-      if [[ "$status" != "Reconcile succeeded" ]]
-      then
-        message "package($package) failed to reconcile ($status), waiting for reconcile"
-        reconcilePackageInstall $TAP_NAMESPACE $package
-        sleep 5
-      fi
-    done
+  while [[ $RETRIES -gt 0 && $EXIT == "false" ]]
+  do
+    echo "Number of RETRIES=$RETRIES"
+    EXIT="true"
+    tanzu package installed list --namespace $TAP_NAMESPACE  -o json | \
+      jq -r '.[] | (.name + " " + .status)' | \
+      while read package status
+      do
+        if [[ "$status" != "Reconcile succeeded" ]]
+        then
+          message "package($package) failed to reconcile ($status), waiting for reconcile"
+          # reconcilePackageInstall $TAP_NAMESPACE $package
+          sleep $DELAY
+          EXIT="false"
+        fi
+      done
+      ((RETRIES=RETRIES-1))
+  done
+  sleep $DELAY
 
   tanzu package installed list --namespace $TAP_NAMESPACE  -o json | \
     jq -r '.[] | (.name + " " + .status)' | \
@@ -431,7 +444,7 @@ function tapInstallFull {
         exit 1
       fi
     done
-  banner "Setup complete."
+  banner "TAP Install complete."
 }
 
 function tapWorkloadInstallFull {
@@ -534,7 +547,7 @@ function relocateTAPPackages {
 
   docker login --username $TANZUNET_REGISTRY_USERNAME --password $TANZUNET_REGISTRY_PASSWORD $TANZUNET_REGISTRY_HOSTNAME
 
-  docker login --username $ESSENTIALS_REGISTRY_USERNAME --password $ESSENTIALS_REGISTRY_PASSWORD $ESSENTIALS_REGISTRY_HOSTNAME
+  docker login --username $ESSENTIALS_ECR_REGISTRY_USERNAME --password $ESSENTIALS_ECR_REGISTRY_PASSWORD $ESSENTIALS_ECR_REGISTRY_HOSTNAME
 
   # --concurrency 2 is required for AWS
   echo "Relocating Tanzu Cluster Essentials Bundle"
