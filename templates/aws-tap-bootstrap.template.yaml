@@ -23,9 +23,11 @@ Parameters:
   #   AllowedValues:
   #     - Ubuntu
   #   Default: Ubuntu
-  BootstrapKeyName:
+  KeyPairName:
     Type: AWS::EC2::KeyPair::KeyName
-    Description: The name of the SSH Key that will be used to access the Bootstrap VM when it is created.
+    Description: >-
+      The name of the SSH key that will be used to access the Bootstrap
+      instance when it is created.
   BootstrapEgressFromPort:
     Type: Number
     Description: >-
@@ -213,7 +215,7 @@ Resources:
     Properties:
       InstanceType: m5.large
       ImageId: ami-0892d3c7ee96c0bf7
-      KeyName: !Ref BootstrapKeyName
+      KeyName: !Ref KeyPairName
       Monitoring: true
       SecurityGroupIds:
         - !Ref BootstrapSecurityGroup
