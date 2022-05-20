@@ -13,10 +13,9 @@ Parameters:
   VpcId:
     Type: AWS::EC2::VPC::Id
     Description: VPC ID for the Bootstrap instance.
-  BootstrapSubnet:
-    Type: String
-    Description: >-
-      AWS ID for the Subnet that the Bootstrap EC2 will be placed into.
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet ID to which the Bootstrap instance will be connected.
   # BootstrapOS:
   #   Type: String
   #   Description: >-
@@ -218,7 +217,7 @@ Resources:
       Monitoring: true
       SecurityGroupIds:
         - !Ref BootstrapSecurityGroup
-      SubnetId: !Ref BootstrapSubnet
+      SubnetId: !Ref SubnetId
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
