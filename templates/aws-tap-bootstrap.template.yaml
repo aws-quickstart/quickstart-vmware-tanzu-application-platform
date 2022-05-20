@@ -28,31 +28,35 @@ Parameters:
     Description: >-
       The name of the SSH key that will be used to access the Bootstrap
       instance when it is created.
-  BootstrapEgressFromPort:
+  EgressFromPort:
     Type: Number
     Description: >-
       Start of port range for outbound access of the Bootstrap VM (default 0).
     Default: 0
-  BootstrapEgressToPort:
+  EgressToPort:
     Type: Number
     Description: >-
       End of port range for outbound access of the Bootstrap VM
       (default 65535).
     Default: 65535
-  BootstrapEgressCIDR:
+  EgressCidr:
     Type: String
     Description: >-
       IP range for outbound access of the Bootstrap VM
       (default is full and open to guarantee installation success).
     Default: 0.0.0.0/0
-  BootstrapSSHPort:
+  SshPort:
     Type: Number
     Description: >-
       Port number to be used for SSH connectivity to the Bootstrap VM.
-  BootstrapIngressCIDR:
+    MinValue: 0
+    MaxValue: 65535
+    Default: 22
+  IngressCidr:
     Type: String
     Description: >-
-      IP Range to allow inbound access to the Bootstrap VM.
+      CIDR block that is permitted inbound SSH connectivity to the Bootstrap
+      instance.
   # TanzuNetID:
   #   Type: String
   #   Description: >-
@@ -188,18 +192,18 @@ Resources:
   BootstrapSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enables SSH Access to Bootstrap VM
+      GroupDescription: Enables SSH access to the Bootstrap instance
       VpcId: !Ref VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: !Ref BootstrapSSHPort
-          ToPort: !Ref BootstrapSSHPort
-          CidrIp: !Ref BootstrapIngressCIDR
+          FromPort: !Ref SshPort
+          ToPort: !Ref SshPort
+          CidrIp: !Ref IngressCidr
       SecurityGroupEgress:
         - IpProtocol: tcp
-          FromPort: !Ref BootstrapEgressFromPort
-          ToPort: !Ref BootstrapEgressToPort
-          CidrIp: !Ref BootstrapEgressCIDR
+          FromPort: !Ref EgressFromPort
+          ToPort: !Ref EgressToPort
+          CidrIp: !Ref EgressCidr
       Tags:
         - Key: Name
           Value: BootstrapSecurityGroup
