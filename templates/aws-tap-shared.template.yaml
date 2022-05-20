@@ -56,6 +56,12 @@ Parameters:
     Description: >-
       An S3 bucket where configuration files are stored in an encrypted way for
       security purposes.
+    MinLength: 3
+    MaxLength: 63
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription:
+      The TAP bucket name can include numbers, lowercase letters, uppercase
+      letters, and hyphens (-). It cannot start or end with a hyphen (-).
 Resources:
   TanzuNetSecretUser:
     Type: AWS::SecretsManager::Secret
