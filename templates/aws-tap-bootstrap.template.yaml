@@ -290,7 +290,7 @@ Resources:
         - !Ref BootstrapSecurityGroup
       SubnetId: !Ref SubnetId
       BlockDeviceMappings:
-        - DeviceName: /dev/sda1
+        - DeviceName: /dev/xvda
           Ebs:
             VolumeSize: 50
             VolumeType: gp2
