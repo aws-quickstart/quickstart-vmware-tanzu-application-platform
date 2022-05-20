@@ -86,13 +86,11 @@ function installTools {
   sudo chmod +x kubectl
   sudo mv kubectl /usr/local/bin/
 
-  # install Docker in Docker
+  # install Docker
   sudo curl -sSL https://get.docker.com/ | sh
-
-  sudo groupadd docker || true
-  USER=`whoami`
-  sudo usermod -aG docker ${USER}  || true
-  newgrp docker
+  sudo groupadd docker 2>/dev/null || true
+  sudo usermod -aG docker ${USER} 2>/dev/null || true
+  newgrp docker || true
 
   # aws-iam-authenticator
   curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.12.7/2019-03-27/bin/linux/amd64/aws-iam-authenticator
@@ -234,17 +232,9 @@ function readUserInputs {
   DEVELOPER_NAMESPACE=$(yq .workload.namespace $INPUTS/user-input-values.yaml)
   SAMPLE_APP_NAME=$(yq .workload.name $INPUTS/user-input-values.yaml)
 
-  # AWS_REGION=$(yq .aws.region $INPUTS/user-input-values.yaml)
-  # AWS_ACCOUNT=$(yq .aws.account $INPUTS/user-input-values.yaml)
   AWS_REGION=`curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region`
   AWS_ACCOUNT=`curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .accountId`
-  
-  AWS_ROLE=$(yq .aws.role $INPUTS/user-input-values.yaml)
-  AWS_ACCESS_KEY_ID=$(yq .aws.access_key $INPUTS/user-input-values.yaml)
-  AWS_SECRET_ACCESS_KEY=$(yq .aws.secret_key $INPUTS/user-input-values.yaml)
   CLUSTER_NAME=$(yq .aws.eks_cluster_name $INPUTS/user-input-values.yaml)
-
-  AWS_ROUTE53_ZONE_ID=$(yq .aws.route_fifty_three_zone_id $INPUTS/user-input-values.yaml)
   AWS_DOMAIN_NAME=$(yq .aws.domain $INPUTS/user-input-values.yaml)
 }
 
@@ -387,13 +377,6 @@ function createTapRegistrySecret {
     --server $TAP_ECR_REGISTRY_HOSTNAME \
     --export-to-all-namespaces --namespace $TAP_NAMESPACE --yes
 }
-function reconcilePackageInstall {
-  # same as below command
-  # kctrl package installed kick -i <package-installation-name> -n tap-install
-  requireValue TAP_NAMESPACE TAP_PACKAGE_NAME
-  kubectl -n $TAP_NAMESPACE patch packageinstalls.packaging.carvel.dev $TAP_PACKAGE_NAME --type='json' -p '[{"op": "add", "path": "/spec/paused", "value":true}]}}'
-  kubectl -n $TAP_NAMESPACE patch packageinstalls.packaging.carvel.dev $TAP_PACKAGE_NAME --type='json' -p '[{"op": "add", "path": "/spec/paused", "value":false}]}}'
-}
 
 function tapInstallFull {
   requireValue TAP_PACKAGE_NAME TAP_VERSION TAP_NAMESPACE
@@ -418,22 +401,25 @@ function tapInstallFull {
   do
     echo "Number of RETRIES=$RETRIES"
     EXIT="true"
+    rm -rf $GENERATED/tap-packages-installed-list.txt
     tanzu package installed list --namespace $TAP_NAMESPACE  -o json | \
-      jq -r '.[] | (.name + " " + .status)' | \
+      jq -r '.[] | (.name + " " + .status)' > $GENERATED/tap-packages-installed-list.txt
       while read package status
       do
         if [[ "$status" != "Reconcile succeeded" ]]
         then
           message "package($package) failed to reconcile ($status), waiting for reconcile"
           # reconcilePackageInstall $TAP_NAMESPACE $package
+          kctrl package installed kick -i $package -n $TAP_NAMESPACE
           sleep $DELAY
           EXIT="false"
         fi
-      done
+      done < $GENERATED/tap-packages-installed-list.txt
       ((RETRIES=RETRIES-1))
   done
   sleep $DELAY
 
+  banner "Checking for ERRORs in all packages"
   tanzu package installed list --namespace $TAP_NAMESPACE  -o json | \
     jq -r '.[] | (.name + " " + .status)' | \
     while read package status
@@ -444,7 +430,7 @@ function tapInstallFull {
         exit 1
       fi
     done
-  banner "TAP Install complete."
+  banner "TAP Installation is Complete."
 }
 
 function tapWorkloadInstallFull {
@@ -452,7 +438,7 @@ function tapWorkloadInstallFull {
   requireValue OOTB_ECR_REGISTRY_USERNAME OOTB_ECR_REGISTRY_PASSWORD OOTB_ECR_REGISTRY_HOSTNAME \
     DEVELOPER_NAMESPACE SAMPLE_APP_NAME
 
-  banner "Installing sample workload"
+  banner "Installing Sample Workload"
 
   # 'registry-credentials' is used in tap-values.yaml & developer-namespace.yaml files
   tanzu secret registry add registry-credentials --username ${OOTB_ECR_REGISTRY_USERNAME} --password ${OOTB_ECR_REGISTRY_PASSWORD} --server ${OOTB_ECR_REGISTRY_HOSTNAME} --namespace ${DEVELOPER_NAMESPACE}
@@ -462,7 +448,7 @@ function tapWorkloadInstallFull {
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/pipeline.yaml
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/scan-policy.yaml
 
-  tanzu apps workload apply -f resources/workload-aws.yaml -n $DEVELOPER_NAMESPACE --yes
+  tanzu apps workload apply -f $RESOURCES/workload-aws.yaml -n $DEVELOPER_NAMESPACE --yes
 
 }
 
@@ -476,10 +462,9 @@ function tapWorkloadUninstallFull {
   tanzu secret registry delete registry-credentials --namespace $DEVELOPER_NAMESPACE --yes || true
   waitForRemoval kubectl get secret registry-credentials --namespace $DEVELOPER_NAMESPACE -o json
 
-  kubectl -n $DEVELOPER_NAMESPACE delete -f resources/developer-namespace.yaml || true
-  kubectl -n $DEVELOPER_NAMESPACE delete -f resources/pipeline.yaml || true
-  kubectl -n $DEVELOPER_NAMESPACE delete -f resources/scan-policy.yaml || true
-  # kubectl -n $DEVELOPER_NAMESPACE delete -f resources/git-ssh-basic-auth.yaml || true
+  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/developer-namespace.yaml || true
+  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/pipeline.yaml || true
+  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/scan-policy.yaml || true
 }
 
 function tapUninstallFull {

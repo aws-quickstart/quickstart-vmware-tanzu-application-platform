@@ -10,18 +10,16 @@ function tapInstallMain {
   verifyK8ClusterAccess
   parseUserInputs
 
-  # "Initailizing TAP ..."
   if [[ $skipinit == "true" ]]
   then
-    echo "skipping prerequisite"
+    echo "Skipping prerequisite..."
   else
-    echo "setup prerequisite"
+    echo "Setup prerequisite..."
     installTanzuClusterEssentials
     createTapNamespace
     createTapRegistrySecret
     loadPackageRepository
   fi
-  echo "Installing TAP & Sample Workload ..."
   tapInstallFull
   tapWorkloadInstallFull
   printOutputParams
@@ -37,7 +35,6 @@ function tapUninstallMain {
   verifyK8ClusterAccess
   parseUserInputs
 
-  echo "Uninstalling TAP & Sample Workload ..."
   tapWorkloadUninstallFull
   tapUninstallFull
   deleteTapRegistrySecret
@@ -58,6 +55,17 @@ function tapRelocateMain {
   relocateTAPPackages
   echo "TAP Relocate Done ..."
 
+}
+
+
+function bootstrapEC2 {
+  banner "BootstrapEC2 with tools ..."
+  installTools
+  readUserInputs
+  readTAPInternalValues
+  installTanzuCLI
+  verifyTools
+  echo "BootstrapEC2 Done ..."
 }
 
 #####
@@ -81,11 +89,11 @@ do
   shift
 done
 
-if [[ -z "$cmd" ]] || [[ -z "$file" ]]
+if [[ -z "$cmd" ]]
 then
   cat <<EOT
-  Usage: $0 -c {install | uninstall | relocate} -f {filename}  OR
-      $0 -c {install} {filename} [skipinit]
+  Usage: $0 -c {install | uninstall | relocate | bootstrap } OR
+      $0 -c {install} [-s | --skipinit]
 EOT
   exit 1
 fi
@@ -107,6 +115,9 @@ case $cmd in
   ;;
 "relocate")
   tapRelocateMain
+  ;;
+"bootstrap")
+  bootstrapEC2
   ;;
 esac
 

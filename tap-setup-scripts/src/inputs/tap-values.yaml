@@ -51,7 +51,7 @@ contour:
       type: LoadBalancer
 
 cnrs:
-  domain_name: #@ "cnr.{}".format(data.values.aws.domain)
+  domain_name: #@ "{}".format(data.values.aws.domain)
 
 grype:
   namespace: #@ data.values.workload.namespace
