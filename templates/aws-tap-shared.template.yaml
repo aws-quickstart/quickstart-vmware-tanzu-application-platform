@@ -15,22 +15,34 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
+          default: VPC network configuration
+        Parameters:
+          - VpcId
+      - Label:
           default: VMware Tanzu Net authentication configuration
         Parameters:
           - TanzuNetID
           - TanzuNetToken
           - TanzuNetKey
       - Label:
+          default: TAP private DNS domain configuration
+        Parameters:
+          - DomainName
+      - Label:
           default: S3 config file bucket configuration
         Parameters:
           - S3BucketName
     ParameterLabels:
+      VpcId:
+        default: VPC ID
       TanzuNetID:
         default: ID
       TanzuNetKey:
         default: Key
       TanzuNetToken:
         default: Token
+      DomainName:
+        default: Domain name
       S3BucketName:
         default: Name
 Parameters:
@@ -51,6 +63,15 @@ Parameters:
       The authentication token required for certain TAP installation utilities
       within the Bootstrap.
     NoEcho: true
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID for the Route53 private hosted zone.
+  DomainName:
+    Type: String
+    Description: >-
+      Domain name that can be used for access to TAP and its corresponding
+      project URLs. Available within a private DNS Zone.
+    MaxLength: 1024
   S3BucketName:
     Type: String
     Description: >-
@@ -104,3 +125,22 @@ Resources:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: tap/container_tbs_ecr_registry
+  PrivateHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      HostedZoneConfig:
+        Comment: VMware Tanzu Application Platform hosted zone
+      Name: !Ref DomainName
+      VPCs:
+        - VPCId: !Ref VpcId
+          VPCRegion: !Ref AWS::Region
+  DnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Comment: VMware Tanzu Application Platform wildcard record
+      HostedZoneId: !Ref PrivateHostedZone
+      Name: !Sub '*.${DomainName}'
+      ResourceRecords:
+        - tanzu.vmware.com  # We'll reference the LB CNAME here
+      TTL: 60
+      Type: CNAME

@@ -52,6 +52,10 @@ Metadata:
         Parameters:
           - S3TAPConfigBucketName
       - Label:
+          default: TAP private DNS domain configuration
+        Parameters:
+          - TAPDomainName
+      - Label:
           default: AWS Quick Start S3 bucket configuration
         Parameters:
           - QSS3BucketName
@@ -80,6 +84,8 @@ Metadata:
         default: Public subnet 3 CIDR
       S3TAPConfigBucketName:
         default: Name
+      TAPDomainName:
+        default: Domain name
       EKSClusterName:
         default: EKS cluster name
       NodeInstanceType:
@@ -115,11 +121,11 @@ Parameters:
       TAP requires an S3 bucket to store encrypted configuration information,
       this bucket name will be associated with a newly created S3 bucket for
       that purpose.
-  #TAPDomainName:
-  #  Type: String
-  #  Description: >-
-  #    Dummy domain name that can be used for access to TAP and its
-  #    corresponding project URLs. Available within a private DNS Zone.
+  TAPDomainName:
+   Type: String
+   Description: >-
+     Domain name that can be used for access to TAP and its
+     corresponding project URLs. Available within a private DNS Zone.
   NumberOfAZs:
     Type: String
     Description: >-
@@ -328,6 +334,8 @@ Resources:
           S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
       Parameters:
         S3BucketName: !Ref S3TAPConfigBucketName
+        VpcId: !GetAtt VPCStack.Outputs.VPCID
+        DomainName: !Ref TAPDomainName
         TanzuNetID: !Ref TanzuNetID
         TanzuNetKey: !Ref TanzuNetKey
         TanzuNetToken: !Ref TanzuNetToken
