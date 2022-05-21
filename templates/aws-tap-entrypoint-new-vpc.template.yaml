@@ -44,9 +44,9 @@ Metadata:
       - Label:
           default: VMware Tanzu Net authentication configuration
         Parameters:
-          - TanzuNetID
-          - TanzuNetToken
-          - TanzuNetKey
+          - TanzuNetUsername
+          - TanzuNetPassword
+          - TanzuNetApiToken
       - Label:
           default: TAP config file S3 bucket configuration
         Parameters:
@@ -112,12 +112,12 @@ Metadata:
         default: Number of nodes
       MaxNumberOfNodes:
         default: Maximum number of nodes
-      TanzuNetID:
-        default: ID
-      TanzuNetKey:
-        default: Key
-      TanzuNetToken:
-        default: Token
+      TanzuNetUsername:
+        default: Username
+      TanzuNetPassword:
+        default: Password
+      TanzuNetApiToken:
+        default: API token
       QSS3BucketRegion:
         default: Region
       QSS3BucketName:
@@ -278,22 +278,18 @@ Parameters:
       CIDR block for permitted outbound access from the Bootstrap VM
       (default is full and open to guarantee installation success).
     Default: 0.0.0.0/0
-  TanzuNetID:
+  TanzuNetUsername:
     Type: String
     Description: >-
-      The authentication ID or email address for authenticating to VMware's
-      Tanzu Net.
+      The VMware Tanzu Net username (authentication ID or email address).
     NoEcho: true
-  TanzuNetKey:
+  TanzuNetPassword:
     Type: String
-    Description: >-
-      The authentication key for authenticating to VMware's Tanzu Net.
+    Description: The VMware Tanzu Net password (authentication key).
     NoEcho: true
-  TanzuNetToken:
+  TanzuNetApiToken:
     Type: String
-    Description: >-
-      The authentication token required for certain TAP installation utilities
-      within the Bootstrap.
+    Description: The VMware Tanzu Net API token.
     NoEcho: true
   QSS3BucketName:
     Type: String
@@ -355,9 +351,9 @@ Resources:
         S3BucketName: !Ref S3TAPConfigBucketName
         VpcId: !GetAtt VPCStack.Outputs.VPCID
         DomainName: !Ref TAPDomainName
-        TanzuNetID: !Ref TanzuNetID
-        TanzuNetKey: !Ref TanzuNetKey
-        TanzuNetToken: !Ref TanzuNetToken
+        TanzuNetUsername: !Ref TanzuNetUsername
+        TanzuNetPassword: !Ref TanzuNetPassword
+        TanzuNetApiToken: !Ref TanzuNetApiToken
   VPCStack:
     Type: AWS::CloudFormation::Stack
     Metadata:
@@ -401,9 +397,9 @@ Resources:
         EKSClusterName: !GetAtt EKSQSStack.Outputs.EKSClusterName
         ControlPlaneSecurityGroupId: !GetAtt EKSQSStack.Outputs.ControlPlaneSecurityGroup
         NodeGroupSecurityGroupId: !GetAtt EKSQSStack.Outputs.NodeGroupSecurityGroup
-        TanzuNetID: !Ref TanzuNetID
-        TanzuNetKey: !Ref TanzuNetKey
-        TanzuNetToken: !Ref TanzuNetToken
+        TanzuNetUsername: !Ref TanzuNetUsername
+        TanzuNetPassword: !Ref TanzuNetPassword
+        TanzuNetApiToken: !Ref TanzuNetApiToken
   EKSQSStack:
     Type: AWS::CloudFormation::Stack
     Metadata:

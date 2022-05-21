@@ -34,9 +34,9 @@ Metadata:
       - Label:
           default: VMware Tanzu Net authentication configuration
         Parameters:
-          - TanzuNetID
-          - TanzuNetToken
-          - TanzuNetKey
+          - TanzuNetUsername
+          - TanzuNetPassword
+          - TanzuNetApiToken
       - Label:
           default: Amazon EKS configuration
         Parameters:
@@ -62,12 +62,12 @@ Metadata:
         default: Egress to port
       EgressCidr:
         default: Egress CIDR
-      TanzuNetID:
-        default: ID
-      TanzuNetKey:
-        default: Key
-      TanzuNetToken:
-        default: Token
+      TanzuNetUsername:
+        default: Username
+      TanzuNetPassword:
+        default: Password
+      TanzuNetApiToken:
+        default: API token
       EKSClusterName:
         default: Cluster name
       ControlPlaneSecurityGroupId:
@@ -123,22 +123,18 @@ Parameters:
     Description: >-
       CIDR block that is permitted inbound SSH connectivity to the Bootstrap
       instance.
-  TanzuNetID:
+  TanzuNetUsername:
     Type: String
     Description: >-
-      The authentication ID or email address for authenticating to
-      VMware's Tanzu Net.
+      The VMware Tanzu Net username (authentication ID or email address).
     NoEcho: true
-  TanzuNetKey:
+  TanzuNetPassword:
     Type: String
-    Description: >-
-      The authentication Key for authenticating to VMware's Tanzu Net.
+    Description: The VMware Tanzu Net password (authentication key).
     NoEcho: true
-  TanzuNetToken:
+  TanzuNetApiToken:
     Type: String
-    Description: >-
-      The authentication token required for certain TAP installation utilities
-      within the Bootstrap VM.
+    Description: The VMware Tanzu Net API token.
     NoEcho: true
   EKSClusterName:
     Type: String
@@ -440,9 +436,9 @@ Resources:
             #!/bin/bash
             set -e
             cat <<EOF >> /etc/environment
-            TANZU_NET_ID=${TanzuNetID}
-            TANZU_NET_TOKEN=${TanzuNetToken}
-            TANZU_NET_KEY=${TanzuNetKey}
+            TANZU_NET_USERNAME=${TanzuNetUsername}
+            TANZU_NET_PASSWORD=${TanzuNetPassword}
+            TANZU_NET_API_TOKEN=${TanzuNetApiToken}
             TAP_ROUTE53_PRIVATE_HOSTED_ZONE_ID=${PrivateHostedZoneId}
             EOF
             set -a

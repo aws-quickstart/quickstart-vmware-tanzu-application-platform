@@ -21,9 +21,9 @@ Metadata:
       - Label:
           default: VMware Tanzu Net authentication configuration
         Parameters:
-          - TanzuNetID
-          - TanzuNetToken
-          - TanzuNetKey
+          - TanzuNetUsername
+          - TanzuNetPassword
+          - TanzuNetApiToken
       - Label:
           default: TAP private DNS domain configuration
         Parameters:
@@ -35,33 +35,29 @@ Metadata:
     ParameterLabels:
       VpcId:
         default: VPC ID
-      TanzuNetID:
-        default: ID
-      TanzuNetKey:
-        default: Key
-      TanzuNetToken:
-        default: Token
+      TanzuNetUsername:
+        default: Username
+      TanzuNetPassword:
+        default: Password
+      TanzuNetApiToken:
+        default: API token
       DomainName:
         default: Domain name
       S3BucketName:
         default: Name
 Parameters:
-  TanzuNetID:
+  TanzuNetUsername:
     Type: String
     Description: >-
-      The authentication ID or email address for authenticating to
-      VMware's Tanzu Net.
+      The VMware Tanzu Net username (authentication ID or email address).
     NoEcho: true
-  TanzuNetKey:
+  TanzuNetPassword:
     Type: String
-    Description: >-
-      The authentication key for authenticating to VMware's Tanzu Net.
+    Description: The VMware Tanzu Net password (authentication key).
     NoEcho: true
-  TanzuNetToken:
+  TanzuNetApiToken:
     Type: String
-    Description: >-
-      The authentication token required for certain TAP installation utilities
-      within the Bootstrap.
+    Description: The VMware Tanzu Net API token.
     NoEcho: true
   VpcId:
     Type: AWS::EC2::VPC::Id
@@ -88,18 +84,18 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: TanzuNetUserSecret
-      Description: This secret will store the Tanzu Net UserName and Password being passed in by the consumer
+      Description: The Tanzu Net username and password
       SecretString: !Sub >-
         {
-          "username": "${TanzuNetID}",
-          "password": "${TanzuNetKey}"
+          "username": "${TanzuNetUsername}",
+          "password": "${TanzuNetPassword}"
         }
   TanzuNetSecretToken:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: TanzuNetToken
-      Description: This secret will store the Tanzu Net API token being passed in by the consumer
-      SecretString: !Ref TanzuNetToken
+      Name: TanzuNetApiToken
+      Description: The Tanzu Net API token
+      SecretString: !Ref TanzuNetApiToken
   S3Bucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
@@ -139,6 +135,20 @@ Resources:
         - VPCId: !Ref VpcId
           VPCRegion: !Ref AWS::Region
 Outputs:
+  TanzuNetSecretUserArn:
+    Description: >-
+      The Amazon Resource Name (ARN) of the SecretsManager entry for the
+      Tanzu Net username and password.
+    Value: !Ref TanzuNetSecretUser
+    Export:
+      Name: qs-1t1t2pssn:TanzuNetSecretUserArn
+  TanzuNetSecretTokenArn:
+    Description: >-
+      The Amazon Resource Name (ARN) of the SecretsManager entry for the
+      Tanzu Net API token.
+    Value: !Ref TanzuNetSecretToken
+    Export:
+      Name: qs-1t1t2pssn:TanzuNetSecretTokenArn
   S3BucketArn:
     Description: >-
       The Amazon Resource Name (ARN) of the TAP configuration file bucket.

@@ -12,9 +12,9 @@ project:
     EKSClusterName: $[taskcat_random-string]
     NumberOfNodes: 3
     MaxNumberOfNodes: 3
-    TanzuNetID: --override--
-    TanzuNetKey: --override--
-    TanzuNetToken: --override--
+    TanzuNetUsername: --override--
+    TanzuNetPassword: --override--
+    TanzuNetApiToken: --override--
     QSS3BucketName: $[taskcat_autobucket]
     QSS3BucketRegion: $[taskcat_current_region]
   regions:
