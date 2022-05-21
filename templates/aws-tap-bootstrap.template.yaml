@@ -357,6 +357,11 @@ Resources:
             EIAMPolicyWildcardResource: >-
               Resource does not exist at time of policy creation, so it's address is unkown
     Properties:
+      RoleName: TAPBootstrapInstanceRole
+      Description: >-
+        VMware Tanzu Application Platform EKS cluster bootstrap instance
+        IAM Role.
+      Path: /VMwareTanzuApplicationPlatformQuickStart/
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
