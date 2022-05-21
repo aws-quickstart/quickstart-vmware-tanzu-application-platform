@@ -460,7 +460,8 @@ Resources:
   BootstrapInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
-      Path: /
+      InstanceProfileName: TAPBootstrapInstanceProfile
+      Path: /VMwareTanzuApplicationPlatformQuickStart/
       Roles:
         - !Ref BootstrapRole
   BootstrapInstance:
