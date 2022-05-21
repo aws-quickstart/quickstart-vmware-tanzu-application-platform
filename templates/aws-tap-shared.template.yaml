@@ -138,13 +138,16 @@ Resources:
       VPCs:
         - VPCId: !Ref VpcId
           VPCRegion: !Ref AWS::Region
-  DnsRecord:
-    Type: AWS::Route53::RecordSet
-    Properties:
-      Comment: VMware Tanzu Application Platform wildcard record
-      HostedZoneId: !Ref PrivateHostedZone
-      Name: !Sub '*.${DomainName}'
-      ResourceRecords:
-        - tanzu.vmware.com  # We'll reference the LB CNAME here
-      TTL: 60
-      Type: CNAME
+Outputs:
+  S3BucketArn:
+    Description: >-
+      The Amazon Resource Name (ARN) of the TAP configuration file bucket.
+    Value: !GetAtt S3Bucket.Arn
+    Export:
+      Name: qs-1t1t2pssn:S3BucketArn
+  PrivateHostedZoneId:
+    Description: >-
+      The ID that Amazon Route 53 assigned to the hosted zone upon creation.
+    Value: !GetAtt PrivateHostedZone.Id
+    Export:
+      Name: qs-1t1t2pssn:PrivateHostedZoneId

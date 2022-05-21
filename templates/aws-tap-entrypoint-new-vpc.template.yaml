@@ -384,7 +384,6 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn:
       - SharedStack
-      - EKSQSStack
     Properties:
       TemplateURL: !Sub
         - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/aws-tap-bootstrap.template.yaml
@@ -399,6 +398,9 @@ Resources:
         EgressToPort: !Ref BootstrapEgressToPort
         EgressCidr: !Ref BootstrapEgressCidr
         KeyPairName: !Ref KeyPairName
+        EKSClusterName: !GetAtt EKSQSStack.Outputs.EKSClusterName
+        ControlPlaneSecurityGroupId: !GetAtt EKSQSStack.Outputs.ControlPlaneSecurityGroup
+        NodeGroupSecurityGroupId: !GetAtt EKSQSStack.Outputs.NodeGroupSecurityGroup
         # TanzuNetID: !Ref TanzuNetID
         # TanzuNetKey: !Ref TanzuNetKey
         # TanzuNetToken: !Ref TanzuNetToken
