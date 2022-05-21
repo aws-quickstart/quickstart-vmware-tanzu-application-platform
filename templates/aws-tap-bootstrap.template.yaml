@@ -211,7 +211,7 @@ Resources:
       Domain: vpc
       Tags:
         - Key: Name
-          Value: BootstrapEIP
+          Value: TAPBootstrapEIP
   BootstrapInstance:
     Type: AWS::EC2::Instance
     Properties:
@@ -235,7 +235,7 @@ Resources:
             VolumeType: gp2
       Tags:
         - Key: Name
-          Value: BootstrapEC2
+          Value: TAPBootstrapInstance
   BootstrapEIPAssoc:
     Type: AWS::EC2::EIPAssociation
     Properties:
