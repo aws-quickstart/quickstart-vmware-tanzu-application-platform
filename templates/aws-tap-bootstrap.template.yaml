@@ -31,12 +31,12 @@ Metadata:
           - EgressFromPort
           - EgressToPort
           - EgressCidr
-      # - Label:
-      #     default: VMware Tanzu Net authentication configuration
-      #   Parameters:
-      #     - TanzuNetID
-      #     - TanzuNetToken
-      #     - TanzuNetKey
+      - Label:
+          default: VMware Tanzu Net authentication configuration
+        Parameters:
+          - TanzuNetID
+          - TanzuNetToken
+          - TanzuNetKey
       - Label:
           default: Amazon EKS configuration
         Parameters:
@@ -62,12 +62,12 @@ Metadata:
         default: Egress to port
       EgressCidr:
         default: Egress CIDR
-      # TanzuNetID:
-      #   default: ID
-      # TanzuNetKey:
-      #   default: Key
-      # TanzuNetToken:
-      #   default: Token
+      TanzuNetID:
+        default: ID
+      TanzuNetKey:
+        default: Key
+      TanzuNetToken:
+        default: Token
       EKSClusterName:
         default: Cluster name
       ControlPlaneSecurityGroupId:
@@ -123,23 +123,23 @@ Parameters:
     Description: >-
       CIDR block that is permitted inbound SSH connectivity to the Bootstrap
       instance.
-  # TanzuNetID:
-  #   Type: String
-  #   Description: >-
-  #     The authentication ID or email address for authenticating to
-  #     VMware's Tanzu Net.
-  #   NoEcho: true
-  # TanzuNetKey:
-  #   Type: String
-  #   Description: >-
-  #     The authentication Key for authenticating to VMware's Tanzu Net.
-  #   NoEcho: true
-  # TanzuNetToken:
-  #   Type: String
-  #   Description: >-
-  #     The authentication token required for certain TAP installation utilities
-  #     within the Bootstrap VM.
-  #   NoEcho: true
+  TanzuNetID:
+    Type: String
+    Description: >-
+      The authentication ID or email address for authenticating to
+      VMware's Tanzu Net.
+    NoEcho: true
+  TanzuNetKey:
+    Type: String
+    Description: >-
+      The authentication Key for authenticating to VMware's Tanzu Net.
+    NoEcho: true
+  TanzuNetToken:
+    Type: String
+    Description: >-
+      The authentication token required for certain TAP installation utilities
+      within the Bootstrap VM.
+    NoEcho: true
   EKSClusterName:
     Type: String
     Description: >-
@@ -440,6 +440,9 @@ Resources:
             #!/bin/bash
             set -e
             cat <<EOF >> /etc/environment
+            TANZU_NET_ID=${TanzuNetID}
+            TANZU_NET_TOKEN=${TanzuNetToken}
+            TANZU_NET_KEY=${TanzuNetKey}
             TAP_ROUTE53_PRIVATE_HOSTED_ZONE_ID=${PrivateHostedZoneId}
             EOF
             set -a
