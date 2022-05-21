@@ -295,16 +295,6 @@ Parameters:
       The authentication token required for certain TAP installation utilities
       within the Bootstrap.
     NoEcho: true
-  #AWSCLIToken:
-  #  Type: String
-  #  Description: >-
-  #    AWS token ID used when authenticating with the AWS CLI.
-  #  NoEcho: true
-  #AWSCLIKey:
-  #  Type: String
-  #  Description: >-
-  #    AWS token key used when authenticating with the AWS CLI.
-  #  NoEcho: true
   QSS3BucketName:
     Type: String
     Description: >-
@@ -412,8 +402,6 @@ Resources:
         # TanzuNetID: !Ref TanzuNetID
         # TanzuNetKey: !Ref TanzuNetKey
         # TanzuNetToken: !Ref TanzuNetToken
-        # AWSCLIToken: !Ref AWSCLIToken
-        # AWSCLIKey: !Ref AWSCLIKey
   EKSQSStack:
     Type: AWS::CloudFormation::Stack
     Metadata:

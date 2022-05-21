@@ -128,14 +128,6 @@ Parameters:
   #     The authentication token required for certain TAP installation utilities
   #     within the Bootstrap VM.
   #   NoEcho: true
-  # AWSCLIToken:
-  #   Type: String
-  #   Description: AWS Token ID used when authenticating with the AWS CLI.
-  #   NoEcho: true
-  # AWSCLIKey:
-  #   Description: AWS Token Key used when authenticating with the AWS CLI.
-  #   Type: String
-  #   NoEcho: true
 Mappings:
   AwsAmiRegionMap:
     # Ubuntu Server lookup: https://cloud-images.ubuntu.com/locator/ec2/
