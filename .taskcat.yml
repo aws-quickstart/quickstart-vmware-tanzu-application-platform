@@ -6,7 +6,7 @@ project:
   parameters:
     AvailabilityZones: $[taskcat_genaz_3]
     NumberOfAZs: 3
-    KeyName: --override--
+    KeyPairName: --override--
     RemoteAccessCidr: --override--
     S3TAPConfigBucketName: $[taskcat_random-string]-$[taskcat_current_region]
     EKSClusterName: $[taskcat_random-string]
