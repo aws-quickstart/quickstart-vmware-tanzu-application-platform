@@ -384,11 +384,11 @@ Resources:
         PrivateSubnet1ACIDR: !Ref PrivateSubnet1CIDR
         PrivateSubnet2ACIDR: !Ref PrivateSubnet2CIDR
         PrivateSubnet3ACIDR: !Ref PrivateSubnet3CIDR
-        PrivateSubnetATag2: "kubernetes.io/role/internal-elb="
+        PrivateSubnetATag2: kubernetes.io/role/internal-elb=
         PublicSubnet1CIDR: !Ref PublicSubnet1CIDR
         PublicSubnet2CIDR: !Ref PublicSubnet2CIDR
         PublicSubnet3CIDR: !Ref PublicSubnet3CIDR
-        PublicSubnetTag2: "kubernetes.io/role/elb="
+        PublicSubnetTag2: kubernetes.io/role/elb=
         VPCCIDR: !Ref VPCCIDR
   EC2Stack:
     Type: AWS::CloudFormation::Stack
