@@ -67,8 +67,8 @@ Metadata:
           default: AWS Quick Start S3 bucket configuration
         Parameters:
           - QSS3BucketName
-          - QSS3KeyPrefix
           - QSS3BucketRegion
+          - QSS3KeyPrefix
     ParameterLabels:
       AvailabilityZones:
         default: Availability Zones
@@ -118,10 +118,10 @@ Metadata:
         default: Password
       TanzuNetApiToken:
         default: API token
-      QSS3BucketRegion:
-        default: Region
       QSS3BucketName:
         default: Name
+      QSS3BucketRegion:
+        default: Region
       QSS3KeyPrefix:
         default: Key prefix
       RemoteAccessCidr:
@@ -400,6 +400,9 @@ Resources:
         TanzuNetUsername: !Ref TanzuNetUsername
         TanzuNetPassword: !Ref TanzuNetPassword
         TanzuNetApiToken: !Ref TanzuNetApiToken
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3BucketRegion: !Ref QSS3BucketRegion
+        QSS3KeyPrefix: !Ref QSS3KeyPrefix
   EKSQSStack:
     Type: AWS::CloudFormation::Stack
     Metadata:

@@ -43,6 +43,12 @@ Metadata:
           - EKSClusterName
           - ControlPlaneSecurityGroupId
           - NodeGroupSecurityGroupId
+      - Label:
+          default: AWS Quick Start S3 bucket configuration
+        Parameters:
+          - QSS3BucketName
+          - QSS3BucketRegion
+          - QSS3KeyPrefix
     ParameterLabels:
       VpcId:
         default: VPC ID
@@ -74,6 +80,12 @@ Metadata:
         default: Control plane security group ID
       NodeGroupSecurityGroupId:
         default: Node security group ID
+      QSS3BucketName:
+        default: Name
+      QSS3BucketRegion:
+        default: Region
+      QSS3KeyPrefix:
+        default: Key prefix
 Parameters:
   VpcId:
     Type: AWS::EC2::VPC::Id
@@ -155,6 +167,48 @@ Parameters:
     Type: AWS::EC2::SecurityGroup::Id
     Description: >-
       The EKS cluster's node group security group ID.
+  QSS3BucketName:
+    Type: String
+    Description: >-
+      Name of the S3 bucket for your copy of the Quick Start assets.
+      Keep the default name unless you are customizing the template.
+      Changing the name updates code references to point to a new Quick
+      Start location. This name can include numbers, lowercase letters,
+      uppercase letters, and hyphens, but do not start or end with a hyphen (-).
+      See https://aws-quickstart.github.io/option1.html.
+    MinLength: 3
+    MaxLength: 63
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: >-
+      The Quick Start bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a
+      hyphen (-).
+    Default: aws-quickstart
+  QSS3KeyPrefix:
+    Type: String
+    Description: >-
+      S3 key prefix that is used to simulate a directory for your copy of the
+      Quick Start assets. Keep the default prefix unless you are customizing
+      the template. Changing this prefix updates code references to point to
+      a new Quick Start location. This prefix can include numbers, lowercase
+      letters, uppercase letters, hyphens (-), and forward slashes (/). End
+      with a forward slash.
+      See https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
+      and https://aws-quickstart.github.io/option1.html.
+    AllowedPattern: ^([0-9a-zA-Z-.]+/)*$
+    ConstraintDescription:
+      The Quick Start S3 key prefix can include numbers, lowercase letters,
+      uppercase letters, hyphens (-), and forward slashes (/).
+    Default: quickstart-vmware-tanzu-application-platform/
+  QSS3BucketRegion:
+    Type: String
+    Description: >-
+      AWS Region where the Quick Start S3 bucket (QSS3BucketName) is
+      hosted. Keep the default Region unless you are customizing the template.
+      Changing this Region updates code references to point to a new
+      Quick Start location. When using your own bucket, specify the Region.
+      See https://aws-quickstart.github.io/option1.html.
+    Default: us-east-1
 Mappings:
   AwsAmiRegionMap:
     # Ubuntu Server lookup: https://cloud-images.ubuntu.com/locator/ec2/
@@ -213,6 +267,8 @@ Mappings:
   LinuxAmiNameMap:
     Ubuntu-Server-22.04-LTS-HVM:
       Code: US2204HVM
+Conditions:
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
 Resources:
   BootstrapSecurityGroup:
     Type: AWS::EC2::SecurityGroup
