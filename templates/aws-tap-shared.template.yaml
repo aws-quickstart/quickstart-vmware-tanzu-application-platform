@@ -111,20 +111,24 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
             BucketKeyEnabled: true
-  TAPImageRepo:
+  TAPPackagesRepo:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: tap/tap_ecr_registry
+      RepositoryName: private/tanzu-application-platform/tap-packages
       EncryptionConfiguration:
         EncryptionType: AES256
+  TAPClusterEssentialsBundleRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: private/tanzu-cluster-essentials/bundle
   TAPWorkloadRepo:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: tap/container_workload_ecr_registry
-  TAPTBSRepo:
+      RepositoryName: private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload
+  TAPWorkloadBundleRepo:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: tap/container_tbs_ecr_registry
+      RepositoryName: private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload-bundle
   PrivateHostedZone:
     Type: AWS::Route53::HostedZone
     Properties:
