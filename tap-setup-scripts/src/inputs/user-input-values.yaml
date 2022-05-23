@@ -1,0 +1,5 @@
+
+aws:
+  eks_cluster_name: eks-us-east-2-cl1
+  domain: tap-tanzu.link
+

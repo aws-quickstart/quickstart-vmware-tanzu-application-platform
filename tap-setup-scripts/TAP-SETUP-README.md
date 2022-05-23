@@ -1,103 +1,74 @@
 # Project: Tanzu Application Platform on AWS
 
-Create an EC2 Instance of Ubuntu 22.04
-```
-cat /etc/lsb-release
-DISTRIB_ID=Ubuntu
-DISTRIB_RELEASE=22.04
-DISTRIB_CODENAME=jammy
-DISTRIB_DESCRIPTION="Ubuntu 22.04 LTS"
-```
+## Pre-requisite
+1. EC2 Instance 
 
- This EC2 instance to have IAM roles attached to access EKS cluster.
+    Create an EC2 Instance of Ubuntu 22.04 (ami-09d56f8956ab235b3)
 
- Install iam-authenticator
+1. IAM Role
 
-## TAP Install Process
-
-    <br>
-1. Input Params
-
-    Fill up all the info as per below file.
-
-    Filename: /tmp/inputs/user-input-values.yaml
-
-    *aws.eks_cluster_name is mandatory and rest of aws.* are optional params*
-
-    ```yaml
-    # below variable are mandatory & user can modify
-    aws:
-      <!-- region: us-east-2 -->
-      <!-- access_key:
-      secret_key:
-      role: svc.service-account
-      account-id: -->
-      eks_cluster_name: auto-eks-yewubxfvpk
-      route_fifty_three_domain: example.com
-      <!-- route_fifty_three_zone_id: -->
-
-    tap_ecr_registry:
-      <!-- hostname: 19876543213.dkr.ecr.us-east-1.amazonaws.com -->
-      <!-- region: us-east-1 -->
-      repository: private/tanzu-application-platform/tap-packages
-
-    cluster_essentials_ecr_registry:
-        hostname: 19876543213.dkr.ecr.us-east-1.amazonaws.com
-        region: us-east-1
-        repository: private/tanzu-cluster-essentials/bundle
-
-    tbs_ecr_registry:
-      hostname: 19876543213.dkr.ecr.us-west-1.amazonaws.com
-      region: us-west-1
-      #This repository is a prefix used in workload repos
-      repository: private/tap-build-service
-
-    ootb_ecr_registry:
-      hostname: 19876543213.dkr.ecr.us-west-1.amazonaws.com
-      region: us-west-1
-      repository: private/tap-supply-chain
-
-    # below variable are optional and user can modify
-    workload:
-      name: tanzu-java-web-app-workload
-      namespace: tap-workload
-      ecr_registry:
-        hostname: 19876543213.dkr.ecr.us-west-1.amazonaws.com
-        region: us-west-1
-        # repository1 = ${ootb_ecr_registry.repository}-${name}-{namespace}
-        repository1: private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload
-        # repository2 = ${ootb_ecr_registry.repository}-${name}-{namespace}-bundle
-        repository2: private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload-bundle
-    ```
-    <br>
+    This EC2 instance has IAM roles attached to access the EKS cluster & ECR Repos.
 
 1. Pre-Create ECR Repos
 
     Use CFT to create Repos. Use the default names given above
+      - tap_ecr_registry.repository
+      - cluster_essentials_ecr_registry.repository
+      - tbs_ecr_registry.repository
+      - workload.ecr_registry.repository1
+      - workload.ecr_registry.repository2
 
-    - tap_ecr_registry.repository
-    - cluster_essentials_ecr_registry.repository
-    - tbs_ecr_registry.repository
-    - ootb_ecr_registry.repository
-    - workload.ecr_registry.repository1
-    - workload.ecr_registry.repository2
+## TAP Install Process
 
+1. Checkout public Git Repo
 
+    GITHUB_REPO_NAME=quickstart-vmware-tanzu-application-platform
+    git clone https://github.com/satya-dillikar/$GITHUB_REPO_NAME.git
+
+1. Change Dir to run the scripts
+
+    cd $GITHUB_REPO_NAME/tap-setup-scripts/
+
+1. Update Input Params Files
+
+    Fill up all the info and copy it into the below file.
+    Filename: $GITHUB_REPO_NAME/tap-setup-scripts/inputs/user-input-values.yaml
+
+    ```yaml
+    # below variable are mandatory & user can modify
+    aws:
+      eks_cluster_name: your-cluster-name
+      route_fifty_three_domain: your-domain.com
+    ```
     <br>
+
+1. Update TanzuNet Credentials
+    Fill up TanzuNet Credentials in file: $GITHUB_REPO_NAME/tap-setup-scripts/inputs/tap-config-internal-values.yaml
+
+    ```yaml
+    tanzunet:
+      hostname: registry.tanzu.vmware.com
+      username:
+      password:
+      pivnet_token:
+    ```
+    <br>
+
+   Note: Don't modify ECR Repo names.
 
 1. One Time tasks
 
 
     Run the below commands only once.
 
-    - Install tools
+    - Prepare Bootstrap EC2 & Install tools
       ```
-      ./src/install-tools.sh
+      ./src/tap-main.sh -c bootstrap
       ```
 
-    - relocate TAP images to ECR
+    - Relocate TAP images to ECR
       ```
-      ./src/tap-main.sh -c relocate -f /tmp/inputs/user-input-values.yaml
+      ./src/tap-main.sh -c relocate
       ```
     <br>
 
@@ -106,17 +77,17 @@ DISTRIB_DESCRIPTION="Ubuntu 22.04 LTS"
 
     - tap install
       ```
-      ./src/tap-main.sh -c install -f /tmp/inputs/user-input-values.yaml
+      ./src/tap-main.sh -c install
       ```
 
     - tap uninstall
       ```
-      ./src/tap-main.sh -c uninstall -f /tmp/inputs/user-input-values.yaml
+      ./src/tap-main.sh -c uninstall
       ```
 
     - tap install with skipping prerequisite (for 2nd or later runs)
       ```
-      ./src/tap-main.sh -c install -f /tmp/inputs/user-input-values.yaml  -s
+      ./src/tap-main.sh -c install -s
       ```
 
     <br>

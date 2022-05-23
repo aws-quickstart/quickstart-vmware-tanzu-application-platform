@@ -6,13 +6,26 @@ tanzunet:
   password:
   pivnet_token:
 
+tap_ecr_repository: private/tanzu-application-platform/tap-packages
+cluster_essentials_ecr_repository: private/tanzu-cluster-essentials/bundle
+tbs_ecr_repository: private/tap-build-service
+
+workload:
+  name: tanzu-java-web-app-workload
+  namespace: tap-workload
+  ootb_repo_prefix: private/tap-supply-chain
+  # repository convention is ${ootb_repo_prefix}-${name}-{namespace}
+  # repository: private/tanzu-java-web-app-workload-tap-workload
+  # bundle_repository convention is ${ootb_repo_prefix}-${name}-{namespace}-bundle
+  # bundle_repository: private/tanzu-java-web-app-workload-tap-workload-bundle
+
 cluster_essentials_bundle:
   bundle: registry.tanzu.vmware.com/tanzu-cluster-essentials/cluster-essentials-bundle
   bundle_sha256: sha256:ab0a3539da241a6ea59c75c0743e9058511d7c56312ea3906178ec0f3491f51d
+  version: 1.1.0
+  file_id: 1191987
 
 tap:
   name: tap
   namespace: tap-install
-  version: 1.1.1
-
-# append mandatory variable here
+  version: 1.1.0

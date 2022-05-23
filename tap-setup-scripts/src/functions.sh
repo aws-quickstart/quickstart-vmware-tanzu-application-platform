@@ -120,9 +120,7 @@ function installTanzuCLI {
   then
     pivnet login --api-token="$PIVNET_TOKEN"
 
-    ESSENTIALS_VERSION=1.1.0
     ESSENTIALS_FILE_NAME=tanzu-cluster-essentials-linux-amd64-$ESSENTIALS_VERSION.tgz
-    ESSENTIALS_FILE_ID=1191987
 
     pivnet download-product-files \
       --download-dir $DOWNLOADS \
@@ -209,31 +207,9 @@ function readUserInputs {
 
   banner "Reading $INPUTS/user-input-values.yaml"
 
-  # tap_ecr_registry values
-  export TAP_ECR_REGISTRY_HOSTNAME=$(yq .tap_ecr_registry.hostname $INPUTS/user-input-values.yaml)
-  export TAP_ECR_REGISTRY_REPOSITORY=$(yq .tap_ecr_registry.repository $INPUTS/user-input-values.yaml)
-  export TAP_ECR_REGISTRY_REGION=$(yq .tap_ecr_registry.region $INPUTS/user-input-values.yaml)
-
-  # tap_ecr_registry values
-  export ESSENTIALS_ECR_REGISTRY_HOSTNAME=$(yq .cluster_essentials_ecr_registry.hostname $INPUTS/user-input-values.yaml)
-  export ESSENTIALS_ECR_REGISTRY_REPOSITORY=$(yq .cluster_essentials_ecr_registry.repository $INPUTS/user-input-values.yaml)
-  export ESSENTIALS_ECR_REGISTRY_REGION=$(yq .cluster_essentials_ecr_registry.region $INPUTS/user-input-values.yaml)
-
-  # tbs_ecr_registry values
-  export TBS_ECR_REGISTRY_HOSTNAME=$(yq .tbs_ecr_registry.hostname $INPUTS/user-input-values.yaml)
-  export TBS_ECR_REGISTRY_REPOSITORY=$(yq .tbs_ecr_registry.repository $INPUTS/user-input-values.yaml)
-  export TBS_ECR_REGISTRY_REGION=$(yq .tbs_ecr_registry.region $INPUTS/user-input-values.yaml)
-
-  # ootb_ecr_registry values
-  export OOTB_ECR_REGISTRY_HOSTNAME=$(yq .ootb_ecr_registry.hostname $INPUTS/user-input-values.yaml)
-  export OOTB_ECR_REGISTRY_REPOSITORY=$(yq .ootb_ecr_registry.repository $INPUTS/user-input-values.yaml)
-  export OOTB_ECR_REGISTRY_REGION=$(yq .ootb_ecr_registry.region $INPUTS/user-input-values.yaml)
-
-  DEVELOPER_NAMESPACE=$(yq .workload.namespace $INPUTS/user-input-values.yaml)
-  SAMPLE_APP_NAME=$(yq .workload.name $INPUTS/user-input-values.yaml)
-
   AWS_REGION=`curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region`
   AWS_ACCOUNT=`curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .accountId`
+
   CLUSTER_NAME=$(yq .aws.eks_cluster_name $INPUTS/user-input-values.yaml)
   AWS_DOMAIN_NAME=$(yq .aws.domain $INPUTS/user-input-values.yaml)
 }
@@ -252,29 +228,28 @@ function readTAPInternalValues {
 
   export ESSENTIALS_BUNDLE=$(yq .cluster_essentials_bundle.bundle $INPUTS/tap-config-internal-values.yaml)
   export ESSENTIALS_BUNDLE_SHA256=$(yq .cluster_essentials_bundle.bundle_sha256 $INPUTS/tap-config-internal-values.yaml)
+  export ESSENTIALS_VERSION=$(yq .cluster_essentials_bundle.version $INPUTS/tap-config-internal-values.yaml)
+  export ESSENTIALS_FILE_ID=$(yq .cluster_essentials_bundle.file_id $INPUTS/tap-config-internal-values.yaml)
 
+  export TAP_ECR_REGISTRY_REPOSITORY=$(yq .tap_ecr_repository $INPUTS/tap-config-internal-values.yaml)
+  export ESSENTIALS_ECR_REGISTRY_REPOSITORY=$(yq .cluster_essentials_ecr_repository $INPUTS/tap-config-internal-values.yaml)
+  export TBS_ECR_REGISTRY_REPOSITORY=$(yq .tbs_ecr_repository $INPUTS/tap-config-internal-values.yaml)
+
+  DEVELOPER_NAMESPACE=$(yq .workload.namespace $INPUTS/tap-config-internal-values.yaml)
+  SAMPLE_APP_NAME=$(yq .workload.name $INPUTS/tap-config-internal-values.yaml)
 }
 
 function parseUserInputs {
 
   banner "getting ECR registry credentials"
 
-  export TAP_ECR_REGISTRY_USERNAME=AWS
-  export TAP_ECR_REGISTRY_PASSWORD=$(aws ecr get-login-password --region $TAP_ECR_REGISTRY_REGION)
+  export ECR_REGISTRY_HOSTNAME=${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+  export ECR_REGISTRY_USERNAME=AWS
+  export ECR_REGISTRY_PASSWORD=$(aws ecr get-login-password --region $AWS_REGION)
 
-  export ESSENTIALS_ECR_REGISTRY_USERNAME=AWS
-  export ESSENTIALS_ECR_REGISTRY_PASSWORD=$(aws ecr get-login-password --region $ESSENTIALS_ECR_REGISTRY_REGION)
-
-  export TBS_ECR_REGISTRY_USERNAME=AWS
-  export TBS_ECR_REGISTRY_PASSWORD=$(aws ecr get-login-password --region $TBS_ECR_REGISTRY_REGION)
-
-  export OOTB_ECR_REGISTRY_USERNAME=AWS
-  export OOTB_ECR_REGISTRY_PASSWORD=$(aws ecr get-login-password --region $OOTB_ECR_REGISTRY_REGION)
-
-  # echo TAP_ECR_REGISTRY_PASSWORD $TAP_ECR_REGISTRY_PASSWORD
-  # echo ESSENTIALS_ECR_REGISTRY_PASSWORD $ESSENTIALS_ECR_REGISTRY_PASSWORD
-  # echo TBS_ECR_REGISTRY_PASSWORD $TBS_ECR_REGISTRY_PASSWORD
-  # echo OOTB_ECR_REGISTRY_PASSWORD $OOTB_ECR_REGISTRY_PASSWORD
+  echo ECR_REGISTRY_HOSTNAME $ECR_REGISTRY_HOSTNAME
+  echo ECR_REGISTRY_USERNAME $ECR_REGISTRY_USERNAME
+  echo ECR_REGISTRY_PASSWORD $ECR_REGISTRY_PASSWORD
   rm -rf $GENERATED
   mkdir -p $GENERATED
 
@@ -283,22 +258,23 @@ function parseUserInputs {
   banner "Generating tap-values.yaml"
 
   ytt -f $INPUTS/tap-values.yaml -f $GENERATED/user-input-values.yaml \
-  	--data-value tbs_ecr_registry.username=$TBS_ECR_REGISTRY_USERNAME \
-  	--data-value tbs_ecr_registry.password=$TBS_ECR_REGISTRY_PASSWORD \
+    --data-value ecr_registry_username=$ECR_REGISTRY_USERNAME \
+    --data-value ecr_registry_password=$ECR_REGISTRY_PASSWORD \
+    --data-value ecr_registry_hostname=$ECR_REGISTRY_HOSTNAME \
     --ignore-unknown-comments > $GENERATED/tap-values.yaml
 }
 
 
 function installTanzuClusterEssentials {
   requireValue TAP_VERSION  \
-    ESSENTIALS_ECR_REGISTRY_HOSTNAME ESSENTIALS_ECR_REGISTRY_REPOSITORY \
-    ESSENTIALS_ECR_REGISTRY_USERNAME ESSENTIALS_ECR_REGISTRY_PASSWORD
+    ECR_REGISTRY_HOSTNAME ESSENTIALS_ECR_REGISTRY_REPOSITORY \
+    ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD ESSENTIALS_BUNDLE_SHA256
 
   # tanzu-cluster-essentials install.sh script needs INSTALL_BUNDLE & below INSTALL_XXX params
-  export INSTALL_BUNDLE=$ESSENTIALS_ECR_REGISTRY_HOSTNAME/$ESSENTIALS_ECR_REGISTRY_REPOSITORY@$ESSENTIALS_BUNDLE_SHA256
-  export INSTALL_REGISTRY_HOSTNAME=$ESSENTIALS_ECR_REGISTRY_HOSTNAME
-  export INSTALL_REGISTRY_USERNAME=$ESSENTIALS_ECR_REGISTRY_USERNAME
-  export INSTALL_REGISTRY_PASSWORD=$ESSENTIALS_ECR_REGISTRY_PASSWORD
+  export INSTALL_BUNDLE=$ECR_REGISTRY_HOSTNAME/$ESSENTIALS_ECR_REGISTRY_REPOSITORY@$ESSENTIALS_BUNDLE_SHA256
+  export INSTALL_REGISTRY_HOSTNAME=$ECR_REGISTRY_HOSTNAME
+  export INSTALL_REGISTRY_USERNAME=$ECR_REGISTRY_USERNAME
+  export INSTALL_REGISTRY_PASSWORD=$ECR_REGISTRY_PASSWORD
   # echo INSTALL_BUNDLE $INSTALL_BUNDLE
   # echo INSTALL_REGISTRY_HOSTNAME $INSTALL_REGISTRY_HOSTNAME
   # echo INSTALL_REGISTRY_USERNAME $INSTALL_REGISTRY_USERNAME
@@ -344,7 +320,7 @@ function createTapNamespace {
 
 function loadPackageRepository {
   requireValue TAP_VERSION TAP_NAMESPACE \
-    TAP_ECR_REGISTRY_HOSTNAME TAP_ECR_REGISTRY_REPOSITORY
+    ECR_REGISTRY_HOSTNAME TAP_ECR_REGISTRY_REPOSITORY
 
   banner "Removing any current TAP package repository"
 
@@ -354,7 +330,7 @@ function loadPackageRepository {
   banner "Adding TAP package repository"
 
   tanzu package repository add tanzu-tap-repository \
-      --url $TAP_ECR_REGISTRY_HOSTNAME/$TAP_ECR_REGISTRY_REPOSITORY:$TAP_VERSION \
+      --url $ECR_REGISTRY_HOSTNAME/$TAP_ECR_REGISTRY_REPOSITORY:$TAP_VERSION \
       --namespace $TAP_NAMESPACE
   tanzu package repository get tanzu-tap-repository --namespace $TAP_NAMESPACE
   while [[ $(tanzu package available list --namespace $TAP_NAMESPACE -o json) == '[]' ]]
@@ -365,7 +341,7 @@ function loadPackageRepository {
 }
 
 function createTapRegistrySecret {
-  requireValue TAP_ECR_REGISTRY_USERNAME TAP_ECR_REGISTRY_PASSWORD TAP_ECR_REGISTRY_HOSTNAME TAP_NAMESPACE
+  requireValue ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD ECR_REGISTRY_HOSTNAME TAP_NAMESPACE
 
   banner "Creating tap-registry registry secret"
 
@@ -373,8 +349,8 @@ function createTapRegistrySecret {
   waitForRemoval kubectl get secret tap-registry --namespace $TAP_NAMESPACE -o json
 
   tanzu secret registry add tap-registry \
-    --username "$TAP_ECR_REGISTRY_USERNAME" --password "$TAP_ECR_REGISTRY_PASSWORD" \
-    --server $TAP_ECR_REGISTRY_HOSTNAME \
+    --username "$ECR_REGISTRY_USERNAME" --password "$ECR_REGISTRY_PASSWORD" \
+    --server $ECR_REGISTRY_HOSTNAME \
     --export-to-all-namespaces --namespace $TAP_NAMESPACE --yes
 }
 
@@ -410,14 +386,13 @@ function tapInstallFull {
         then
           message "package($package) failed to reconcile ($status), waiting for reconcile"
           # reconcilePackageInstall $TAP_NAMESPACE $package
-          kctrl package installed kick -i $package -n $TAP_NAMESPACE
-          sleep $DELAY
+          kctrl package installed kick -i $package -n $TAP_NAMESPACE -y
           EXIT="false"
         fi
       done < $GENERATED/tap-packages-installed-list.txt
       ((RETRIES=RETRIES-1))
+      sleep $DELAY
   done
-  sleep $DELAY
 
   banner "Checking for ERRORs in all packages"
   tanzu package installed list --namespace $TAP_NAMESPACE  -o json | \
@@ -435,13 +410,13 @@ function tapInstallFull {
 
 function tapWorkloadInstallFull {
 
-  requireValue OOTB_ECR_REGISTRY_USERNAME OOTB_ECR_REGISTRY_PASSWORD OOTB_ECR_REGISTRY_HOSTNAME \
+  requireValue ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD ECR_REGISTRY_HOSTNAME \
     DEVELOPER_NAMESPACE SAMPLE_APP_NAME
 
   banner "Installing Sample Workload"
 
   # 'registry-credentials' is used in tap-values.yaml & developer-namespace.yaml files
-  tanzu secret registry add registry-credentials --username ${OOTB_ECR_REGISTRY_USERNAME} --password ${OOTB_ECR_REGISTRY_PASSWORD} --server ${OOTB_ECR_REGISTRY_HOSTNAME} --namespace ${DEVELOPER_NAMESPACE}
+  tanzu secret registry add registry-credentials --username ${ECR_REGISTRY_USERNAME} --password ${ECR_REGISTRY_PASSWORD} --server ${ECR_REGISTRY_HOSTNAME} --namespace ${DEVELOPER_NAMESPACE}
 
 
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/developer-namespace.yaml
@@ -521,27 +496,24 @@ function relocateTAPPackages {
 
   requireValue TANZUNET_REGISTRY_USERNAME TANZUNET_REGISTRY_PASSWORD \
     TANZUNET_REGISTRY_HOSTNAME TAP_VERSION ESSENTIALS_BUNDLE ESSENTIALS_BUNDLE_SHA256 \
-    TAP_ECR_REGISTRY_HOSTNAME TAP_ECR_REGISTRY_REPOSITORY \
-    TAP_ECR_REGISTRY_USERNAME TAP_ECR_REGISTRY_PASSWORD  \
-    ESSENTIALS_ECR_REGISTRY_HOSTNAME ESSENTIALS_ECR_REGISTRY_REPOSITORY \
-    ESSENTIALS_ECR_REGISTRY_USERNAME ESSENTIALS_ECR_REGISTRY_PASSWORD
+    TAP_ECR_REGISTRY_REPOSITORY \
+    ECR_REGISTRY_HOSTNAME ESSENTIALS_ECR_REGISTRY_REPOSITORY \
+    ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD
 
-  banner "Relocating TAP images, this will take time in minutes (30-45min) ..."
+  banner "Relocating images, this will take time in minutes (30-45min) ..."
 
-  docker login --username $TAP_ECR_REGISTRY_USERNAME --password $TAP_ECR_REGISTRY_PASSWORD $TAP_ECR_REGISTRY_HOSTNAME
+  docker login --username $ECR_REGISTRY_USERNAME --password $ECR_REGISTRY_PASSWORD $ECR_REGISTRY_HOSTNAME
 
   docker login --username $TANZUNET_REGISTRY_USERNAME --password $TANZUNET_REGISTRY_PASSWORD $TANZUNET_REGISTRY_HOSTNAME
-
-  docker login --username $ESSENTIALS_ECR_REGISTRY_USERNAME --password $ESSENTIALS_ECR_REGISTRY_PASSWORD $ESSENTIALS_ECR_REGISTRY_HOSTNAME
 
   # --concurrency 2 is required for AWS
   echo "Relocating Tanzu Cluster Essentials Bundle"
   imgpkg copy --concurrency 2 -b ${ESSENTIALS_BUNDLE}@${ESSENTIALS_BUNDLE_SHA256} \
-  --to-repo ${ESSENTIALS_ECR_REGISTRY_HOSTNAME}/${ESSENTIALS_ECR_REGISTRY_REPOSITORY}
+  --to-repo ${ECR_REGISTRY_HOSTNAME}/${ESSENTIALS_ECR_REGISTRY_REPOSITORY}
 
   echo "Relocating TAP packages"
   imgpkg copy --concurrency 2 -b ${TANZUNET_REGISTRY_HOSTNAME}/tanzu-application-platform/tap-packages:${TAP_VERSION} \
-   --to-repo ${TAP_ECR_REGISTRY_HOSTNAME}/${TAP_ECR_REGISTRY_REPOSITORY}
+   --to-repo ${ECR_REGISTRY_HOSTNAME}/${TAP_ECR_REGISTRY_REPOSITORY}
 }
 
 function printOutputParams {
