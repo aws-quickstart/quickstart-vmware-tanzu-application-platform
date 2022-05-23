@@ -1,19 +1,22 @@
 project:
   name: quickstart-vmware-tanzu-application-platform
   owner: quickstart-eng@amazon.com
+  s3_regional_buckets: true
   template: templates/aws-tap-entrypoint-new-vpc.template.yaml
   parameters:
     AvailabilityZones: $[taskcat_genaz_3]
     NumberOfAZs: 3
     KeyName: --override--
     RemoteAccessCIDR: --override--
-    S3TAPConfigBucketName: $[taskcat_autobucket]
+    S3TAPConfigBucketName: $[taskcat_random-string]-$[taskcat_current_region]
     EKSClusterName: $[taskcat_random-string]
     NumberOfNodes: 3
     MaxNumberOfNodes: 3
     TanzuNetID: --override--
     TanzuNetKey: --override--
     TanzuNetToken: --override--
+    QSS3BucketName: $[taskcat_autobucket]
+    QSS3BucketRegion: $[taskcat_current_region]
   regions:
     - us-east-1
 tests:
