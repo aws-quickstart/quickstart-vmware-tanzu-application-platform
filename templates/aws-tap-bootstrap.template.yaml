@@ -486,6 +486,7 @@ Resources:
           Ebs:
             VolumeSize: 50
             VolumeType: gp2
+            Encrypted: true
       Tags:
         - Key: Name
           Value: TAPBootstrapInstance
