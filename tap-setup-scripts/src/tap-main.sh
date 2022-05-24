@@ -1,32 +1,26 @@
 #!/bin/bash
 set -e
 
-export GITHUB_HOME=$HOME/tap-setup-scripts
-
-source "$GITHUB_HOME/src/functions.sh"
+source "src/functions.sh"
 
 function tapInstallMain {
   banner "TAP Install..."
   readUserInputs
   readTAPInternalValues
-  setupAWSConfig
   verifyK8ClusterAccess
   parseUserInputs
 
-  # "Initailizing TAP ..."
   if [[ $skipinit == "true" ]]
   then
-    echo "skipping prerequisite"
+    echo "Skipping prerequisite..."
   else
-    echo "setup prerequisite"
+    echo "Setup prerequisite..."
     installTanzuClusterEssentials
     createTapNamespace
     createTapRegistrySecret
     loadPackageRepository
   fi
-  echo "Installing TAP & Sample Workload ..."
   tapInstallFull
-  # createDnsRecord
   tapWorkloadInstallFull
   printOutputParams
   echo "TAP Install Done ..."
@@ -38,13 +32,10 @@ function tapUninstallMain {
   banner "TAP Uninstall..."
   readUserInputs
   readTAPInternalValues
-  setupAWSConfig
   verifyK8ClusterAccess
   parseUserInputs
 
-  echo "Uninstalling TAP & Sample Workload ..."
   tapWorkloadUninstallFull
-  # deleteDnsRecord
   tapUninstallFull
   deleteTapRegistrySecret
   deletePackageRepository
@@ -59,12 +50,21 @@ function tapRelocateMain {
   banner "TAP Relocate..."
   readUserInputs
   readTAPInternalValues
-  setupAWSConfig
-  verifyK8ClusterAccess
   parseUserInputs
   relocateTAPPackages
   echo "TAP Relocate Done ..."
 
+}
+
+
+function bootstrapEC2 {
+  banner "BootstrapEC2 with tools ..."
+  installTools
+  readUserInputs
+  readTAPInternalValues
+  installTanzuCLI
+  verifyTools
+  echo "BootstrapEC2 Done ..."
 }
 
 #####
@@ -88,21 +88,23 @@ do
   shift
 done
 
-if [[ -z "$cmd" ]] || [[ -z "$file" ]]
+if [[ -z "$cmd" ]]
 then
   cat <<EOT
-  Usage: $0 -c {install | uninstall | relocate} -f {filename}  OR
-      $0 -c {install} {filename} [skipinit]
+  Usage: $0 -c {install | uninstall | relocate | bootstrap } OR
+      $0 -c {install} [-s | --skipinit]
 EOT
   exit 1
 fi
 
-echo COMMAND=$cmd FILENAME=$file SKIPINIT=$skipinit
+export GITHUB_HOME=$PWD
+echo COMMAND=$cmd SKIPINIT=$skipinit GITHUB_HOME=$GITHUB_HOME
 
-export GITHUB_HOME=$HOME/tap-setup-scripts/
-cd $GITHUB_HOME/src
-rm -rf inputs/user-input-values.yaml
-cp  $file  inputs/user-input-values.yaml
+export DOWNLOADS=$GITHUB_HOME/downloads
+export INPUTS=$GITHUB_HOME/src/inputs
+export GENERATED=$GITHUB_HOME/generated
+export RESOURCES=$GITHUB_HOME/src/resources
+
 
 case $cmd in
 "install")
@@ -113,6 +115,9 @@ case $cmd in
   ;;
 "relocate")
   tapRelocateMain
+  ;;
+"bootstrap")
+  bootstrapEC2
   ;;
 esac
 

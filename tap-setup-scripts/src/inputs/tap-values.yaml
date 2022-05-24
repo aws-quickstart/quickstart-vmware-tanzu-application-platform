@@ -3,9 +3,9 @@
 profile: full
 ceip_policy_disclosed: true # Installation fails if this is set to 'false'
 buildservice:
-  kp_default_repository: #@ "{}/{}".format(data.values.tbs_ecr_registry.hostname, data.values.tbs_ecr_registry.repository)
-  kp_default_repository_username: #@ data.values.tbs_ecr_registry.username
-  kp_default_repository_password: #@ data.values.tbs_ecr_registry.password
+  kp_default_repository: #@ "{}/{}".format(data.values.ecr_registry_hostname, data.values.tbs_ecr_repository)
+  kp_default_repository_username: #@ data.values.ecr_registry_username
+  kp_default_repository_password: #@ data.values.ecr_registry_password
   tanzunet_username: #@ data.values.tanzunet.username
   tanzunet_password: #@ data.values.tanzunet.password
   enable_automatic_dependency_updates: false
@@ -15,8 +15,8 @@ supply_chain: testing_scanning
 
 ootb_supply_chain_testing_scanning:
   registry:
-    server: #@ data.values.ootb_ecr_registry.hostname
-    repository: #@ data.values.ootb_ecr_registry.repository
+    server: #@ data.values.ecr_registry_hostname
+    repository: #@ data.values.workload.ootb_repo_prefix
   gitops:
     ssh_secret: ""
 
@@ -51,7 +51,7 @@ contour:
       type: LoadBalancer
 
 cnrs:
-  domain_name: #@ "cnr.{}".format(data.values.aws.domain)
+  domain_name: #@ "{}".format(data.values.aws.domain)
 
 grype:
   namespace: #@ data.values.workload.namespace

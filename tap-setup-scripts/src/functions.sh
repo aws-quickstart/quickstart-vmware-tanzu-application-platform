@@ -1,9 +1,4 @@
 #!/bin/bash
-export GITHUB_HOME=$HOME/tap-setup-scripts
-export DOWNLOADS=$GITHUB_HOME/downloads
-export INPUTS=$GITHUB_HOME/src/inputs
-export GENERATED=$GITHUB_HOME/generated
-export RESOURCES=$GITHUB_HOME/src/resources
 
 function banner {
   local line
@@ -40,47 +35,26 @@ function requireValue {
   done
 }
 
+function fail {
+  echo $1 >&2
+  exit 1
+}
 # Wait until there is no (non-error) output from a command
 function waitForRemoval {
+  local n=1
+  local max=5
+  local delay=5
+  echo "Waiting for $@"
   while [[ -n $("$@" 2> /dev/null || true) ]]
   do
-    message "Waiting for resource to disappear ..."
-    sleep 5
+    if [[ $n -lt $max ]]; then
+      ((n++))
+      echo "Command failed. Attempt $n/$max:"
+      sleep $delay;
+    else
+     fail "The command has failed after $n attempts."
+    fi
   done
-}
-
-function setupAWSConfig {
-  requireValue AWS_REGION AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_ACCOUNT AWS_ROLE
-
-  banner "Configuring AWS credentials..."
-
-  rm -rf ~/.aws
-  mkdir -p ~/.aws
-  touch ~/.aws/credentials
-  touch ~/.aws/config
-
-  export AWS_PROFILE=$AWS_ACCOUNT-profile
-  cat << EOF > ~/.aws/credentials
-[$AWS_ROLE]
-aws_access_key_id = $AWS_ACCESS_KEY_ID
-aws_secret_access_key = $AWS_SECRET_ACCESS_KEY
-EOF
-
-  cat << EOF > ~/.aws/config
-[profile $AWS_ROLE]
-region = $AWS_REGION
-output = json
-
-[profile $AWS_PROFILE]
-role_arn = arn:aws:iam::$AWS_ACCOUNT:role/$AWS_ROLE
-source_profile = $AWS_ROLE
-region = $AWS_REGION
-EOF
-
-  unset AWS_ACCESS_KEY_ID
-  unset AWS_SECRET_ACCESS_KEY
-
-  aws sts get-caller-identity --profile $AWS_PROFILE
 }
 
 function installTools {
@@ -91,7 +65,6 @@ function installTools {
 
   # install awscli
   sudo pip3 install yq
-  # sudo apt install -y awscli
   sudo pip3 install awscli --upgrade
 
   #install yq
@@ -112,19 +85,36 @@ function installTools {
   sudo chmod +x kubectl
   sudo mv kubectl /usr/local/bin/
 
-  # install Docker in Docker
-  sudo curl -sSL https://get.docker.com/ | sh
+  # aws-iam-authenticator
+  curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.12.7/2019-03-27/bin/linux/amd64/aws-iam-authenticator
+  chmod +x ./aws-iam-authenticator
+  sudo mv ./aws-iam-authenticator /usr/local/bin/
 
-  sudo groupadd docker || true
-  USER=`whoami`
-  sudo usermod -aG docker ${USER}  || true
-  # sudo service docker start  || true
+  # install Docker
+  sudo apt-get -y remove docker docker-engine docker.io containerd runc || true
+  sudo apt-get -y update
+  sudo apt-get install -y \
+      ca-certificates \
+      curl \
+      gnupg \
+      lsb-release
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg --yes
+  echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  sudo apt-get -y update
+  sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+  sudo apt-get install -y docker-ce="5:20.10.16~3-0~ubuntu-jammy" docker-ce-cli="5:20.10.16~3-0~ubuntu-jammy" containerd.io docker-compose-plugin
+  sudo groupadd docker 2>/dev/null || true
+  sudo usermod -aG docker ${USER} 2>/dev/null || true
+  newgrp docker || true
+
+
+
 }
 
 
 function installTanzuCLI {
-  requireValue TAP_VERSION
-
   banner "Downloading kapp, secretgen configuration bundle & tanzu cli"
 
   mkdir -p $DOWNLOADS
@@ -134,7 +124,6 @@ function installTanzuCLI {
     echo "Installing pivnet CLI"
 
     curl -Lo $DOWNLOADS/pivnet https://github.com/pivotal-cf/pivnet-cli/releases/download/v3.0.1/pivnet-linux-amd64-3.0.1
-    # sudo install -o user -g user -m 0755 $DOWNLOADS/pivnet /usr/local/bin/pivnet
     sudo install -o ubuntu -g ubuntu -m 0755 $DOWNLOADS/pivnet /usr/local/bin/pivnet
   else
     echo "pivnet CLI already present"
@@ -144,9 +133,7 @@ function installTanzuCLI {
   then
     pivnet login --api-token="$PIVNET_TOKEN"
 
-    ESSENTIALS_VERSION=$TAP_VERSION
     ESSENTIALS_FILE_NAME=tanzu-cluster-essentials-linux-amd64-$ESSENTIALS_VERSION.tgz
-    ESSENTIALS_FILE_ID=1191987
 
     pivnet download-product-files \
       --download-dir $DOWNLOADS \
@@ -233,37 +220,10 @@ function readUserInputs {
 
   banner "Reading $INPUTS/user-input-values.yaml"
 
-  # tap_ecr_registry values
-  export TAP_ECR_REGISTRY_HOSTNAME=$(yq .tap_ecr_registry.hostname $INPUTS/user-input-values.yaml)
-  export TAP_ECR_REGISTRY_REPOSITORY=$(yq .tap_ecr_registry.repository $INPUTS/user-input-values.yaml)
-  export TAP_ECR_REGISTRY_REGION=$(yq .tap_ecr_registry.region $INPUTS/user-input-values.yaml)
+  AWS_REGION=`curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region`
+  AWS_ACCOUNT=`curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .accountId`
 
-  # tap_ecr_registry values
-  export ESSENTIALS_ECR_REGISTRY_HOSTNAME=$(yq .cluster_essentials_ecr_registry.hostname $INPUTS/user-input-values.yaml)
-  export ESSENTIALS_ECR_REGISTRY_REPOSITORY=$(yq .cluster_essentials_ecr_registry.repository $INPUTS/user-input-values.yaml)
-  export ESSENTIALS_ECR_REGISTRY_REGION=$(yq .cluster_essentials_ecr_registry.region $INPUTS/user-input-values.yaml)
-
-  # tbs_ecr_registry values
-  export TBS_ECR_REGISTRY_HOSTNAME=$(yq .tbs_ecr_registry.hostname $INPUTS/user-input-values.yaml)
-  export TBS_ECR_REGISTRY_REPOSITORY=$(yq .tbs_ecr_registry.repository $INPUTS/user-input-values.yaml)
-  export TBS_ECR_REGISTRY_REGION=$(yq .tbs_ecr_registry.region $INPUTS/user-input-values.yaml)
-
-  # ootb_ecr_registry values
-  export OOTB_ECR_REGISTRY_HOSTNAME=$(yq .ootb_ecr_registry.hostname $INPUTS/user-input-values.yaml)
-  export OOTB_ECR_REGISTRY_REPOSITORY=$(yq .ootb_ecr_registry.repository $INPUTS/user-input-values.yaml)
-  export OOTB_ECR_REGISTRY_REGION=$(yq .ootb_ecr_registry.region $INPUTS/user-input-values.yaml)
-
-  DEVELOPER_NAMESPACE=$(yq .workload.namespace $INPUTS/user-input-values.yaml)
-  SAMPLE_APP_NAME=$(yq .workload.name $INPUTS/user-input-values.yaml)
-
-  AWS_REGION=$(yq .aws.region $INPUTS/user-input-values.yaml)
-  AWS_ACCOUNT=$(yq .aws.account $INPUTS/user-input-values.yaml)
-  AWS_ROLE=$(yq .aws.role $INPUTS/user-input-values.yaml)
-  AWS_ACCESS_KEY_ID=$(yq .aws.access_key $INPUTS/user-input-values.yaml)
-  AWS_SECRET_ACCESS_KEY=$(yq .aws.secret_key $INPUTS/user-input-values.yaml)
   CLUSTER_NAME=$(yq .aws.eks_cluster_name $INPUTS/user-input-values.yaml)
-
-  AWS_ROUTE53_ZONE_ID=$(yq .aws.route_fifty_three_zone_id $INPUTS/user-input-values.yaml)
   AWS_DOMAIN_NAME=$(yq .aws.domain $INPUTS/user-input-values.yaml)
 }
 
@@ -281,30 +241,28 @@ function readTAPInternalValues {
 
   export ESSENTIALS_BUNDLE=$(yq .cluster_essentials_bundle.bundle $INPUTS/tap-config-internal-values.yaml)
   export ESSENTIALS_BUNDLE_SHA256=$(yq .cluster_essentials_bundle.bundle_sha256 $INPUTS/tap-config-internal-values.yaml)
+  export ESSENTIALS_VERSION=$(yq .cluster_essentials_bundle.version $INPUTS/tap-config-internal-values.yaml)
+  export ESSENTIALS_FILE_ID=$(yq .cluster_essentials_bundle.file_id $INPUTS/tap-config-internal-values.yaml)
 
+  export TAP_ECR_REGISTRY_REPOSITORY=$(yq .tap_ecr_repository $INPUTS/tap-config-internal-values.yaml)
+  export ESSENTIALS_ECR_REGISTRY_REPOSITORY=$(yq .cluster_essentials_ecr_repository $INPUTS/tap-config-internal-values.yaml)
+  export TBS_ECR_REGISTRY_REPOSITORY=$(yq .tbs_ecr_repository $INPUTS/tap-config-internal-values.yaml)
+
+  DEVELOPER_NAMESPACE=$(yq .workload.namespace $INPUTS/tap-config-internal-values.yaml)
+  SAMPLE_APP_NAME=$(yq .workload.name $INPUTS/tap-config-internal-values.yaml)
 }
 
-# call this function after setupAWSConfig
 function parseUserInputs {
 
   banner "getting ECR registry credentials"
 
-  export TAP_ECR_REGISTRY_USERNAME=AWS
-  export TAP_ECR_REGISTRY_PASSWORD=$(aws ecr get-login-password --region $TAP_ECR_REGISTRY_REGION --profile $AWS_PROFILE)
+  export ECR_REGISTRY_HOSTNAME=${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+  export ECR_REGISTRY_USERNAME=AWS
+  export ECR_REGISTRY_PASSWORD=$(aws ecr get-login-password --region $AWS_REGION)
 
-  export ESSENTIALS_ECR_REGISTRY_USERNAME=AWS
-  export ESSENTIALS_ECR_REGISTRY_PASSWORD=$(aws ecr get-login-password --region $ESSENTIALS_ECR_REGISTRY_REGION --profile $AWS_PROFILE)
-
-  export TBS_ECR_REGISTRY_USERNAME=AWS
-  export TBS_ECR_REGISTRY_PASSWORD=$(aws ecr get-login-password --region $TBS_ECR_REGISTRY_REGION --profile $AWS_PROFILE)
-
-  export OOTB_ECR_REGISTRY_USERNAME=AWS
-  export OOTB_ECR_REGISTRY_PASSWORD=$(aws ecr get-login-password --region $OOTB_ECR_REGISTRY_REGION --profile $AWS_PROFILE)
-
-  # echo TAP_ECR_REGISTRY_PASSWORD $TAP_ECR_REGISTRY_PASSWORD
-  # echo ESSENTIALS_ECR_REGISTRY_PASSWORD $ESSENTIALS_ECR_REGISTRY_PASSWORD
-  # echo TBS_ECR_REGISTRY_PASSWORD $TBS_ECR_REGISTRY_PASSWORD
-  # echo OOTB_ECR_REGISTRY_PASSWORD $OOTB_ECR_REGISTRY_PASSWORD
+  # echo ECR_REGISTRY_HOSTNAME $ECR_REGISTRY_HOSTNAME
+  # echo ECR_REGISTRY_USERNAME $ECR_REGISTRY_USERNAME
+  # echo ECR_REGISTRY_PASSWORD $ECR_REGISTRY_PASSWORD
   rm -rf $GENERATED
   mkdir -p $GENERATED
 
@@ -313,22 +271,23 @@ function parseUserInputs {
   banner "Generating tap-values.yaml"
 
   ytt -f $INPUTS/tap-values.yaml -f $GENERATED/user-input-values.yaml \
-  	--data-value tbs_ecr_registry.username=$TBS_ECR_REGISTRY_USERNAME \
-  	--data-value tbs_ecr_registry.password=$TBS_ECR_REGISTRY_PASSWORD \
+    --data-value ecr_registry_username=$ECR_REGISTRY_USERNAME \
+    --data-value ecr_registry_password=$ECR_REGISTRY_PASSWORD \
+    --data-value ecr_registry_hostname=$ECR_REGISTRY_HOSTNAME \
     --ignore-unknown-comments > $GENERATED/tap-values.yaml
 }
 
 
 function installTanzuClusterEssentials {
-  requireValue TAP_VERSION AWS_REGION AWS_PROFILE \
-    ESSENTIALS_ECR_REGISTRY_HOSTNAME ESSENTIALS_ECR_REGISTRY_REPOSITORY \
-    ESSENTIALS_ECR_REGISTRY_USERNAME ESSENTIALS_ECR_REGISTRY_PASSWORD
+  requireValue TAP_VERSION  \
+    ECR_REGISTRY_HOSTNAME ESSENTIALS_ECR_REGISTRY_REPOSITORY \
+    ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD ESSENTIALS_BUNDLE_SHA256
 
   # tanzu-cluster-essentials install.sh script needs INSTALL_BUNDLE & below INSTALL_XXX params
-  export INSTALL_BUNDLE=$ESSENTIALS_ECR_REGISTRY_HOSTNAME/$ESSENTIALS_ECR_REGISTRY_REPOSITORY@$ESSENTIALS_BUNDLE_SHA256
-  export INSTALL_REGISTRY_HOSTNAME=$ESSENTIALS_ECR_REGISTRY_HOSTNAME
-  export INSTALL_REGISTRY_USERNAME=$ESSENTIALS_ECR_REGISTRY_USERNAME
-  export INSTALL_REGISTRY_PASSWORD=$ESSENTIALS_ECR_REGISTRY_PASSWORD
+  export INSTALL_BUNDLE=$ECR_REGISTRY_HOSTNAME/$ESSENTIALS_ECR_REGISTRY_REPOSITORY@$ESSENTIALS_BUNDLE_SHA256
+  export INSTALL_REGISTRY_HOSTNAME=$ECR_REGISTRY_HOSTNAME
+  export INSTALL_REGISTRY_USERNAME=$ECR_REGISTRY_USERNAME
+  export INSTALL_REGISTRY_PASSWORD=$ECR_REGISTRY_PASSWORD
   # echo INSTALL_BUNDLE $INSTALL_BUNDLE
   # echo INSTALL_REGISTRY_HOSTNAME $INSTALL_REGISTRY_HOSTNAME
   # echo INSTALL_REGISTRY_USERNAME $INSTALL_REGISTRY_USERNAME
@@ -343,14 +302,15 @@ function installTanzuClusterEssentials {
 }
 
 function verifyK8ClusterAccess {
-  requireValue CLUSTER_NAME AWS_REGION AWS_PROFILE
+  requireValue CLUSTER_NAME AWS_REGION
 
   rm -rf ~/.kube
   mkdir -p ~/.kube
   touch ~/.kube/config
 
   banner "Verify EKS Cluster ${CLUSTER_NAME} access"
-  aws eks --region ${AWS_REGION} update-kubeconfig --name ${CLUSTER_NAME} --profile $AWS_PROFILE
+  aws sts get-caller-identity
+  aws eks --region ${AWS_REGION} update-kubeconfig --name ${CLUSTER_NAME}
   kubectl config current-context
   kubectl get nodes
 }
@@ -373,7 +333,7 @@ function createTapNamespace {
 
 function loadPackageRepository {
   requireValue TAP_VERSION TAP_NAMESPACE \
-    TAP_ECR_REGISTRY_HOSTNAME TAP_ECR_REGISTRY_REPOSITORY
+    ECR_REGISTRY_HOSTNAME TAP_ECR_REGISTRY_REPOSITORY
 
   banner "Removing any current TAP package repository"
 
@@ -383,7 +343,7 @@ function loadPackageRepository {
   banner "Adding TAP package repository"
 
   tanzu package repository add tanzu-tap-repository \
-      --url $TAP_ECR_REGISTRY_HOSTNAME/$TAP_ECR_REGISTRY_REPOSITORY:$TAP_VERSION \
+      --url $ECR_REGISTRY_HOSTNAME/$TAP_ECR_REGISTRY_REPOSITORY:$TAP_VERSION \
       --namespace $TAP_NAMESPACE
   tanzu package repository get tanzu-tap-repository --namespace $TAP_NAMESPACE
   while [[ $(tanzu package available list --namespace $TAP_NAMESPACE -o json) == '[]' ]]
@@ -394,7 +354,7 @@ function loadPackageRepository {
 }
 
 function createTapRegistrySecret {
-  requireValue TAP_ECR_REGISTRY_USERNAME TAP_ECR_REGISTRY_PASSWORD TAP_ECR_REGISTRY_HOSTNAME TAP_NAMESPACE
+  requireValue ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD ECR_REGISTRY_HOSTNAME TAP_NAMESPACE
 
   banner "Creating tap-registry registry secret"
 
@@ -402,8 +362,8 @@ function createTapRegistrySecret {
   waitForRemoval kubectl get secret tap-registry --namespace $TAP_NAMESPACE -o json
 
   tanzu secret registry add tap-registry \
-    --username "$TAP_ECR_REGISTRY_USERNAME" --password "$TAP_ECR_REGISTRY_PASSWORD" \
-    --server $TAP_ECR_REGISTRY_HOSTNAME \
+    --username "$ECR_REGISTRY_USERNAME" --password "$ECR_REGISTRY_PASSWORD" \
+    --server $ECR_REGISTRY_HOSTNAME \
     --export-to-all-namespaces --namespace $TAP_NAMESPACE --yes
 }
 
@@ -422,7 +382,32 @@ function tapInstallFull {
   fi
 
   banner "Checking state of all packages"
+  local RETRIES=10
+  local DELAY=15
+  local EXIT="false"
 
+  while [[ $RETRIES -gt 0 && $EXIT == "false" ]]
+  do
+    echo "Number of RETRIES=$RETRIES"
+    EXIT="true"
+    rm -rf $GENERATED/tap-packages-installed-list.txt
+    tanzu package installed list --namespace $TAP_NAMESPACE  -o json | \
+      jq -r '.[] | (.name + " " + .status)' > $GENERATED/tap-packages-installed-list.txt
+      while read package status
+      do
+        if [[ "$status" != "Reconcile succeeded" ]]
+        then
+          message "package($package) failed to reconcile ($status), waiting for reconcile"
+          # reconcilePackageInstall $TAP_NAMESPACE $package
+          # kctrl package installed kick -i $package -n $TAP_NAMESPACE -y
+          EXIT="false"
+        fi
+      done < $GENERATED/tap-packages-installed-list.txt
+      ((RETRIES=RETRIES-1))
+      sleep $DELAY
+  done
+
+  banner "Checking for ERRORs in all packages"
   tanzu package installed list --namespace $TAP_NAMESPACE  -o json | \
     jq -r '.[] | (.name + " " + .status)' | \
     while read package status
@@ -433,72 +418,27 @@ function tapInstallFull {
         exit 1
       fi
     done
-
-  banner "Setup complete."
-
-
+  banner "TAP Installation is Complete."
 }
 
 function tapWorkloadInstallFull {
 
-  requireValue OOTB_ECR_REGISTRY_USERNAME OOTB_ECR_REGISTRY_PASSWORD OOTB_ECR_REGISTRY_HOSTNAME \
+  requireValue ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD ECR_REGISTRY_HOSTNAME \
     DEVELOPER_NAMESPACE SAMPLE_APP_NAME
 
-  banner "Installing sample workload"
+  banner "Installing Sample Workload"
 
   # 'registry-credentials' is used in tap-values.yaml & developer-namespace.yaml files
-  tanzu secret registry add registry-credentials --username ${OOTB_ECR_REGISTRY_USERNAME} --password ${OOTB_ECR_REGISTRY_PASSWORD} --server ${OOTB_ECR_REGISTRY_HOSTNAME} --namespace ${DEVELOPER_NAMESPACE}
+  tanzu secret registry add registry-credentials --username ${ECR_REGISTRY_USERNAME} --password ${ECR_REGISTRY_PASSWORD} --server ${ECR_REGISTRY_HOSTNAME} --namespace ${DEVELOPER_NAMESPACE}
 
 
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/developer-namespace.yaml
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/pipeline.yaml
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/scan-policy.yaml
-  # kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/git-ssh-basic-auth.yaml
 
-  (tanzu apps workload get $SAMPLE_APP_NAME -n $DEVELOPER_NAMESPACE -o json 2> /dev/null) || \
-  tanzu apps workload apply -f resources/workload-aws.yaml -n $DEVELOPER_NAMESPACE --yes
+  tanzu apps workload apply -f $RESOURCES/workload-aws.yaml -n $DEVELOPER_NAMESPACE --yes
 
 }
-
-function createDnsRecord {
-
-  requireValue AWS_DOMAIN_NAME AWS_PROFILE
-  # requireValue AWS_ROUTE53_ZONE_ID
-
-  fqdn=$AWS_DOMAIN_NAME
-  zone_id=$AWS_ROUTE53_ZONE_ID
-
-  # envoy loadbalancer ip
-  elb_hostname=$(kubectl get svc envoy -n tanzu-system-ingress -o jsonpath='{ .status.loadBalancer.ingress[0].hostname }' || true)
-
-  elb_zone_id=$(aws elb describe-load-balancers --profile $AWS_PROFILE | jq --arg DNSNAME "${elb_hostname}" '.LoadBalancerDescriptions[] | select( .DNSName == $DNSNAME ) | .CanonicalHostedZoneNameID ' | sed s/\"//g)
-
-  file="$GENERATED/$fqdn.json"
-  cat > "$file" << EOF
-{
-    "Comment": "Creating $fqdn Alias resource record sets in Route 53",
-    "Changes": [
-        {
-            "Action": "UPSERT",
-            "ResourceRecordSet": {
-                "Name": "*.$fqdn",
-                "Type": "CNAME",
-                "AliasTarget": {
-                    "HostedZoneId": "$elb_zone_id",
-                    "DNSName": "$elb_hostname",
-                    "EvaluateTargetHealth": false
-                }
-            }
-        }
-    ]
-}
-EOF
-  banner "Creating Route53 DNS entry for $fqdn, hostname=$elb_hostname"
-
-  aws route53 change-resource-record-sets --hosted-zone-id ${zone_id}  --change-batch "file://$file" --profile $AWS_PROFILE
-}
-
-
 
 function tapWorkloadUninstallFull {
   requireValue DEVELOPER_NAMESPACE SAMPLE_APP_NAME
@@ -510,16 +450,9 @@ function tapWorkloadUninstallFull {
   tanzu secret registry delete registry-credentials --namespace $DEVELOPER_NAMESPACE --yes || true
   waitForRemoval kubectl get secret registry-credentials --namespace $DEVELOPER_NAMESPACE -o json
 
-  kubectl -n $DEVELOPER_NAMESPACE delete -f resources/developer-namespace.yaml || true
-  kubectl -n $DEVELOPER_NAMESPACE delete -f resources/pipeline.yaml || true
-  kubectl -n $DEVELOPER_NAMESPACE delete -f resources/scan-policy.yaml || true
-  # kubectl -n $DEVELOPER_NAMESPACE delete -f resources/git-ssh-basic-auth.yaml || true
-}
-
-function deleteDnsRecord {
-  requireValue
-
-  banner "Deleting DNS Records"
+  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/developer-namespace.yaml || true
+  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/pipeline.yaml || true
+  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/scan-policy.yaml || true
 }
 
 function tapUninstallFull {
@@ -576,32 +509,29 @@ function relocateTAPPackages {
 
   requireValue TANZUNET_REGISTRY_USERNAME TANZUNET_REGISTRY_PASSWORD \
     TANZUNET_REGISTRY_HOSTNAME TAP_VERSION ESSENTIALS_BUNDLE ESSENTIALS_BUNDLE_SHA256 \
-    TAP_ECR_REGISTRY_HOSTNAME TAP_ECR_REGISTRY_REPOSITORY \
-    TAP_ECR_REGISTRY_USERNAME TAP_ECR_REGISTRY_PASSWORD  \
-    ESSENTIALS_ECR_REGISTRY_HOSTNAME ESSENTIALS_ECR_REGISTRY_REPOSITORY \
-    ESSENTIALS_ECR_REGISTRY_USERNAME ESSENTIALS_ECR_REGISTRY_PASSWORD
-  
-  banner "Relocating TAP images, this will take time in minutes (30-45min) ..."
+    TAP_ECR_REGISTRY_REPOSITORY \
+    ECR_REGISTRY_HOSTNAME ESSENTIALS_ECR_REGISTRY_REPOSITORY \
+    ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD
 
-  docker login --username $TAP_ECR_REGISTRY_USERNAME --password $TAP_ECR_REGISTRY_PASSWORD $TAP_ECR_REGISTRY_HOSTNAME
+  banner "Relocating images, this will take time in minutes (30-45min) ..."
+
+  docker login --username $ECR_REGISTRY_USERNAME --password $ECR_REGISTRY_PASSWORD $ECR_REGISTRY_HOSTNAME
 
   docker login --username $TANZUNET_REGISTRY_USERNAME --password $TANZUNET_REGISTRY_PASSWORD $TANZUNET_REGISTRY_HOSTNAME
-
-  docker login --username $ESSENTIALS_REGISTRY_USERNAME --password $ESSENTIALS_REGISTRY_PASSWORD $ESSENTIALS_REGISTRY_HOSTNAME
 
   # --concurrency 2 is required for AWS
   echo "Relocating Tanzu Cluster Essentials Bundle"
   imgpkg copy --concurrency 2 -b ${ESSENTIALS_BUNDLE}@${ESSENTIALS_BUNDLE_SHA256} \
-  --to-repo ${ESSENTIALS_ECR_REGISTRY_HOSTNAME}/${ESSENTIALS_ECR_REGISTRY_REPOSITORY}
+  --to-repo ${ECR_REGISTRY_HOSTNAME}/${ESSENTIALS_ECR_REGISTRY_REPOSITORY}
 
   echo "Relocating TAP packages"
   imgpkg copy --concurrency 2 -b ${TANZUNET_REGISTRY_HOSTNAME}/tanzu-application-platform/tap-packages:${TAP_VERSION} \
-   --to-repo ${TAP_ECR_REGISTRY_HOSTNAME}/${TAP_ECR_REGISTRY_REPOSITORY}
+   --to-repo ${ECR_REGISTRY_HOSTNAME}/${TAP_ECR_REGISTRY_REPOSITORY}
 }
 
 function printOutputParams {
   # envoy loadbalancer ip
-  requireValue AWS_DOMAIN_NAME AWS_PROFILE
+  requireValue AWS_DOMAIN_NAME
 
   elb_hostname=$(kubectl get svc envoy -n tanzu-system-ingress -o jsonpath='{ .status.loadBalancer.ingress[0].hostname }' || true)
   echo "Create Route53 DNS CNAME record for *.$AWS_DOMAIN_NAME with $elb_hostname"

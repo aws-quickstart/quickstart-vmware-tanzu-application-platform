@@ -1,80 +1,100 @@
 # Project: Tanzu Application Platform on AWS
 
-## Run Commands
+## Pre-requisite
+1. EC2 Instance
 
-Step-1:
+    Create an EC2 Instance of Ubuntu 22.04 (ami-09d56f8956ab235b3)
 
-  Fill up all the info as per below file.
+1. IAM Role
 
-  Filename: /tmp/inputs/user-input-values.yaml
+    This EC2 instance should have IAM roles attached to access the EKS cluster & ECR Repos.
+
+1. Pre-Create ECR Repos
+
+    Use CFT to create Repos. Use the default names given here
+      - tap_ecr_repository: private/tanzu-application-platform/tap-packages
+      - cluster_essentials_ecr_repository: private/tanzu-cluster-essentials/bundle
+      - tbs_ecr_repository: private/tap-build-service
+      - workload_repository: private/tanzu-java-web-app-workload-tap-workload
+      - workload_bundle_repository: private/tanzu-java-web-app-workload-tap-workload-bundle
+
+1. Create EKS Cluster
+
+## TAP Install Process
+
+1. Checkout public Git Repo
+
+    GITHUB_REPO_NAME=quickstart-vmware-tanzu-application-platform
+    git clone https://github.com/satya-dillikar/$GITHUB_REPO_NAME.git
+
+1. Change Dir to run the scripts
+
+    cd $GITHUB_REPO_NAME/tap-setup-scripts/
+
+1. Update Input Params Files
+
+    Fill up all the info and copy it into the below file.
+    Filename: $GITHUB_REPO_NAME/tap-setup-scripts/inputs/user-input-values.yaml
+
+    ```yaml
+    # below variable are mandatory & user can modify
+    aws:
+      eks_cluster_name: your-cluster-name
+      route_fifty_three_domain: your-domain.com
+    ```
+    <br>
+
+1. Update TanzuNet Credentials
+    Fill up TanzuNet Credentials in file: $GITHUB_REPO_NAME/tap-setup-scripts/inputs/tap-config-internal-values.yaml
+
+    ```yaml
+    tanzunet:
+      hostname: registry.tanzu.vmware.com
+      username:
+      password:
+      pivnet_token:
+    ```
+    <br>
+
+   Note: Don't modify ECR Repo names.
+
+1. One Time tasks
 
 
-  ```yaml
-  # below variable are mandatory & user can modify
-  aws:
-    region: us-east-2
-    access_key:
-    secret_key:
-    role: svc.service-account
-    account-id:
-    eks_cluster_name: auto-eks-yewubxfvpk
-    route_fifty_three_domain: example.com
-    route_fifty_three_zone_id:
+    Run the below commands only once.
 
-  tap_ecr_registry:
-    hostname: 19876543213.dkr.ecr.us-east-1.amazonaws.com
-    region: us-east-1
-    repository: private/tanzu-application-platform/tap-packages
+    - Prepare Bootstrap EC2 & Install tools
+      ```
+      ./src/tap-main.sh -c bootstrap
+      ```
 
-  cluster_essentials_ecr_registry:
-      hostname: 19876543213.dkr.ecr.us-east-1.amazonaws.com
-      region: us-east-1
-      repository: private/tanzu-cluster-essentials/bundle
+    - Relocate TAP images to ECR
+      ```
+      ./src/tap-main.sh -c relocate
+      ```
+    <br>
 
-  tbs_ecr_registry:
-    hostname: 19876543213.dkr.ecr.us-west-1.amazonaws.com
-    region: us-west-1
-    repository: private/tap-build-service
-
-  ootb_ecr_registry:
-    hostname: 19876543213.dkr.ecr.us-west-1.amazonaws.com
-    region: us-west-1
-    repository: private/tap-supply-chain
-
-  # below variable are optional and user can modify
-  workload:
-    name: tanzu-java-web-app-workload
-    namespace: tap-workload
-    ecr_registry:
-      hostname: 19876543213.dkr.ecr.us-west-1.amazonaws.com
-      region: us-west-1
-      # prefix=private/
-      # repository1 = ${prefix}-${name}-{namespace}
-      repository1: private/tanzu-java-web-app-workload-tap-workload
-      # repository2 = ${prefix}-${name}-{namespace}-bundle
-      repository2: private/tanzu-java-web-app-workload-tap-workload-bundle
-  ```
+1. TAP setup
 
 
-Step-2:
+    - tap install
+      ```
+      ./src/tap-main.sh -c install
+      ```
 
+    - tap uninstall
+      ```
+      ./src/tap-main.sh -c uninstall
+      ```
 
-- tap install
-  ```
-  ./src/tap-main.sh -c install -f /tmp/inputs/user-input-values.yaml
-  ```
+    - tap install with skipping prerequisite (for 2nd or later runs)
+      ```
+      ./src/tap-main.sh -c install -s
+      ```
 
-- tap uninstall
-  ```
-  ./src/tap-main.sh -c uninstall -f /tmp/inputs/user-input-values.yaml
-  ```
+    <br>
 
-- tap relocate images
-  ```
-  ./src/tap-main.sh -c relocate -f /tmp/inputs/user-input-values.yaml
-  ```
+1. Output Params
 
-- tap install with skipping prerequisite (for 2nd or later runs)
-  ```
-  ./src/tap-main.sh -c install -f /tmp/inputs/user-input-values.yaml  -s
-  ```
+     - CFT to Create Route53 DNS CNAME record for *.$AWS_DOMAIN_NAME with $elb_hostname"
+     - Display TAP GUI URL $tap_gui_url
