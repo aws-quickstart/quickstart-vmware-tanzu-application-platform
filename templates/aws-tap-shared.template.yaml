@@ -15,22 +15,34 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
+          default: VPC network configuration
+        Parameters:
+          - VpcId
+      - Label:
           default: VMware Tanzu Net authentication configuration
         Parameters:
           - TanzuNetID
           - TanzuNetToken
           - TanzuNetKey
       - Label:
+          default: TAP private DNS domain configuration
+        Parameters:
+          - DomainName
+      - Label:
           default: S3 config file bucket configuration
         Parameters:
           - S3BucketName
     ParameterLabels:
+      VpcId:
+        default: VPC ID
       TanzuNetID:
         default: ID
       TanzuNetKey:
         default: Key
       TanzuNetToken:
         default: Token
+      DomainName:
+        default: Domain name
       S3BucketName:
         default: Name
 Parameters:
@@ -51,11 +63,26 @@ Parameters:
       The authentication token required for certain TAP installation utilities
       within the Bootstrap.
     NoEcho: true
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID for the Route53 private hosted zone.
+  DomainName:
+    Type: String
+    Description: >-
+      Domain name that can be used for access to TAP and its corresponding
+      project URLs. Available within a private DNS Zone.
+    MaxLength: 1024
   S3BucketName:
     Type: String
     Description: >-
       An S3 bucket where configuration files are stored in an encrypted way for
       security purposes.
+    MinLength: 3
+    MaxLength: 63
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription:
+      The TAP bucket name can include numbers, lowercase letters, uppercase
+      letters, and hyphens (-). It cannot start or end with a hyphen (-).
 Resources:
   TanzuNetSecretUser:
     Type: AWS::SecretsManager::Secret
@@ -84,17 +111,43 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
             BucketKeyEnabled: true
-  TAPImageRepo:
+  TAPPackagesRepo:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: tap/tap_ecr_registry
+      RepositoryName: private/tanzu-application-platform/tap-packages
       EncryptionConfiguration:
         EncryptionType: AES256
+  TAPClusterEssentialsBundleRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: private/tanzu-cluster-essentials/bundle
   TAPWorkloadRepo:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: tap/container_workload_ecr_registry
-  TAPTBSRepo:
+      RepositoryName: private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload
+  TAPWorkloadBundleRepo:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: tap/container_tbs_ecr_registry
+      RepositoryName: private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload-bundle
+  PrivateHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      HostedZoneConfig:
+        Comment: VMware Tanzu Application Platform hosted zone
+      Name: !Ref DomainName
+      VPCs:
+        - VPCId: !Ref VpcId
+          VPCRegion: !Ref AWS::Region
+Outputs:
+  S3BucketArn:
+    Description: >-
+      The Amazon Resource Name (ARN) of the TAP configuration file bucket.
+    Value: !GetAtt S3Bucket.Arn
+    Export:
+      Name: qs-1t1t2pssn:S3BucketArn
+  PrivateHostedZoneId:
+    Description: >-
+      The ID that Amazon Route 53 assigned to the hosted zone upon creation.
+    Value: !GetAtt PrivateHostedZone.Id
+    Export:
+      Name: qs-1t1t2pssn:PrivateHostedZoneId
