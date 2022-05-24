@@ -50,7 +50,6 @@ function tapRelocateMain {
   banner "TAP Relocate..."
   readUserInputs
   readTAPInternalValues
-  verifyK8ClusterAccess
   parseUserInputs
   relocateTAPPackages
   echo "TAP Relocate Done ..."

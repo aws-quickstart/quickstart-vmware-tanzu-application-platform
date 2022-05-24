@@ -1,13 +1,13 @@
 # Project: Tanzu Application Platform on AWS
 
 ## Pre-requisite
-1. EC2 Instance 
+1. EC2 Instance
 
     Create an EC2 Instance of Ubuntu 22.04 (ami-09d56f8956ab235b3)
 
 1. IAM Role
 
-    This EC2 instance has IAM roles attached to access the EKS cluster & ECR Repos.
+    This EC2 instance should have IAM roles attached to access the EKS cluster & ECR Repos.
 
 1. Pre-Create ECR Repos
 
@@ -17,6 +17,8 @@
       - tbs_ecr_registry.repository
       - workload.ecr_registry.repository1
       - workload.ecr_registry.repository2
+
+1. Create EKS Cluster
 
 ## TAP Install Process
 

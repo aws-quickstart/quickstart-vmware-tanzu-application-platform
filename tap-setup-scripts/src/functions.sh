@@ -65,7 +65,6 @@ function installTools {
 
   # install awscli
   sudo pip3 install yq
-  # sudo apt install -y awscli
   sudo pip3 install awscli --upgrade
 
   #install yq
@@ -86,16 +85,31 @@ function installTools {
   sudo chmod +x kubectl
   sudo mv kubectl /usr/local/bin/
 
-  # install Docker
-  sudo curl -sSL https://get.docker.com/ | sh
-  sudo groupadd docker 2>/dev/null || true
-  sudo usermod -aG docker ${USER} 2>/dev/null || true
-  newgrp docker || true
-
   # aws-iam-authenticator
   curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.12.7/2019-03-27/bin/linux/amd64/aws-iam-authenticator
   chmod +x ./aws-iam-authenticator
   sudo mv ./aws-iam-authenticator /usr/local/bin/
+
+  # install Docker
+  sudo apt-get -y remove docker docker-engine docker.io containerd runc || true
+  sudo apt-get -y update
+  sudo apt-get install -y \
+      ca-certificates \
+      curl \
+      gnupg \
+      lsb-release
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg --yes
+  echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  sudo apt-get -y update
+  sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+  sudo apt-get install -y docker-ce="5:20.10.16~3-0~ubuntu-jammy" docker-ce-cli="5:20.10.16~3-0~ubuntu-jammy" containerd.io docker-compose-plugin
+  sudo groupadd docker 2>/dev/null || true
+  sudo usermod -aG docker ${USER} 2>/dev/null || true
+  newgrp docker || true
+
+
 
 }
 
@@ -110,7 +124,6 @@ function installTanzuCLI {
     echo "Installing pivnet CLI"
 
     curl -Lo $DOWNLOADS/pivnet https://github.com/pivotal-cf/pivnet-cli/releases/download/v3.0.1/pivnet-linux-amd64-3.0.1
-    # sudo install -o user -g user -m 0755 $DOWNLOADS/pivnet /usr/local/bin/pivnet
     sudo install -o ubuntu -g ubuntu -m 0755 $DOWNLOADS/pivnet /usr/local/bin/pivnet
   else
     echo "pivnet CLI already present"
@@ -247,9 +260,9 @@ function parseUserInputs {
   export ECR_REGISTRY_USERNAME=AWS
   export ECR_REGISTRY_PASSWORD=$(aws ecr get-login-password --region $AWS_REGION)
 
-  echo ECR_REGISTRY_HOSTNAME $ECR_REGISTRY_HOSTNAME
-  echo ECR_REGISTRY_USERNAME $ECR_REGISTRY_USERNAME
-  echo ECR_REGISTRY_PASSWORD $ECR_REGISTRY_PASSWORD
+  # echo ECR_REGISTRY_HOSTNAME $ECR_REGISTRY_HOSTNAME
+  # echo ECR_REGISTRY_USERNAME $ECR_REGISTRY_USERNAME
+  # echo ECR_REGISTRY_PASSWORD $ECR_REGISTRY_PASSWORD
   rm -rf $GENERATED
   mkdir -p $GENERATED
 
@@ -386,7 +399,7 @@ function tapInstallFull {
         then
           message "package($package) failed to reconcile ($status), waiting for reconcile"
           # reconcilePackageInstall $TAP_NAMESPACE $package
-          kctrl package installed kick -i $package -n $TAP_NAMESPACE -y
+          # kctrl package installed kick -i $package -n $TAP_NAMESPACE -y
           EXIT="false"
         fi
       done < $GENERATED/tap-packages-installed-list.txt
