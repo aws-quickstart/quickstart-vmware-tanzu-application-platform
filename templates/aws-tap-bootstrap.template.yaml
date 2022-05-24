@@ -267,7 +267,9 @@ Mappings:
   LinuxAmiNameMap:
     Ubuntu-Server-22.04-LTS-HVM:
       Code: US2204HVM
+      OS: Ubuntu
 Conditions:
+  Ubuntu: !Equals [!FindInMap [LinuxAmiNameMap, !Ref OS, OS], Ubuntu]
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
 Resources:
   BootstrapSecurityGroup:
@@ -464,8 +466,9 @@ Resources:
       Path: /VMwareTanzuApplicationPlatformQuickStart/
       Roles:
         - !Ref BootstrapRole
-  BootstrapInstance:
+  BootstrapUbuntuInstance:
     Type: AWS::EC2::Instance
+    Condition: Ubuntu
     Properties:
       InstanceType: m5.large
       IamInstanceProfile: !Ref BootstrapInstanceProfile
@@ -543,8 +546,9 @@ Resources:
             git clone https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform.git
             popd
           - PrivateHostedZoneId: !ImportValue qs-1t1t2pssn:PrivateHostedZoneId
-  BootstrapEIPAssoc:
+  BootstrapUbuntuEipAssociation:
     Type: AWS::EC2::EIPAssociation
+    Condition: Ubuntu
     Properties:
-      InstanceId: !Ref BootstrapInstance
+      InstanceId: !Ref BootstrapUbuntuInstance
       AllocationId: !GetAtt BootstrapEIP.AllocationId
