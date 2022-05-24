@@ -11,12 +11,12 @@
 
 1. Pre-Create ECR Repos
 
-    Use CFT to create Repos. Use the default names given above
-      - tap_ecr_registry.repository
-      - cluster_essentials_ecr_registry.repository
-      - tbs_ecr_registry.repository
-      - workload.ecr_registry.repository1
-      - workload.ecr_registry.repository2
+    Use CFT to create Repos. Use the default names given here
+      - tap_ecr_repository: private/tanzu-application-platform/tap-packages
+      - cluster_essentials_ecr_repository: private/tanzu-cluster-essentials/bundle
+      - tbs_ecr_repository: private/tap-build-service
+      - workload_repository: private/tanzu-java-web-app-workload-tap-workload
+      - workload_bundle_repository: private/tanzu-java-web-app-workload-tap-workload-bundle
 
 1. Create EKS Cluster
 
