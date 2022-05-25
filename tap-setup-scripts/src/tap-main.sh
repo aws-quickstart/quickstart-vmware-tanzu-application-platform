@@ -1,5 +1,10 @@
 #!/bin/bash
 set -e
+group=docker
+if [ $(id -gn) != $group ]; then
+  echo "execute as group docker"
+  exec sg $group "$0 $*"
+fi
 
 source "src/functions.sh"
 
@@ -60,6 +65,7 @@ function tapRelocateMain {
 function bootstrapEC2 {
   banner "BootstrapEC2 with tools ..."
   installTools
+  installDocker
   readUserInputs
   readTAPInternalValues
   installTanzuCLI
@@ -99,7 +105,7 @@ fi
 
 export GITHUB_HOME=$PWD
 echo COMMAND=$cmd SKIPINIT=$skipinit GITHUB_HOME=$GITHUB_HOME
-
+echo "This script is running as group $(id -gn)"
 export DOWNLOADS=$GITHUB_HOME/downloads
 export INPUTS=$GITHUB_HOME/src/inputs
 export GENERATED=$GITHUB_HOME/generated
