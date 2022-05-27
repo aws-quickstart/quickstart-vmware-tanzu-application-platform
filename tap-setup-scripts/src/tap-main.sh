@@ -61,22 +61,31 @@ function tapRelocateMain {
 
 }
 
-
-function bootstrapEC2 {
-  banner "BootstrapEC2 with tools ..."
-  installTools
-  installDocker
+function tapTestPreReqs {
+  banner "TAP Test PreReqs ..."
+  
   readUserInputs
   readTAPInternalValues
-  installTanzuCLI
-  verifyTools
-  echo "BootstrapEC2 Done ..."
+  parseUserInputs
+
+  echo ECR_REGISTRY_HOSTNAME $ECR_REGISTRY_HOSTNAME
+  echo ECR_REGISTRY_USERNAME $ECR_REGISTRY_USERNAME
+  echo ECR_REGISTRY_PASSWORD $ECR_REGISTRY_PASSWORD
+  echo AWS_DOMAIN_NAME $AWS_DOMAIN_NAME
+  echo CLUSTER_NAME $CLUSTER_NAME
+  echo TANZUNET_REGISTRY_HOSTNAME $TANZUNET_REGISTRY_HOSTNAME
+  echo TANZUNET_REGISTRY_USERNAME $TANZUNET_REGISTRY_USERNAME
+  echo TANZUNET_REGISTRY_PASSWORD $TANZUNET_REGISTRY_PASSWORD
+  echo PIVNET_TOKEN $PIVNET_TOKEN
+
+  verifyK8ClusterAccess
+
+  echo "TAP Test PreReqs Done ..."
 }
 
 #####
 ##### Main code starts here
 #####
-
 
 while [[ "$#" -gt 0 ]]
 do
@@ -97,7 +106,7 @@ done
 if [[ -z "$cmd" ]]
 then
   cat <<EOT
-  Usage: $0 -c {install | uninstall | relocate | bootstrap } OR
+  Usage: $0 -c {install | uninstall | relocate | prereqs } OR
       $0 -c {install} [-s | --skipinit]
 EOT
   exit 1
@@ -111,7 +120,6 @@ export INPUTS=$GITHUB_HOME/src/inputs
 export GENERATED=$GITHUB_HOME/generated
 export RESOURCES=$GITHUB_HOME/src/resources
 
-
 case $cmd in
 "install")
   tapInstallMain
@@ -122,8 +130,8 @@ case $cmd in
 "relocate")
   tapRelocateMain
   ;;
-"bootstrap")
-  bootstrapEC2
+"prereqs")
+  tapTestPreReqs
   ;;
 esac
 

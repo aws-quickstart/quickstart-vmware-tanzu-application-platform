@@ -1,5 +1,10 @@
+tanzunet:
+  hostname: registry.tanzu.vmware.com
+  username:
+  password:
+  pivnet_token:
 
 aws:
-  eks_cluster_name: eks-us-east-2-cl1
-  domain: tap-tanzu.link
+  eks_cluster_name:
+  domain:
 

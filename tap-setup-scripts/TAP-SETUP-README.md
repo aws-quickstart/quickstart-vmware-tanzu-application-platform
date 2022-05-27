@@ -3,7 +3,7 @@
 ## Pre-requisite
 1. EC2 Instance
 
-    Create an EC2 Instance of Ubuntu 22.04 (ami-09d56f8956ab235b3)
+    Create an EC2 Instance of Ubuntu 22.04
 
 1. IAM Role
 
@@ -15,8 +15,8 @@
       - tap_ecr_repository: private/tanzu-application-platform/tap-packages
       - cluster_essentials_ecr_repository: private/tanzu-cluster-essentials/bundle
       - tbs_ecr_repository: private/tap-build-service
-      - workload_repository: private/tanzu-java-web-app-workload-tap-workload
-      - workload_bundle_repository: private/tanzu-java-web-app-workload-tap-workload-bundle
+      - workload_repository: private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload
+      - workload_bundle_repository: private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload-bundle
 
 1. Create EKS Cluster
 
@@ -61,17 +61,22 @@
 1. One Time tasks
 
 
-    Run the below commands only once.
+    Run the below commands only once in this particular order
 
-    - Prepare Bootstrap EC2 & Install tools
-      ```
-      ./src/tap-main.sh -c bootstrap
-      ```
+    1. Prepare Bootstrap EC2 & Install tools
+        ```
+        src/install-tools.sh
+        ```
 
-    - Relocate TAP images to ECR
-      ```
-      ./src/tap-main.sh -c relocate
-      ```
+    1. Verify correct IAM Role attached to EC2 (OPTIONAL)
+        ```
+        src/tap-main.sh -c prereqs
+        ```
+
+    1. Relocate TAP images to ECR
+        ```
+        src/tap-main.sh -c relocate
+        ```
     <br>
 
 1. TAP setup
