@@ -8,6 +8,7 @@ project:
     NumberOfAZs: 3
     KeyPairName: --override--
     RemoteAccessCidr: --override--
+    BootstrapIngressCidr: --override--
     S3TAPConfigBucketName: $[taskcat_random-string]-$[taskcat_current_region]
     EKSClusterName: $[taskcat_random-string]
     NumberOfNodes: 3
@@ -15,6 +16,7 @@ project:
     TanzuNetUsername: --override--
     TanzuNetPassword: --override--
     TanzuNetApiToken: --override--
+    TAPDomainName: --override--
     QSS3BucketName: $[taskcat_autobucket]
     QSS3BucketRegion: $[taskcat_current_region]
   regions:
