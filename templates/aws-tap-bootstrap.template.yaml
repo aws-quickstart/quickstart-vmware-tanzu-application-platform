@@ -523,7 +523,7 @@ Resources:
         Fn::Base64: !Sub
           - |
             #!/bin/bash
-            set -e
+            set -xe
             cat <<EOF >> /etc/environment
             TANZU_NET_USERNAME=${TanzuNetUsername}
             TANZU_NET_PASSWORD=${TanzuNetPassword}
