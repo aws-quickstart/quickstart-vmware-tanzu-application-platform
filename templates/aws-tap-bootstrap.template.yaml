@@ -501,10 +501,7 @@ Resources:
       ImageId: !FindInMap
         - AwsAmiRegionMap
         - !Ref AWS::Region
-        - !FindInMap
-          - LinuxAmiNameMap
-          - !Ref OS
-          - Code
+        - !FindInMap [LinuxAmiNameMap, !Ref OS, Code]
       KeyName: !Ref KeyPairName
       Monitoring: true
       SecurityGroupIds:
