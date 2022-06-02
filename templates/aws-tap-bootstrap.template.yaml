@@ -541,7 +541,7 @@ Resources:
             echo "Installing python dependencies for $user..."
             su - $user python3 -m pip install --upgrade pip setuptools wheel yq
             echo "Updating certificate authority certificates..."
-            sudo update-ca-certificates
+            update-ca-certificates
             echo "Installing kubectl..."
             pushd /tmp
             curl -o ./kubectl "https://amazon-eks.s3-us-west-2.amazonaws.com/$AWS_KUBECTL_VERSION/bin/linux/amd64/kubectl"
