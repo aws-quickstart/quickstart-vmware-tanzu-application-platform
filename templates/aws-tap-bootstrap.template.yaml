@@ -561,10 +561,17 @@ Resources:
             echo "Configuring Docker..."
             groupadd docker
             usermod -aG docker $user
-            sudo curl -sSL https://get.docker.com/ | sh
-            echo "Installing Docker..."
-            sudo groupadd docker || true
-            sudo usermod -aG docker $USER || true
+            mkdir -p /root/.docker
+            mkdir -p /home/$user/.docker
+            cat <<EOF >> /root/.docker/config.json
+            {
+              "credHelpers": {
+                "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com": "ecr-login",
+                "public.ecr.aws": "ecr-login"
+              }
+            }
+            cp /root/.docker/config.json /home/$user/.docker/
+            chown -R $user:$user /home/$user
             echo "Configuring the SSH listening port..."
             sudo printf "Port ${SshPort}\n" > /etc/ssh/sshd_config.d/port.conf
             sudo systemctl status sshd.service
