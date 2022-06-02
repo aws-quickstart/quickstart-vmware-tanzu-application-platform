@@ -637,6 +637,7 @@ Resources:
             TAPWorkloadBundleRepoUri: !ImportValue qs-1t1t2pssn:TAPWorkloadBundleRepoUri
   BootstrapUbuntuEipAssociation:
     Type: AWS::EC2::EIPAssociation
+    UpdateReplacePolicy: Delete
     Condition: Ubuntu
     Properties:
       InstanceId: !Ref BootstrapUbuntuInstance
