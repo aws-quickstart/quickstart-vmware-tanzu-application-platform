@@ -544,12 +544,11 @@ Resources:
             update-ca-certificates
             echo "Installing kubectl..."
             pushd /tmp
-            curl -o ./kubectl "https://amazon-eks.s3-us-west-2.amazonaws.com/$AWS_KUBECTL_VERSION/bin/linux/amd64/kubectl"
-            curl -o ./kubectl.sha256 "https://s3.us-west-2.amazonaws.com/amazon-eks/$AWS_KUBECTL_VERSION/bin/linux/amd64/kubectl.sha256"
+            aws s3 cp "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/amd64/kubectl" ./kubectl
+            aws s3 cp "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/amd64/kubectl.sha256" ./kubectl.sha256
             openssl sha1 -sha256 ./kubectl
             chmod 755 ./kubectl
-            sudo chown root:root ./kubectl
-            sudo mv kubectl /usr/local/bin/
+            mv ./kubectl /usr/local/bin/
             popd
             echo "Installing Carvel imgpkg..."
             sudo bash -c "set -eo pipefail; wget -O- https://carvel.dev/install.sh | bash"
