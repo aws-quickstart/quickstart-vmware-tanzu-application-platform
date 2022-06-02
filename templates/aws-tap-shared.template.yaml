@@ -163,6 +163,71 @@ Outputs:
     Value: !GetAtt S3Bucket.Arn
     Export:
       Name: qs-1t1t2pssn:S3BucketArn
+  TAPPackagesRepoArn:
+    Description: TAP packages ECR repo ARN.
+    Value: !GetAtt TAPPackagesRepo.Arn
+    Export:
+      Name: qs-1t1t2pssn:TAPPackagesRepoArn
+  TAPPackagesRepoUri:
+    Description: TAP packages ECR repo URI.
+    Value: !GetAtt TAPPackagesRepo.RepositoryUri
+    Export:
+      Name: qs-1t1t2pssn:TAPPackagesRepoUri
+  TAPClusterEssentialsBundleRepoArn:
+    Description: TAP cluster essentials ECR repo ARN.
+    Value: !GetAtt TAPClusterEssentialsBundleRepo.Arn
+    Export:
+      Name: qs-1t1t2pssn:TAPClusterEssentialsBundleRepoArn
+  TAPClusterEssentialsBundleRepoUri:
+    Description: TAP cluster essentials ECR repo URI.
+    Value: !GetAtt TAPClusterEssentialsBundleRepo.RepositoryUri
+    Export:
+      Name: qs-1t1t2pssn:TAPClusterEssentialsBundleRepoUri
+  TAPBuildServiceRepoArn:
+    Description: TAP build service ECR repo ARN.
+    Value: !GetAtt TAPBuildServiceRepo.Arn
+    Export:
+      Name: qs-1t1t2pssn:TAPBuildServiceRepoArn
+  TAPBuildServiceRepoUri:
+    Description: TAP build service ECR repo URI.
+    Value: !GetAtt TAPBuildServiceRepo.RepositoryUri
+    Export:
+      Name: qs-1t1t2pssn:TAPBuildServiceRepoUri
+  TAPSupplyChainRepoArn:
+    Description: TAP supply chain ECR repo ARN.
+    Value: !GetAtt TAPSupplyChainRepo.Arn
+    Export:
+      Name: qs-1t1t2pssn:TAPSupplyChainRepoArn
+  TAPSupplyChainRepoUri:
+    Description: TAP supply chain ECR repo URI.
+    Value: !GetAtt TAPSupplyChainRepo.RepositoryUri
+    Export:
+      Name: qs-1t1t2pssn:TAPSupplyChainRepoUri
+  TAPWorkloadRepoArn:
+    Description: TAP workload ECR repo ARN.
+    Value: !GetAtt TAPWorkloadRepo.Arn
+    Export:
+      Name: qs-1t1t2pssn:TAPWorkloadRepoArn
+  TAPWorkloadRepoUri:
+    Description: TAP workload ECR repo URI.
+    Value: !GetAtt TAPWorkloadRepo.RepositoryUri
+    Export:
+      Name: qs-1t1t2pssn:TAPWorkloadRepoUri
+  TAPWorkloadBundleRepoArn:
+    Description: TAP workload bundle ECR repo ARN.
+    Value: !GetAtt TAPWorkloadBundleRepo.Arn
+    Export:
+      Name: qs-1t1t2pssn:TAPWorkloadBundleRepoArn
+  TAPWorkloadBundleRepoUri:
+    Description: TAP workload bundle ECR repo URI.
+    Value: !GetAtt TAPWorkloadBundleRepo.RepositoryUri
+    Export:
+      Name: qs-1t1t2pssn:TAPWorkloadBundleRepoUri
+  TAPDomainName:
+    Description: TAP DNS domain name.
+    Value: !Ref DomainName
+    Export:
+      Name: qs-1t1t2pssn:TAPDomainName
   PrivateHostedZoneId:
     Description: >-
       The ID that Amazon Route 53 assigned to the hosted zone upon creation.
