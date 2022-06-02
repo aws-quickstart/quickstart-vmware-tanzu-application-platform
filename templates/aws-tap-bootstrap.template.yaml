@@ -524,6 +524,7 @@ Resources:
           - |
             #!/bin/bash
             set -xe
+            tap_dir=/opt/tap-setup-scripts
             user=ubuntu
             cat <<EOF >> /etc/environment
             AWS_REGION=${AWS::Region}
