@@ -351,13 +351,6 @@ Resources:
           Value: TAPBootstrapEIP
   BootstrapRole:
     Type: AWS::IAM::Role
-    Metadata:
-      cfn-lint:
-        config:
-          ignore_checks: [EIAMPolicyWildcardResource]
-          ignore_reasons:
-            EIAMPolicyWildcardResource: >-
-              Resource does not exist at time of policy creation, so it's address is unkown
     Properties:
       RoleName: TAPBootstrapInstanceRole
       Description: >-
@@ -421,25 +414,25 @@ Resources:
                 Action:
                   - ecr:DescribeRegistry
                   - ecr:GetAuthorizationToken
-                Resource:
-                  - !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:*
+                Resource: '*'
               - Sid: ListIamRoles
                 Effect: Allow
                 Action: iam:ListRoles
-                Resource: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/*
+                Resource: '*'
               - Sid: ListRoute53HostedZones
                 Effect: Allow
                 Action:
-                  - route53:ListHostedZonesByVPC
                   - route53:ListHostedZones
                   - route53:ListHostedZonesByName
-                Resource: !Sub arn:${AWS::Partition}:route53:::*
+                Resource: '*'
               - Sid: ManageTapRoute53HostedZoneRecordSets
                 Effect: Allow
                 Action:
                   - route53:ListResourceRecordSets
                   - route53:ChangeResourceRecordSets
-                Resource: !Sub arn:${AWS::Partition}:route53:::hostedzone/*
+                Resource: !Sub
+                  - arn:${AWS::Partition}:route53:::hostedzone/${PrivateHostedZoneId}
+                  - PrivateHostedZoneId: !ImportValue qs-1t1t2pssn:PrivateHostedZoneId
               - Sid: ManageCloudWatchLogs
                 Effect: Allow
                 Action:
