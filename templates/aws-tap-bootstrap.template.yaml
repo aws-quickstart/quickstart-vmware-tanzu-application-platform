@@ -405,10 +405,12 @@ Resources:
                   - ecr:PutImage
                   - ecr:UploadLayerPart
                 Resource:
-                  - !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/private/tanzu-application-platform/tap-packages
-                  - !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/private/tanzu-cluster-essentials/bundle
-                  - !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload
-                  - !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload-bundle
+                  - !ImportValue qs-1t1t2pssn:TAPPackagesRepoArn
+                  - !ImportValue qs-1t1t2pssn:TAPClusterEssentialsBundleRepoArn
+                  - !ImportValue qs-1t1t2pssn:TAPBuildServiceRepoArn
+                  - !ImportValue qs-1t1t2pssn:TAPSupplyChainRepoArn
+                  - !ImportValue qs-1t1t2pssn:TAPWorkloadRepoArn
+                  - !ImportValue qs-1t1t2pssn:TAPWorkloadBundleRepoArn
               - Sid: DescribeEcrPrivateRegistryAndGetAuthToken
                 Effect: Allow
                 Action:
