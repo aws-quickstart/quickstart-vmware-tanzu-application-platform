@@ -524,13 +524,13 @@ Resources:
           - |
             #!/bin/bash
             set -xe
+            user=ubuntu
             cat <<EOF >> /etc/environment
             AWS_REGION=${AWS::Region}
             AWS_DEFAULT_REGION=${AWS::Region}
             EOF
             set -a
             source /etc/environment
-            USER=`whoami`
             echo "Updating & upgrading..."
             sudo apt-get -y update
             sudo apt-get -y upgrade
