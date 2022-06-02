@@ -551,7 +551,7 @@ Resources:
             mv ./kubectl /usr/local/bin/
             popd
             echo "Installing Carvel imgpkg..."
-            sudo bash -c "set -eo pipefail; wget -O- https://carvel.dev/install.sh | bash"
+            bash -c "set -eo pipefail; curl https://carvel.dev/install.sh | bash"
             sudo curl -sSL https://get.docker.com/ | sh
             echo "Installing Docker..."
             sudo groupadd docker || true
