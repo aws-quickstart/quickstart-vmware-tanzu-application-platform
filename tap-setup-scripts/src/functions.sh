@@ -39,6 +39,7 @@ function fail {
   echo $1 >&2
   exit 1
 }
+
 # Wait until there is no (non-error) output from a command
 function waitForRemoval {
   local n=1
@@ -217,7 +218,6 @@ function verifyTools {
 }
 
 function readUserInputs {
-
   banner "Reading $INPUTS/user-input-values.yaml"
 
   AWS_REGION=`curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region`
@@ -228,7 +228,6 @@ function readUserInputs {
 }
 
 function readTAPInternalValues {
-
   banner "Reading $INPUTS/tap-config-internal-values.yaml"
   export TANZUNET_REGISTRY_HOSTNAME=$(yq .tanzunet.hostname $INPUTS/tap-config-internal-values.yaml)
   export TANZUNET_REGISTRY_USERNAME=$(yq .tanzunet.username $INPUTS/tap-config-internal-values.yaml)
@@ -253,7 +252,6 @@ function readTAPInternalValues {
 }
 
 function parseUserInputs {
-
   banner "getting ECR registry credentials"
 
   export ECR_REGISTRY_HOSTNAME=${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
@@ -298,7 +296,6 @@ function installTanzuClusterEssentials {
   cd $DOWNLOADS/tanzu-cluster-essentials
   ./install.sh --yes
   cd ../..
-
 }
 
 function verifyK8ClusterAccess {
@@ -316,7 +313,6 @@ function verifyK8ClusterAccess {
 }
 
 function createTapNamespace {
-
   requireValue TAP_NAMESPACE DEVELOPER_NAMESPACE
 
   banner "Creating $TAP_NAMESPACE namespace"
@@ -329,7 +325,6 @@ function createTapNamespace {
   (kubectl get ns $DEVELOPER_NAMESPACE 2> /dev/null) || \
     kubectl create ns $DEVELOPER_NAMESPACE
 }
-
 
 function loadPackageRepository {
   requireValue TAP_VERSION TAP_NAMESPACE \
@@ -431,13 +426,11 @@ function tapWorkloadInstallFull {
   # 'registry-credentials' is used in tap-values.yaml & developer-namespace.yaml files
   tanzu secret registry add registry-credentials --username ${ECR_REGISTRY_USERNAME} --password ${ECR_REGISTRY_PASSWORD} --server ${ECR_REGISTRY_HOSTNAME} --namespace ${DEVELOPER_NAMESPACE}
 
-
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/developer-namespace.yaml
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/pipeline.yaml
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/scan-policy.yaml
 
   tanzu apps workload apply -f $RESOURCES/workload-aws.yaml -n $DEVELOPER_NAMESPACE --yes
-
 }
 
 function tapWorkloadUninstallFull {
@@ -538,5 +531,4 @@ function printOutputParams {
 
   tap_gui_url=$(yq .tap_gui.app_config.backend.baseUrl $GENERATED/tap-values.yaml)
   echo "TAP GUI URL $tap_gui_url"
-
 }

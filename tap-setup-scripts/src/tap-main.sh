@@ -24,11 +24,9 @@ function tapInstallMain {
   tapWorkloadInstallFull
   printOutputParams
   echo "TAP Install Done ..."
-
 }
 
 function tapUninstallMain {
-
   banner "TAP Uninstall..."
   readUserInputs
   readTAPInternalValues
@@ -43,7 +41,6 @@ function tapUninstallMain {
   deleteTapNamespace
 
   echo "TAP Uninstall Done ..."
-
 }
 
 function tapRelocateMain {
@@ -53,7 +50,6 @@ function tapRelocateMain {
   parseUserInputs
   relocateTAPPackages
   echo "TAP Relocate Done ..."
-
 }
 
 
@@ -70,7 +66,6 @@ function bootstrapEC2 {
 #####
 ##### Main code starts here
 #####
-
 
 while [[ "$#" -gt 0 ]]
 do
@@ -105,7 +100,6 @@ export INPUTS=$GITHUB_HOME/src/inputs
 export GENERATED=$GITHUB_HOME/generated
 export RESOURCES=$GITHUB_HOME/src/resources
 
-
 case $cmd in
 "install")
   tapInstallMain
@@ -120,4 +114,3 @@ case $cmd in
   bootstrapEC2
   ;;
 esac
-
