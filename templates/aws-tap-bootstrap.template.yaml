@@ -532,12 +532,18 @@ Resources:
             EOF
             set -a
             source /etc/environment
+            echo "Removing built-in Docker..."
+            apt-get -y remove containerd docker docker-engine docker.io runc
+            echo "Adding Docker CE repo..."
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg --yes
+            add-apt-repository "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
             echo "Updating & upgrading..."
             apt-get -y update
             apt-get -y upgrade
             echo "Installing system dependencies..."
-            apt-get -y install amazon-ecr-credential-helper awscli ca-certificates curl git \
-              jq openssl perl sudo python3-pip python3-setuptools uuid-runtime vim wget
+            apt-get -y install amazon-ecr-credential-helper awscli ca-certificates containerd.io curl docker-ce \
+              docker-ce-cli docker-compose-plugin git gnupg jq lsb-release openssl perl sudo python3-pip \
+              python3-setuptools uuid-runtime vim wget
             echo "Installing python dependencies for $user..."
             su - $user python3 -m pip install --upgrade pip setuptools wheel yq
             echo "Updating certificate authority certificates..."
@@ -552,6 +558,9 @@ Resources:
             popd
             echo "Installing Carvel imgpkg..."
             bash -c "set -eo pipefail; curl https://carvel.dev/install.sh | bash"
+            echo "Configuring Docker..."
+            groupadd docker
+            usermod -aG docker $user
             sudo curl -sSL https://get.docker.com/ | sh
             echo "Installing Docker..."
             sudo groupadd docker || true
