@@ -376,11 +376,12 @@ Resources:
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Effect: Allow
-                Action:
-                  - eks:ListClusters
+              - Sid: ListAllEksClusters
+                Effect: Allow
+                Action: eks:ListClusters
                 Resource: !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/*
-              - Effect: Allow
+              - Sid: ManageTapEksCluster
+                Effect: Allow
                 Action:
                   - eks:ListAddons
                   - eks:ListFargateProfiles
@@ -392,11 +393,13 @@ Resources:
                   - eks:DescribeCluster
                   - eks:DescribeNodegroup
                 Resource: !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}
-              - Effect: Allow
+              - Sid: DescribeEksAddons
+                Effect: Allow
                 Action:
                   - eks:DescribeAddon
                 Resource: !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:addon/*/*/*
-              - Effect: Allow
+              - Sid: ManageTapEcrRepos
+                Effect: Allow
                 Action:
                   - ecr:DescribeImages
                   - ecr:ListImages
@@ -413,28 +416,32 @@ Resources:
                   - !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/private/tanzu-cluster-essentials/bundle
                   - !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload
                   - !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload-bundle
-              - Effect: Allow
+              - Sid: DescribeEcrPrivateRegistryAndGetAuthToken
+                Effect: Allow
                 Action:
                   - ecr:DescribeRegistry
                   - ecr:GetAuthorizationToken
                 Resource:
                   - !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:*
-              - Effect: Allow
-                Action:
-                  - iam:ListRoles
+              - Sid: ListIamRoles
+                Effect: Allow
+                Action: iam:ListRoles
                 Resource: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/*
-              - Effect: Allow
+              - Sid: ListRoute53HostedZones
+                Effect: Allow
                 Action:
                   - route53:ListHostedZonesByVPC
                   - route53:ListHostedZones
                   - route53:ListHostedZonesByName
                 Resource: !Sub arn:${AWS::Partition}:route53:::*
-              - Effect: Allow
+              - Sid: ManageTapRoute53HostedZoneRecordSets
+                Effect: Allow
                 Action:
                   - route53:ListResourceRecordSets
                   - route53:ChangeResourceRecordSets
                 Resource: !Sub arn:${AWS::Partition}:route53:::hostedzone/*
-              - Effect: Allow
+              - Sid: ManageCloudWatchLogs
+                Effect: Allow
                 Action:
                   - logs:DescribeLogGroups
                   - logs:DescribeLogStreams
@@ -445,15 +452,16 @@ Resources:
                   - logs:PutMetricFilter
                   - logs:PutRetentionPolicy
                 Resource: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*
-              - Effect: Allow
+              - Sid: ManageTapS3ConfigBucketObjects
+                Effect: Allow
                 Action:
                   - s3:ListBucket
                   - s3:GetObject
                   - s3:PutObject
                 Resource: !ImportValue qs-1t1t2pssn:S3BucketArn
-              - Effect: Allow
-                Action:
-                  - s3:ListAllMyBuckets
+              - Sid: ListAllS3Buckets
+                Effect: Allow
+                Action: s3:ListAllMyBuckets
                 Resource: !Sub arn:${AWS::Partition}:s3:::*
       ManagedPolicyArns:
         - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM
