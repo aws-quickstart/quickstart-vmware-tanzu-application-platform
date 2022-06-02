@@ -530,7 +530,6 @@ Resources:
             EOF
             set -a
             source /etc/environment
-            AWS_KUBECTL_VERSION="1.22.6/2022-03-09"
             USER=`whoami`
             echo "Updating & upgrading..."
             sudo apt-get -y update
@@ -566,7 +565,8 @@ Resources:
             pushd git
             git clone https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform.git
             popd
-          - PrivateHostedZoneId: !ImportValue qs-1t1t2pssn:PrivateHostedZoneId
+          - AwsKubectlVersion: 1.22.6/2022-03-09
+            PrivateHostedZoneId: !ImportValue qs-1t1t2pssn:PrivateHostedZoneId
   BootstrapUbuntuEipAssociation:
     Type: AWS::EC2::EIPAssociation
     Condition: Ubuntu
