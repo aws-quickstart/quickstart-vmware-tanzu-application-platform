@@ -469,6 +469,12 @@ Resources:
                   - s3:GetObject
                   - s3:PutObject
                 Resource: !ImportValue qs-1t1t2pssn:S3BucketArn
+              - Sid: GetQSS3BucketObjects
+                Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub
+                  - arn:${AWS::Partition}:s3:::${S3Bucket}/${QSS3KeyPrefix}*
+                  - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
               - Sid: ListAllS3Buckets
                 Effect: Allow
                 Action: s3:ListAllMyBuckets
