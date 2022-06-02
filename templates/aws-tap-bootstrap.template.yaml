@@ -573,15 +573,68 @@ Resources:
             cp /root/.docker/config.json /home/$user/.docker/
             chown -R $user:$user /home/$user
             echo "Configuring the SSH listening port..."
-            sudo printf "Port ${SshPort}\n" > /etc/ssh/sshd_config.d/port.conf
-            sudo systemctl status sshd.service
-            echo "Cloning the VMware Tanzu Application Platform Quick Start project..."
-            mkdir git
-            pushd git
-            git clone https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform.git
+            printf "Port ${SshPort}\n" > /etc/ssh/sshd_config.d/port.conf
+            systemctl status sshd.service
+            echo "Downloading the VMware Tanzu Application Platform Quick Start scripts..."
+            mkdir -p "$tap_dir/downloads"
+            mkdir -p "$tap_dir/generated"
+            mkdir -p "$tap_dir/src/inputs"
+            mkdir -p "$tap_dir/src/resources"
+            pushd "$tap_dir/src"
+            aws s3 cp "${TAPScriptPath}/src/tap-main.sh" "./tap-main.sh"
+            chmod +x ./tap-main.sh
+            aws s3 cp "${TAPScriptPath}/src/install-tools.sh" "./install-tools.sh"
+            chmod +x ./install-tools.sh
+            aws s3 cp "${TAPScriptPath}/src/functions.sh" "./functions.sh"
+            chmod +x ./functions.sh
             popd
+            pushd "$tap_dir/src/inputs"
+            aws s3 cp "${TAPScriptPath}/src/inputs/tap-config-internal-values.yaml" "./tap-config-internal-values.yaml"
+            aws s3 cp "${TAPScriptPath}/src/inputs/tap-values.yaml" "./tap-values.yaml"
+            cat <<EOF > ./user-input-values.yaml
+            tanzunet_secrets:
+              credentials_arn: ${TanzuNetSecretCredentialsArn}
+              api_token_arn: ${TanzuNetSecretApiTokenArn}
+            eks:
+              cluster_name: ${EKSClusterName}
+            route53:
+              domain_name: ${TAPDomainName}
+              zone_id: ${PrivateHostedZoneId}
+            repositories:
+              tap_packages: ${TAPPackagesRepoUri}
+              cluster_essentials: ${TAPClusterEssentialsBundleRepoUri}
+              build_service: ${TAPBuildServiceRepoUri}
+              ootb_supply_chain: ${TAPSupplyChainRepoUri}
+              workload:
+                name: tanzu-java-web-app-workload
+                namespace: tap-workload
+                repo1: ${TAPWorkloadRepoUri}
+                repo2: ${TAPWorkloadBundleRepoUri}
+            EOF
+            popd
+            pushd "$tap_dir/src/resources"
+            aws s3 cp "${TAPScriptPath}/src/resources/developer-namespace.yaml" "./developer-namespace.yaml"
+            aws s3 cp "${TAPScriptPath}/src/resources/git-ssh-basic-auth.yaml" "./git-ssh-basic-auth.yaml"
+            aws s3 cp "${TAPScriptPath}/src/resources/pipeline.yaml" "./pipeline.yaml"
+            aws s3 cp "${TAPScriptPath}/src/resources/scan-policy.yaml" "./scan-policy.yaml"
+            aws s3 cp "${TAPScriptPath}/src/resources/workload-aws.yaml" "./workload-aws.yaml"
+            popd
+            wget -O "$tap_dir/downloads/pivnet" https://github.com/pivotal-cf/pivnet-cli/releases/download/v3.0.1/pivnet-linux-amd64-3.0.1
+            install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
           - AwsKubectlVersion: 1.22.6/2022-03-09
             PrivateHostedZoneId: !ImportValue qs-1t1t2pssn:PrivateHostedZoneId
+            TAPScriptPath: !Sub
+            - s3://${S3Bucket}/${QSS3KeyPrefix}tap-setup-scripts
+            - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+            TAPDomainName: !ImportValue qs-1t1t2pssn:TAPDomainName
+            TanzuNetSecretCredentialsArn: !ImportValue qs-1t1t2pssn:TanzuNetSecretCredentialsArn
+            TanzuNetSecretApiTokenArn: !ImportValue qs-1t1t2pssn:TanzuNetSecretApiTokenArn
+            TAPPackagesRepoUri: !ImportValue qs-1t1t2pssn:TAPPackagesRepoUri
+            TAPClusterEssentialsBundleRepoUri: !ImportValue qs-1t1t2pssn:TAPClusterEssentialsBundleRepoUri
+            TAPBuildServiceRepoUri: !ImportValue qs-1t1t2pssn:TAPBuildServiceRepoUri
+            TAPSupplyChainRepoUri: !ImportValue qs-1t1t2pssn:TAPSupplyChainRepoUri
+            TAPWorkloadRepoUri: !ImportValue qs-1t1t2pssn:TAPWorkloadRepoUri
+            TAPWorkloadBundleRepoUri: !ImportValue qs-1t1t2pssn:TAPWorkloadBundleRepoUri
   BootstrapUbuntuEipAssociation:
     Type: AWS::EC2::EIPAssociation
     Condition: Ubuntu
