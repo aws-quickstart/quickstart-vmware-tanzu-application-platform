@@ -419,6 +419,23 @@ Resources:
                 Effect: Allow
                 Action: iam:ListRoles
                 Resource: '*'
+              - Sid: ManageTapSecrets
+                Effect: Allow
+                Action:
+                  - secretsmanager:DescribeSecret
+                  - secretsmanager:GetResourcePolicy
+                  - secretsmanager:GetSecretValue
+                  - secretsmanager:ListSecretVersionIds
+                  - secretsmanager:PutSecretValue
+                Resource:
+                  - !ImportValue qs-1t1t2pssn:TanzuNetSecretCredentialsArn
+                  - !ImportValue qs-1t1t2pssn:TanzuNetSecretApiTokenArn
+              - Sid: ListSecretsAndGetRandomPassword
+                Effect: Allow
+                Action:
+                  - secretsmanager:GetRandomPassword
+                  - secretsmanager:ListSecrets
+                Resource: '*'
               - Sid: ListRoute53HostedZones
                 Effect: Allow
                 Action:
