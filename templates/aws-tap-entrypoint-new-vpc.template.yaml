@@ -356,8 +356,6 @@ Resources:
         TanzuNetApiToken: !Ref TanzuNetApiToken
   VPCStack:
     Type: AWS::CloudFormation::Stack
-    Metadata:
-      cfn-lint: { config: { ignore_checks: [ W9901 ] } }
     Properties:
       TemplateURL: !Sub
         - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/submodules/quickstart-aws-vpc/templates/aws-vpc.template.yaml
@@ -401,8 +399,6 @@ Resources:
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
   EKSQSStack:
     Type: AWS::CloudFormation::Stack
-    Metadata:
-      cfn-lint: { config: { ignore_checks: [ W9901, E9902 ] } }
     Properties:
       TemplateURL: !Sub
         - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
