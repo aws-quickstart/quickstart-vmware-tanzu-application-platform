@@ -58,63 +58,6 @@ function waitForRemoval {
   done
 }
 
-function installTools {
-  # install tools required in the scripts
-  sudo apt-get -y update
-  sudo apt-get install -y uuid-runtime vim sudo curl wget
-  sudo apt-get install -y jq python3-pip
-
-  # install awscli
-  sudo pip3 install yq
-  sudo pip3 install awscli --upgrade
-
-  #install yq
-  sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-  sudo chmod a+x /usr/local/bin/yq
-
-  #install carvel tools
-  # perl is needed for shasum
-  sudo apt-get -y update
-  sudo apt-get install -y  perl ca-certificates
-  sudo update-ca-certificates
-  sudo rm -rf /var/lib/apt/lists/*
-  sudo bash -c "set -eo pipefail; wget -O- https://carvel.dev/install.sh | bash"
-
-  # install kubectl
-  export AWS_KUBECTL_VERSION="1.22.6/2022-03-09"
-  sudo curl -o kubectl  https://amazon-eks.s3-us-west-2.amazonaws.com/${AWS_KUBECTL_VERSION}/bin/linux/amd64/kubectl
-  sudo chmod +x kubectl
-  sudo mv kubectl /usr/local/bin/
-
-  # aws-iam-authenticator
-  curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.12.7/2019-03-27/bin/linux/amd64/aws-iam-authenticator
-  chmod +x ./aws-iam-authenticator
-  sudo mv ./aws-iam-authenticator /usr/local/bin/
-
-  # install Docker
-  sudo apt-get -y remove docker docker-engine docker.io containerd runc || true
-  sudo apt-get -y update
-  sudo apt-get install -y \
-      ca-certificates \
-      curl \
-      gnupg \
-      lsb-release
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg --yes
-  echo \
-    "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-  sudo apt-get -y update
-  sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-  sudo apt-get install -y docker-ce="5:20.10.16~3-0~ubuntu-jammy" docker-ce-cli="5:20.10.16~3-0~ubuntu-jammy" containerd.io docker-compose-plugin
-  sudo groupadd docker 2>/dev/null || true
-  sudo usermod -aG docker ${USER} 2>/dev/null || true
-  newgrp docker || true
-
-
-
-}
-
-
 function installTanzuCLI {
   banner "Downloading kapp, secretgen configuration bundle & tanzu cli"
 
