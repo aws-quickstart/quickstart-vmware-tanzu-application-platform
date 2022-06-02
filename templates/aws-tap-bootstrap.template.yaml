@@ -538,6 +538,8 @@ Resources:
             echo "Installing system dependencies..."
             apt-get -y install amazon-ecr-credential-helper awscli ca-certificates curl git \
               jq openssl perl sudo python3-pip python3-setuptools uuid-runtime vim wget
+            echo "Installing python dependencies for $user..."
+            su - $user python3 -m pip install --upgrade pip setuptools wheel yq
             echo "Updating certificate authority certificates..."
             sudo update-ca-certificates
             echo "Installing kubectl..."
