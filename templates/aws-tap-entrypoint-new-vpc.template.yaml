@@ -397,11 +397,7 @@ Resources:
         EKSClusterName: !GetAtt EKSQSStack.Outputs.EKSClusterName
         ControlPlaneSecurityGroupId: !GetAtt EKSQSStack.Outputs.ControlPlaneSecurityGroup
         NodeGroupSecurityGroupId: !GetAtt EKSQSStack.Outputs.NodeGroupSecurityGroup
-        TanzuNetUsername: !Ref TanzuNetUsername
-        TanzuNetPassword: !Ref TanzuNetPassword
-        TanzuNetApiToken: !Ref TanzuNetApiToken
         QSS3BucketName: !Ref QSS3BucketName
-        QSS3BucketRegion: !Ref QSS3BucketRegion
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
   EKSQSStack:
     Type: AWS::CloudFormation::Stack
