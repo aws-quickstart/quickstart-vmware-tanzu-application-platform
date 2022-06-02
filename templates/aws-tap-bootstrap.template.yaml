@@ -328,8 +328,8 @@ Resources:
         plane
       GroupId: !Ref BootstrapSecurityGroup
       IpProtocol: tcp
-      FromPort: 6443
-      ToPort: 6443
+      FromPort: 443
+      ToPort: 443
       DestinationSecurityGroupId: !Ref ControlPlaneSecurityGroupId
   EKSControlPlaneApiIngressRule:
     Type: AWS::EC2::SecurityGroupIngress
@@ -339,8 +339,8 @@ Resources:
         plane
       GroupId: !Ref ControlPlaneSecurityGroupId
       IpProtocol: tcp
-      ToPort: 6443
-      FromPort: 6443
+      ToPort: 443
+      FromPort: 443
       SourceSecurityGroupId: !Ref BootstrapSecurityGroup
   BootstrapEIP:
     Type: AWS::EC2::EIP
