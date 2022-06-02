@@ -525,6 +525,8 @@ Resources:
             #!/bin/bash
             set -xe
             cat <<EOF >> /etc/environment
+            AWS_REGION=${AWS::Region}
+            AWS_DEFAULT_REGION=${AWS::Region}
             EOF
             set -a
             source /etc/environment
