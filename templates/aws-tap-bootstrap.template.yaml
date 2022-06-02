@@ -525,10 +525,6 @@ Resources:
             #!/bin/bash
             set -xe
             cat <<EOF >> /etc/environment
-            TANZU_NET_USERNAME=${TanzuNetUsername}
-            TANZU_NET_PASSWORD=${TanzuNetPassword}
-            TANZU_NET_API_TOKEN=${TanzuNetApiToken}
-            TAP_ROUTE53_PRIVATE_HOSTED_ZONE_ID=${PrivateHostedZoneId}
             EOF
             set -a
             source /etc/environment
