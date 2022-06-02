@@ -117,6 +117,14 @@ Resources:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: private/tanzu-cluster-essentials/bundle
+  TAPBuildServiceRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: private/tap-build-service
+  TAPSupplyChainRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: private/tap-supply-chain
   TAPWorkloadRepo:
     Type: AWS::ECR::Repository
     Properties:
