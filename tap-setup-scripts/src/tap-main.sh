@@ -12,9 +12,9 @@ function tapInstallMain {
 
   if [[ $skipinit == "true" ]]
   then
-    echo "Skipping prerequisite..."
+    echo "Skipping prerequisites..."
   else
-    echo "Setup prerequisite..."
+    echo "Setup prerequisites..."
     installTanzuClusterEssentials
     createTapNamespace
     createTapRegistrySecret
@@ -23,11 +23,11 @@ function tapInstallMain {
   tapInstallFull
   tapWorkloadInstallFull
   printOutputParams
-  echo "TAP Install Done ..."
+  echo "TAP install done..."
 }
 
 function tapUninstallMain {
-  banner "TAP Uninstall..."
+  banner "TAP uninstall..."
   readUserInputs
   readTAPInternalValues
   verifyK8ClusterAccess
@@ -40,27 +40,26 @@ function tapUninstallMain {
   deleteTanzuClusterEssentials
   deleteTapNamespace
 
-  echo "TAP Uninstall Done ..."
+  echo "TAP uninstall done..."
 }
 
 function tapRelocateMain {
-  banner "TAP Relocate..."
+  banner "TAP relocate..."
   readUserInputs
   readTAPInternalValues
   parseUserInputs
   relocateTAPPackages
-  echo "TAP Relocate Done ..."
+  echo "TAP relocate done..."
 }
 
 
 function bootstrapEC2 {
-  banner "BootstrapEC2 with tools ..."
-  installTools
+  banner "Bootstrap EC2 with tools..."
   readUserInputs
   readTAPInternalValues
   installTanzuCLI
   verifyTools
-  echo "BootstrapEC2 Done ..."
+  echo "Bootstrap EC2 done..."
 }
 
 #####
