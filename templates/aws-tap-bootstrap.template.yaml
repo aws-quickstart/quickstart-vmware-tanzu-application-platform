@@ -533,8 +533,8 @@ Resources:
             set -a
             source /etc/environment
             echo "Updating & upgrading..."
-            sudo apt-get -y update
-            sudo apt-get -y upgrade
+            apt-get -y update
+            apt-get -y upgrade
             echo "Installing dependencies..."
             sudo apt-get -y install amazon-ecr-credential-helper awscli ca-certificates curl git jq openssl perl sudo python3-pip uuid-runtime vim wget
             echo "Configuring AWS CLI..."
