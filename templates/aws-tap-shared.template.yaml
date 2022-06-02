@@ -80,17 +80,17 @@ Parameters:
       The TAP bucket name can include numbers, lowercase letters, uppercase
       letters, and hyphens (-). It cannot start or end with a hyphen (-).
 Resources:
-  TanzuNetSecretUser:
+  TanzuNetSecretCredentials:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: TanzuNetUserSecret
+      Name: TanzuNetCredentials
       Description: The Tanzu Net username and password
       SecretString: !Sub >-
         {
           "username": "${TanzuNetUsername}",
           "password": "${TanzuNetPassword}"
         }
-  TanzuNetSecretToken:
+  TanzuNetSecretApiToken:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: TanzuNetApiToken
@@ -135,20 +135,20 @@ Resources:
         - VPCId: !Ref VpcId
           VPCRegion: !Ref AWS::Region
 Outputs:
-  TanzuNetSecretUserArn:
+  TanzuNetSecretCredentialsArn:
     Description: >-
       The Amazon Resource Name (ARN) of the SecretsManager entry for the
       Tanzu Net username and password.
-    Value: !Ref TanzuNetSecretUser
+    Value: !Ref TanzuNetSecretCredentials
     Export:
-      Name: qs-1t1t2pssn:TanzuNetSecretUserArn
-  TanzuNetSecretTokenArn:
+      Name: qs-1t1t2pssn:TanzuNetSecretCredentialsArn
+  TanzuNetSecretApiTokenArn:
     Description: >-
       The Amazon Resource Name (ARN) of the SecretsManager entry for the
       Tanzu Net API token.
-    Value: !Ref TanzuNetSecretToken
+    Value: !Ref TanzuNetSecretApiToken
     Export:
-      Name: qs-1t1t2pssn:TanzuNetSecretTokenArn
+      Name: qs-1t1t2pssn:TanzuNetSecretApiTokenArn
   S3BucketArn:
     Description: >-
       The Amazon Resource Name (ARN) of the TAP configuration file bucket.
