@@ -815,6 +815,7 @@ Resources:
             aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/scan-policy.yaml" "./scan-policy.yaml"
             aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/workload-aws.yaml" "./workload-aws.yaml"
             popd
+            echo "Installing pivnet CLI..."
             wget -O "$tap_dir/downloads/pivnet" "https://github.com/pivotal-cf/pivnet-cli/releases/download/v${PivNetVersion}/pivnet-linux-$(dpkg --print-architecture)-${PivNetVersion}"
             install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
           - AwsKubectlVersion: 1.22.6/2022-03-09
