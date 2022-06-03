@@ -173,8 +173,8 @@ function readUserInputs {
 function readTAPInternalValues {
   banner "Reading $INPUTS/tap-config-internal-values.yaml"
   export TANZUNET_REGISTRY_HOSTNAME=$(yq .tanzunet.hostname $INPUTS/tap-config-internal-values.yaml)
-  export TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN=$(yq .tanzunet_secrets.credentials_arn $INPUTS/user-input-values.yaml)
-  export TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN=$(yq .tanzunet_secrets.api_token_arn $INPUTS/user-input-values.yaml)
+  export TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN=$(yq -r .tanzunet_secrets.credentials_arn $INPUTS/user-input-values.yaml)
+  export TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN=$(yq -r .tanzunet_secrets.api_token_arn $INPUTS/user-input-values.yaml)
   export TANZUNET_REGISTRY_USERNAME=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN" --query "SecretString" --output text | jq -r .username)
   export TANZUNET_REGISTRY_PASSWORD=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN" --query "SecretString" --output text | jq -r .password)
   export PIVNET_TOKEN=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN" --query "SecretString" --output text)
