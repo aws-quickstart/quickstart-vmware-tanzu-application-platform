@@ -2,9 +2,6 @@
 ---
 tanzunet:
   hostname: registry.tanzu.vmware.com
-  username:
-  password:
-  pivnet_token:
 
 tap_ecr_repository: private/tanzu-application-platform/tap-packages
 cluster_essentials_ecr_repository: private/tanzu-cluster-essentials/bundle

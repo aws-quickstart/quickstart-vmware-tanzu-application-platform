@@ -1,10 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  This template creates a Single-AZ, multi-subnet VPC infrastructure that will
-  include an EC2 instance for bootstrapping an install of
-  VMware's Tanzu Application Platform (TAP). In addition to the EC2 instance, a
-  single EKS cluster, ECR instance, and S3 bucket will also be deployed to the
-  VPC to support the installation of the TAP software.
+  AWS CloudFormation template for deploying VMware Tanzu Application Platform
+  (TAP) on Amazon EKS in a new VPC.
   **WARNING** This template creates AWS resources. You will be billed for the
   AWS resources used if you create a stack from this template. (qs-1t1t2psqo)
 Metadata:
@@ -44,9 +41,9 @@ Metadata:
       - Label:
           default: VMware Tanzu Net authentication configuration
         Parameters:
-          - TanzuNetID
-          - TanzuNetToken
-          - TanzuNetKey
+          - TanzuNetUsername
+          - TanzuNetPassword
+          - TanzuNetApiToken
       - Label:
           default: TAP config file S3 bucket configuration
         Parameters:
@@ -59,16 +56,12 @@ Metadata:
           default: Bootstrap EC2 instance network configuration
         Parameters:
           - BootstrapSshPort
-          - BootstrapIngressCidr
-          - BootstrapEgressFromPort
-          - BootstrapEgressToPort
-          - BootstrapEgressCidr
       - Label:
           default: AWS Quick Start S3 bucket configuration
         Parameters:
           - QSS3BucketName
-          - QSS3KeyPrefix
           - QSS3BucketRegion
+          - QSS3KeyPrefix
     ParameterLabels:
       AvailabilityZones:
         default: Availability Zones
@@ -94,14 +87,6 @@ Metadata:
         default: Name
       BootstrapSshPort:
         default: SSH port
-      BootstrapIngressCidr:
-        default: Ingress CIDR
-      BootstrapEgressFromPort:
-        default: Egress from port
-      BootstrapEgressToPort:
-        default: Egress to port
-      BootstrapEgressCidr:
-        default: Egress CIDR
       TAPDomainName:
         default: Domain name
       EKSClusterName:
@@ -112,16 +97,16 @@ Metadata:
         default: Number of nodes
       MaxNumberOfNodes:
         default: Maximum number of nodes
-      TanzuNetID:
-        default: ID
-      TanzuNetKey:
-        default: Key
-      TanzuNetToken:
-        default: Token
-      QSS3BucketRegion:
-        default: Region
+      TanzuNetUsername:
+        default: Username
+      TanzuNetPassword:
+        default: Password
+      TanzuNetApiToken:
+        default: API token
       QSS3BucketName:
         default: Name
+      QSS3BucketRegion:
+        default: Region
       QSS3KeyPrefix:
         default: Key prefix
       RemoteAccessCidr:
@@ -249,51 +234,26 @@ Parameters:
   RemoteAccessCidr:
     Type: String
     Description: >-
-      IP range that will be allowed to access the EKS cluster once deployed.
+      IP range that will be allowed to access the Bootstrap EC2 instance and
+      EKS cluster once deployed.
   BootstrapSshPort:
     Type: Number
     Description: TCP port to use for SSH traffic to the Bootstrap instance.
     MinValue: 0
     MaxValue: 65535
     Default: 22
-  BootstrapIngressCidr:
+  TanzuNetUsername:
     Type: String
     Description: >-
-      CIDR block that is permitted inbound SSH connectivity to the Bootstrap
-      instance.
-  BootstrapEgressFromPort:
-    Type: Number
-    Description: >-
-      Start of port range for outbound access of the Bootstrap instance (default 0).
-    Default: 0
-  BootstrapEgressToPort:
-    Type: Number
-    Description: >-
-      End of port range for outbound access of the Bootstrap instance
-      (default 65535).
-    Default: 65535
-  BootstrapEgressCidr:
-    Type: String
-    Description: >-
-      CIDR block for permitted outbound access from the Bootstrap VM
-      (default is full and open to guarantee installation success).
-    Default: 0.0.0.0/0
-  TanzuNetID:
-    Type: String
-    Description: >-
-      The authentication ID or email address for authenticating to VMware's
-      Tanzu Net.
+      The VMware Tanzu Net username (authentication ID or email address).
     NoEcho: true
-  TanzuNetKey:
+  TanzuNetPassword:
     Type: String
-    Description: >-
-      The authentication key for authenticating to VMware's Tanzu Net.
+    Description: The VMware Tanzu Net password (authentication key).
     NoEcho: true
-  TanzuNetToken:
+  TanzuNetApiToken:
     Type: String
-    Description: >-
-      The authentication token required for certain TAP installation utilities
-      within the Bootstrap.
+    Description: The VMware Tanzu Net API token.
     NoEcho: true
   QSS3BucketName:
     Type: String
@@ -344,24 +304,8 @@ Conditions:
     - !Equals [!Ref NumberOfAZs, 3]
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
 Resources:
-  SharedStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub
-        - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/aws-tap-shared.template.yaml
-        - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-          S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
-      Parameters:
-        S3BucketName: !Ref S3TAPConfigBucketName
-        VpcId: !GetAtt VPCStack.Outputs.VPCID
-        DomainName: !Ref TAPDomainName
-        TanzuNetID: !Ref TanzuNetID
-        TanzuNetKey: !Ref TanzuNetKey
-        TanzuNetToken: !Ref TanzuNetToken
   VPCStack:
     Type: AWS::CloudFormation::Stack
-    Metadata:
-      cfn-lint: { config: { ignore_checks: [ W9901 ] } }
     Properties:
       TemplateURL: !Sub
         - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/submodules/quickstart-aws-vpc/templates/aws-vpc.template.yaml
@@ -380,80 +324,45 @@ Resources:
         PublicSubnet3CIDR: !Ref PublicSubnet3CIDR
         PublicSubnetTag2: kubernetes.io/role/elb=
         VPCCIDR: !Ref VPCCIDR
-  EC2Stack:
+  ExistingVpcStack:
     Type: AWS::CloudFormation::Stack
-    DependsOn:
-      - SharedStack
     Properties:
       TemplateURL: !Sub
-        - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/aws-tap-bootstrap.template.yaml
+        - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/aws-tap-entrypoint-existing-vpc.template.yaml
         - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
           S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
       Parameters:
         VpcId: !GetAtt VPCStack.Outputs.VPCID
-        SubnetId: !GetAtt VPCStack.Outputs.PublicSubnet1ID
-        SshPort: !Ref BootstrapSshPort
-        IngressCidr: !Ref BootstrapIngressCidr
-        EgressFromPort: !Ref BootstrapEgressFromPort
-        EgressToPort: !Ref BootstrapEgressToPort
-        EgressCidr: !Ref BootstrapEgressCidr
-        KeyPairName: !Ref KeyPairName
-        EKSClusterName: !GetAtt EKSQSStack.Outputs.EKSClusterName
-        ControlPlaneSecurityGroupId: !GetAtt EKSQSStack.Outputs.ControlPlaneSecurityGroup
-        NodeGroupSecurityGroupId: !GetAtt EKSQSStack.Outputs.NodeGroupSecurityGroup
-        TanzuNetID: !Ref TanzuNetID
-        TanzuNetKey: !Ref TanzuNetKey
-        TanzuNetToken: !Ref TanzuNetToken
-  EKSQSStack:
-    Type: AWS::CloudFormation::Stack
-    Metadata:
-      cfn-lint: { config: { ignore_checks: [ W9901, E9902 ] } }
-    Properties:
-      TemplateURL: !Sub
-        - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
-        - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-          S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
-      Parameters:
-        VPCID: !GetAtt VPCStack.Outputs.VPCID
-        PrivateSubnet1ID: !GetAtt VPCStack.Outputs.PrivateSubnet1AID
-        PrivateSubnet2ID: !If
+        PrivateSubnet1Id: !GetAtt VPCStack.Outputs.PrivateSubnet1AID
+        PrivateSubnet2Id: !If
           - 2AZDeployment
           - !GetAtt VPCStack.Outputs.PrivateSubnet2AID
           - !Ref AWS::NoValue
-        PrivateSubnet3ID: !If
+        PrivateSubnet3Id: !If
           - 3AZDeployment
           - !GetAtt VPCStack.Outputs.PrivateSubnet3AID
           - !Ref AWS::NoValue
-        PublicSubnet1ID: !GetAtt VPCStack.Outputs.PublicSubnet1ID
-        PublicSubnet2ID: !If
+        PublicSubnet1Id: !GetAtt VPCStack.Outputs.PublicSubnet1ID
+        PublicSubnet2Id: !If
           - 2AZDeployment
           - !GetAtt VPCStack.Outputs.PublicSubnet2ID
           - !Ref AWS::NoValue
-        PublicSubnet3ID: !If
+        PublicSubnet3Id: !If
           - 3AZDeployment
           - !GetAtt VPCStack.Outputs.PublicSubnet3ID
           - !Ref AWS::NoValue
-        RemoteAccessCIDR: !Ref RemoteAccessCidr
-        EKSPublicAccessEndpoint: Enabled
+        RemoteAccessCidr: !Ref RemoteAccessCidr
+        BootstrapSshPort: !Ref BootstrapSshPort
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
         NodeInstanceType: !Ref NodeInstanceType
-        NodeInstanceFamily: Standard
-        NodeGroupType: Managed
-        NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Ref EKSClusterName
-        ClusterAutoScaler: Enabled
-        ProvisionBastionHost: Disabled
-        SnykIntegration: Disabled
-        NewRelicIntegration: Disabled
-        CalicoIntegration: Disabled
-        RafaySysIntegration: Disabled
-        GrafanaIntegration: Disabled
-        PrometheusIntegration: Disabled
-        VaultIntegration: Disabled
-        ConsulIntegration: Disabled
-        RancherIntegration: Disabled
-        MonitoringStack: None
-        ALBIngressController: Enabled
-        EfsStorageClass: Disabled
+        S3TAPConfigBucketName: !Ref S3TAPConfigBucketName
+        TAPDomainName: !Ref TAPDomainName
+        TanzuNetUsername: !Ref TanzuNetUsername
+        TanzuNetPassword: !Ref TanzuNetPassword
+        TanzuNetApiToken: !Ref TanzuNetApiToken
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3BucketRegion: !Ref QSS3BucketRegion
+        QSS3KeyPrefix: !Ref QSS3KeyPrefix

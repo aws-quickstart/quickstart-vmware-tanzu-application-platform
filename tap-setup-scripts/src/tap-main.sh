@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-source "src/functions.sh"
+export SCRIPT_DIR="$(dirname "$0")"
+source "$SCRIPT_DIR/functions.sh"
 
 function tapInstallMain {
   banner "TAP Install..."
@@ -12,9 +13,9 @@ function tapInstallMain {
 
   if [[ $skipinit == "true" ]]
   then
-    echo "Skipping prerequisite..."
+    echo "Skipping prerequisites..."
   else
-    echo "Setup prerequisite..."
+    echo "Setup prerequisites..."
     installTanzuClusterEssentials
     createTapNamespace
     createTapRegistrySecret
@@ -23,13 +24,11 @@ function tapInstallMain {
   tapInstallFull
   tapWorkloadInstallFull
   printOutputParams
-  echo "TAP Install Done ..."
-
+  echo "TAP install done..."
 }
 
 function tapUninstallMain {
-
-  banner "TAP Uninstall..."
+  banner "TAP uninstall..."
   readUserInputs
   readTAPInternalValues
   verifyK8ClusterAccess
@@ -42,35 +41,31 @@ function tapUninstallMain {
   deleteTanzuClusterEssentials
   deleteTapNamespace
 
-  echo "TAP Uninstall Done ..."
-
+  echo "TAP uninstall done..."
 }
 
 function tapRelocateMain {
-  banner "TAP Relocate..."
+  banner "TAP relocate..."
   readUserInputs
   readTAPInternalValues
   parseUserInputs
   relocateTAPPackages
-  echo "TAP Relocate Done ..."
-
+  echo "TAP relocate done..."
 }
 
 
 function bootstrapEC2 {
-  banner "BootstrapEC2 with tools ..."
-  installTools
+  banner "Bootstrap EC2 with tools..."
   readUserInputs
   readTAPInternalValues
   installTanzuCLI
   verifyTools
-  echo "BootstrapEC2 Done ..."
+  echo "Bootstrap EC2 done..."
 }
 
 #####
 ##### Main code starts here
 #####
-
 
 while [[ "$#" -gt 0 ]]
 do
@@ -97,14 +92,12 @@ EOT
   exit 1
 fi
 
-export GITHUB_HOME=$PWD
-echo COMMAND=$cmd SKIPINIT=$skipinit GITHUB_HOME=$GITHUB_HOME
+echo COMMAND=$cmd SKIPINIT=$skipinit SCRIPT_DIR=$SCRIPT_DIR
 
-export DOWNLOADS=$GITHUB_HOME/downloads
-export INPUTS=$GITHUB_HOME/src/inputs
-export GENERATED=$GITHUB_HOME/generated
-export RESOURCES=$GITHUB_HOME/src/resources
-
+export DOWNLOADS="$(dirname "$SCRIPT_DIR")/downloads"
+export INPUTS="$SCRIPT_DIR/inputs"
+export GENERATED="$(dirname "$SCRIPT_DIR")/generated"
+export RESOURCES="$SCRIPT_DIR/resources"
 
 case $cmd in
 "install")
@@ -120,4 +113,3 @@ case $cmd in
   bootstrapEC2
   ;;
 esac
-
