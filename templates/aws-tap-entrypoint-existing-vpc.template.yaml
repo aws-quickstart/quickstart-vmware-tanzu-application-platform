@@ -1,0 +1,831 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  AWS CloudFormation template for deploying VMware Tanzu Application Platform
+  (TAP) on Amazon EKS in an existing VPC.
+  **WARNING** This template creates AWS resources. You will be billed for the
+  AWS resources used if you create a stack from this template. (qs-1t1t2pssu)
+Metadata:
+  QuickStartDocumentation:
+    EntrypointName: Launch into an existing VPC
+    Order: 2
+  SentenceCaseExclude:
+    - Bootstrap
+    - Net
+    - Tanzu
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Basic configuration
+        Parameters:
+          - NumberOfAZs
+          - KeyPairName
+      - Label:
+          default: VPC network configuration
+        Parameters:
+          - VpcId
+          - PrivateSubnet1Id
+          - PrivateSubnet2Id
+          - PrivateSubnet3Id
+          - PublicSubnet1Id
+          - PublicSubnet2Id
+          - PublicSubnet3Id
+      - Label:
+          default: Amazon EKS configuration
+        Parameters:
+          - EKSClusterName
+          - NodeInstanceType
+          - NumberOfNodes
+          - MaxNumberOfNodes
+          - RemoteAccessCidr
+      - Label:
+          default: VMware Tanzu Net authentication configuration
+        Parameters:
+          - TanzuNetUsername
+          - TanzuNetPassword
+          - TanzuNetApiToken
+      - Label:
+          default: TAP config file S3 bucket configuration
+        Parameters:
+          - S3TAPConfigBucketName
+      - Label:
+          default: TAP private DNS domain configuration
+        Parameters:
+          - TAPDomainName
+      - Label:
+          default: Bootstrap EC2 instance configuration
+        Parameters:
+          - BootstrapOS
+          - BootstrapSshPort
+      - Label:
+          default: AWS Quick Start S3 bucket configuration
+        Parameters:
+          - QSS3BucketName
+          - QSS3BucketRegion
+          - QSS3KeyPrefix
+    ParameterLabels:
+      NumberOfAZs:
+        default: Number of Availability Zones
+      KeyPairName:
+        default: SSH key name
+      VpcId:
+        default: VPC ID
+      PrivateSubnet1Id:
+        default: Private subnet 1 ID
+      PrivateSubnet2Id:
+        default: Private subnet 2 ID
+      PrivateSubnet3Id:
+        default: Private subnet 3 ID
+      PublicSubnet1Id:
+        default: Public subnet 1 ID
+      PublicSubnet2Id:
+        default: Public subnet 2 ID
+      PublicSubnet3Id:
+        default: Public subnet 3 ID
+      S3TAPConfigBucketName:
+        default: Name
+      BootstrapOS:
+        default: OS
+      BootstrapSshPort:
+        default: SSH port
+      TAPDomainName:
+        default: Domain name
+      EKSClusterName:
+        default: EKS cluster name
+      NodeInstanceType:
+        default: Instance type
+      NumberOfNodes:
+        default: Number of nodes
+      MaxNumberOfNodes:
+        default: Maximum number of nodes
+      TanzuNetUsername:
+        default: Username
+      TanzuNetPassword:
+        default: Password
+      TanzuNetApiToken:
+        default: API token
+      QSS3BucketName:
+        default: Name
+      QSS3BucketRegion:
+        default: Region
+      QSS3KeyPrefix:
+        default: Key prefix
+      RemoteAccessCidr:
+        default: Remote access CIDR
+Parameters:
+  S3TAPConfigBucketName:
+    Type: String
+    MinLength: 3
+    MaxLength: 63
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription:
+      The TAP bucket name can include numbers, lowercase letters, uppercase
+      letters, and hyphens (-). It cannot start or end with a hyphen (-).
+    Description: >-
+      TAP requires an S3 bucket to store encrypted configuration information,
+      this bucket name will be associated with a newly created S3 bucket for
+      that purpose.
+  TAPDomainName:
+   Type: String
+   Description: >-
+     Domain name that can be used for access to TAP and its
+     corresponding project URLs. Available within a private DNS Zone.
+  NumberOfAZs:
+    Type: String
+    Description: >-
+      Number of Availability Zones to use in the VPC. This must match the value
+      entered for the AvailabilityZones parameter.
+    AllowedValues: [2, 3]
+    Default: 3
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: >-
+      ID of your existing VPC (eg: vpc-0343606e).
+  PublicSubnet1Id:
+    Type: String
+    Description: >-
+      ID of the public subnet in Availability Zone 1 of your existing VPC
+      (eg: subnet-a0246dcd).
+    Default: ''
+  PublicSubnet2Id:
+    Type: String
+    Description: >-
+      ID of the public subnet in Availability Zone 2 of your existing VPC
+      (eg: subnet-b1236eea).
+    Default: ''
+  PublicSubnet3Id:
+    Type: String
+    Description: >-
+      ID of the public subnet in Availability Zone 3 of your existing VPC
+      (eg: subnet-c3456aba).
+    Default: ''
+  PrivateSubnet1Id:
+    Type: AWS::EC2::Subnet::Id
+    Description: >-
+      ID of the private subnet in Availability Zone 1 of your existing VPC
+      (eg: subnet-fe9a8b32).
+  PrivateSubnet2Id:
+    Type: AWS::EC2::Subnet::Id
+    Description: >-
+      ID of the private subnet in Availability Zone 2 of your existing VPC
+      (eg: subnet-be8b01ea).
+  PrivateSubnet3Id:
+    Type: String
+    Description: >-
+      ID of the private subnet in Availability Zone 3 of your existing VPC
+      (eg: subnet-abd39039).
+    Default: ''
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: >-
+      The name of the SSH key that will be used to access the Bootstrap VM and
+      cluster nodes.
+  EKSClusterName:
+    Type: String
+    Description: >-
+      The name of the cluster that will be created to contain the TAP
+      deployment.
+    MinLength: 1
+    MaxLength: 100
+    AllowedPattern: ^[0-9A-Za-z][A-Za-z0-9\-_]*
+    ConstraintDescription: >-
+      Minimum length of 1. Maximum length of 100. Must start with a letter or
+      number.
+  NumberOfNodes:
+    Type: Number
+    Description: >-
+      The number of nodes that will be the minimum and created for the TAP EKS
+      cluster.
+    MinValue: 3
+    MaxValue: 450
+    Default: 4
+  MaxNumberOfNodes:
+    Type: Number
+    Description: >-
+      The maximum number of nodes that will be available in an auto scaling
+      scenario for the TAP EKS cluster.
+    MinValue: 3
+    MaxValue: 450
+    Default: 6
+  NodeInstanceType:
+    Type: String
+    Description: >-
+      AWS EC2 instance type for each of the nodes deployed within the EKS
+      cluster for TAP.
+    Default: m5.xlarge
+  RemoteAccessCidr:
+    Type: String
+    Description: >-
+      IP range that will be allowed to access the Bootstrap EC2 instance and
+      EKS cluster once deployed.
+  BootstrapOS:
+    Type: String
+    Description: >-
+      Preferred operating system for the Bootstrap EC2 instance based on
+      available values.
+    AllowedValues:
+      - Ubuntu-Server-22.04-LTS-HVM
+    Default: Ubuntu-Server-22.04-LTS-HVM
+  BootstrapSshPort:
+    Type: Number
+    Description: TCP port to use for SSH traffic to the Bootstrap instance.
+    MinValue: 0
+    MaxValue: 65535
+    Default: 22
+  TanzuNetUsername:
+    Type: String
+    Description: >-
+      The VMware Tanzu Net username (authentication ID or email address).
+    NoEcho: true
+  TanzuNetPassword:
+    Type: String
+    Description: The VMware Tanzu Net password (authentication key).
+    NoEcho: true
+  TanzuNetApiToken:
+    Type: String
+    Description: The VMware Tanzu Net API token.
+    NoEcho: true
+  QSS3BucketName:
+    Type: String
+    Description: >-
+      Name of the S3 bucket for your copy of the Quick Start assets.
+      Keep the default name unless you are customizing the template.
+      Changing the name updates code references to point to a new Quick
+      Start location. This name can include numbers, lowercase letters,
+      uppercase letters, and hyphens, but do not start or end with a hyphen (-).
+      See https://aws-quickstart.github.io/option1.html.
+    MinLength: 3
+    MaxLength: 63
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: >-
+      The Quick Start bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a
+      hyphen (-).
+    Default: aws-quickstart
+  QSS3KeyPrefix:
+    Type: String
+    Description: >-
+      S3 key prefix that is used to simulate a directory for your copy of the
+      Quick Start assets. Keep the default prefix unless you are customizing
+      the template. Changing this prefix updates code references to point to
+      a new Quick Start location. This prefix can include numbers, lowercase
+      letters, uppercase letters, hyphens (-), and forward slashes (/). End
+      with a forward slash.
+      See https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
+      and https://aws-quickstart.github.io/option1.html.
+    AllowedPattern: ^([0-9a-zA-Z-.]+/)*$
+    ConstraintDescription:
+      The Quick Start S3 key prefix can include numbers, lowercase letters,
+      uppercase letters, hyphens (-), and forward slashes (/).
+    Default: quickstart-vmware-tanzu-application-platform/
+  QSS3BucketRegion:
+    Type: String
+    Description: >-
+      AWS Region where the Quick Start S3 bucket (QSS3BucketName) is
+      hosted. Keep the default Region unless you are customizing the template.
+      Changing this Region updates code references to point to a new
+      Quick Start location. When using your own bucket, specify the Region.
+      See https://aws-quickstart.github.io/option1.html.
+    Default: us-east-1
+Mappings:
+  AwsAmiRegionMap:
+    # Ubuntu Server lookup: https://cloud-images.ubuntu.com/locator/ec2/
+    af-south-1:
+      US2204HVM: ami-08a1ff0efd6690ede
+    ap-east-1:
+      US2204HVM: ami-0c5b035581d9859b0
+    ap-northeast-1:
+      US2204HVM: ami-055bb115702a738f5
+    ap-northeast-2:
+      US2204HVM: ami-05b9c9c0fe2f5a62c
+    ap-northeast-3:
+      US2204HVM: ami-0b3874967694fae86
+    ap-south-1:
+      US2204HVM: ami-00d095fb90db2fa00
+    ap-southeast-1:
+      US2204HVM: ami-00c76c78e78a3dcd4
+    ap-southeast-2:
+      US2204HVM: ami-0251cb389d14767a2
+    ap-southeast-3:
+      US2204HVM: ami-0de46ab389596d621
+    ca-central-1:
+      US2204HVM: ami-0204f3c59456ea9a1
+    # cn-north-1:
+    #   US2204HVM:
+    # cn-northwest-1:
+    #   US2204HVM:
+    eu-central-1:
+      US2204HVM: ami-04aa66cdfe687d427
+    eu-north-1:
+      US2204HVM: ami-0dbac3c76b4ead6c5
+    eu-south-1:
+      US2204HVM: ami-0fe7a5523599f4c08
+    eu-west-1:
+      US2204HVM: ami-07bd2fc45c8a8dd48
+    eu-west-2:
+      US2204HVM: ami-033c8ef001424a6d3
+    eu-west-3:
+      US2204HVM: ami-00e43f192e8c59874
+    me-south-1:
+      US2204HVM: ami-0d49942d3daf970df
+    sa-east-1:
+      US2204HVM: ami-0b54d646bcf381a79
+    us-east-1:
+      US2204HVM: ami-09db26f1ef0a9f406
+    us-east-2:
+      US2204HVM: ami-07a683b72d6bd7da3
+    us-gov-east-1:
+      US2204HVM: ami-08fcbec75b43330b7
+    us-gov-west-1:
+      US2204HVM: ami-04e77113f128920b2
+    us-west-1:
+      US2204HVM: ami-09596c63850a1bd49
+    us-west-2:
+      US2204HVM: ami-0437ae8a23be4e98b
+  LinuxAmiNameMap:
+    Ubuntu-Server-22.04-LTS-HVM:
+      Code: US2204HVM
+      OS: Ubuntu
+Conditions:
+  3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
+  2AZDeployment: !Or
+    - !Equals [!Ref NumberOfAZs, 2]
+    - !Equals [!Ref NumberOfAZs, 3]
+  Ubuntu: !Equals [!FindInMap [LinuxAmiNameMap, !Ref BootstrapOS, OS], Ubuntu]
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
+Resources:
+  TanzuNetSecretCredentials:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: TanzuNetCredentials
+      Description: The Tanzu Net username and password
+      SecretString: !Sub >-
+        {
+          "username": "${TanzuNetUsername}",
+          "password": "${TanzuNetPassword}"
+        }
+  TanzuNetSecretApiToken:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: TanzuNetApiToken
+      Description: The Tanzu Net API token
+      SecretString: !Ref TanzuNetApiToken
+  S3TAPConfigBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: !Ref S3TAPConfigBucketName
+      AccessControl: Private
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+            BucketKeyEnabled: true
+  TAPPackagesRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: private/tanzu-application-platform/tap-packages
+      EncryptionConfiguration:
+        EncryptionType: AES256
+  TAPClusterEssentialsBundleRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: private/tanzu-cluster-essentials/bundle
+  TAPBuildServiceRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: private/tap-build-service
+  TAPSupplyChainRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: private/tap-supply-chain
+  TAPWorkloadRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload
+  TAPWorkloadBundleRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload-bundle
+  PrivateHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      HostedZoneConfig:
+        Comment: VMware Tanzu Application Platform hosted zone
+      Name: !Ref TAPDomainName
+      VPCs:
+        - VPCId: !Ref VpcId
+          VPCRegion: !Ref AWS::Region
+  EKSQSStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
+        - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+          S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
+      Parameters:
+        VPCID: !Ref VpcId
+        PrivateSubnet1ID: !Ref PrivateSubnet1Id
+        PrivateSubnet2ID: !If
+          - 2AZDeployment
+          - !Ref PrivateSubnet2Id
+          - !Ref AWS::NoValue
+        PrivateSubnet3ID: !If
+          - 3AZDeployment
+          - !Ref PrivateSubnet3Id
+          - !Ref AWS::NoValue
+        PublicSubnet1ID: !Ref PublicSubnet1Id
+        PublicSubnet2ID: !If
+          - 2AZDeployment
+          - !Ref PublicSubnet2Id
+          - !Ref AWS::NoValue
+        PublicSubnet3ID: !If
+          - 3AZDeployment
+          - !Ref PublicSubnet3Id
+          - !Ref AWS::NoValue
+        RemoteAccessCIDR: !Ref RemoteAccessCidr
+        EKSPublicAccessEndpoint: Enabled
+        AdditionalEKSAdminRoleArn: !GetAtt BootstrapIamRole.Arn
+        KeyPairName: !Ref KeyPairName
+        NumberOfNodes: !Ref NumberOfNodes
+        MaxNumberOfNodes: !Ref MaxNumberOfNodes
+        NodeInstanceType: !Ref NodeInstanceType
+        NodeInstanceFamily: Standard
+        NodeGroupType: Managed
+        NodeGroupOS: Amazon Linux 2
+        EKSClusterName: !Ref EKSClusterName
+        ClusterAutoScaler: Enabled
+        ProvisionBastionHost: Disabled
+        SnykIntegration: Disabled
+        NewRelicIntegration: Disabled
+        CalicoIntegration: Disabled
+        RafaySysIntegration: Disabled
+        GrafanaIntegration: Disabled
+        PrometheusIntegration: Disabled
+        VaultIntegration: Disabled
+        ConsulIntegration: Disabled
+        RancherIntegration: Disabled
+        MonitoringStack: None
+        ALBIngressController: Enabled
+        EfsStorageClass: Disabled
+  BootstrapSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enables SSH access to the Bootstrap instance
+      VpcId: !Ref VpcId
+      Tags:
+        - Key: Name
+          Value: TAPBootstrapSecurityGroup
+        - Key: Description
+          Value: >-
+            VMware Tanzu Application Platform EKS cluster bootstrap security
+            group.
+  BootstrapSshIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow SSH to Bootstrap instance
+      GroupId: !Ref BootstrapSecurityGroup
+      IpProtocol: tcp
+      FromPort: !Ref BootstrapSshPort
+      ToPort: !Ref BootstrapSshPort
+      CidrIp: !Ref RemoteAccessCidr
+  BootstrapDefaultEgressRule:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      Description: Bootstrap instance egress
+      GroupId: !Ref BootstrapSecurityGroup
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      CidrIp: 0.0.0.0/0
+  BootstrapSshToNodesEgressRule:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      Description: Allow SSH from Bootstrap instance to EKS nodes
+      GroupId: !Ref BootstrapSecurityGroup
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      DestinationSecurityGroupId: !GetAtt EKSQSStack.Outputs.NodeGroupSecurityGroup
+  NodesSshIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow SSH from Bootstrap instance to EKS nodes
+      GroupId: !GetAtt EKSQSStack.Outputs.NodeGroupSecurityGroup
+      IpProtocol: tcp
+      ToPort: 22
+      FromPort: 22
+      SourceSecurityGroupId: !Ref BootstrapSecurityGroup
+  BootstrapK8sToApiEgressRule:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      Description: >-
+        Allow Kubernetes API traffic from Bootstrap instance to EKS control
+        plane
+      GroupId: !Ref BootstrapSecurityGroup
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      DestinationSecurityGroupId: !GetAtt EKSQSStack.Outputs.ControlPlaneSecurityGroup
+  EKSControlPlaneApiIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: >-
+        Allow Kubernetes API traffic from Bootstrap instance to EKS control
+        plane
+      GroupId: !GetAtt EKSQSStack.Outputs.ControlPlaneSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+      FromPort: 443
+      SourceSecurityGroupId: !Ref BootstrapSecurityGroup
+  BootstrapEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: TAPBootstrapEIP
+  BootstrapIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: TAPBootstrapIamRole
+      Description: >-
+        VMware Tanzu Application Platform EKS cluster bootstrap instance
+        IAM Role.
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub ec2.${AWS::URLSuffix}
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: BootstrapInstanceConfig
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: ListAllEksClusters
+                Effect: Allow
+                Action: eks:ListClusters
+                Resource: !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/*
+              - Sid: ManageTapEksCluster
+                Effect: Allow
+                Action:
+                  - eks:ListAddons
+                  - eks:ListFargateProfiles
+                  - eks:ListIdentityProviderConfigs
+                  - eks:ListNodegroups
+                  - eks:ListUpdates
+                  - eks:AccessKubernetesApi
+                  - eks:DescribeAddonVersions
+                  - eks:DescribeCluster
+                  - eks:DescribeNodegroup
+                Resource: !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}
+              - Sid: DescribeEksAddons
+                Effect: Allow
+                Action:
+                  - eks:DescribeAddon
+                Resource: !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:addon/*/*/*
+              - Sid: ManageTapEcrRepos
+                Effect: Allow
+                Action:
+                  - ecr:DescribeImages
+                  - ecr:ListImages
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:BatchGetImage
+                  - ecr:DescribeRepositories
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:CompleteLayerUpload
+                  - ecr:InitiateLayerUpload
+                  - ecr:PutImage
+                  - ecr:UploadLayerPart
+                Resource:
+                  - !GetAtt TAPPackagesRepo.Arn
+                  - !GetAtt TAPClusterEssentialsBundleRepo.Arn
+                  - !GetAtt TAPBuildServiceRepo.Arn
+                  - !GetAtt TAPSupplyChainRepo.Arn
+                  - !GetAtt TAPWorkloadRepo.Arn
+                  - !GetAtt TAPWorkloadBundleRepo.Arn
+              - Sid: DescribeEcrPrivateRegistryAndGetAuthToken
+                Effect: Allow
+                Action:
+                  - ecr:DescribeRegistry
+                  - ecr:GetAuthorizationToken
+                Resource: '*'
+              - Sid: ListIamRoles
+                Effect: Allow
+                Action: iam:ListRoles
+                Resource: '*'
+              - Sid: ManageTapSecrets
+                Effect: Allow
+                Action:
+                  - secretsmanager:DescribeSecret
+                  - secretsmanager:GetResourcePolicy
+                  - secretsmanager:GetSecretValue
+                  - secretsmanager:ListSecretVersionIds
+                  - secretsmanager:PutSecretValue
+                Resource:
+                  - !Ref TanzuNetSecretCredentials
+                  - !Ref TanzuNetSecretApiToken
+              - Sid: ListSecretsAndGetRandomPassword
+                Effect: Allow
+                Action:
+                  - secretsmanager:GetRandomPassword
+                  - secretsmanager:ListSecrets
+                Resource: '*'
+              - Sid: ListRoute53HostedZones
+                Effect: Allow
+                Action:
+                  - route53:ListHostedZones
+                  - route53:ListHostedZonesByName
+                Resource: '*'
+              - Sid: ManageTapRoute53HostedZoneRecordSets
+                Effect: Allow
+                Action:
+                  - route53:ListResourceRecordSets
+                  - route53:ChangeResourceRecordSets
+                Resource: !Sub arn:${AWS::Partition}:route53:::hostedzone/${PrivateHostedZone.Id}
+              - Sid: ManageCloudWatchLogs
+                Effect: Allow
+                Action:
+                  - logs:DescribeLogGroups
+                  - logs:DescribeLogStreams
+                  - logs:GetLogEvents
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:PutMetricFilter
+                  - logs:PutRetentionPolicy
+                Resource: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*
+              - Sid: ManageTapS3ConfigBucketObjects
+                Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource: !GetAtt S3TAPConfigBucket.Arn
+              - Sid: GetQSS3BucketObjects
+                Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub
+                  - arn:${AWS::Partition}:s3:::${S3Bucket}/${QSS3KeyPrefix}*
+                  - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+              - Sid: ListAllS3Buckets
+                Effect: Allow
+                Action: s3:ListAllMyBuckets
+                Resource: !Sub arn:${AWS::Partition}:s3:::*
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy
+  BootstrapInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: TAPBootstrapInstanceProfile
+      Roles:
+        - !Ref BootstrapIamRole
+  BootstrapUbuntuInstance:
+    Type: AWS::EC2::Instance
+    Condition: Ubuntu
+    Properties:
+      InstanceType: m5.large
+      IamInstanceProfile: !Ref BootstrapInstanceProfile
+      ImageId: !FindInMap
+        - AwsAmiRegionMap
+        - !Ref AWS::Region
+        - !FindInMap [LinuxAmiNameMap, !Ref BootstrapOS, Code]
+      KeyName: !Ref KeyPairName
+      Monitoring: true
+      SecurityGroupIds:
+        - !Ref BootstrapSecurityGroup
+      SubnetId: !Ref PublicSubnet1Id
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 50
+            VolumeType: gp2
+            Encrypted: true
+      Tags:
+        - Key: Name
+          Value: TAPBootstrapInstance
+        - Key: Description
+          Value: >-
+            VMware Tanzu Application Platform EKS cluster bootstrap instance.
+      UserData:
+        Fn::Base64: !Sub
+          - |
+            #!/bin/bash
+            set -xe
+            user=ubuntu
+            tap_dir=/home/$user/tap-setup-scripts
+            cat <<EOF >> /etc/environment
+            AWS_REGION=${AWS::Region}
+            AWS_DEFAULT_REGION=${AWS::Region}
+            EOF
+            set -a
+            source /etc/environment
+            echo "Removing built-in Docker..."
+            apt-get -y remove containerd runc
+            echo "Adding Docker CE repo..."
+            mkdir -p /usr/local/share/keyrings/
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/local/share/keyrings/docker-archive-keyring.gpg --yes
+            printf "deb [arch=$(dpkg --print-architecture) signed-by=/usr/local/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
+            echo "Updating & upgrading..."
+            apt-get -y update
+            apt-get -y upgrade
+            echo "Installing system dependencies..."
+            apt-get -y install amazon-ecr-credential-helper awscli ca-certificates containerd.io curl docker-ce \
+              docker-ce-cli docker-compose-plugin git gnupg jq lsb-release openssl perl sudo python3-pip \
+              python3-setuptools uuid-runtime vim wget
+            echo "Installing python dependencies for $user..."
+            su - $user -c "mkdir -p /home/$user/.local/bin; source /home/$user/.profile; python3 -m pip install --upgrade pip setuptools wheel yq"
+            echo "Updating certificate authority certificates..."
+            update-ca-certificates
+            echo "Installing kubectl..."
+            pushd /tmp
+            aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/amd64/kubectl" ./kubectl
+            aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/amd64/kubectl.sha256" ./kubectl.sha256
+            openssl sha1 -sha256 ./kubectl
+            chmod 755 ./kubectl
+            mv ./kubectl /usr/local/bin/
+            kubectl completion bash > /etc/bash_completion.d/kubectl
+            su - $user -c "aws eks update-kubeconfig --name ${EKSQSStack.Outputs.EKSClusterName}"
+            popd
+            echo "Installing eksctl..."
+            pushd /tmp
+            curl -fsSL "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C .
+            mv /tmp/eksctl /usr/local/bin
+            eksctl completion bash > /etc/bash_completion.d/eksctl
+            popd
+            echo "Installing Carvel imgpkg..."
+            bash -c "set -eo pipefail; curl -fsSL https://carvel.dev/install.sh | bash"
+            echo "Configuring Docker..."
+            getent group docker || groupadd docker
+            usermod -aG docker $user
+            mkdir -p /root/.docker
+            su - $user -c "mkdir -p /home/$user/.docker"
+            cat <<EOF >> /root/.docker/config.json
+            {
+              "credHelpers": {
+                "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com": "ecr-login",
+                "public.ecr.aws": "ecr-login"
+              }
+            }
+            EOF
+            cp /root/.docker/config.json /home/$user/.docker/
+            chown $user:$user /home/$user/.docker/config.json
+            echo "Configuring the SSH listening port..."
+            printf "Port ${BootstrapSshPort}\n" > /etc/ssh/sshd_config.d/port.conf
+            systemctl restart sshd.service
+            systemctl status sshd.service
+            echo "Downloading the VMware Tanzu Application Platform Quick Start scripts..."
+            su - $user -c "mkdir -p \"$tap_dir/downloads\" \"$tap_dir/generated\" \"$tap_dir/src/inputs\" \"$tap_dir/src/resources\""
+            pushd "$tap_dir/src"
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/tap-main.sh" "./tap-main.sh"
+            chmod +x ./tap-main.sh
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/functions.sh" "./functions.sh"
+            popd
+            pushd "$tap_dir/src/inputs"
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-config-internal-values.yaml" "./tap-config-internal-values.yaml"
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values.yaml" "./tap-values.yaml"
+            cat <<EOF > ./user-input-values.yaml
+            tanzunet_secrets:
+              credentials_arn: ${TanzuNetSecretCredentials}
+              api_token_arn: ${TanzuNetSecretApiToken}
+            eks:
+              cluster_name: ${EKSQSStack.Outputs.EKSClusterName}
+            route53:
+              domain_name: ${TAPDomainName}
+              zone_id: ${PrivateHostedZone.Id}
+            repositories:
+              tap_packages: ${TAPPackagesRepo.RepositoryUri}
+              cluster_essentials: ${TAPClusterEssentialsBundleRepo.RepositoryUri}
+              build_service: ${TAPBuildServiceRepo.RepositoryUri}
+              ootb_supply_chain: ${TAPSupplyChainRepo.RepositoryUri}
+              workload:
+                name: tanzu-java-web-app-workload
+                namespace: tap-workload
+                repo1: ${TAPWorkloadRepo.RepositoryUri}
+                repo2: ${TAPWorkloadBundleRepo.RepositoryUri}
+            EOF
+            popd
+            pushd "$tap_dir/src/resources"
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/developer-namespace.yaml" "./developer-namespace.yaml"
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/git-ssh-basic-auth.yaml" "./git-ssh-basic-auth.yaml"
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/pipeline.yaml" "./pipeline.yaml"
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/scan-policy.yaml" "./scan-policy.yaml"
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/workload-aws.yaml" "./workload-aws.yaml"
+            popd
+            wget -O "$tap_dir/downloads/pivnet" "https://github.com/pivotal-cf/pivnet-cli/releases/download/v${PivNetVersion}/pivnet-linux-$(dpkg --print-architecture)-${PivNetVersion}"
+            install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
+          - AwsKubectlVersion: 1.22.6/2022-03-09
+            PivNetVersion: 3.0.1
+            QSS3BucketPath: !Sub
+              - s3://${S3Bucket}/${QSS3KeyPrefix}tap-setup-scripts
+              - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+  BootstrapUbuntuEipAssociation:
+    Type: AWS::EC2::EIPAssociation
+    UpdateReplacePolicy: Delete
+    Condition: Ubuntu
+    Properties:
+      InstanceId: !Ref BootstrapUbuntuInstance
+      AllocationId: !GetAtt BootstrapEIP.AllocationId
