@@ -164,7 +164,6 @@ function verifyTools {
 function readUserInputs {
   banner "Reading $INPUTS/user-input-values.yaml"
 
-  AWS_REGION=`curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region`
   AWS_ACCOUNT=`curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .accountId`
 
   CLUSTER_NAME=$(yq .aws.eks_cluster_name $INPUTS/user-input-values.yaml)
