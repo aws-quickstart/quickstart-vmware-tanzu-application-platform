@@ -116,9 +116,9 @@ function installTanzuCLI {
     MOST_RECENT_CLI=$(find $TANZU_DIR/cli/core/ -name tanzu-core-linux_amd64 | xargs ls -t | head -n 1)
     echo "Installing Tanzu CLI"
     sudo install -m 0755 $MOST_RECENT_CLI /usr/local/bin/tanzu
-    cd $TANZU_DIR
+    pushd $TANZU_DIR
     tanzu plugin install --local cli all
-    cd ../..
+    popd
 
   else
     echo "tanzu-framework-linux already present"
@@ -423,9 +423,9 @@ function deletePackageRepository {
 function deleteTanzuClusterEssentials {
 
   banner "Removing kapp-controller & secretgen-controller"
-  cd $DOWNLOADS/tanzu-cluster-essentials
+  pushd $DOWNLOADS/tanzu-cluster-essentials
   ./uninstall.sh --yes
-  cd ../..
+  popd ../..
 }
 
 function deleteTapNamespace {
