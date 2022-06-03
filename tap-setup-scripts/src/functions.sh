@@ -393,7 +393,6 @@ function tapUninstallFull {
   banner "Uninstalling TAP ..."
   tanzu package installed delete $TAP_PACKAGE_NAME -n $TAP_NAMESPACE --yes || true
   waitForRemoval tanzu package installed get $TAP_PACKAGE_NAME -n $TAP_NAMESPACE -o json
-
 }
 
 function deleteTapRegistrySecret {
@@ -446,8 +445,6 @@ function relocateTAPPackages {
     ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD
 
   banner "Relocating images, this will take time in minutes (30-45min) ..."
-
-  docker login --username $ECR_REGISTRY_USERNAME --password $ECR_REGISTRY_PASSWORD $ECR_REGISTRY_HOSTNAME
 
   docker login --username $TANZUNET_REGISTRY_USERNAME --password $TANZUNET_REGISTRY_PASSWORD $TANZUNET_REGISTRY_HOSTNAME
 
