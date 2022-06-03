@@ -220,7 +220,6 @@ function parseUserInputs {
     --ignore-unknown-comments > $GENERATED/tap-values.yaml
 }
 
-
 function installTanzuClusterEssentials {
   requireValue TAP_VERSION  \
     ECR_REGISTRY_HOSTNAME ESSENTIALS_ECR_REGISTRY_REPOSITORY \
@@ -238,9 +237,9 @@ function installTanzuClusterEssentials {
 
   banner "Deploy kapp, secretgen configuration bundle & install tanzu CLI"
 
-  cd $DOWNLOADS/tanzu-cluster-essentials
+  pushd $DOWNLOADS/tanzu-cluster-essentials
   ./install.sh --yes
-  cd ../..
+  popd
 }
 
 function verifyK8ClusterAccess {
