@@ -1,8 +1,5 @@
 #@data/values
 ---
-tanzunet:
-  hostname: registry.tanzu.vmware.com
-
 tap_ecr_repository: private/tanzu-application-platform/tap-packages
 cluster_essentials_ecr_repository: private/tanzu-cluster-essentials/bundle
 tbs_ecr_repository: private/tap-build-service

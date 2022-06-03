@@ -168,10 +168,17 @@ function readUserInputs {
 
   CLUSTER_NAME=$(yq .aws.eks_cluster_name $INPUTS/user-input-values.yaml)
   AWS_DOMAIN_NAME=$(yq .aws.domain $INPUTS/user-input-values.yaml)
+
+  export TANZUNET_REGISTRY_HOSTNAME=$(yq .tanzunet.hostname $INPUTS/user-input-values.yaml)
+  export TANZUNET_REGISTRY_USERNAME=$(yq .tanzunet.username $INPUTS/user-input-values.yaml)
+  export TANZUNET_REGISTRY_PASSWORD=$(yq .tanzunet.password $INPUTS/user-input-values.yaml)
+  export PIVNET_TOKEN=$(yq .tanzunet.pivnet_token $INPUTS/user-input-values.yaml)
+
 }
 
 function readTAPInternalValues {
   banner "Reading $INPUTS/tap-config-internal-values.yaml"
+
   export TANZUNET_REGISTRY_HOSTNAME=$(yq .tanzunet.hostname $INPUTS/tap-config-internal-values.yaml)
   export TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN=$(yq -r .tanzunet_secrets.credentials_arn $INPUTS/user-input-values.yaml)
   export TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN=$(yq -r .tanzunet_secrets.api_token_arn $INPUTS/user-input-values.yaml)
