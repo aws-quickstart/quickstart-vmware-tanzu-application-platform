@@ -426,7 +426,7 @@ function deleteTanzuClusterEssentials {
   banner "Removing kapp-controller & secretgen-controller"
   pushd $DOWNLOADS/tanzu-cluster-essentials
   ./uninstall.sh --yes
-  popd ../..
+  popd
 }
 
 function deleteTapNamespace {
