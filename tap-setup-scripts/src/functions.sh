@@ -67,7 +67,8 @@ function installTanzuCLI {
   then
     echo "Installing pivnet CLI"
 
-    curl -Lo $DOWNLOADS/pivnet https://github.com/pivotal-cf/pivnet-cli/releases/download/v3.0.1/pivnet-linux-amd64-3.0.1
+    PIVNET_VERSION=3.0.1
+    curl -Lo $DOWNLOADS/pivnet "https://github.com/pivotal-cf/pivnet-cli/releases/download/v$PIVNET_VERSION/pivnet-linux-$(dpkg --print-architecture)-$PIVNET_VERSION"
     sudo install -o ubuntu -g ubuntu -m 0755 $DOWNLOADS/pivnet /usr/local/bin/pivnet
   else
     echo "pivnet CLI already present"
@@ -77,7 +78,7 @@ function installTanzuCLI {
   then
     pivnet login --api-token="$PIVNET_TOKEN"
 
-    ESSENTIALS_FILE_NAME=tanzu-cluster-essentials-linux-amd64-$ESSENTIALS_VERSION.tgz
+    ESSENTIALS_FILE_NAME="tanzu-cluster-essentials-linux-$(dpkg --print-architecture)-$ESSENTIALS_VERSION.tgz"
 
     pivnet download-product-files \
       --download-dir $DOWNLOADS \
@@ -99,7 +100,7 @@ function installTanzuCLI {
 
     pivnet login --api-token="$PIVNET_TOKEN"
 
-    TANZUCLI_FILE_NAME=tanzu-framework-linux-amd64.tar
+    TANZUCLI_FILE_NAME="tanzu-framework-linux-$(dpkg --print-architecture).tar"
     TANZUCLI_FILE_ID=$(pivnet product-files \
       -p tanzu-application-platform \
       -r $TAP_VERSION \
@@ -113,7 +114,7 @@ function installTanzuCLI {
 
     tar xvf $DOWNLOADS/$TANZUCLI_FILE_NAME -C $TANZU_DIR
     export TANZU_CLI_NO_INIT=true
-    MOST_RECENT_CLI=$(find $TANZU_DIR/cli/core/ -name tanzu-core-linux_amd64 | xargs ls -t | head -n 1)
+    MOST_RECENT_CLI=$(find $TANZU_DIR/cli/core/ -name tanzu-core-linux_$(dpkg --print-architecture) | xargs ls -t | head -n 1)
     echo "Installing Tanzu CLI"
     sudo install -m 0755 $MOST_RECENT_CLI /usr/local/bin/tanzu
     pushd $TANZU_DIR
