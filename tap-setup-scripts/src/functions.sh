@@ -245,10 +245,6 @@ function installTanzuClusterEssentials {
 function verifyK8ClusterAccess {
   requireValue CLUSTER_NAME
 
-  rm -rf ~/.kube
-  mkdir -p ~/.kube
-  touch ~/.kube/config
-
   banner "Verify EKS Cluster ${CLUSTER_NAME} access"
   aws eks update-kubeconfig --name ${CLUSTER_NAME}
   kubectl config current-context
