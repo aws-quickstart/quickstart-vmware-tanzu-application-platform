@@ -166,8 +166,8 @@ function readUserInputs {
 
   AWS_ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
 
-  CLUSTER_NAME=$(yq .aws.eks_cluster_name $INPUTS/user-input-values.yaml)
-  AWS_DOMAIN_NAME=$(yq .aws.domain $INPUTS/user-input-values.yaml)
+  CLUSTER_NAME=$(yq .eks.cluster_name $INPUTS/user-input-values.yaml)
+  AWS_DOMAIN_NAME=$(yq .route53.domain_name $INPUTS/user-input-values.yaml)
 
   export TANZUNET_REGISTRY_HOSTNAME=$(yq .tanzunet.hostname $INPUTS/user-input-values.yaml)
   export TANZUNET_REGISTRY_USERNAME=$(yq .tanzunet.username $INPUTS/user-input-values.yaml)
