@@ -53,8 +53,9 @@ Metadata:
         Parameters:
           - TAPDomainName
       - Label:
-          default: Bootstrap EC2 instance network configuration
+          default: Bootstrap EC2 instance configuration
         Parameters:
+          - BootstrapOS
           - BootstrapSshPort
       - Label:
           default: AWS Quick Start S3 bucket configuration
@@ -85,6 +86,8 @@ Metadata:
         default: Public subnet 3 CIDR
       S3TAPConfigBucketName:
         default: Name
+      BootstrapOS:
+        default: OS
       BootstrapSshPort:
         default: SSH port
       TAPDomainName:
@@ -236,6 +239,14 @@ Parameters:
     Description: >-
       IP range that will be allowed to access the Bootstrap EC2 instance and
       EKS cluster once deployed.
+  BootstrapOS:
+    Type: String
+    Description: >-
+      Preferred operating system for the Bootstrap EC2 instance based on
+      available values.
+    AllowedValues:
+      - Ubuntu-Server-22.04-LTS-HVM
+    Default: Ubuntu-Server-22.04-LTS-HVM
   BootstrapSshPort:
     Type: Number
     Description: TCP port to use for SSH traffic to the Bootstrap instance.
@@ -352,6 +363,7 @@ Resources:
           - !GetAtt VPCStack.Outputs.PublicSubnet3ID
           - !Ref AWS::NoValue
         RemoteAccessCidr: !Ref RemoteAccessCidr
+        BootstrapOS: !Ref BootstrapOS
         BootstrapSshPort: !Ref BootstrapSshPort
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
