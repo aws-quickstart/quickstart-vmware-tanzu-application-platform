@@ -39,6 +39,7 @@ function fail {
   echo $1 >&2
   exit 1
 }
+
 # Wait until there is no (non-error) output from a command
 function waitForRemoval {
   local n=1
@@ -56,67 +57,6 @@ function waitForRemoval {
     fi
   done
 }
-
-function installTools {
-  # install tools required in the scripts
-  sudo apt-get -y update
-  sudo apt-get install -y uuid-runtime vim sudo curl wget
-  sudo apt-get install -y jq python3-pip
-
-  # install awscli
-  sudo pip3 install yq
-  sudo pip3 install awscli --upgrade
-
-  #install yq
-  sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-  sudo chmod a+x /usr/local/bin/yq
-
-  #install carvel tools
-  # perl is needed for shasum
-  sudo apt-get -y update
-  sudo apt-get install -y  perl ca-certificates
-  sudo update-ca-certificates
-  sudo rm -rf /var/lib/apt/lists/*
-  sudo bash -c "set -eo pipefail; wget -O- https://carvel.dev/install.sh | bash"
-
-  # install kubectl
-  export AWS_KUBECTL_VERSION="1.22.6/2022-03-09"
-  sudo curl -o kubectl  https://amazon-eks.s3-us-west-2.amazonaws.com/${AWS_KUBECTL_VERSION}/bin/linux/amd64/kubectl
-  sudo chmod +x kubectl
-  sudo mv kubectl /usr/local/bin/
-
-  # aws-iam-authenticator
-  curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.12.7/2019-03-27/bin/linux/amd64/aws-iam-authenticator
-  chmod +x ./aws-iam-authenticator
-  sudo mv ./aws-iam-authenticator /usr/local/bin/
-}
-
-function installDocker {
-  # install Docker
-  sudo apt-get -y remove docker docker-engine docker.io containerd runc || true
-  sudo apt-get -y update
-  sudo apt-get install -y \
-      ca-certificates \
-      curl \
-      gnupg \
-      lsb-release
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg --yes
-  echo \
-    "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-  sudo apt-get -y update
-  sudo apt-get install -y docker-ce docker-ce-cli containerd.io || true
-  if [ $(getent group docker) ]; then
-    echo "group 'docker' exists."
-  else
-    echo "group 'docker' does not exist."
-    sudo groupadd docker 2>/dev/null || true
-  fi
-  sudo usermod -aG docker ${USER} 2>/dev/null || true
-
-  echo "docker install done"
-}
-
 
 function installTanzuCLI {
   banner "Downloading kapp, secretgen configuration bundle & tanzu cli"
@@ -221,7 +161,6 @@ function verifyTools {
 }
 
 function readUserInputs {
-
   banner "Reading $INPUTS/user-input-values.yaml"
 
   AWS_REGION=`curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region`
@@ -238,8 +177,14 @@ function readUserInputs {
 }
 
 function readTAPInternalValues {
-
   banner "Reading $INPUTS/tap-config-internal-values.yaml"
+
+  export TANZUNET_REGISTRY_HOSTNAME=$(yq .tanzunet.hostname $INPUTS/tap-config-internal-values.yaml)
+  export TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN=$(yq -r .tanzunet_secrets.credentials_arn $INPUTS/user-input-values.yaml)
+  export TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN=$(yq -r .tanzunet_secrets.api_token_arn $INPUTS/user-input-values.yaml)
+  export TANZUNET_REGISTRY_USERNAME=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN" --query "SecretString" --output text | jq -r .username)
+  export TANZUNET_REGISTRY_PASSWORD=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN" --query "SecretString" --output text | jq -r .password)
+  export PIVNET_TOKEN=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN" --query "SecretString" --output text)
 
   TAP_VERSION=$(yq .tap.version $INPUTS/tap-config-internal-values.yaml)
   TAP_PACKAGE_NAME=$(yq .tap.name $INPUTS/tap-config-internal-values.yaml)
@@ -259,7 +204,6 @@ function readTAPInternalValues {
 }
 
 function parseUserInputs {
-
   banner "getting ECR registry credentials"
 
   export ECR_REGISTRY_HOSTNAME=${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
@@ -283,7 +227,6 @@ function parseUserInputs {
     --ignore-unknown-comments > $GENERATED/tap-values.yaml
 }
 
-
 function installTanzuClusterEssentials {
   requireValue TAP_VERSION  \
     ECR_REGISTRY_HOSTNAME ESSENTIALS_ECR_REGISTRY_REPOSITORY \
@@ -301,28 +244,21 @@ function installTanzuClusterEssentials {
 
   banner "Deploy kapp, secretgen configuration bundle & install tanzu CLI"
 
-  cd $DOWNLOADS/tanzu-cluster-essentials
+  pushd $DOWNLOADS/tanzu-cluster-essentials
   ./install.sh --yes
-  cd ../..
-
+  popd
 }
 
 function verifyK8ClusterAccess {
-  requireValue CLUSTER_NAME AWS_REGION
-
-  rm -rf ~/.kube
-  mkdir -p ~/.kube
-  touch ~/.kube/config
+  requireValue CLUSTER_NAME
 
   banner "Verify EKS Cluster ${CLUSTER_NAME} access"
-  aws sts get-caller-identity
-  aws eks --region ${AWS_REGION} update-kubeconfig --name ${CLUSTER_NAME}
+  aws eks update-kubeconfig --name ${CLUSTER_NAME}
   kubectl config current-context
   kubectl get nodes
 }
 
 function createTapNamespace {
-
   requireValue TAP_NAMESPACE DEVELOPER_NAMESPACE
 
   banner "Creating $TAP_NAMESPACE namespace"
@@ -335,7 +271,6 @@ function createTapNamespace {
   (kubectl get ns $DEVELOPER_NAMESPACE 2> /dev/null) || \
     kubectl create ns $DEVELOPER_NAMESPACE
 }
-
 
 function loadPackageRepository {
   requireValue TAP_VERSION TAP_NAMESPACE \
@@ -437,13 +372,11 @@ function tapWorkloadInstallFull {
   # 'registry-credentials' is used in tap-values.yaml & developer-namespace.yaml files
   tanzu secret registry add registry-credentials --username ${ECR_REGISTRY_USERNAME} --password ${ECR_REGISTRY_PASSWORD} --server ${ECR_REGISTRY_HOSTNAME} --namespace ${DEVELOPER_NAMESPACE}
 
-
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/developer-namespace.yaml
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/pipeline.yaml
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/scan-policy.yaml
 
   tanzu apps workload apply -f $RESOURCES/workload-aws.yaml -n $DEVELOPER_NAMESPACE --yes
-
 }
 
 function tapWorkloadUninstallFull {
@@ -467,7 +400,6 @@ function tapUninstallFull {
   banner "Uninstalling TAP ..."
   tanzu package installed delete $TAP_PACKAGE_NAME -n $TAP_NAMESPACE --yes || true
   waitForRemoval tanzu package installed get $TAP_PACKAGE_NAME -n $TAP_NAMESPACE -o json
-
 }
 
 function deleteTapRegistrySecret {
@@ -521,8 +453,6 @@ function relocateTAPPackages {
 
   banner "Relocating images, this will take time in minutes (30-45min) ..."
 
-  docker login --username $ECR_REGISTRY_USERNAME --password $ECR_REGISTRY_PASSWORD $ECR_REGISTRY_HOSTNAME
-
   docker login --username $TANZUNET_REGISTRY_USERNAME --password $TANZUNET_REGISTRY_PASSWORD $TANZUNET_REGISTRY_HOSTNAME
 
   # --concurrency 2 is required for AWS
@@ -544,5 +474,4 @@ function printOutputParams {
 
   tap_gui_url=$(yq .tap_gui.app_config.backend.baseUrl $GENERATED/tap-values.yaml)
   echo "TAP GUI URL $tap_gui_url"
-
 }
