@@ -179,7 +179,7 @@ function readUserInputs {
 function readTAPInternalValues {
   banner "Reading $INPUTS/tap-config-internal-values.yaml"
 
-  export TANZUNET_REGISTRY_HOSTNAME=$(yq .tanzunet.hostname $INPUTS/tap-config-internal-values.yaml)
+  export TANZUNET_REGISTRY_FQDN=$(yq .tanzunet.fqdn $INPUTS/tap-config-internal-values.yaml)
 
   TAP_VERSION=$(yq .tap.version $INPUTS/tap-config-internal-values.yaml)
   TAP_PACKAGE_NAME=$(yq .tap.name $INPUTS/tap-config-internal-values.yaml)
@@ -441,14 +441,14 @@ function relocateTAPPackages {
   # ECR_REPOSITORY to be pre-created
 
   requireValue TANZUNET_REGISTRY_USERNAME TANZUNET_REGISTRY_PASSWORD \
-    TANZUNET_REGISTRY_HOSTNAME TAP_VERSION ESSENTIALS_BUNDLE ESSENTIALS_BUNDLE_SHA256 \
+    TANZUNET_REGISTRY_FQDN TAP_VERSION ESSENTIALS_BUNDLE ESSENTIALS_BUNDLE_SHA256 \
     TAP_ECR_REGISTRY_REPOSITORY \
     ECR_REGISTRY_HOSTNAME ESSENTIALS_ECR_REGISTRY_REPOSITORY \
     ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD
 
   banner "Relocating images, this will take time in minutes (30-45min) ..."
 
-  docker login --username $TANZUNET_REGISTRY_USERNAME --password $TANZUNET_REGISTRY_PASSWORD $TANZUNET_REGISTRY_HOSTNAME
+  docker login --username $TANZUNET_REGISTRY_USERNAME --password $TANZUNET_REGISTRY_PASSWORD $TANZUNET_REGISTRY_FQDN
 
   # --concurrency 2 is required for AWS
   echo "Relocating Tanzu Cluster Essentials Bundle"
@@ -456,7 +456,7 @@ function relocateTAPPackages {
   --to-repo ${ECR_REGISTRY_HOSTNAME}/${ESSENTIALS_ECR_REGISTRY_REPOSITORY}
 
   echo "Relocating TAP packages"
-  imgpkg copy --concurrency 2 -b ${TANZUNET_REGISTRY_HOSTNAME}/tanzu-application-platform/tap-packages:${TAP_VERSION} \
+  imgpkg copy --concurrency 2 -b ${TANZUNET_REGISTRY_FQDN}/tanzu-application-platform/tap-packages:${TAP_VERSION} \
    --to-repo ${ECR_REGISTRY_HOSTNAME}/${TAP_ECR_REGISTRY_REPOSITORY}
 }
 
