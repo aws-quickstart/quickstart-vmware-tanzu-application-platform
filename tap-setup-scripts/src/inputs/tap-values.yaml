@@ -21,14 +21,14 @@ ootb_supply_chain_testing_scanning:
     ssh_secret: ""
 
 learningcenter:
-  ingressDomain: #@ "learning-center.{}".format(data.values.aws.domain)
+  ingressDomain: #@ "learning-center.{}".format(data.values.route53.domain_name)
 
 ootb_delivery_basic:
   service_account: default
 
 tap_gui:
   ingressEnabled: true
-  ingressDomain: #@ data.values.aws.domain
+  ingressDomain: #@ data.values.route53.domain_name
   service_type: ClusterIP # NodePort for distributions that don't support LoadBalancer
   app_config:
     supplyChain:
@@ -36,11 +36,11 @@ tap_gui:
     auth:
       allowGuestAccess: true
     backend:
-      baseUrl: #@ "http://tap-gui.{}".format(data.values.aws.domain)
+      baseUrl: #@ "http://tap-gui.{}".format(data.values.route53.domain_name)
       cors:
-        origin: #@ "http://tap-gui.{}".format(data.values.aws.domain)
+        origin: #@ "http://tap-gui.{}".format(data.values.route53.domain_name)
     app:
-      baseUrl: #@ "http://tap-gui.{}".format(data.values.aws.domain)
+      baseUrl: #@ "http://tap-gui.{}".format(data.values.route53.domain_name)
 
 metadata_store:
   app_service_type: LoadBalancer
@@ -51,7 +51,7 @@ contour:
       type: LoadBalancer
 
 cnrs:
-  domain_name: #@ "{}".format(data.values.aws.domain)
+  domain_name: #@ "{}".format(data.values.route53.domain_name)
 
 grype:
   namespace: #@ data.values.workload.namespace
