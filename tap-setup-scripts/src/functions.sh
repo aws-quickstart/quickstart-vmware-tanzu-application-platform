@@ -164,7 +164,7 @@ function verifyTools {
 function readUserInputs {
   banner "Reading $INPUTS/user-input-values.yaml"
 
-  AWS_ACCOUNT=`curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .accountId`
+  AWS_ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
 
   CLUSTER_NAME=$(yq .aws.eks_cluster_name $INPUTS/user-input-values.yaml)
   AWS_DOMAIN_NAME=$(yq .aws.domain $INPUTS/user-input-values.yaml)
