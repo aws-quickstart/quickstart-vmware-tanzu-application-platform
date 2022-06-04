@@ -1221,8 +1221,8 @@ Resources:
               workload:
                 name: tanzu-java-web-app-workload
                 namespace: tap-workload
-                repo1: ${TAPWorkloadRepo.RepositoryUri}
-                repo2: ${TAPWorkloadBundleRepo.RepositoryUri}
+                repository: ${TAPWorkloadRepo.RepositoryUri}
+                bundle_repository: ${TAPWorkloadBundleRepo.RepositoryUri}
             EOF
             popd
             pushd "$tap_dir/src/resources"
