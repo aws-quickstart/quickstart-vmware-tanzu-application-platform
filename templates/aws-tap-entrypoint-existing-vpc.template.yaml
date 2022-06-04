@@ -1084,6 +1084,8 @@ Resources:
             #!/bin/bash
             set -xe
             user=ubuntu
+            arch=$(dpkg --print-architecture)
+            uname=$(uname -s)
             tap_dir=/home/$user/tap-setup-scripts
             cat <<EOF >> /etc/environment
             AWS_REGION=${AWS::Region}
@@ -1096,7 +1098,7 @@ Resources:
             echo "Adding Docker CE repo..."
             mkdir -p /usr/local/share/keyrings/
             curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/local/share/keyrings/docker-archive-keyring.gpg --yes
-            printf "deb [arch=$(dpkg --print-architecture) signed-by=/usr/local/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
+            printf "deb [arch=$arch signed-by=/usr/local/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
             echo "Updating & upgrading..."
             apt-get -y update
             apt-get -y upgrade
@@ -1110,8 +1112,8 @@ Resources:
             update-ca-certificates
             echo "Installing kubectl..."
             pushd /tmp
-            aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/amd64/kubectl" ./kubectl
-            aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/amd64/kubectl.sha256" ./kubectl.sha256
+            aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl" ./kubectl
+            aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl.sha256" ./kubectl.sha256
             openssl sha1 -sha256 ./kubectl
             chmod 755 ./kubectl
             mv ./kubectl /usr/local/bin/
@@ -1120,7 +1122,7 @@ Resources:
             popd
             echo "Installing eksctl..."
             pushd /tmp
-            curl -fsSL "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C .
+            curl -fsSL "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_${!uname}_${!arch}.tar.gz" | tar xz -C .
             mv /tmp/eksctl /usr/local/bin
             eksctl completion bash > /etc/bash_completion.d/eksctl
             popd
