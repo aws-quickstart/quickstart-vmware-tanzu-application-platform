@@ -52,6 +52,11 @@ Metadata:
         Parameters:
           - TAPDomainName
       - Label:
+          default: TAP version configuration
+        Parameters:
+          - TAPVersion
+          - ClusterEssentialsBundleVersion
+      - Label:
           default: Bootstrap EC2 instance configuration
         Parameters:
           - BootstrapOS
@@ -103,6 +108,10 @@ Metadata:
         default: Password
       TanzuNetApiToken:
         default: API token
+      TAPVersion:
+        default: Version
+      ClusterEssentialsBundleVersion:
+        default: Cluster essentials bundle version
       QSS3BucketName:
         default: Name
       QSS3BucketRegion:
@@ -586,6 +595,18 @@ Parameters:
     Type: String
     Description: The VMware Tanzu Net API token.
     NoEcho: true
+  TAPVersion:
+    Type: String
+    Description: The version of TAP to deploy.
+    AllowedValues:
+      - 1.1.0
+    Default: 1.1.0
+  ClusterEssentialsBundleVersion:
+    Type: String
+    Description: The version of the cluster essentials bundle to deploy.
+    AllowedValues:
+      - 1.1.0
+    Default: 1.1.0
   QSS3BucketName:
     Type: String
     Description: >-
@@ -687,6 +708,11 @@ Mappings:
     Ubuntu-Server-22.04-LTS-HVM:
       Code: US2204HVM
       OS: Ubuntu
+  ClusterEssentialsBundle:
+    1.1.0:
+      Repo: registry.tanzu.vmware.com/tanzu-cluster-essentials/cluster-essentials-bundle
+      FileHash: sha256:ab0a3539da241a6ea59c75c0743e9058511d7c56312ea3906178ec0f3491f51d
+      FileId: 1191987
 Conditions:
   3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
   2AZDeployment: !Or
@@ -1127,8 +1153,22 @@ Resources:
             aws s3 cp --no-progress "${QSS3BucketPath}/src/functions.sh" "./functions.sh"
             popd
             pushd "$tap_dir/src/inputs"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-config-internal-values.yaml" "./tap-config-internal-values.yaml"
             aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values.yaml" "./tap-values.yaml"
+            cat <<EOF > ./tap-config-internal-values.yaml
+            #@data/values
+            ---
+            tanzunet:
+              fqdn: registry.tanzu.vmware.com
+            cluster_essentials_bundle:
+              bundle: ${ClusterEssentialsBundleRepo}
+              bundle_sha256: ${ClusterEssentialsBundleFileHash}
+              version: ${ClusterEssentialsBundleVersion}
+              file_id: ${ClusterEssentialsBundleFileId}
+            tap:
+              name: tap
+              namespace: tap-install
+              version: ${TAPVersion}
+            EOF
             cat <<EOF > ./user-input-values.yaml
             tanzunet_secrets:
               credentials_arn: ${TanzuNetSecretCredentials}
@@ -1161,6 +1201,9 @@ Resources:
             wget -O "$tap_dir/downloads/pivnet" "https://github.com/pivotal-cf/pivnet-cli/releases/download/v${PivNetVersion}/pivnet-linux-$(dpkg --print-architecture)-${PivNetVersion}"
             install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
           - AwsKubectlVersion: 1.22.6/2022-03-09
+            ClusterEssentialsBundleRepo: !FindInMap [ClusterEssentialsBundle, !Ref ClusterEssentialsBundleVersion, Repo]
+            ClusterEssentialsBundleFileHash: !FindInMap [ClusterEssentialsBundle, !Ref ClusterEssentialsBundleVersion, FileHash]
+            ClusterEssentialsBundleFileId: !FindInMap [ClusterEssentialsBundle, !Ref ClusterEssentialsBundleVersion, FileId]
             PivNetVersion: 3.0.1
             QSS3BucketPath: !Sub
               - s3://${S3Bucket}/${QSS3KeyPrefix}tap-setup-scripts
