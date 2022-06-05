@@ -1,10 +1,17 @@
-tanzunet:
-  hostname: registry.tanzu.vmware.com
-  username:
-  password:
-  pivnet_token:
-
-aws:
-  eks_cluster_name:
-  domain:
-
+tanzunet_secrets:
+  credentials_arn:
+  api_token_arn:
+cluster:
+  name:
+dns:
+  domain_name:
+  zone_id:
+repositories:
+  tap_packages:
+  cluster_essentials:
+  build_service:
+  workload:
+    name:
+    namespace:
+    repository:
+    bundle_repository:
