@@ -780,17 +780,17 @@ Resources:
   TAPPackagesRepo:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: private/tanzu-application-platform/tap-packages
+      RepositoryName: tanzu-application-platform/tap-packages
       EncryptionConfiguration:
         EncryptionType: AES256
   TAPClusterEssentialsBundleRepo:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: private/tanzu-cluster-essentials/bundle
+      RepositoryName: tanzu-cluster-essentials/bundle
   TAPBuildServiceRepo:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: private/tap-build-service
+      RepositoryName: tap-build-service
   TAPWorkloadRepo:
     Type: AWS::ECR::Repository
     Properties:
