@@ -170,11 +170,11 @@ function readUserInputs {
 
   DOMAIN_NAME=$(yq -r .dns.domain_name $INPUTS/user-input-values.yaml)
 
-  export TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN=$(yq -r .tanzunet_secrets.credentials_arn $INPUTS/user-input-values.yaml)
-  export TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN=$(yq -r .tanzunet_secrets.api_token_arn $INPUTS/user-input-values.yaml)
-  export TANZUNET_REGISTRY_USERNAME=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN" --query "SecretString" --output text | jq -r .username)
-  export TANZUNET_REGISTRY_PASSWORD=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN" --query "SecretString" --output text | jq -r .password)
-  export PIVNET_TOKEN=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN" --query "SecretString" --output text)
+  TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN=$(yq -r .tanzunet_secrets.credentials_arn $INPUTS/user-input-values.yaml)
+  TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN=$(yq -r .tanzunet_secrets.api_token_arn $INPUTS/user-input-values.yaml)
+  TANZUNET_REGISTRY_USERNAME=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN" --query "SecretString" --output text | jq -r .username)
+  TANZUNET_REGISTRY_PASSWORD=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN" --query "SecretString" --output text | jq -r .password)
+  PIVNET_TOKEN=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN" --query "SecretString" --output text)
 }
 
 function readTAPInternalValues {
@@ -182,10 +182,10 @@ function readTAPInternalValues {
 
   TANZUNET_REGISTRY_SERVER=$(yq -r .tanzunet.server $INPUTS/tap-config-internal-values.yaml)
 
-  export ESSENTIALS_BUNDLE=$(yq .cluster_essentials_bundle.bundle $INPUTS/tap-config-internal-values.yaml)
+  ESSENTIALS_BUNDLE=$(yq -r .cluster_essentials_bundle.bundle $INPUTS/tap-config-internal-values.yaml)
   ESSENTIALS_FILE_HASH=$(yq -r .cluster_essentials_bundle.file_hash $INPUTS/tap-config-internal-values.yaml)
-  export ESSENTIALS_VERSION=$(yq .cluster_essentials_bundle.version $INPUTS/tap-config-internal-values.yaml)
-  export ESSENTIALS_FILE_ID=$(yq .cluster_essentials_bundle.file_id $INPUTS/tap-config-internal-values.yaml)
+  ESSENTIALS_VERSION=$(yq -r .cluster_essentials_bundle.version $INPUTS/tap-config-internal-values.yaml)
+  ESSENTIALS_FILE_ID=$(yq -r .cluster_essentials_bundle.file_id $INPUTS/tap-config-internal-values.yaml)
 
   export TAP_ECR_REGISTRY_REPOSITORY=$(yq .tap_ecr_repository $INPUTS/tap-config-internal-values.yaml)
   export ESSENTIALS_ECR_REGISTRY_REPOSITORY=$(yq .cluster_essentials_ecr_repository $INPUTS/tap-config-internal-values.yaml)
