@@ -1243,9 +1243,9 @@ Resources:
             tanzunet_secrets:
               credentials_arn: ${TanzuNetSecretCredentials}
               api_token_arn: ${TanzuNetSecretApiToken}
-            eks:
-              cluster_name: ${EKSQSStack.Outputs.EKSClusterName}
-            route53:
+            cluster:
+              name: ${EKSQSStack.Outputs.EKSClusterName}
+            dns:
               domain_name: ${TAPDomainName}
               zone_id: ${PrivateHostedZone.Id}
             repositories:

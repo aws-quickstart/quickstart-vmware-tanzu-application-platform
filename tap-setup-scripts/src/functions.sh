@@ -166,8 +166,9 @@ function readUserInputs {
 
   AWS_ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
 
-  CLUSTER_NAME=$(yq .eks.cluster_name $INPUTS/user-input-values.yaml)
-  AWS_DOMAIN_NAME=$(yq .route53.domain_name $INPUTS/user-input-values.yaml)
+  CLUSTER_NAME=$(yq -r .cluster.name $INPUTS/user-input-values.yaml)
+
+  DOMAIN_NAME=$(yq -r .dns.domain_name $INPUTS/user-input-values.yaml)
 
   export TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN=$(yq -r .tanzunet_secrets.credentials_arn $INPUTS/user-input-values.yaml)
   export TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN=$(yq -r .tanzunet_secrets.api_token_arn $INPUTS/user-input-values.yaml)
@@ -466,10 +467,10 @@ function relocateTAPPackages {
 
 function printOutputParams {
   # envoy loadbalancer ip
-  requireValue AWS_DOMAIN_NAME
+  requireValue DOMAIN_NAME
 
   elb_hostname=$(kubectl get svc envoy -n tanzu-system-ingress -o jsonpath='{ .status.loadBalancer.ingress[0].hostname }' || true)
-  echo "Create Route53 DNS CNAME record for *.$AWS_DOMAIN_NAME with $elb_hostname"
+  echo "Create Route53 DNS CNAME record for *.$DOMAIN_NAME with $elb_hostname"
 
   tap_gui_url=$(yq .tap_gui.app_config.backend.baseUrl $GENERATED/tap-values.yaml)
   echo "TAP GUI URL $tap_gui_url"
