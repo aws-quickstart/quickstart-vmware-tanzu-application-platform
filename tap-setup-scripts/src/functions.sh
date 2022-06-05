@@ -175,6 +175,15 @@ function readUserInputs {
   TANZUNET_REGISTRY_USERNAME=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN" --query "SecretString" --output text | jq -r .username)
   TANZUNET_REGISTRY_PASSWORD=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN" --query "SecretString" --output text | jq -r .password)
   PIVNET_TOKEN=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN" --query "SecretString" --output text)
+
+  TAP_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.tap_packages $INPUTS/user-input-values.yaml)
+  ESSENTIALS_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.cluster_essentials $INPUTS/user-input-values.yaml)
+  TBS_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.build_service $INPUTS/user-input-values.yaml)
+
+  SAMPLE_APP_NAME=$(yq -r .repositories.workload.name $INPUTS/user-input-values.yaml)
+  DEVELOPER_NAMESPACE=$(yq -r .repositories.workload.namespace $INPUTS/user-input-values.yaml)
+  SAMPLE_APP_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.workload.repository $INPUTS/user-input-values.yaml)
+  SAMPLE_APP_BUNDLE_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.workload.bundle_repository $INPUTS/user-input-values.yaml)
 }
 
 function readTAPInternalValues {
@@ -187,10 +196,6 @@ function readTAPInternalValues {
   ESSENTIALS_VERSION=$(yq -r .cluster_essentials_bundle.version $INPUTS/tap-config-internal-values.yaml)
   ESSENTIALS_FILE_ID=$(yq -r .cluster_essentials_bundle.file_id $INPUTS/tap-config-internal-values.yaml)
 
-  export TAP_ECR_REGISTRY_REPOSITORY=$(yq .tap_ecr_repository $INPUTS/tap-config-internal-values.yaml)
-  export ESSENTIALS_ECR_REGISTRY_REPOSITORY=$(yq .cluster_essentials_ecr_repository $INPUTS/tap-config-internal-values.yaml)
-  export TBS_ECR_REGISTRY_REPOSITORY=$(yq .tbs_ecr_repository $INPUTS/tap-config-internal-values.yaml)
-
   ESSENTIALS_URI="$ESSENTIALS_BUNDLE@$ESSENTIALS_FILE_HASH"
 
   TAP_PACKAGE_NAME=$(yq -r .tap.name $INPUTS/tap-config-internal-values.yaml)
@@ -199,9 +204,6 @@ function readTAPInternalValues {
   TAP_VERSION=$(yq -r .tap.version $INPUTS/tap-config-internal-values.yaml)
 
   TAP_URI="$TAP_REPOSITORY:$TAP_VERSION"
-
-  DEVELOPER_NAMESPACE=$(yq .workload.namespace $INPUTS/tap-config-internal-values.yaml)
-  SAMPLE_APP_NAME=$(yq .workload.name $INPUTS/tap-config-internal-values.yaml)
 }
 
 function parseUserInputs {
