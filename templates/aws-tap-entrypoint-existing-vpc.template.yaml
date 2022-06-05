@@ -1217,12 +1217,12 @@ Resources:
             echo "Downloading the VMware Tanzu Application Platform Quick Start scripts..."
             su - $user -c "mkdir -p \"$tap_dir/downloads\" \"$tap_dir/generated\" \"$tap_dir/src/inputs\" \"$tap_dir/src/resources\""
             pushd "$tap_dir/src"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/tap-main.sh" "./tap-main.sh"
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/tap-main.sh" ./tap-main.sh
             chmod +x ./tap-main.sh
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/functions.sh" "./functions.sh"
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/functions.sh" ./functions.sh
             popd
             pushd "$tap_dir/src/inputs"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values.yaml" "./tap-values.yaml"
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values.yaml" ./tap-values.yaml
             cat <<EOF > ./tap-config-internal-values.yaml
             #@data/values
             ---
@@ -1259,11 +1259,11 @@ Resources:
             EOF
             popd
             pushd "$tap_dir/src/resources"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/developer-namespace.yaml" "./developer-namespace.yaml"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/git-ssh-basic-auth.yaml" "./git-ssh-basic-auth.yaml"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/pipeline.yaml" "./pipeline.yaml"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/scan-policy.yaml" "./scan-policy.yaml"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/workload-aws.yaml" "./workload-aws.yaml"
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/developer-namespace.yaml" ./developer-namespace.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/git-ssh-basic-auth.yaml" ./git-ssh-basic-auth.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/pipeline.yaml" ./pipeline.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/scan-policy.yaml" ./scan-policy.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/workload-aws.yaml" ./workload-aws.yaml
             cat <<EOF > ./workload-aws.yaml
             ${SampleAppConfig}
             EOF
