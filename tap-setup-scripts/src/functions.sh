@@ -221,9 +221,12 @@ function parseUserInputs {
   banner "Generating tap-values.yaml"
 
   ytt -f $INPUTS/tap-values.yaml -f $GENERATED/user-input-values.yaml \
-    --data-value ecr_registry_username=$ECR_REGISTRY_USERNAME \
-    --data-value ecr_registry_password=$ECR_REGISTRY_PASSWORD \
-    --data-value ecr_registry_hostname=$ECR_REGISTRY_HOSTNAME \
+    --data-value ecr_registry.username=$ECR_REGISTRY_USERNAME \
+    --data-value ecr_registry.password=$ECR_REGISTRY_PASSWORD \
+    --data-value repositories.workload.server=$(echo $SUPPLY_CHAIN_ECR_REGISTRY_REPOSITORY | cut -d '/' -f1) \
+    --data-value repositories.workload.ootb_repo_prefix=$(echo $SUPPLY_CHAIN_ECR_REGISTRY_REPOSITORY | cut -d '/' -f2-) \
+    --data-value tanzunet.username=$TANZUNET_REGISTRY_USERNAME \
+    --data-value tanzunet.password=$TANZUNET_REGISTRY_PASSWORD \
     --ignore-unknown-comments > $GENERATED/tap-values.yaml
 }
 

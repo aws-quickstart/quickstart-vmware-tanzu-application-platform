@@ -3,9 +3,9 @@
 profile: full
 ceip_policy_disclosed: true # Installation fails if this is set to 'false'
 buildservice:
-  kp_default_repository: #@ "{}/{}".format(data.values.ecr_registry_hostname, data.values.tbs_ecr_repository)
-  kp_default_repository_username: #@ data.values.ecr_registry_username
-  kp_default_repository_password: #@ data.values.ecr_registry_password
+  kp_default_repository: #@ data.values.repositories.build_service
+  kp_default_repository_username: #@ data.values.ecr_registry.username
+  kp_default_repository_password: #@ data.values.ecr_registry.password
   tanzunet_username: #@ data.values.tanzunet.username
   tanzunet_password: #@ data.values.tanzunet.password
   enable_automatic_dependency_updates: false
@@ -15,8 +15,8 @@ supply_chain: testing_scanning
 
 ootb_supply_chain_testing_scanning:
   registry:
-    server: #@ data.values.ecr_registry_hostname
-    repository: #@ data.values.workload.ootb_repo_prefix
+    server: #@ data.values.repositories.workload.server
+    repository: #@ data.values.repositories.workload.ootb_repo_prefix
   gitops:
     ssh_secret: ""
 
@@ -51,8 +51,8 @@ contour:
       type: LoadBalancer
 
 cnrs:
-  domain_name: #@ "{}".format(data.values.route53.domain_name)
+  domain_name: #@ data.values.route53.domain_name
 
 grype:
-  namespace: #@ data.values.workload.namespace
+  namespace: #@ data.values.repositories.workload.namespace
   targetImagePullSecret: registry-credentials
