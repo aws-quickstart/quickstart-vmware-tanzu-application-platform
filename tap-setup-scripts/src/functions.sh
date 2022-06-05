@@ -186,7 +186,7 @@ function readTAPInternalValues {
   TAP_NAMESPACE=$(yq .tap.namespace $INPUTS/tap-config-internal-values.yaml)
 
   export ESSENTIALS_BUNDLE=$(yq .cluster_essentials_bundle.bundle $INPUTS/tap-config-internal-values.yaml)
-  export ESSENTIALS_BUNDLE_SHA256=$(yq .cluster_essentials_bundle.bundle_sha256 $INPUTS/tap-config-internal-values.yaml)
+  ESSENTIALS_FILE_HASH=$(yq -r .cluster_essentials_bundle.file_hash $INPUTS/tap-config-internal-values.yaml)
   export ESSENTIALS_VERSION=$(yq .cluster_essentials_bundle.version $INPUTS/tap-config-internal-values.yaml)
   export ESSENTIALS_FILE_ID=$(yq .cluster_essentials_bundle.file_id $INPUTS/tap-config-internal-values.yaml)
 
@@ -225,10 +225,10 @@ function parseUserInputs {
 function installTanzuClusterEssentials {
   requireValue TAP_VERSION  \
     ECR_REGISTRY_HOSTNAME ESSENTIALS_ECR_REGISTRY_REPOSITORY \
-    ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD ESSENTIALS_BUNDLE_SHA256
+    ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD ESSENTIALS_FILE_HASH
 
   # tanzu-cluster-essentials install.sh script needs INSTALL_BUNDLE & below INSTALL_XXX params
-  export INSTALL_BUNDLE=$ECR_REGISTRY_HOSTNAME/$ESSENTIALS_ECR_REGISTRY_REPOSITORY@$ESSENTIALS_BUNDLE_SHA256
+  export INSTALL_BUNDLE=$ECR_REGISTRY_HOSTNAME/$ESSENTIALS_ECR_REGISTRY_REPOSITORY@$ESSENTIALS_FILE_HASH
   export INSTALL_REGISTRY_HOSTNAME=$ECR_REGISTRY_HOSTNAME
   export INSTALL_REGISTRY_USERNAME=$ECR_REGISTRY_USERNAME
   export INSTALL_REGISTRY_PASSWORD=$ECR_REGISTRY_PASSWORD

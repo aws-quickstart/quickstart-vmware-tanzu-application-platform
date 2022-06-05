@@ -1230,7 +1230,7 @@ Resources:
               server: ${TanzuNetRegistryServer}
             cluster_essentials_bundle:
               bundle: ${ClusterEssentialsBundleRepo}
-              bundle_sha256: ${ClusterEssentialsBundleFileHash}
+              file_hash: ${ClusterEssentialsBundleFileHash}
               version: ${TAPVersion}
               file_id: ${ClusterEssentialsBundleFileId}
             tap:
