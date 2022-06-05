@@ -10,4 +10,5 @@ cluster_essentials_bundle:
 tap:
   name: tap
   namespace: tap-install
+  repository: registry.tanzu.vmware.com/tanzu-application-platform/tap-packages
   version: 1.1.0

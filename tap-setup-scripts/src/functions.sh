@@ -181,10 +181,6 @@ function readTAPInternalValues {
 
   TANZUNET_REGISTRY_SERVER=$(yq -r .tanzunet.server $INPUTS/tap-config-internal-values.yaml)
 
-  TAP_VERSION=$(yq .tap.version $INPUTS/tap-config-internal-values.yaml)
-  TAP_PACKAGE_NAME=$(yq .tap.name $INPUTS/tap-config-internal-values.yaml)
-  TAP_NAMESPACE=$(yq .tap.namespace $INPUTS/tap-config-internal-values.yaml)
-
   export ESSENTIALS_BUNDLE=$(yq .cluster_essentials_bundle.bundle $INPUTS/tap-config-internal-values.yaml)
   ESSENTIALS_FILE_HASH=$(yq -r .cluster_essentials_bundle.file_hash $INPUTS/tap-config-internal-values.yaml)
   export ESSENTIALS_VERSION=$(yq .cluster_essentials_bundle.version $INPUTS/tap-config-internal-values.yaml)
@@ -193,6 +189,15 @@ function readTAPInternalValues {
   export TAP_ECR_REGISTRY_REPOSITORY=$(yq .tap_ecr_repository $INPUTS/tap-config-internal-values.yaml)
   export ESSENTIALS_ECR_REGISTRY_REPOSITORY=$(yq .cluster_essentials_ecr_repository $INPUTS/tap-config-internal-values.yaml)
   export TBS_ECR_REGISTRY_REPOSITORY=$(yq .tbs_ecr_repository $INPUTS/tap-config-internal-values.yaml)
+
+  ESSENTIALS_URI="$ESSENTIALS_BUNDLE@$ESSENTIALS_FILE_HASH"
+
+  TAP_PACKAGE_NAME=$(yq -r .tap.name $INPUTS/tap-config-internal-values.yaml)
+  TAP_NAMESPACE=$(yq -r .tap.namespace $INPUTS/tap-config-internal-values.yaml)
+  TAP_REPOSITORY=$(yq -r .tap.repository $INPUTS/tap-config-internal-values.yaml)
+  TAP_VERSION=$(yq -r .tap.version $INPUTS/tap-config-internal-values.yaml)
+
+  TAP_URI="$TAP_REPOSITORY:$TAP_VERSION"
 
   DEVELOPER_NAMESPACE=$(yq .workload.namespace $INPUTS/tap-config-internal-values.yaml)
   SAMPLE_APP_NAME=$(yq .workload.name $INPUTS/tap-config-internal-values.yaml)
@@ -440,11 +445,9 @@ function relocateTAPPackages {
   # Relocate the images with the Carvel tool imgpkg
   # ECR_REPOSITORY to be pre-created
 
-  requireValue TANZUNET_REGISTRY_USERNAME TANZUNET_REGISTRY_PASSWORD \
-    TANZUNET_REGISTRY_SERVER TAP_VERSION ESSENTIALS_BUNDLE ESSENTIALS_BUNDLE_SHA256 \
-    TAP_ECR_REGISTRY_REPOSITORY \
-    ECR_REGISTRY_HOSTNAME ESSENTIALS_ECR_REGISTRY_REPOSITORY \
-    ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD
+  requireValue TANZUNET_REGISTRY_USERNAME TANZUNET_REGISTRY_PASSWORD TANZUNET_REGISTRY_SERVER \
+    ESSENTIALS_URI ESSENTIALS_ECR_REGISTRY_REPOSITORY \
+    TAP_URI TAP_ECR_REGISTRY_REPOSITORY
 
   banner "Relocating images, this will take time in minutes (30-45min) ..."
 
@@ -452,12 +455,10 @@ function relocateTAPPackages {
 
   # --concurrency 2 is required for AWS
   echo "Relocating Tanzu Cluster Essentials Bundle"
-  imgpkg copy --concurrency 2 -b ${ESSENTIALS_BUNDLE}@${ESSENTIALS_BUNDLE_SHA256} \
-  --to-repo ${ECR_REGISTRY_HOSTNAME}/${ESSENTIALS_ECR_REGISTRY_REPOSITORY}
+  imgpkg copy --concurrency 2 -b ${ESSENTIALS_URI} --to-repo ${ESSENTIALS_ECR_REGISTRY_REPOSITORY}
 
   echo "Relocating TAP packages"
-  imgpkg copy --concurrency 2 -b ${TANZUNET_REGISTRY_SERVER}/tanzu-application-platform/tap-packages:${TAP_VERSION} \
-   --to-repo ${ECR_REGISTRY_HOSTNAME}/${TAP_ECR_REGISTRY_REPOSITORY}
+  imgpkg copy --concurrency 2 -b ${TAP_URI} --to-repo ${TAP_ECR_REGISTRY_REPOSITORY}
 }
 
 function printOutputParams {
