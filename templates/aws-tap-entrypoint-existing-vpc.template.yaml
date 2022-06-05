@@ -56,7 +56,6 @@ Metadata:
           default: TAP version configuration
         Parameters:
           - TAPVersion
-          - ClusterEssentialsBundleVersion
       - Label:
           default: Bootstrap EC2 instance configuration
         Parameters:
@@ -113,8 +112,6 @@ Metadata:
         default: Server
       TAPVersion:
         default: Version
-      ClusterEssentialsBundleVersion:
-        default: Cluster essentials bundle version
       QSS3BucketName:
         default: Name
       QSS3BucketRegion:
@@ -605,12 +602,6 @@ Parameters:
   TAPVersion:
     Type: String
     Description: The version of TAP to deploy.
-    AllowedValues:
-      - 1.1.0
-    Default: 1.1.0
-  ClusterEssentialsBundleVersion:
-    Type: String
-    Description: The version of the cluster essentials bundle to deploy.
     AllowedValues:
       - 1.1.0
     Default: 1.1.0
@@ -1203,7 +1194,7 @@ Resources:
             cluster_essentials_bundle:
               bundle: ${ClusterEssentialsBundleRepo}
               bundle_sha256: ${ClusterEssentialsBundleFileHash}
-              version: ${ClusterEssentialsBundleVersion}
+              version: ${TAPVersion}
               file_id: ${ClusterEssentialsBundleFileId}
             tap:
               name: tap
@@ -1243,8 +1234,8 @@ Resources:
             install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
           - AwsKubectlVersion: 1.22.6/2022-03-09
             ClusterEssentialsBundleRepo: !Sub '${TanzuNetRegistryServer}/tanzu-cluster-essentials/cluster-essentials-bundle'
-            ClusterEssentialsBundleFileHash: !FindInMap [ClusterEssentialsBundle, !Ref ClusterEssentialsBundleVersion, FileHash]
-            ClusterEssentialsBundleFileId: !FindInMap [ClusterEssentialsBundle, !Ref ClusterEssentialsBundleVersion, FileId]
+            ClusterEssentialsBundleFileHash: !FindInMap [ClusterEssentialsBundle, !Ref TAPVersion, FileHash]
+            ClusterEssentialsBundleFileId: !FindInMap [ClusterEssentialsBundle, !Ref TAPVersion, FileId]
             PivNetVersion: 3.0.1
             QSS3BucketPath: !Sub
               - s3://${S3Bucket}/${QSS3KeyPrefix}tap-setup-scripts
