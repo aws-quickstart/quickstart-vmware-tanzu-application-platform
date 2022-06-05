@@ -1138,8 +1138,8 @@ Resources:
             apt-get -y upgrade
             echo "Installing system dependencies..."
             apt-get -y install amazon-ecr-credential-helper awscli ca-certificates containerd.io curl docker-ce \
-              docker-ce-cli docker-compose-plugin git gnupg jq lsb-release openssl perl sudo python3-pip \
-              python3-setuptools uuid-runtime vim wget
+              docker-ce-cli docker-compose-plugin git gnupg jq lsb-release openssl perl python3-pip \
+              python3-setuptools sudo traceroute uuid-runtime vim wget
             echo "Installing python dependencies for $user..."
             su - $user -c "mkdir -p /home/$user/.local/bin; source /home/$user/.profile; python3 -m pip install --upgrade pip setuptools wheel yq"
             echo "Updating certificate authority certificates..."
