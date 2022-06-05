@@ -45,17 +45,15 @@ Metadata:
           - TanzuNetApiToken
           - TanzuNetRegistryServer
       - Label:
-          default: TAP config file S3 bucket configuration
-        Parameters:
-          - S3TAPConfigBucketName
-      - Label:
-          default: TAP private DNS domain configuration
-        Parameters:
-          - TAPDomainName
-      - Label:
-          default: TAP version configuration
+          default: TAP configuration
         Parameters:
           - TAPVersion
+          - S3TAPConfigBucketName
+          - TAPDomainName
+      - Label:
+          default: Sample app configuration
+        Parameters:
+          - SampleAppName
       - Label:
           default: Bootstrap EC2 instance configuration
         Parameters:
@@ -112,6 +110,8 @@ Metadata:
         default: Server
       TAPVersion:
         default: Version
+      SampleAppName:
+        default: Name
       QSS3BucketName:
         default: Name
       QSS3BucketRegion:
@@ -605,6 +605,12 @@ Parameters:
     AllowedValues:
       - 1.1.0
     Default: 1.1.0
+  SampleAppName:
+    Type: String
+    Description: The sample application to deploy in your cluster.
+    AllowedValues:
+      - tanzu-java-web-app-workload
+    Default: tanzu-java-web-app-workload
   QSS3BucketName:
     Type: String
     Description: >-
@@ -710,6 +716,32 @@ Mappings:
     1.1.0:
       FileHash: sha256:ab0a3539da241a6ea59c75c0743e9058511d7c56312ea3906178ec0f3491f51d
       FileId: 1191987
+  SampleAppProperties:
+    Namespace:
+      Name: tap-workload
+    OotbRepoPrefix:
+      Name: tap-supply-chain
+  SampleAppConfig:
+    tanzu-java-web-app-workload:
+      Config: |
+        apiVersion: carto.run/v1alpha1
+        kind: Workload
+        metadata:
+          name: tanzu-java-web-app-workload
+          labels:
+            apps.tanzu.vmware.com/workload-type: web
+            app.kubernetes.io/part-of: tanzu-java-web-app
+            apps.tanzu.vmware.com/has-tests: true
+        spec:
+          params:
+            - name: annotations
+              value:
+                autoscaling.knative.dev/minScale: "1"
+          source:
+            git:
+              url: https://github.com/sample-accelerators/tanzu-java-web-app
+              ref:
+                branch: main
 Conditions:
   3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
   2AZDeployment: !Or
@@ -759,18 +791,24 @@ Resources:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: private/tap-build-service
-  TAPSupplyChainRepo:
-    Type: AWS::ECR::Repository
-    Properties:
-      RepositoryName: private/tap-supply-chain
   TAPWorkloadRepo:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload
+      RepositoryName: !Sub
+        - '${Prefix}/${Suffix}'
+        - Prefix: !FindInMap [SampleAppProperties, OotbRepoPrefix, Name]
+          Suffix: !Sub
+            - '${SampleAppName}-${Namespace}'
+            - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
   TAPWorkloadBundleRepo:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload-bundle
+      RepositoryName: !Sub
+        - '${Prefix}/${Suffix}-bundle'
+        - Prefix: !FindInMap [SampleAppProperties, OotbRepoPrefix, Name]
+          Suffix: !Sub
+            - '${SampleAppName}-${Namespace}'
+            - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
   PrivateHostedZone:
     Type: AWS::Route53::HostedZone
     Properties:
@@ -967,7 +1005,6 @@ Resources:
                   - !GetAtt TAPPackagesRepo.Arn
                   - !GetAtt TAPClusterEssentialsBundleRepo.Arn
                   - !GetAtt TAPBuildServiceRepo.Arn
-                  - !GetAtt TAPSupplyChainRepo.Arn
                   - !GetAtt TAPWorkloadRepo.Arn
                   - !GetAtt TAPWorkloadBundleRepo.Arn
               - Sid: DescribeEcrPrivateRegistryAndGetAuthToken
@@ -1214,10 +1251,9 @@ Resources:
               tap_packages: ${TAPPackagesRepo.RepositoryUri}
               cluster_essentials: ${TAPClusterEssentialsBundleRepo.RepositoryUri}
               build_service: ${TAPBuildServiceRepo.RepositoryUri}
-              ootb_supply_chain: ${TAPSupplyChainRepo.RepositoryUri}
               workload:
-                name: tanzu-java-web-app-workload
-                namespace: tap-workload
+                name: ${SampleAppName}
+                namespace: ${SampleAppNamespace}
                 repository: ${TAPWorkloadRepo.RepositoryUri}
                 bundle_repository: ${TAPWorkloadBundleRepo.RepositoryUri}
             EOF
@@ -1228,7 +1264,11 @@ Resources:
             aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/pipeline.yaml" "./pipeline.yaml"
             aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/scan-policy.yaml" "./scan-policy.yaml"
             aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/workload-aws.yaml" "./workload-aws.yaml"
+            cat <<EOF > ./workload-aws.yaml
+            ${SampleAppConfig}
+            EOF
             popd
+            chown -R $user:$user "$tap_dir"
             echo "Installing pivnet CLI..."
             wget -O "$tap_dir/downloads/pivnet" "https://github.com/pivotal-cf/pivnet-cli/releases/download/v${PivNetVersion}/pivnet-linux-$(dpkg --print-architecture)-${PivNetVersion}"
             install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
@@ -1237,6 +1277,8 @@ Resources:
             ClusterEssentialsBundleFileHash: !FindInMap [ClusterEssentialsBundle, !Ref TAPVersion, FileHash]
             ClusterEssentialsBundleFileId: !FindInMap [ClusterEssentialsBundle, !Ref TAPVersion, FileId]
             PivNetVersion: 3.0.1
+            SampleAppConfig: !FindInMap [SampleAppConfig, !Ref SampleAppName, Config]
+            SampleAppNamespace: !FindInMap [SampleAppProperties, Namespace, Name]
             QSS3BucketPath: !Sub
               - s3://${S3Bucket}/${QSS3KeyPrefix}tap-setup-scripts
               - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]

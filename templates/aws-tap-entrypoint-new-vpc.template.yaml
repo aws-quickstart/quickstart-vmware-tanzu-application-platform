@@ -46,17 +46,15 @@ Metadata:
           - TanzuNetApiToken
           - TanzuNetRegistryServer
       - Label:
-          default: TAP config file S3 bucket configuration
-        Parameters:
-          - S3TAPConfigBucketName
-      - Label:
-          default: TAP private DNS domain configuration
-        Parameters:
-          - TAPDomainName
-      - Label:
-          default: TAP version configuration
+          default: TAP configuration
         Parameters:
           - TAPVersion
+          - S3TAPConfigBucketName
+          - TAPDomainName
+      - Label:
+          default: Sample app configuration
+        Parameters:
+          - SampleAppName
       - Label:
           default: Bootstrap EC2 instance configuration
         Parameters:
@@ -115,6 +113,8 @@ Metadata:
         default: Server
       TAPVersion:
         default: Version
+      SampleAppName:
+        default: Name
       QSS3BucketName:
         default: Name
       QSS3BucketRegion:
@@ -627,6 +627,12 @@ Parameters:
     AllowedValues:
       - 1.1.0
     Default: 1.1.0
+  SampleAppName:
+    Type: String
+    Description: The sample application to deploy in your cluster.
+    AllowedValues:
+      - tanzu-java-web-app-workload
+    Default: tanzu-java-web-app-workload
   QSS3BucketName:
     Type: String
     Description: >-
@@ -738,6 +744,7 @@ Resources:
         TanzuNetApiToken: !Ref TanzuNetApiToken
         TanzuNetRegistryServer: !Ref TanzuNetRegistryServer
         TAPVersion: !Ref TAPVersion
+        SampleAppName: !Ref SampleAppName
         QSS3BucketName: !Ref QSS3BucketName
         QSS3BucketRegion: !Ref QSS3BucketRegion
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
