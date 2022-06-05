@@ -43,6 +43,7 @@ Metadata:
           - TanzuNetUsername
           - TanzuNetPassword
           - TanzuNetApiToken
+          - TanzuNetRegistryServer
       - Label:
           default: TAP config file S3 bucket configuration
         Parameters:
@@ -108,6 +109,8 @@ Metadata:
         default: Password
       TanzuNetApiToken:
         default: API token
+      TanzuNetRegistryServer:
+        default: Server
       TAPVersion:
         default: Version
       ClusterEssentialsBundleVersion:
@@ -595,6 +598,10 @@ Parameters:
     Type: String
     Description: The VMware Tanzu Net API token.
     NoEcho: true
+  TanzuNetRegistryServer:
+    Type: String
+    Description: The TanzuNet registry server.
+    Default: registry.tanzu.vmware.com
   TAPVersion:
     Type: String
     Description: The version of TAP to deploy.
@@ -710,7 +717,6 @@ Mappings:
       OS: Ubuntu
   ClusterEssentialsBundle:
     1.1.0:
-      Repo: registry.tanzu.vmware.com/tanzu-cluster-essentials/cluster-essentials-bundle
       FileHash: sha256:ab0a3539da241a6ea59c75c0743e9058511d7c56312ea3906178ec0f3491f51d
       FileId: 1191987
 Conditions:
@@ -1193,7 +1199,7 @@ Resources:
             #@data/values
             ---
             tanzunet:
-              fqdn: registry.tanzu.vmware.com
+              server: ${TanzuNetRegistryServer}
             cluster_essentials_bundle:
               bundle: ${ClusterEssentialsBundleRepo}
               bundle_sha256: ${ClusterEssentialsBundleFileHash}
@@ -1236,7 +1242,7 @@ Resources:
             wget -O "$tap_dir/downloads/pivnet" "https://github.com/pivotal-cf/pivnet-cli/releases/download/v${PivNetVersion}/pivnet-linux-$(dpkg --print-architecture)-${PivNetVersion}"
             install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
           - AwsKubectlVersion: 1.22.6/2022-03-09
-            ClusterEssentialsBundleRepo: !FindInMap [ClusterEssentialsBundle, !Ref ClusterEssentialsBundleVersion, Repo]
+            ClusterEssentialsBundleRepo: !Sub '${TanzuNetRegistryServer}/tanzu-cluster-essentials/cluster-essentials-bundle'
             ClusterEssentialsBundleFileHash: !FindInMap [ClusterEssentialsBundle, !Ref ClusterEssentialsBundleVersion, FileHash]
             ClusterEssentialsBundleFileId: !FindInMap [ClusterEssentialsBundle, !Ref ClusterEssentialsBundleVersion, FileId]
             PivNetVersion: 3.0.1

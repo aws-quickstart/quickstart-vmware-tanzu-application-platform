@@ -44,6 +44,7 @@ Metadata:
           - TanzuNetUsername
           - TanzuNetPassword
           - TanzuNetApiToken
+          - TanzuNetRegistryServer
       - Label:
           default: TAP config file S3 bucket configuration
         Parameters:
@@ -111,6 +112,8 @@ Metadata:
         default: Password
       TanzuNetApiToken:
         default: API token
+      TanzuNetRegistryServer:
+        default: Server
       TAPVersion:
         default: Version
       ClusterEssentialsBundleVersion:
@@ -617,6 +620,10 @@ Parameters:
     Type: String
     Description: The VMware Tanzu Net API token.
     NoEcho: true
+  TanzuNetRegistryServer:
+    Type: String
+    Description: The TanzuNet registry server.
+    Default: registry.tanzu.vmware.com
   TAPVersion:
     Type: String
     Description: The version of TAP to deploy.
@@ -738,6 +745,7 @@ Resources:
         TanzuNetUsername: !Ref TanzuNetUsername
         TanzuNetPassword: !Ref TanzuNetPassword
         TanzuNetApiToken: !Ref TanzuNetApiToken
+        TanzuNetRegistryServer: !Ref TanzuNetRegistryServer
         TAPVersion: !Ref TAPVersion
         ClusterEssentialsBundleVersion: !Ref ClusterEssentialsBundleVersion
         QSS3BucketName: !Ref QSS3BucketName
