@@ -1272,6 +1272,7 @@ Resources:
             echo "Installing pivnet CLI..."
             wget -O "$tap_dir/downloads/pivnet" "https://github.com/pivotal-cf/pivnet-cli/releases/download/v${PivNetVersion}/pivnet-linux-$(dpkg --print-architecture)-${PivNetVersion}"
             install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
+            echo "Completed successfully!"
           - AwsKubectlVersion: 1.22.6/2022-03-09
             ClusterEssentialsBundleRepo: !Sub '${TanzuNetRegistryServer}/tanzu-cluster-essentials/cluster-essentials-bundle'
             ClusterEssentialsBundleFileHash: !FindInMap [ClusterEssentialsBundle, !Ref TAPVersion, FileHash]
