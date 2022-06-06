@@ -360,14 +360,14 @@ function tapInstallFull {
 }
 
 function tapWorkloadInstallFull {
-
   requireValue ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD ECR_REGISTRY_HOSTNAME \
     DEVELOPER_NAMESPACE SAMPLE_APP_NAME
 
   banner "Installing Sample Workload"
 
   # 'registry-credentials' is used in tap-values.yaml & developer-namespace.yaml files
-  tanzu secret registry add registry-credentials --username ${ECR_REGISTRY_USERNAME} --password ${ECR_REGISTRY_PASSWORD} --server ${ECR_REGISTRY_HOSTNAME} --namespace ${DEVELOPER_NAMESPACE}
+  tanzu secret registry add registry-credentials --username ${ECR_REGISTRY_USERNAME} --password ${ECR_REGISTRY_PASSWORD} \
+    --server ${ECR_REGISTRY_HOSTNAME} --namespace ${DEVELOPER_NAMESPACE}
 
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/developer-namespace.yaml
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/pipeline.yaml
