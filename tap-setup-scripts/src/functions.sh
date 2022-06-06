@@ -271,8 +271,7 @@ function createTapNamespace {
 }
 
 function loadPackageRepository {
-  requireValue TAP_VERSION TAP_NAMESPACE \
-    ECR_REGISTRY_HOSTNAME TAP_ECR_REGISTRY_REPOSITORY
+  requireValue TAP_ECR_REGISTRY_REPOSITORY TAP_VERSION TAP_NAMESPACE
 
   banner "Removing any current TAP package repository"
 
@@ -282,7 +281,7 @@ function loadPackageRepository {
   banner "Adding TAP package repository"
 
   tanzu package repository add tanzu-tap-repository \
-      --url $ECR_REGISTRY_HOSTNAME/$TAP_ECR_REGISTRY_REPOSITORY:$TAP_VERSION \
+      --url $TAP_ECR_REGISTRY_REPOSITORY:$TAP_VERSION \
       --namespace $TAP_NAMESPACE
   tanzu package repository get tanzu-tap-repository --namespace $TAP_NAMESPACE
   while [[ $(tanzu package available list --namespace $TAP_NAMESPACE -o json) == '[]' ]]
