@@ -1,5 +1,17 @@
 This Quick Start deploys {partner-product-name} on the AWS Cloud. If you are unfamiliar with AWS Quick Starts, refer to the https://fwd.aws/rA69w?[AWS Quick Start General Information Guide^].
 
-// For advanced information about the product that this Quick Start deploys, refer to the https://{quickstart-github-org}.github.io/{quickstart-project-name}/operational/index.html[Operational Guide^].
+This Quick Start reference deployment guide provides step-by-step instructions for deploying the Tanzu Application Platform within a Amazon Elastic Kubernetes Service (Amazon EKS) clusters.
 
-// For information about using this Quick Start for migrations, refer to the https://{quickstart-github-org}.github.io/{quickstart-project-name}/migration/index.html[Migration Guide^].
+VMware Tanzu Application Platform is a packaged set of components that helps developers and operators to more easily build, deploy, and manage apps on a Kubernetes platform.
+
+Tanzu Application Platform simplifies workflows in both the inner loop and outer loop of Kubernetes-based app development:
+
+* Inner Loop: The inner loop describes a developer’s local development environment where they code and test apps. The activities that take place in the inner loop include writing code, committing to a version control system, deploying to a development or staging environment, testing, and then making additional code changes.
+
+* Outer Loop: The outer loop describes the steps to deploy apps to production and maintain them over time. For example, on a cloud-native platform, the outer loop includes activities such as building container images, adding container security, and configuring continuous integration (CI) and continuous delivery (CD) pipelines.
+
+VMware Tanzu Application Platform provides development teams a pre-paved path to production to get code running on any Kubernetes enabling security and scale. It is an application aware platform that is modular so teams can customize it based on their organization’s preferences.
+
+This Quick Start is for users who want a repeatable, customizable reference deployment for Tanzu Application Platform on Amazon EKS using AWS CloudFormation.
+
+For advanced information about the product that this Quick Start deploys, refer to the https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-overview.html.
