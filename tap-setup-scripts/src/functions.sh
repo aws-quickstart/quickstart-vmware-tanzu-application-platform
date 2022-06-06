@@ -207,15 +207,14 @@ function readTAPInternalValues {
 }
 
 function parseUserInputs {
+  requireValue AWS_ACCOUNT AWS_REGION GENERATED INPUTS TANZUNET_REGISTRY_USERNAME TANZUNET_REGISTRY_PASSWORD
+
   banner "getting ECR registry credentials"
 
-  export ECR_REGISTRY_HOSTNAME=${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
-  export ECR_REGISTRY_USERNAME=AWS
-  export ECR_REGISTRY_PASSWORD=$(aws ecr get-login-password --region $AWS_REGION)
+  ECR_REGISTRY_HOSTNAME=${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+  ECR_REGISTRY_USERNAME=AWS
+  ECR_REGISTRY_PASSWORD=$(aws ecr get-login-password)
 
-  # echo ECR_REGISTRY_HOSTNAME $ECR_REGISTRY_HOSTNAME
-  # echo ECR_REGISTRY_USERNAME $ECR_REGISTRY_USERNAME
-  # echo ECR_REGISTRY_PASSWORD $ECR_REGISTRY_PASSWORD
   rm -rf $GENERATED
   mkdir -p $GENERATED
 
@@ -319,7 +318,7 @@ function tapInstallFull {
 
   banner "Installing TAP values from $GENERATED/tap-values.yaml..."
 
-  first_time=$(tanzu package installed get $TAP_PACKAGE_NAME  -n $TAP_NAMESPACE  -o json 2>/dev/null)
+  first_time=$(tanzu package installed get $TAP_PACKAGE_NAME -n $TAP_NAMESPACE -o json 2>/dev/null)
 
   if [[ -z $first_time ]]
   then
