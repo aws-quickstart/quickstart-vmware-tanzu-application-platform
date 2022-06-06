@@ -1,23 +1,21 @@
 #!/bin/bash
 set -e
 
-source "src/functions.sh"
+export SCRIPT_DIR="$(dirname "$0")"
+source "$SCRIPT_DIR/functions.sh"
 
 function bootstrapEC2 {
-  banner "BootstrapEC2 with tools ..."
-  installTools
-  installDocker
+  banner "Bootstrap EC2 instance with tools..."
   readUserInputs
   readTAPInternalValues
   installTanzuCLI
   verifyTools
-  echo "BootstrapEC2 Done ..."
+  echo "Bootstrap EC2 instance done..."
 }
 
-export GITHUB_HOME=$PWD
-echo COMMAND=$cmd SKIPINIT=$skipinit GITHUB_HOME=$GITHUB_HOME
-export DOWNLOADS=$GITHUB_HOME/downloads
-export INPUTS=$GITHUB_HOME/src/inputs
-export GENERATED=$GITHUB_HOME/generated
-export RESOURCES=$GITHUB_HOME/src/resources
+echo COMMAND=$cmd SKIPINIT=$skipinit SCRIPT_DIR=$SCRIPT_DIR
+export DOWNLOADS="$(dirname "$SCRIPT_DIR")/downloads"
+export INPUTS="$SCRIPT_DIR/inputs"
+export GENERATED="$(dirname "$SCRIPT_DIR")/generated"
+export RESOURCES="$SCRIPT_DIR/resources"
 bootstrapEC2
