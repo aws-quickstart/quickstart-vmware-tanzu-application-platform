@@ -63,7 +63,7 @@ function installTanzuCLI {
 
   mkdir -p $DOWNLOADS
 
-  if [[ ! -f $DOWNLOADS/pivnet ]]
+  if [[ ! -f /usr/local/bin/pivnet ]]
   then
     echo "Installing pivnet CLI"
 
@@ -74,7 +74,7 @@ function installTanzuCLI {
     echo "pivnet CLI already present"
   fi
 
-  if [[ ! -d $DOWNLOADS/tanzu-cluster-essentials ]]
+  if [[ ! -f $DOWNLOADS/tanzu-cluster-essentials/install.sh ]]
   then
     pivnet login --api-token="$PIVNET_TOKEN"
 
@@ -93,7 +93,7 @@ function installTanzuCLI {
   fi
 
   TANZU_DIR=$DOWNLOADS/tanzu
-  if [[ ! -d $TANZU_DIR ]]
+  if [[ ! -f /usr/local/bin/tanzu ]]
   then
     mkdir -p $TANZU_DIR
     export TANZU_CLI_NO_INIT=true
@@ -120,14 +120,12 @@ function installTanzuCLI {
     pushd $TANZU_DIR
     tanzu plugin install --local cli all
     popd
-
   else
     echo "tanzu-framework-linux already present"
   fi
 }
 
 function verifyTools {
-
   banner "echo all tool versions"
 
   ytt version
