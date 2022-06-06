@@ -465,6 +465,6 @@ function printOutputParams {
   elb_hostname=$(kubectl get svc envoy -n tanzu-system-ingress -o jsonpath='{ .status.loadBalancer.ingress[0].hostname }' || true)
   echo "Create Route53 DNS CNAME record for *.$DOMAIN_NAME with $elb_hostname"
 
-  tap_gui_url=$(yq .tap_gui.app_config.backend.baseUrl $GENERATED/tap-values.yaml)
+  tap_gui_url=$(yq -r .tap_gui.app_config.backend.baseUrl $GENERATED/tap-values.yaml)
   echo "TAP GUI URL $tap_gui_url"
 }
