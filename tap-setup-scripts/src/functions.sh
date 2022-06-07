@@ -451,12 +451,12 @@ function relocateTAPPackages {
   printf "$TANZUNET_REGISTRY_PASSWORD" |
     docker login --username $TANZUNET_REGISTRY_USERNAME --password-stdin $TANZUNET_REGISTRY_SERVER
 
-  # --concurrency 2 is required for AWS
+  # --concurrency 2 or 1 is required for ECR
   echo "Relocating Tanzu Cluster Essentials Bundle"
   imgpkg copy --concurrency 2 -b ${ESSENTIALS_URI} --to-repo ${ESSENTIALS_ECR_REGISTRY_REPOSITORY}
 
   echo "Relocating TAP packages"
-  imgpkg copy --concurrency 2 -b ${TAP_URI} --to-repo ${TAP_ECR_REGISTRY_REPOSITORY}
+  imgpkg copy --concurrency 1 -b ${TAP_URI} --to-repo ${TAP_ECR_REGISTRY_REPOSITORY}
 }
 
 function printOutputParams {
