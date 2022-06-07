@@ -1280,14 +1280,13 @@ Resources:
             wget -O "$tap_dir/downloads/pivnet" "https://github.com/pivotal-cf/pivnet-cli/releases/download/v${PivNetVersion}/pivnet-linux-$(dpkg --print-architecture)-${PivNetVersion}"
             install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
             echo "Installing tanzu CLI and staging tanzu-cluster-essentials..."
-            su - $user -c "$tap_dir/install-tools.sh"
-            tanzu completion bash > /etc/bash_completion.d/tanzu
+            su - $user -c "$tap_dir/src/install-tools.sh"
             echo "Installing TAP prerequisites..."
-            su - $user -c "$tap_dir/tap-main.sh -c prereqs"
+            su - $user -c "$tap_dir/src/tap-main.sh -c prereqs"
             echo "Creating local copies of key TAP container repos per VMware best practices..."
-            su - $user -c "$tap_dir/tap-main.sh -c relocate"
+            su - $user -c "$tap_dir/src/tap-main.sh -c relocate"
             echo "Installing Tanzu Application Platform..."
-            su - $user -c "$tap_dir/tap-main.sh -c install"
+            su - $user -c "$tap_dir/src/tap-main.sh -c install"
             echo "Completed successfully!"
           - AwsKubectlVersion: 1.22.6/2022-03-09
             ClusterEssentialsBundleRepo: !Sub '${TanzuNetRegistryServer}/tanzu-cluster-essentials/cluster-essentials-bundle'
