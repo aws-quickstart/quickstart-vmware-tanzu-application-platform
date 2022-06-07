@@ -68,7 +68,7 @@ function installTanzuCLI {
     echo "Installing pivnet CLI"
 
     PIVNET_VERSION=3.0.1
-    curl -Lo $DOWNLOADS/pivnet "https://github.com/pivotal-cf/pivnet-cli/releases/download/v$PIVNET_VERSION/pivnet-linux-$(dpkg --print-architecture)-$PIVNET_VERSION"
+    curl -fsSLo $DOWNLOADS/pivnet "https://github.com/pivotal-cf/pivnet-cli/releases/download/v$PIVNET_VERSION/pivnet-linux-$(dpkg --print-architecture)-$PIVNET_VERSION"
     sudo install -o ubuntu -g ubuntu -m 0755 $DOWNLOADS/pivnet /usr/local/bin/pivnet
   else
     echo "pivnet CLI already present"
