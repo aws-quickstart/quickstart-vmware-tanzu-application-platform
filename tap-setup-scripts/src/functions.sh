@@ -225,7 +225,7 @@ function parseUserInputs {
     --data-value ecr_registry.username=$ECR_REGISTRY_USERNAME \
     --data-value ecr_registry.password=$ECR_REGISTRY_PASSWORD \
     --data-value repositories.workload.server=$(echo $SUPPLY_CHAIN_ECR_REGISTRY_REPOSITORY | cut -d '/' -f1) \
-    --data-value repositories.workload.ootb_repo_prefix=$(echo $SUPPLY_CHAIN_ECR_REGISTRY_REPOSITORY | cut -d '/' -f2-) \
+    --data-value repositories.workload.ootb_repo_prefix=$(echo $SUPPLY_CHAIN_ECR_REGISTRY_REPOSITORY | cut -d '/' -f2-3) \
     --data-value tanzunet.username=$TANZUNET_REGISTRY_USERNAME \
     --data-value tanzunet.password=$TANZUNET_REGISTRY_PASSWORD \
     --ignore-unknown-comments > $GENERATED/tap-values.yaml
