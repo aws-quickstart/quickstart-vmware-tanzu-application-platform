@@ -328,20 +328,21 @@ function tapInstallFull {
     echo "Number of RETRIES=$RETRIES"
     EXIT="true"
     rm -rf $GENERATED/tap-packages-installed-list.txt
-    tanzu package installed list --namespace $TAP_NAMESPACE  -o json | \
-      jq -r '.[] | (.name + " " + .status)' > $GENERATED/tap-packages-installed-list.txt
-      while read package status
-      do
-        if [[ "$status" != "Reconcile succeeded" ]]
-        then
-          message "package($package) failed to reconcile ($status), waiting for reconcile"
-          # reconcilePackageInstall $TAP_NAMESPACE $package
-          # kctrl package installed kick -i $package -n $TAP_NAMESPACE -y
-          EXIT="false"
-        fi
-      done < $GENERATED/tap-packages-installed-list.txt
-      ((RETRIES=RETRIES-1))
-      sleep $DELAY
+    tanzu package installed list --namespace $TAP_NAMESPACE -o json |
+      jq -r '.[] | (.name + " " + .status)' > $GENERATED/tap-packages-installed-list.txt || true
+
+    while read package status
+    do
+      if [[ "$status" != "Reconcile succeeded" ]]
+      then
+        message "package($package) failed to reconcile ($status), waiting for reconcile"
+        # reconcilePackageInstall $TAP_NAMESPACE $package
+        # kctrl package installed kick -i $package -n $TAP_NAMESPACE -y
+        EXIT="false"
+      fi
+    done < $GENERATED/tap-packages-installed-list.txt
+    ((RETRIES=RETRIES-1))
+    sleep $DELAY
   done
 
   banner "Checking for ERRORs in all packages"
