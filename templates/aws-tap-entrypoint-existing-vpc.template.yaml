@@ -779,6 +779,7 @@ Resources:
             BucketKeyEnabled: true
   TAPPackagesRepo:
     Type: AWS::ECR::Repository
+    UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Properties:
       RepositoryName: tanzu-application-platform/tap-packages
@@ -786,16 +787,19 @@ Resources:
         EncryptionType: AES256
   TAPClusterEssentialsBundleRepo:
     Type: AWS::ECR::Repository
+    UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Properties:
       RepositoryName: tanzu-cluster-essentials/bundle
   TAPBuildServiceRepo:
     Type: AWS::ECR::Repository
+    UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Properties:
       RepositoryName: tap-build-service
   TAPWorkloadRepo:
     Type: AWS::ECR::Repository
+    UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Properties:
       RepositoryName: !Sub
@@ -806,6 +810,7 @@ Resources:
             - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
   TAPWorkloadBundleRepo:
     Type: AWS::ECR::Repository
+    UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Properties:
       RepositoryName: !Sub
