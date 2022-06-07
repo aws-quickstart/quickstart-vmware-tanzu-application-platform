@@ -226,7 +226,7 @@ Parameters:
     Description: >-
       The number of nodes that will be the minimum and created for the TAP EKS
       cluster.
-    MinValue: 3
+    MinValue: 4
     MaxValue: 450
     Default: 4
   MaxNumberOfNodes:
@@ -234,7 +234,7 @@ Parameters:
     Description: >-
       The maximum number of nodes that will be available in an auto scaling
       scenario for the TAP EKS cluster.
-    MinValue: 3
+    MinValue: 4
     MaxValue: 450
     Default: 6
   NodeInstanceType:

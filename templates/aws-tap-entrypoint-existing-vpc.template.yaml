@@ -204,7 +204,7 @@ Parameters:
     Description: >-
       The number of nodes that will be the minimum and created for the TAP EKS
       cluster.
-    MinValue: 3
+    MinValue: 4
     MaxValue: 450
     Default: 4
   MaxNumberOfNodes:
@@ -212,7 +212,7 @@ Parameters:
     Description: >-
       The maximum number of nodes that will be available in an auto scaling
       scenario for the TAP EKS cluster.
-    MinValue: 3
+    MinValue: 4
     MaxValue: 450
     Default: 6
   NodeInstanceType:
@@ -1148,6 +1148,7 @@ Resources:
             arch=$(dpkg --print-architecture)
             uname=$(uname -s)
             tap_dir=/home/$user/tap-setup-scripts
+            tap_install_complete_filename=tap-install-complete
             cat <<EOF >> /etc/environment
             AWS_REGION=${AWS::Region}
             AWS_DEFAULT_REGION=${AWS::Region}
@@ -1165,8 +1166,8 @@ Resources:
             apt-get -y upgrade
             echo "Installing system dependencies..."
             apt-get -y install amazon-ecr-credential-helper awscli ca-certificates containerd.io curl docker-ce \
-              docker-ce-cli docker-compose-plugin git gnupg jq lsb-release openssl perl python3-pip \
-              python3-setuptools sudo traceroute uuid-runtime vim wget
+              docker-ce-cli docker-compose-plugin git gnupg gnupg2 jq lsb-release openssl pass perl python3-pip \
+              python3-setuptools sed sudo traceroute uuid-runtime vim wget
             echo "Installing python dependencies for $user..."
             su - $user -c "mkdir -p /home/$user/.local/bin; source /home/$user/.profile; python3 -m pip install --upgrade pip setuptools wheel yq"
             echo "Updating certificate authority certificates..."
@@ -1227,6 +1228,10 @@ Resources:
             usermod -aG docker $user
             mkdir -p /root/.docker
             su - $user -c "mkdir -p /home/$user/.docker"
+            pushd /tmp
+            curl -fsSL "https://github.com/docker/docker-credential-helpers/releases/download/v${DockerCredPassVersion}/docker-credential-pass-v${DockerCredPassVersion}-$arch.tar.gz" | tar xz -C .
+            mv docker-credential-pass /usr/local/bin/
+            popd
             cat <<EOF >> /root/.docker/config.json
             {
               "credHelpers": {
@@ -1310,11 +1315,14 @@ Resources:
             su - $user -c "$tap_dir/src/tap-main.sh -c relocate"
             echo "Installing Tanzu Application Platform..."
             su - $user -c "$tap_dir/src/tap-main.sh -c install"
+            # echo "$(date)" > /tmp/.tap-install-complete
+            # aws s3 cp /tmp/.tap-install-complete s3://${S3TAPConfigBucket}/
             echo "Completed successfully!"
           - AwsKubectlVersion: 1.22.6/2022-03-09
             ClusterEssentialsBundleRepo: !Sub '${TanzuNetRegistryServer}/tanzu-cluster-essentials/cluster-essentials-bundle'
             ClusterEssentialsBundleFileHash: !FindInMap [ClusterEssentialsBundle, !Ref TAPVersion, FileHash]
             ClusterEssentialsBundleFileId: !FindInMap [ClusterEssentialsBundle, !Ref TAPVersion, FileId]
+            DockerCredPassVersion: 0.6.4
             PivNetVersion: 3.0.1
             SampleAppConfig: !FindInMap [SampleAppConfig, !Ref SampleAppName, Config]
             SampleAppNamespace: !FindInMap [SampleAppProperties, Namespace, Name]
