@@ -167,6 +167,7 @@ function readUserInputs {
   CLUSTER_NAME=$(yq -r .cluster.name $INPUTS/user-input-values.yaml)
 
   DOMAIN_NAME=$(yq -r .dns.domain_name $INPUTS/user-input-values.yaml)
+  ZONE_ID=$(yq -r .dns.zone_id $INPUTS/user-input-values.yaml)
 
   TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN=$(yq -r .tanzunet_secrets.credentials_arn $INPUTS/user-input-values.yaml)
   TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN=$(yq -r .tanzunet_secrets.api_token_arn $INPUTS/user-input-values.yaml)
@@ -460,10 +461,30 @@ function relocateTAPPackages {
 
 function printOutputParams {
   # envoy loadbalancer ip
-  requireValue DOMAIN_NAME
+  requireValue INPUTS DOMAIN_NAME
 
-  elb_hostname=$(kubectl get svc envoy -n tanzu-system-ingress -o jsonpath='{ .status.loadBalancer.ingress[0].hostname }' || true)
+  elb_hostname=$(kubectl get svc envoy -n tanzu-system-ingress -o jsonpath='{ .status.loadBalancer.ingress[0].hostname }')
   echo "Create Route53 DNS CNAME record for *.$DOMAIN_NAME with $elb_hostname"
+
+  pushd $INPUTS
+  cat <<EOF > ./tap-gui-route53-wildcard-resource-record-set-config.json
+{
+  "Comment": "UPSERT TAP GUI records",
+  "Changes": [
+    {
+      "Action": "UPSERT",
+        "ResourceRecordSet": {
+          "Name": "*.$DOMAIN_NAME",
+          "Type": "CNAME",
+          "TTL": 300,
+        "ResourceRecords": [{ "Value": "$elb_hostname"}]
+      }
+    }
+  ]
+}
+EOF
+  aws route53 change-resource-record-sets --hosted-zone-id $ZONE_ID --change-batch "file://$INPUTS/tap-gui-route53-wildcard-resource-record-set-config.json"
+  popd
 
   tap_gui_url=$(yq -r .tap_gui.app_config.backend.baseUrl $GENERATED/tap-values.yaml)
   echo "TAP GUI URL $tap_gui_url"

@@ -816,6 +816,7 @@ Resources:
             - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
   PrivateHostedZone:
     Type: AWS::Route53::HostedZone
+    DeletionPolicy: Delete
     Properties:
       HostedZoneConfig:
         Comment: VMware Tanzu Application Platform hosted zone
