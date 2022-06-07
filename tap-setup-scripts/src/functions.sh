@@ -446,7 +446,9 @@ function relocateTAPPackages {
 
   banner "Relocating images, this will take time in minutes (30-45min) ..."
 
-  docker login --username $TANZUNET_REGISTRY_USERNAME --password $TANZUNET_REGISTRY_PASSWORD $TANZUNET_REGISTRY_SERVER
+  # TODO: Replace with a credential helper
+  printf "$TANZUNET_REGISTRY_PASSWORD" |
+    docker login --username $TANZUNET_REGISTRY_USERNAME --password-stdin $TANZUNET_REGISTRY_SERVER
 
   # --concurrency 2 is required for AWS
   echo "Relocating Tanzu Cluster Essentials Bundle"
