@@ -462,7 +462,7 @@ function relocateTAPPackages {
 
 function printOutputParams {
   # envoy loadbalancer ip
-  requireValue INPUTS DOMAIN_NAME
+  requireValue INPUTS GENERATED DOMAIN_NAME ZONE_ID
 
   elb_hostname=$(kubectl get svc envoy -n tanzu-system-ingress -o jsonpath='{ .status.loadBalancer.ingress[0].hostname }')
   echo "Create Route53 DNS CNAME record for *.$DOMAIN_NAME with $elb_hostname"
