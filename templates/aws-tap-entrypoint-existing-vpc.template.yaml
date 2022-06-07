@@ -1230,6 +1230,8 @@ Resources:
             pushd "$tap_dir/src"
             aws s3 cp --no-progress "${QSS3BucketPath}/src/tap-main.sh" ./tap-main.sh
             chmod +x ./tap-main.sh
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/install-tools.sh" ./install-tools.sh
+            chmod +x ./install-tools.sh
             aws s3 cp --no-progress "${QSS3BucketPath}/src/functions.sh" ./functions.sh
             popd
             pushd "$tap_dir/src/inputs"
