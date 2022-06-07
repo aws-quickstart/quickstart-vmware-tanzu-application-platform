@@ -294,7 +294,7 @@ function createTapRegistrySecret {
 
   banner "Creating tap-registry registry secret"
 
-  tanzu secret registry delete tap-registry --namespace $TAP_NAMESPACE -y || true
+  tanzu secret registry delete tap-registry --namespace $TAP_NAMESPACE -y
   waitForRemoval kubectl get secret tap-registry --namespace $TAP_NAMESPACE -o json
 
   tanzu secret registry add tap-registry \
@@ -378,22 +378,22 @@ function tapWorkloadUninstallFull {
   requireValue DEVELOPER_NAMESPACE SAMPLE_APP_NAME
 
   banner "Deleting workload $SAMPLE_APP_NAME from Developer namespace"
-  tanzu apps workload delete $SAMPLE_APP_NAME -n $DEVELOPER_NAMESPACE --yes || true
+  tanzu apps workload delete $SAMPLE_APP_NAME -n $DEVELOPER_NAMESPACE --yes
 
   banner "Removing registry-credentials secret from Developer namespace"
-  tanzu secret registry delete registry-credentials --namespace $DEVELOPER_NAMESPACE --yes || true
+  tanzu secret registry delete registry-credentials --namespace $DEVELOPER_NAMESPACE --yes
   waitForRemoval kubectl get secret registry-credentials --namespace $DEVELOPER_NAMESPACE -o json
 
-  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/developer-namespace.yaml || true
-  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/pipeline.yaml || true
-  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/scan-policy.yaml || true
+  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/developer-namespace.yaml
+  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/pipeline.yaml
+  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/scan-policy.yaml
 }
 
 function tapUninstallFull {
   requireValue TAP_PACKAGE_NAME TAP_NAMESPACE
 
   banner "Uninstalling TAP ..."
-  tanzu package installed delete $TAP_PACKAGE_NAME -n $TAP_NAMESPACE --yes || true
+  tanzu package installed delete $TAP_PACKAGE_NAME -n $TAP_NAMESPACE --yes
   waitForRemoval tanzu package installed get $TAP_PACKAGE_NAME -n $TAP_NAMESPACE -o json
 }
 
@@ -402,7 +402,7 @@ function deleteTapRegistrySecret {
 
   banner "Removing tap-registry registry secret"
 
-  tanzu secret registry delete tap-registry --namespace $TAP_NAMESPACE -y || true
+  tanzu secret registry delete tap-registry --namespace $TAP_NAMESPACE -y
   waitForRemoval kubectl get secret tap-registry --namespace $TAP_NAMESPACE -o json
 }
 
@@ -411,7 +411,7 @@ function deletePackageRepository {
 
   banner "Removing current TAP package repository"
 
-  tanzu package repository delete tanzu-tap-repository -n $TAP_NAMESPACE --yes || true
+  tanzu package repository delete tanzu-tap-repository -n $TAP_NAMESPACE --yes
   waitForRemoval tanzu package repository get tanzu-tap-repository -n $TAP_NAMESPACE -o json
 }
 
@@ -427,11 +427,11 @@ function deleteTapNamespace {
   requireValue TAP_NAMESPACE
 
   banner "Removing Developer namespace"
-  kubectl delete ns $DEVELOPER_NAMESPACE || true
+  kubectl delete ns $DEVELOPER_NAMESPACE
   waitForRemoval kubectl get ns $DEVELOPER_NAMESPACE -o json
 
   banner "Removing TAP namespace"
-  kubectl delete namespace $TAP_NAMESPACE || true
+  kubectl delete namespace $TAP_NAMESPACE
   waitForRemoval kubectl get namespace $TAP_NAMESPACE -o json
 }
 
