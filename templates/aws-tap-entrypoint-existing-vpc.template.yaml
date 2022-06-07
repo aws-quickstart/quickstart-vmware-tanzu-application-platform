@@ -753,7 +753,9 @@ Resources:
   TanzuNetSecretCredentials:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: TanzuNetCredentials
+      Name: !Sub
+        - '${StackId}/TanzuNetCredentials'
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Description: The Tanzu Net username and password
       SecretString: !Sub >-
         {
@@ -763,7 +765,9 @@ Resources:
   TanzuNetSecretApiToken:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: TanzuNetApiToken
+      Name: !Sub
+        - '${StackId}/TanzuNetApiToken'
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Description: The Tanzu Net API token
       SecretString: !Ref TanzuNetApiToken
   S3TAPConfigBucket:
@@ -782,7 +786,9 @@ Resources:
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Properties:
-      RepositoryName: tanzu-application-platform/tap-packages
+      RepositoryName: !Sub
+        - '${StackId}/tanzu-application-platform/tap-packages'
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       EncryptionConfiguration:
         EncryptionType: AES256
   TAPClusterEssentialsBundleRepo:
@@ -790,21 +796,26 @@ Resources:
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Properties:
-      RepositoryName: tanzu-cluster-essentials/bundle
+      RepositoryName: !Sub
+        - '${StackId}/tanzu-cluster-essentials/bundle'
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
   TAPBuildServiceRepo:
     Type: AWS::ECR::Repository
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Properties:
-      RepositoryName: tap-build-service
+      RepositoryName: !Sub
+        - '${StackId}/tap-build-service'
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
   TAPWorkloadRepo:
     Type: AWS::ECR::Repository
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Properties:
       RepositoryName: !Sub
-        - '${Prefix}/${Suffix}'
-        - Prefix: !FindInMap [SampleAppProperties, OotbRepoPrefix, Name]
+        - '${StackId}/${Prefix}/${Suffix}'
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+          Prefix: !FindInMap [SampleAppProperties, OotbRepoPrefix, Name]
           Suffix: !Sub
             - '${SampleAppName}-${Namespace}'
             - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
@@ -814,8 +825,9 @@ Resources:
     DeletionPolicy: Delete
     Properties:
       RepositoryName: !Sub
-        - '${Prefix}/${Suffix}-bundle'
-        - Prefix: !FindInMap [SampleAppProperties, OotbRepoPrefix, Name]
+        - '${StackId}/${Prefix}/${Suffix}-bundle'
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+          Prefix: !FindInMap [SampleAppProperties, OotbRepoPrefix, Name]
           Suffix: !Sub
             - '${SampleAppName}-${Namespace}'
             - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
@@ -961,7 +973,9 @@ Resources:
   BootstrapIamRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: TAPBootstrapIamRole
+      RoleName: !Sub
+        - TAPBootstrapIamRole-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Description: >-
         VMware Tanzu Application Platform EKS cluster bootstrap instance
         IAM Role.
@@ -1093,7 +1107,9 @@ Resources:
   BootstrapInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
-      InstanceProfileName: TAPBootstrapInstanceProfile
+      InstanceProfileName: !Sub
+        - TAPBootstrapInstanceProfile-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Roles:
         - !Ref BootstrapIamRole
   BootstrapUbuntuInstance:
