@@ -457,6 +457,7 @@ function relocateTAPPackages {
 
   echo "Relocating TAP packages"
   imgpkg copy --concurrency 1 -b ${TAP_URI} --to-repo ${TAP_ECR_REGISTRY_REPOSITORY}
+  echo "Ignore the non-distributable skipped layer warning- non-issue"
 }
 
 function printOutputParams {
