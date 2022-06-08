@@ -1336,8 +1336,6 @@ Resources:
             su - $user -c "$tap_dir/src/tap-main.sh -c relocate"
             echo "Installing Tanzu Application Platform..."
             su - $user -c "$tap_dir/src/tap-main.sh -c install"
-            # echo "$(date)" > /tmp/.tap-install-complete
-            # aws s3 cp /tmp/.tap-install-complete s3://${S3TAPConfigBucket}/
             echo "Completed successfully!"
           - AwsKubectlVersion: 1.22.6/2022-03-09
             ClusterEssentialsBundleRepo: !Sub '${TanzuNetRegistryServer}/tanzu-cluster-essentials/cluster-essentials-bundle'
