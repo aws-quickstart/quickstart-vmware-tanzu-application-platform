@@ -333,7 +333,7 @@ function tapInstallFull {
 
     while read package status
     do
-      if [[ "$status" != "Reconcile succeeded" ]]
+      if [ "$status" != "Reconcile succeeded" ]
       then
         message "package($package) failed to reconcile ($status), waiting for reconcile"
         # reconcilePackageInstall $TAP_NAMESPACE $package
@@ -350,7 +350,7 @@ function tapInstallFull {
     jq -r '.[] | (.name + " " + .status)' | \
     while read package status
     do
-      if [[ "$status" != "Reconcile succeeded" ]]
+      if [ "$status" != "Reconcile succeeded" ]
       then
         message "ERROR: At least one package ($package) failed to reconcile ($status)"
         exit 1
