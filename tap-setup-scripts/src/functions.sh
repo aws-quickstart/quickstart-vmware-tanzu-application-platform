@@ -260,12 +260,12 @@ function createTapNamespace {
 
   banner "Creating $TAP_NAMESPACE namespace"
 
-  (kubectl get ns $TAP_NAMESPACE 2> /dev/null) || \
+  (kubectl get ns $TAP_NAMESPACE 2> /dev/null) ||
     kubectl create ns $TAP_NAMESPACE
 
   banner "Creating $DEVELOPER_NAMESPACE namespace"
 
-  (kubectl get ns $DEVELOPER_NAMESPACE 2> /dev/null) || \
+  (kubectl get ns $DEVELOPER_NAMESPACE 2> /dev/null) ||
     kubectl create ns $DEVELOPER_NAMESPACE
 }
 
@@ -285,7 +285,7 @@ function loadPackageRepository {
   tanzu package repository get tanzu-tap-repository --namespace $TAP_NAMESPACE
   while [[ $(tanzu package available list --namespace $TAP_NAMESPACE -o json) == '[]' ]]
   do
-    message "Waiting for packages ..."
+    message "Waiting for packages..."
     sleep 5
   done
 }
@@ -346,8 +346,8 @@ function tapInstallFull {
   done
 
   banner "Checking for ERRORs in all packages"
-  tanzu package installed list --namespace $TAP_NAMESPACE  -o json | \
-    jq -r '.[] | (.name + " " + .status)' | \
+  tanzu package installed list --namespace $TAP_NAMESPACE -o json |
+    jq -r '.[] | (.name + " " + .status)' |
     while read package status
     do
       if [ "$status" != "Reconcile succeeded" ]
@@ -394,13 +394,13 @@ function tapWorkloadUninstallFull {
 function tapUninstallFull {
   requireValue TAP_PACKAGE_NAME TAP_NAMESPACE
 
-  banner "Uninstalling TAP ..."
+  banner "Uninstalling TAP..."
   tanzu package installed delete $TAP_PACKAGE_NAME -n $TAP_NAMESPACE --yes
   waitForRemoval tanzu package installed get $TAP_PACKAGE_NAME -n $TAP_NAMESPACE -o json
 }
 
 function deleteTapRegistrySecret {
-  requireValue  TAP_NAMESPACE
+  requireValue TAP_NAMESPACE
 
   banner "Removing tap-registry registry secret"
 
@@ -446,7 +446,7 @@ function relocateTAPPackages {
     ESSENTIALS_URI ESSENTIALS_ECR_REGISTRY_REPOSITORY \
     TAP_URI TAP_ECR_REGISTRY_REPOSITORY
 
-  banner "Relocating images, this will take time in minutes (30-45min) ..."
+  banner "Relocating images, this will take time in minutes (30-45min)..."
 
   # TODO: Replace with a credential helper
   printf "$TANZUNET_REGISTRY_PASSWORD" |
