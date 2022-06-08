@@ -39,12 +39,13 @@ Metadata:
           - MaxNumberOfNodes
           - RemoteAccessCidr
       - Label:
-          default: VMware Tanzu Net authentication configuration
+          default: VMware Tanzu Net configuration
         Parameters:
           - TanzuNetUsername
           - TanzuNetPassword
           - TanzuNetApiToken
           - TanzuNetRegistryServer
+          - AcceptEULAs
       - Label:
           default: TAP configuration
         Parameters:
@@ -67,6 +68,8 @@ Metadata:
           - QSS3BucketRegion
           - QSS3KeyPrefix
     ParameterLabels:
+      AcceptEULAs:
+        default: Accept applicable VMware Tanzu EULAs
       AvailabilityZones:
         default: Availability Zones
       NumberOfAZs:
@@ -124,6 +127,16 @@ Metadata:
       RemoteAccessCidr:
         default: Remote access CIDR
 Parameters:
+  AcceptEULAs:
+    Type: String
+    Description: >-
+      Choose 'Yes' to accept the following VMware TanzuNet
+      end-user license agreements (EULAs):
+      TODO: insert links.
+    AllowedValues:
+      - 'Yes'
+      - 'No'
+    Default: 'No'
   S3TAPConfigBucketName:
     Type: String
     MinLength: 3
@@ -675,6 +688,14 @@ Parameters:
       Quick Start location. When using your own bucket, specify the Region.
       See https://aws-quickstart.github.io/option1.html.
     Default: us-east-1
+Rules:
+  AcceptEULAsRule:
+    Assertions:
+    - Assert:
+        !Equals [!Ref AcceptEULAs, 'Yes']
+      AssertDescription: >-
+        You must agree to all of the applicable VMware Tanzu Net
+        end-user license agreements (EULAs).
 Conditions:
   3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
   2AZDeployment: !Or
@@ -710,6 +731,7 @@ Resources:
         - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
           S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
       Parameters:
+        AcceptEULAs: !Ref AcceptEULAs
         VpcId: !GetAtt VPCStack.Outputs.VPCID
         PrivateSubnet1Id: !GetAtt VPCStack.Outputs.PrivateSubnet1AID
         PrivateSubnet2Id: !If

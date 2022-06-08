@@ -4,6 +4,7 @@ project:
   s3_regional_buckets: true
   template: templates/aws-tap-entrypoint-new-vpc.template.yaml
   parameters:
+    AcceptEULAs: --override--
     AvailabilityZones: $[taskcat_genaz_3]
     NumberOfAZs: 3
     KeyPairName: --override--
