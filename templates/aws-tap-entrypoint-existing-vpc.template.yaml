@@ -49,7 +49,6 @@ Metadata:
           default: TAP configuration
         Parameters:
           - TAPVersion
-          - S3TAPConfigBucketName
           - TAPDomainName
       - Label:
           default: Sample app configuration
@@ -87,8 +86,6 @@ Metadata:
         default: Public subnet 2 ID
       PublicSubnet3Id:
         default: Public subnet 3 ID
-      S3TAPConfigBucketName:
-        default: Name
       BootstrapOS:
         default: OS
       BootstrapSshPort:
@@ -134,18 +131,6 @@ Parameters:
       - 'Yes'
       - 'No'
     Default: 'No'
-  S3TAPConfigBucketName:
-    Type: String
-    MinLength: 3
-    MaxLength: 63
-    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
-    ConstraintDescription:
-      The TAP bucket name can include numbers, lowercase letters, uppercase
-      letters, and hyphens (-). It cannot start or end with a hyphen (-).
-    Description: >-
-      TAP requires an S3 bucket to store encrypted configuration information,
-      this bucket name will be associated with a newly created S3 bucket for
-      that purpose.
   TAPDomainName:
    Type: String
    Description: >-
@@ -647,17 +632,6 @@ Resources:
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Description: The Tanzu Net API token
       SecretString: !Ref TanzuNetApiToken
-  S3TAPConfigBucket:
-    Type: AWS::S3::Bucket
-    DeletionPolicy: Delete
-    Properties:
-      BucketName: !Ref S3TAPConfigBucketName
-      AccessControl: Private
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: AES256
-            BucketKeyEnabled: true
   TAPPackagesRepo:
     Type: AWS::ECR::Repository
     UpdateReplacePolicy: Delete
@@ -960,13 +934,6 @@ Resources:
                   - logs:PutMetricFilter
                   - logs:PutRetentionPolicy
                 Resource: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*
-              - Sid: ManageTapS3ConfigBucketObjects
-                Effect: Allow
-                Action:
-                  - s3:ListBucket
-                  - s3:GetObject
-                  - s3:PutObject
-                Resource: !GetAtt S3TAPConfigBucket.Arn
               - Sid: GetQSS3BucketObjects
                 Effect: Allow
                 Action: s3:GetObject

@@ -50,7 +50,6 @@ Metadata:
           default: TAP configuration
         Parameters:
           - TAPVersion
-          - S3TAPConfigBucketName
           - TAPDomainName
       - Label:
           default: Sample app configuration
@@ -90,8 +89,6 @@ Metadata:
         default: Public subnet 2 CIDR
       PublicSubnet3CIDR:
         default: Public subnet 3 CIDR
-      S3TAPConfigBucketName:
-        default: Name
       BootstrapOS:
         default: OS
       BootstrapSshPort:
@@ -137,18 +134,6 @@ Parameters:
       - 'Yes'
       - 'No'
     Default: 'No'
-  S3TAPConfigBucketName:
-    Type: String
-    MinLength: 3
-    MaxLength: 63
-    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
-    ConstraintDescription:
-      The TAP bucket name can include numbers, lowercase letters, uppercase
-      letters, and hyphens (-). It cannot start or end with a hyphen (-).
-    Description: >-
-      TAP requires an S3 bucket to store encrypted configuration information,
-      this bucket name will be associated with a newly created S3 bucket for
-      that purpose.
   TAPDomainName:
    Type: String
    Description: >-
@@ -615,7 +600,6 @@ Resources:
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
         NodeInstanceType: !Ref NodeInstanceType
         EKSClusterName: !Ref EKSClusterName
-        S3TAPConfigBucketName: !Ref S3TAPConfigBucketName
         TAPDomainName: !Ref TAPDomainName
         TanzuNetUsername: !Ref TanzuNetUsername
         TanzuNetPassword: !Ref TanzuNetPassword
