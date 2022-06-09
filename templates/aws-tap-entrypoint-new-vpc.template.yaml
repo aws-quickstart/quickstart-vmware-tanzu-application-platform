@@ -455,9 +455,9 @@ Parameters:
   NodeVolumeSize:
     Type: Number
     Description: Size of the node's root EBS volumes.
-    MinValue: 70
+    MinValue: 80
     MaxValue: 16384
-    Default: 70
+    Default: 80
   RemoteAccessCidr:
     Type: String
     Description: >-
