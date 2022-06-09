@@ -34,7 +34,9 @@ Metadata:
           default: Amazon EKS configuration
         Parameters:
           - EKSClusterName
+          - KubernetesVersion
           - NodeInstanceType
+          - NodeVolumeSize
           - NumberOfNodes
           - MaxNumberOfNodes
           - RemoteAccessCidr
@@ -89,6 +91,8 @@ Metadata:
         default: Public subnet 2 CIDR
       PublicSubnet3CIDR:
         default: Public subnet 3 CIDR
+      RemoteAccessCidr:
+        default: Remote access CIDR
       BootstrapOS:
         default: OS
       BootstrapSshPort:
@@ -97,8 +101,12 @@ Metadata:
         default: Domain name
       EKSClusterName:
         default: EKS cluster name
+      KubernetesVersion:
+        default: Kubernetes version
       NodeInstanceType:
         default: Instance type
+      NodeVolumeSize:
+        default: Volume size
       NumberOfNodes:
         default: Number of nodes
       MaxNumberOfNodes:
@@ -121,8 +129,6 @@ Metadata:
         default: Region
       QSS3KeyPrefix:
         default: Key prefix
-      RemoteAccessCidr:
-        default: Remote access CIDR
 Parameters:
   AcceptEULAs:
     Type: String
@@ -219,6 +225,13 @@ Parameters:
     ConstraintDescription: >-
       Minimum length of 1. Maximum length of 100. Must start with a letter or
       number.
+  KubernetesVersion:
+    Type: String
+    Description: Kubernetes control plane version.
+    AllowedValues:
+      - '1.20'
+      - '1.21'
+    Default: '1.21'
   NumberOfNodes:
     Type: Number
     Description: >-
@@ -439,6 +452,12 @@ Parameters:
       - z1d.metal
     ConstraintDescription: Must be a valid EC2 instance type.
     Default: m5.xlarge
+  NodeVolumeSize:
+    Type: Number
+    Description: Size of the node's root EBS volumes.
+    MinValue: 70
+    MaxValue: 16384
+    Default: 70
   RemoteAccessCidr:
     Type: String
     Description: >-
@@ -599,7 +618,9 @@ Resources:
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
         NodeInstanceType: !Ref NodeInstanceType
+        NodeVolumeSize: !Ref NodeVolumeSize
         EKSClusterName: !Ref EKSClusterName
+        KubernetesVersion: !Ref KubernetesVersion
         TAPDomainName: !Ref TAPDomainName
         TanzuNetUsername: !Ref TanzuNetUsername
         TanzuNetPassword: !Ref TanzuNetPassword

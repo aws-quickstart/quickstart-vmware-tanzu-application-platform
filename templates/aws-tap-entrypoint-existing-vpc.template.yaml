@@ -33,7 +33,9 @@ Metadata:
           default: Amazon EKS configuration
         Parameters:
           - EKSClusterName
+          - KubernetesVersion
           - NodeInstanceType
+          - NodeVolumeSize
           - NumberOfNodes
           - MaxNumberOfNodes
           - RemoteAccessCidr
@@ -86,6 +88,8 @@ Metadata:
         default: Public subnet 2 ID
       PublicSubnet3Id:
         default: Public subnet 3 ID
+      RemoteAccessCidr:
+        default: Remote access CIDR
       BootstrapOS:
         default: OS
       BootstrapSshPort:
@@ -94,8 +98,12 @@ Metadata:
         default: Domain name
       EKSClusterName:
         default: EKS cluster name
+      KubernetesVersion:
+        default: Kubernetes version
       NodeInstanceType:
         default: Instance type
+      NodeVolumeSize:
+        default: Volume size
       NumberOfNodes:
         default: Number of nodes
       MaxNumberOfNodes:
@@ -118,8 +126,6 @@ Metadata:
         default: Region
       QSS3KeyPrefix:
         default: Key prefix
-      RemoteAccessCidr:
-        default: Remote access CIDR
 Parameters:
   AcceptEULAs:
     Type: String
@@ -197,6 +203,13 @@ Parameters:
     ConstraintDescription: >-
       Minimum length of 1. Maximum length of 100. Must start with a letter or
       number.
+  KubernetesVersion:
+    Type: String
+    Description: Kubernetes control plane version.
+    AllowedValues:
+      - '1.20'
+      - '1.21'
+    Default: '1.21'
   NumberOfNodes:
     Type: Number
     Description: >-
@@ -417,6 +430,12 @@ Parameters:
       - z1d.metal
     ConstraintDescription: Must be a valid EC2 instance type.
     Default: m5.xlarge
+  NodeVolumeSize:
+    Type: Number
+    Description: Size of the node's root EBS volumes.
+    MinValue: 70
+    MaxValue: 16384
+    Default: 70
   RemoteAccessCidr:
     Type: String
     Description: >-
@@ -692,14 +711,30 @@ Resources:
       VPCs:
         - VPCId: !Ref VpcId
           VPCRegion: !Ref AWS::Region
+  EKSAdvancedConfigStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-advanced-configuration.template.yaml
+        - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+          S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
+      Parameters:
+        ConfigSetName: !Ref AWS::StackName
+        NodeVolumeSize: !Ref NodeVolumeSize
+        KubernetesVersion: !Ref KubernetesVersion
+        NodeGroupName: VMware-Tanzu-Application-Platform
+        Labels: partition=VMware-Tanzu-Application-Platform
   EKSQSStack:
     Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - EKSAdvancedConfigStack
     Properties:
       TemplateURL: !Sub
         - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
         - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
           S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
       Parameters:
+        ConfigSetName: !Ref AWS::StackName
         VPCID: !Ref VpcId
         PrivateSubnet1ID: !Ref PrivateSubnet1Id
         PrivateSubnet2ID: !If
