@@ -62,6 +62,51 @@ Before launching the Quick Start, you must sign in to the AWS Management Console
 
 ==== Prepare your Tanzu Network Account
 
-One of the requirements for this QuickStart to deploy automatically will be that you have already created a Tanzu Network Login and received an API token to use by the automation scripts. If you do not already have a valid Tanzu Network login, then you can start by going here: https://network.pivotal.io/[VMWare Tanzu Network]. Once on this web page, you will need to perform the following steps:
+One of the requirements for this QuickStart to deploy automatically will be that you have already created a Tanzu Network Login and received an API token to use by the automation scripts. 
 
-1. Click on "Sign In" link in the top right corner
+===== Create new Tanzu Network Login
+
+If you do not already have a valid Tanzu Network login, then you can start by going here: https://network.pivotal.io/[VMWare Tanzu Network]. Once on this web page, you will need to perform the following steps:
+
+. Click on "Sign In" link in the top right corner
+
+image::TanzuNetLogin.jpg[]
+
+[start=2]
+. Click on the "Create Account" link
+
+image::TanzuNetCreateLogin.jpg[]
+
+[start=3]
+. Fill in all the necessary fields to complete the process and then login using the newly created user
+
+image::TanzuNetworkFields.jpg[]
+
+===== Retrieve API Token for Tanzu Network Login
+
+In addition to the actual Tanzu Network credentials, this QuickStart will also need an API token from the Tanzu Network site. This API token will allow for the downloading all of the required packages to install the Tanzu Application Platform.
+
+. Click on the drop-down next to your login name and click on "Edit Profile"
+
+image::EditProfile.jpg[]
+
+[start=2]
+. To create an API token you will need to use the "Update Refresh Token" button. 
+
+image::RefreshToken.jpg[]
+
+[start=3]
+. Make sure to copy the long string that is provided and have that available when asked for the parameters during the running of the Quick Start
+
+image::ResultsToken.jpg[]
+
+===== Accept all of the required EULA agreements
+
+Before installing packages, you must accept the End User License Agreements (EULAs). For each of the following components, accept or confirm that you have accepted the EULA:
+
+* https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/#/releases/1011100[Cluster Essentials for VMware Tanzu]
+* https://network.tanzu.vmware.com/products/tanzu-application-platform/[Tanzu Application Platform]
+* https://network.tanzu.vmware.com/products/build-service/[Tanzu Build Service] and its associated components:
+** https://network.tanzu.vmware.com/products/tbs-dependencies/[Tanzu Build Service Dependencies]
+** https://network.tanzu.vmware.com/products/tanzu-buildpacks-suite[Buildpacks for VMware Tanzu]
+** https://network.tanzu.vmware.com/products/tanzu-stacks-suite[Stacks for VMware Tanzu]

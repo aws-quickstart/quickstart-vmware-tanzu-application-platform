@@ -15,3 +15,9 @@ VMware Tanzu Application Platform provides development teams a pre-paved path to
 This Quick Start is for users who want a repeatable, customizable reference deployment for Tanzu Application Platform on Amazon EKS using AWS CloudFormation.
 
 For advanced information about the product that this Quick Start deploys, refer to the https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-overview.html.
+
+== AWS Costs
+
+You are responsible for the cost of the AWS services and any third-party licenses used while running this Quick Start. There is no additional cost for using the Quick Start.
+
+The AWS CloudFormation templates for Quick Starts include configuration parameters that you can customize. Some of the settings, such as the instance type, affect the cost of deployment. For cost estimates, see the pricing pages for each AWS service you use. Prices are subject to change.
