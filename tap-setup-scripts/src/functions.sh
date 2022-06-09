@@ -206,7 +206,8 @@ function readTAPInternalValues {
 }
 
 function parseUserInputs {
-  requireValue AWS_ACCOUNT AWS_REGION GENERATED INPUTS TANZUNET_REGISTRY_USERNAME TANZUNET_REGISTRY_PASSWORD
+  requireValue AWS_ACCOUNT AWS_REGION GENERATED INPUTS TANZUNET_REGISTRY_USERNAME TANZUNET_REGISTRY_PASSWORD \
+    SAMPLE_APP_ECR_REGISTRY_REPOSITORY
 
   banner "getting ECR registry credentials"
 
@@ -224,8 +225,8 @@ function parseUserInputs {
   ytt -f $INPUTS/tap-values.yaml -f $GENERATED/user-input-values.yaml \
     --data-value ecr_registry.username=$ECR_REGISTRY_USERNAME \
     --data-value ecr_registry.password=$ECR_REGISTRY_PASSWORD \
-    --data-value repositories.workload.server=$(echo $SUPPLY_CHAIN_ECR_REGISTRY_REPOSITORY | cut -d '/' -f1) \
-    --data-value repositories.workload.ootb_repo_prefix=$(echo $SUPPLY_CHAIN_ECR_REGISTRY_REPOSITORY | cut -d '/' -f2-3) \
+    --data-value repositories.workload.server=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f1) \
+    --data-value repositories.workload.ootb_repo_prefix=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f2-3) \
     --data-value tanzunet.username=$TANZUNET_REGISTRY_USERNAME \
     --data-value tanzunet.password=$TANZUNET_REGISTRY_PASSWORD \
     --ignore-unknown-comments > $GENERATED/tap-values.yaml
