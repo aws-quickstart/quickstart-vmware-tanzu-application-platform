@@ -2,7 +2,7 @@
 :quickstart-github-org: aws-quickstart
 :partner-product-name: Tanzu Application Platform
 :partner-product-short-name: Tanzu Application Platform
-:partner-company-name: VM Ware, Inc.
+:partner-company-name: VMware, Inc.
 :doc-month: June
 :doc-year: 2022
 :partner-contributors: Brian C Harrison, Satya Dillikar {partner-company-name}
