@@ -9,8 +9,15 @@ Metadata:
     EntrypointName: Launch into a new VPC
     Order: 1
   SentenceCaseExclude:
+    - Application
     - Bootstrap
+    - Build
+    - Cluster
+    - Essentials
     - Net
+    - Platform
+    - Service
+    - Stacks
     - Tanzu
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -135,7 +142,12 @@ Parameters:
     Description: >-
       Choose 'Yes' to accept the following VMware TanzuNet
       end-user license agreements (EULAs):
-      TODO: insert links.
+      1/ Cluster Essentials for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/,
+      2/ Tanzu Application Platform: https://network.tanzu.vmware.com/products/tanzu-application-platform/,
+      3/ Tanzu Build Service and associated components: https://network.tanzu.vmware.com/products/build-service/,
+      4/ Tanzu Build Service dependencies: https://network.tanzu.vmware.com/products/tbs-dependencies/,
+      5/ Buildpacks for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-buildpacks-suite,
+      6/ Stacks for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-stacks-suite.
     AllowedValues:
       - 'Yes'
       - 'No'
