@@ -605,6 +605,9 @@ Mappings:
     Ubuntu-Server-22.04-LTS-HVM:
       Code: US2204HVM
       OS: Ubuntu
+  TAPVersion:
+    1.1.0:
+      ClusterEssentialsBundleVersion: 1.1.0
   ClusterEssentialsBundle:
     1.1.0:
       FileHash: sha256:ab0a3539da241a6ea59c75c0743e9058511d7c56312ea3906178ec0f3491f51d
@@ -1156,7 +1159,7 @@ Resources:
             cluster_essentials_bundle:
               bundle: ${ClusterEssentialsBundleRepo}
               file_hash: ${ClusterEssentialsBundleFileHash}
-              version: ${TAPVersion}
+              version: ${ClusterEssentialsBundleVersion}
               file_id: ${ClusterEssentialsBundleFileId}
             tap:
               name: tap
@@ -1211,6 +1214,7 @@ Resources:
             ClusterEssentialsBundleRepo: !Sub '${TanzuNetRegistryServer}/tanzu-cluster-essentials/cluster-essentials-bundle'
             ClusterEssentialsBundleFileHash: !FindInMap [ClusterEssentialsBundle, !Ref TAPVersion, FileHash]
             ClusterEssentialsBundleFileId: !FindInMap [ClusterEssentialsBundle, !Ref TAPVersion, FileId]
+            ClusterEssentialsBundleVersion: !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion]
             DockerCredPassVersion: 0.6.4
             PivNetVersion: 3.0.1
             SampleAppConfig: !FindInMap [SampleAppConfig, !Ref SampleAppName, Config]
