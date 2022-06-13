@@ -740,8 +740,6 @@ Resources:
         ConfigSetName: !Ref AWS::StackName
         NodeVolumeSize: !Ref NodeVolumeSize
         KubernetesVersion: !Ref KubernetesVersion
-        NodeGroupName: VMware-Tanzu-Application-Platform
-        Labels: partition=VMware-Tanzu-Application-Platform
   EKSQSStack:
     Type: AWS::CloudFormation::Stack
     DependsOn:
