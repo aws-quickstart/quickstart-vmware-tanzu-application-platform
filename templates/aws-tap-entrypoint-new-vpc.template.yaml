@@ -511,7 +511,8 @@ Parameters:
     Description: The version of TAP to deploy.
     AllowedValues:
       - 1.1.0
-    Default: 1.1.0
+      - 1.1.1
+    Default: 1.1.1
   SampleAppName:
     Type: String
     Description: The sample application to deploy in your cluster.

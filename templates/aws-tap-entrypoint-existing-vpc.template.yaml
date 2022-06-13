@@ -489,7 +489,8 @@ Parameters:
     Description: The version of TAP to deploy.
     AllowedValues:
       - 1.1.0
-    Default: 1.1.0
+      - 1.1.1
+    Default: 1.1.1
   SampleAppName:
     Type: String
     Description: The sample application to deploy in your cluster.
@@ -607,6 +608,8 @@ Mappings:
       OS: Ubuntu
   TAPVersion:
     1.1.0:
+      ClusterEssentialsBundleVersion: 1.1.0
+    1.1.1:
       ClusterEssentialsBundleVersion: 1.1.0
   ClusterEssentialsBundle:
     1.1.0:
