@@ -1,6 +1,7 @@
 # Project: Tanzu Application Platform on AWS
 
-## Pre-requisite
+## Prerequisites
+
 1. EC2 Instance
 
     Create an EC2 Instance of Ubuntu 22.04

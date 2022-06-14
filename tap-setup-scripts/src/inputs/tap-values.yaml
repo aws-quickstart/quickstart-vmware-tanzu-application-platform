@@ -3,9 +3,9 @@
 profile: full
 ceip_policy_disclosed: true # Installation fails if this is set to 'false'
 buildservice:
-  kp_default_repository: #@ "{}/{}".format(data.values.ecr_registry_hostname, data.values.tbs_ecr_repository)
-  kp_default_repository_username: #@ data.values.ecr_registry_username
-  kp_default_repository_password: #@ data.values.ecr_registry_password
+  kp_default_repository: #@ data.values.repositories.build_service
+  kp_default_repository_username: #@ data.values.ecr_registry.username
+  kp_default_repository_password: #@ data.values.ecr_registry.password
   tanzunet_username: #@ data.values.tanzunet.username
   tanzunet_password: #@ data.values.tanzunet.password
   enable_automatic_dependency_updates: false
@@ -15,20 +15,20 @@ supply_chain: testing_scanning
 
 ootb_supply_chain_testing_scanning:
   registry:
-    server: #@ data.values.ecr_registry_hostname
-    repository: #@ data.values.workload.ootb_repo_prefix
+    server: #@ data.values.repositories.workload.server
+    repository: #@ data.values.repositories.workload.ootb_repo_prefix
   gitops:
     ssh_secret: ""
 
 learningcenter:
-  ingressDomain: #@ "learning-center.{}".format(data.values.aws.domain)
+  ingressDomain: #@ "learning-center.{}".format(data.values.dns.domain_name)
 
 ootb_delivery_basic:
   service_account: default
 
 tap_gui:
   ingressEnabled: true
-  ingressDomain: #@ data.values.aws.domain
+  ingressDomain: #@ data.values.dns.domain_name
   service_type: ClusterIP # NodePort for distributions that don't support LoadBalancer
   app_config:
     supplyChain:
@@ -36,11 +36,11 @@ tap_gui:
     auth:
       allowGuestAccess: true
     backend:
-      baseUrl: #@ "http://tap-gui.{}".format(data.values.aws.domain)
+      baseUrl: #@ "http://tap-gui.{}".format(data.values.dns.domain_name)
       cors:
-        origin: #@ "http://tap-gui.{}".format(data.values.aws.domain)
+        origin: #@ "http://tap-gui.{}".format(data.values.dns.domain_name)
     app:
-      baseUrl: #@ "http://tap-gui.{}".format(data.values.aws.domain)
+      baseUrl: #@ "http://tap-gui.{}".format(data.values.dns.domain_name)
 
 metadata_store:
   app_service_type: LoadBalancer
@@ -51,8 +51,8 @@ contour:
       type: LoadBalancer
 
 cnrs:
-  domain_name: #@ "{}".format(data.values.aws.domain)
+  domain_name: #@ data.values.dns.domain_name
 
 grype:
-  namespace: #@ data.values.workload.namespace
+  namespace: #@ data.values.repositories.workload.namespace
   targetImagePullSecret: registry-credentials

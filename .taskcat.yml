@@ -4,14 +4,15 @@ project:
   s3_regional_buckets: true
   template: templates/aws-tap-entrypoint-new-vpc.template.yaml
   parameters:
+    AcceptEULAs: --override--
     AvailabilityZones: $[taskcat_genaz_3]
     NumberOfAZs: 3
     KeyPairName: --override--
     RemoteAccessCidr: --override--
     S3TAPConfigBucketName: $[taskcat_random-string]-$[taskcat_current_region]
     EKSClusterName: $[taskcat_random-string]
-    NumberOfNodes: 3
-    MaxNumberOfNodes: 3
+    NumberOfNodes: 4
+    MaxNumberOfNodes: 4
     TanzuNetUsername: --override--
     TanzuNetPassword: --override--
     TanzuNetApiToken: --override--

@@ -9,8 +9,15 @@ Metadata:
     EntrypointName: Launch into an existing VPC
     Order: 2
   SentenceCaseExclude:
+    - Application
     - Bootstrap
+    - Build
+    - Cluster
+    - Essentials
     - Net
+    - Platform
+    - Service
+    - Stacks
     - Tanzu
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -33,24 +40,29 @@ Metadata:
           default: Amazon EKS configuration
         Parameters:
           - EKSClusterName
+          - KubernetesVersion
           - NodeInstanceType
+          - NodeVolumeSize
           - NumberOfNodes
           - MaxNumberOfNodes
           - RemoteAccessCidr
       - Label:
-          default: VMware Tanzu Net authentication configuration
+          default: VMware Tanzu Net configuration
         Parameters:
           - TanzuNetUsername
           - TanzuNetPassword
           - TanzuNetApiToken
+          - TanzuNetRegistryServer
+          - AcceptEULAs
       - Label:
-          default: TAP config file S3 bucket configuration
+          default: TAP configuration
         Parameters:
-          - S3TAPConfigBucketName
-      - Label:
-          default: TAP private DNS domain configuration
-        Parameters:
+          - TAPVersion
           - TAPDomainName
+      - Label:
+          default: Sample app configuration
+        Parameters:
+          - SampleAppName
       - Label:
           default: Bootstrap EC2 instance configuration
         Parameters:
@@ -63,6 +75,8 @@ Metadata:
           - QSS3BucketRegion
           - QSS3KeyPrefix
     ParameterLabels:
+      AcceptEULAs:
+        default: Accept applicable VMware Tanzu EULAs
       NumberOfAZs:
         default: Number of Availability Zones
       KeyPairName:
@@ -81,8 +95,8 @@ Metadata:
         default: Public subnet 2 ID
       PublicSubnet3Id:
         default: Public subnet 3 ID
-      S3TAPConfigBucketName:
-        default: Name
+      RemoteAccessCidr:
+        default: Remote access CIDR
       BootstrapOS:
         default: OS
       BootstrapSshPort:
@@ -91,8 +105,12 @@ Metadata:
         default: Domain name
       EKSClusterName:
         default: EKS cluster name
+      KubernetesVersion:
+        default: Kubernetes version
       NodeInstanceType:
         default: Instance type
+      NodeVolumeSize:
+        default: Volume size
       NumberOfNodes:
         default: Number of nodes
       MaxNumberOfNodes:
@@ -103,27 +121,34 @@ Metadata:
         default: Password
       TanzuNetApiToken:
         default: API token
+      TanzuNetRegistryServer:
+        default: Server
+      TAPVersion:
+        default: Version
+      SampleAppName:
+        default: Name
       QSS3BucketName:
         default: Name
       QSS3BucketRegion:
         default: Region
       QSS3KeyPrefix:
         default: Key prefix
-      RemoteAccessCidr:
-        default: Remote access CIDR
 Parameters:
-  S3TAPConfigBucketName:
+  AcceptEULAs:
     Type: String
-    MinLength: 3
-    MaxLength: 63
-    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
-    ConstraintDescription:
-      The TAP bucket name can include numbers, lowercase letters, uppercase
-      letters, and hyphens (-). It cannot start or end with a hyphen (-).
     Description: >-
-      TAP requires an S3 bucket to store encrypted configuration information,
-      this bucket name will be associated with a newly created S3 bucket for
-      that purpose.
+      Choose 'Yes' to accept the following VMware Tanzu Net
+      end-user license agreements (EULAs):
+      1/ Cluster Essentials for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-cluster-essentials,
+      2/ Tanzu Application Platform: https://network.tanzu.vmware.com/products/tanzu-application-platform,
+      3/ Tanzu Build Service and associated components: https://network.tanzu.vmware.com/products/build-service,
+      4/ Tanzu Build Service dependencies: https://network.tanzu.vmware.com/products/tbs-dependencies,
+      5/ Buildpacks for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-buildpacks-suite,
+      6/ Stacks for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-stacks-suite.
+    AllowedValues:
+      - 'Yes'
+      - 'No'
+    Default: 'No'
   TAPDomainName:
    Type: String
    Description: >-
@@ -190,12 +215,19 @@ Parameters:
     ConstraintDescription: >-
       Minimum length of 1. Maximum length of 100. Must start with a letter or
       number.
+  KubernetesVersion:
+    Type: String
+    Description: Kubernetes control plane version.
+    AllowedValues:
+      - '1.20'
+      - '1.21'
+    Default: '1.21'
   NumberOfNodes:
     Type: Number
     Description: >-
       The number of nodes that will be the minimum and created for the TAP EKS
       cluster.
-    MinValue: 3
+    MinValue: 4
     MaxValue: 450
     Default: 4
   MaxNumberOfNodes:
@@ -203,7 +235,7 @@ Parameters:
     Description: >-
       The maximum number of nodes that will be available in an auto scaling
       scenario for the TAP EKS cluster.
-    MinValue: 3
+    MinValue: 4
     MaxValue: 450
     Default: 6
   NodeInstanceType:
@@ -211,7 +243,211 @@ Parameters:
     Description: >-
       AWS EC2 instance type for each of the nodes deployed within the EKS
       cluster for TAP.
+    AllowedValues:
+      - c4.4xlarge
+      - c4.8xlarge
+      - c5.2xlarge
+      - c5.4xlarge
+      - c5.9xlarge
+      - c5.12xlarge
+      - c5.18xlarge
+      - c5.24xlarge
+      - c5.metal
+      - c5a.2xlarge
+      - c5a.4xlarge
+      - c5a.8xlarge
+      - c5a.12xlarge
+      - c5a.16xlarge
+      - c5a.24xlarge
+      - c5ad.2xlarge
+      - c5ad.4xlarge
+      - c5ad.8xlarge
+      - c5ad.12xlarge
+      - c5ad.16xlarge
+      - c5ad.24xlarge
+      - c5d.2xlarge
+      - c5d.4xlarge
+      - c5d.9xlarge
+      - c5d.12xlarge
+      - c5d.18xlarge
+      - c5d.24xlarge
+      - c5d.metal
+      - c5n.2xlarge
+      - c5n.4xlarge
+      - c5n.9xlarge
+      - c5n.18xlarge
+      - c5n.metal
+      - d2.xlarge
+      - d2.2xlarge
+      - d2.4xlarge
+      - d2.8xlarge
+      - f1.2xlarge
+      - f1.4xlarge
+      - f1.16xlarge
+      - g3.4xlarge
+      - g3.8xlarge
+      - g3.16xlarge
+      - g3s.xlarge
+      - g4dn.xlarge
+      - g4dn.2xlarge
+      - g4dn.4xlarge
+      - g4dn.8xlarge
+      - g4dn.12xlarge
+      - g4dn.16xlarge
+      - g4dn.metal
+      - h1.2xlarge
+      - h1.4xlarge
+      - h1.8xlarge
+      - h1.16xlarge
+      - i3.xlarge
+      - i3.2xlarge
+      - i3.4xlarge
+      - i3.8xlarge
+      - i3.16xlarge
+      - i3.metal
+      - i3en.xlarge
+      - i3en.2xlarge
+      - i3en.3xlarge
+      - i3en.6xlarge
+      - i3en.12xlarge
+      - i3en.24xlarge
+      - i3en.metal
+      - inf1.2xlarge
+      - inf1.6xlarge
+      - inf1.24xlarge
+      - m4.xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - m4.16xlarge
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m5.8xlarge
+      - m5.12xlarge
+      - m5.16xlarge
+      - m5.24xlarge
+      - m5.metal
+      - m5a.xlarge
+      - m5a.2xlarge
+      - m5a.4xlarge
+      - m5a.8xlarge
+      - m5a.12xlarge
+      - m5a.16xlarge
+      - m5a.24xlarge
+      - m5ad.xlarge
+      - m5ad.2xlarge
+      - m5ad.4xlarge
+      - m5ad.8xlarge
+      - m5ad.12xlarge
+      - m5ad.16xlarge
+      - m5ad.24xlarge
+      - m5d.xlarge
+      - m5d.2xlarge
+      - m5d.4xlarge
+      - m5d.8xlarge
+      - m5d.12xlarge
+      - m5d.16xlarge
+      - m5d.24xlarge
+      - m5d.metal
+      - m5dn.xlarge
+      - m5dn.2xlarge
+      - m5dn.4xlarge
+      - m5dn.8xlarge
+      - m5dn.12xlarge
+      - m5dn.16xlarge
+      - m5dn.24xlarge
+      - m5n.xlarge
+      - m5n.2xlarge
+      - m5n.4xlarge
+      - m5n.8xlarge
+      - m5n.12xlarge
+      - m5n.16xlarge
+      - m5n.24xlarge
+      - p2.xlarge
+      - p2.8xlarge
+      - p2.16xlarge
+      - p3.2xlarge
+      - p3.8xlarge
+      - p3.16xlarge
+      - p3dn.24xlarge
+      - r4.xlarge
+      - r4.2xlarge
+      - r4.4xlarge
+      - r4.8xlarge
+      - r4.16xlarge
+      - r5.xlarge
+      - r5.2xlarge
+      - r5.4xlarge
+      - r5.8xlarge
+      - r5.12xlarge
+      - r5.16xlarge
+      - r5.24xlarge
+      - r5.metal
+      - r5a.xlarge
+      - r5a.2xlarge
+      - r5a.4xlarge
+      - r5a.8xlarge
+      - r5a.12xlarge
+      - r5a.16xlarge
+      - r5a.24xlarge
+      - r5ad.xlarge
+      - r5ad.2xlarge
+      - r5ad.4xlarge
+      - r5ad.8xlarge
+      - r5ad.12xlarge
+      - r5ad.16xlarge
+      - r5ad.24xlarge
+      - r5d.xlarge
+      - r5d.2xlarge
+      - r5d.4xlarge
+      - r5d.8xlarge
+      - r5d.12xlarge
+      - r5d.16xlarge
+      - r5d.24xlarge
+      - r5d.metal
+      - r5dn.xlarge
+      - r5dn.2xlarge
+      - r5dn.4xlarge
+      - r5dn.8xlarge
+      - r5dn.12xlarge
+      - r5dn.16xlarge
+      - r5dn.24xlarge
+      - r5n.xlarge
+      - r5n.2xlarge
+      - r5n.4xlarge
+      - r5n.8xlarge
+      - r5n.12xlarge
+      - r5n.16xlarge
+      - r5n.24xlarge
+      - t2.xlarge
+      - t2.2xlarge
+      - t3.xlarge
+      - t3.2xlarge
+      - t3a.xlarge
+      - t3a.2xlarge
+      - x1.16xlarge
+      - x1.32xlarge
+      - x1e.xlarge
+      - x1e.2xlarge
+      - x1e.4xlarge
+      - x1e.8xlarge
+      - x1e.16xlarge
+      - x1e.32xlarge
+      - z1d.xlarge
+      - z1d.2xlarge
+      - z1d.3xlarge
+      - z1d.6xlarge
+      - z1d.12xlarge
+      - z1d.metal
+    ConstraintDescription: Must be a valid EC2 instance type.
     Default: m5.xlarge
+  NodeVolumeSize:
+    Type: Number
+    Description: Size of the node's root EBS volumes.
+    MinValue: 80
+    MaxValue: 16384
+    Default: 80
   RemoteAccessCidr:
     Type: String
     Description: >-
@@ -244,6 +480,23 @@ Parameters:
     Type: String
     Description: The VMware Tanzu Net API token.
     NoEcho: true
+  TanzuNetRegistryServer:
+    Type: String
+    Description: The TanzuNet registry server.
+    Default: registry.tanzu.vmware.com
+  TAPVersion:
+    Type: String
+    Description: The version of TAP to deploy.
+    AllowedValues:
+      - 1.1.0
+      - 1.1.1
+    Default: 1.1.1
+  SampleAppName:
+    Type: String
+    Description: The sample application to deploy in your cluster.
+    AllowedValues:
+      - tanzu-java-web-app-workload
+    Default: tanzu-java-web-app-workload
   QSS3BucketName:
     Type: String
     Description: >-
@@ -286,6 +539,14 @@ Parameters:
       Quick Start location. When using your own bucket, specify the Region.
       See https://aws-quickstart.github.io/option1.html.
     Default: us-east-1
+Rules:
+  AcceptEULAsRule:
+    Assertions:
+    - Assert:
+        !Equals [!Ref AcceptEULAs, 'Yes']
+      AssertDescription: >-
+        You must agree to all of the following applicable VMware TanzuNet
+        end-user license agreements (EULAs).
 Mappings:
   AwsAmiRegionMap:
     # Ubuntu Server lookup: https://cloud-images.ubuntu.com/locator/ec2/
@@ -345,6 +606,41 @@ Mappings:
     Ubuntu-Server-22.04-LTS-HVM:
       Code: US2204HVM
       OS: Ubuntu
+  TAPVersion:
+    1.1.0:
+      ClusterEssentialsBundleVersion: 1.1.0
+    1.1.1:
+      ClusterEssentialsBundleVersion: 1.1.0
+  ClusterEssentialsBundle:
+    1.1.0:
+      FileHash: sha256:ab0a3539da241a6ea59c75c0743e9058511d7c56312ea3906178ec0f3491f51d
+      FileId: 1191987
+  SampleAppProperties:
+    Namespace:
+      Name: tap-workload
+    OotbRepoPrefix:
+      Name: tap-supply-chain
+  SampleAppConfig:
+    tanzu-java-web-app-workload:
+      Config: |
+        apiVersion: carto.run/v1alpha1
+        kind: Workload
+        metadata:
+          name: tanzu-java-web-app-workload
+          labels:
+            apps.tanzu.vmware.com/workload-type: web
+            app.kubernetes.io/part-of: tanzu-java-web-app
+            apps.tanzu.vmware.com/has-tests: true
+        spec:
+          params:
+            - name: annotations
+              value:
+                autoscaling.knative.dev/minScale: "1"
+          source:
+            git:
+              url: https://github.com/sample-accelerators/tanzu-java-web-app
+              ref:
+                branch: main
 Conditions:
   3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
   2AZDeployment: !Or
@@ -356,7 +652,9 @@ Resources:
   TanzuNetSecretCredentials:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: TanzuNetCredentials
+      Name: !Sub
+        - '${StackId}/TanzuNetCredentials'
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Description: The Tanzu Net username and password
       SecretString: !Sub >-
         {
@@ -366,48 +664,64 @@ Resources:
   TanzuNetSecretApiToken:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: TanzuNetApiToken
+      Name: !Sub
+        - '${StackId}/TanzuNetApiToken'
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Description: The Tanzu Net API token
       SecretString: !Ref TanzuNetApiToken
-  S3TAPConfigBucket:
-    Type: AWS::S3::Bucket
-    DeletionPolicy: Delete
-    Properties:
-      BucketName: !Ref S3TAPConfigBucketName
-      AccessControl: Private
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: AES256
-            BucketKeyEnabled: true
   TAPPackagesRepo:
     Type: AWS::ECR::Repository
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
-      RepositoryName: private/tanzu-application-platform/tap-packages
+      RepositoryName: !Sub
+        - '${StackId}/tanzu-application-platform/tap-packages'
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       EncryptionConfiguration:
         EncryptionType: AES256
   TAPClusterEssentialsBundleRepo:
     Type: AWS::ECR::Repository
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
-      RepositoryName: private/tanzu-cluster-essentials/bundle
+      RepositoryName: !Sub
+        - '${StackId}/tanzu-cluster-essentials/bundle'
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
   TAPBuildServiceRepo:
     Type: AWS::ECR::Repository
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
-      RepositoryName: private/tap-build-service
-  TAPSupplyChainRepo:
-    Type: AWS::ECR::Repository
-    Properties:
-      RepositoryName: private/tap-supply-chain
+      RepositoryName: !Sub
+        - '${StackId}/tap-build-service'
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
   TAPWorkloadRepo:
     Type: AWS::ECR::Repository
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
-      RepositoryName: private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload
+      RepositoryName: !Sub
+        - '${StackId}/${Prefix}/${Suffix}'
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+          Prefix: !FindInMap [SampleAppProperties, OotbRepoPrefix, Name]
+          Suffix: !Sub
+            - '${SampleAppName}-${Namespace}'
+            - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
   TAPWorkloadBundleRepo:
     Type: AWS::ECR::Repository
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
-      RepositoryName: private/tap-supply-chain/tanzu-java-web-app-workload-tap-workload-bundle
+      RepositoryName: !Sub
+        - '${StackId}/${Prefix}/${Suffix}-bundle'
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+          Prefix: !FindInMap [SampleAppProperties, OotbRepoPrefix, Name]
+          Suffix: !Sub
+            - '${SampleAppName}-${Namespace}'
+            - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
   PrivateHostedZone:
     Type: AWS::Route53::HostedZone
+    DeletionPolicy: Delete
     Properties:
       HostedZoneConfig:
         Comment: VMware Tanzu Application Platform hosted zone
@@ -415,14 +729,28 @@ Resources:
       VPCs:
         - VPCId: !Ref VpcId
           VPCRegion: !Ref AWS::Region
+  EKSAdvancedConfigStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-advanced-configuration.template.yaml
+        - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+          S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
+      Parameters:
+        ConfigSetName: !Ref AWS::StackName
+        NodeVolumeSize: !Ref NodeVolumeSize
+        KubernetesVersion: !Ref KubernetesVersion
   EKSQSStack:
     Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - EKSAdvancedConfigStack
     Properties:
       TemplateURL: !Sub
         - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
         - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
           S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
       Parameters:
+        ConfigSetName: !Ref AWS::StackName
         VPCID: !Ref VpcId
         PrivateSubnet1ID: !Ref PrivateSubnet1Id
         PrivateSubnet2ID: !If
@@ -547,7 +875,9 @@ Resources:
   BootstrapIamRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: TAPBootstrapIamRole
+      RoleName: !Sub
+        - TAPBootstrapIamRole-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Description: >-
         VMware Tanzu Application Platform EKS cluster bootstrap instance
         IAM Role.
@@ -602,7 +932,6 @@ Resources:
                   - !GetAtt TAPPackagesRepo.Arn
                   - !GetAtt TAPClusterEssentialsBundleRepo.Arn
                   - !GetAtt TAPBuildServiceRepo.Arn
-                  - !GetAtt TAPSupplyChainRepo.Arn
                   - !GetAtt TAPWorkloadRepo.Arn
                   - !GetAtt TAPWorkloadBundleRepo.Arn
               - Sid: DescribeEcrPrivateRegistryAndGetAuthToken
@@ -656,13 +985,6 @@ Resources:
                   - logs:PutMetricFilter
                   - logs:PutRetentionPolicy
                 Resource: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*
-              - Sid: ManageTapS3ConfigBucketObjects
-                Effect: Allow
-                Action:
-                  - s3:ListBucket
-                  - s3:GetObject
-                  - s3:PutObject
-                Resource: !GetAtt S3TAPConfigBucket.Arn
               - Sid: GetQSS3BucketObjects
                 Effect: Allow
                 Action: s3:GetObject
@@ -680,7 +1002,9 @@ Resources:
   BootstrapInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
-      InstanceProfileName: TAPBootstrapInstanceProfile
+      InstanceProfileName: !Sub
+        - TAPBootstrapInstanceProfile-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Roles:
         - !Ref BootstrapIamRole
   BootstrapUbuntuInstance:
@@ -716,7 +1040,10 @@ Resources:
             #!/bin/bash
             set -xe
             user=ubuntu
+            arch=$(dpkg --print-architecture)
+            uname=$(uname -s)
             tap_dir=/home/$user/tap-setup-scripts
+            tap_install_complete_filename=tap-install-complete
             cat <<EOF >> /etc/environment
             AWS_REGION=${AWS::Region}
             AWS_DEFAULT_REGION=${AWS::Region}
@@ -728,22 +1055,55 @@ Resources:
             echo "Adding Docker CE repo..."
             mkdir -p /usr/local/share/keyrings/
             curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/local/share/keyrings/docker-archive-keyring.gpg --yes
-            printf "deb [arch=$(dpkg --print-architecture) signed-by=/usr/local/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
+            printf "deb [arch=$arch signed-by=/usr/local/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
             echo "Updating & upgrading..."
             apt-get -y update
             apt-get -y upgrade
             echo "Installing system dependencies..."
             apt-get -y install amazon-ecr-credential-helper awscli ca-certificates containerd.io curl docker-ce \
-              docker-ce-cli docker-compose-plugin git gnupg jq lsb-release openssl perl sudo python3-pip \
-              python3-setuptools uuid-runtime vim wget
+              docker-ce-cli docker-compose-plugin git gnupg gnupg2 jq lsb-release openssl pass perl python3-pip \
+              python3-setuptools sed sudo traceroute uuid-runtime vim wget
             echo "Installing python dependencies for $user..."
             su - $user -c "mkdir -p /home/$user/.local/bin; source /home/$user/.profile; python3 -m pip install --upgrade pip setuptools wheel yq"
             echo "Updating certificate authority certificates..."
             update-ca-certificates
+            echo "Installing Amazon CloudWatch agent..."
+            mkdir -p /opt/aws/amazon-cloudwatch-agent/etc/
+            cat <<EOF >> /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+            {
+              "metrics": {
+                "append_dimensions": {
+                  "ImageId": "\${!aws:ImageId}",
+                  "InstanceId": "\${!aws:InstanceId}",
+                  "InstanceType": "\${!aws:InstanceType}"
+                },
+                "metrics_collected": {
+                  "mem": {
+                    "measurement": [
+                      "mem_used_percent"
+                    ]
+                  },
+                  "swap": {
+                    "measurement": [
+                      "swap_used_percent"
+                    ]
+                  }
+                }
+              }
+            }
+            EOF
+            pushd /tmp
+            aws s3 cp --no-progress "s3://amazoncloudwatch-agent-${AWS::Region}/ubuntu/$arch/latest/amazon-cloudwatch-agent.deb" ./amazon-cloudwatch-agent.deb
+            dpkg -i ./amazon-cloudwatch-agent.deb
+            popd
+            /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+            systemctl enable amazon-cloudwatch-agent.service
+            systemctl start amazon-cloudwatch-agent.service
+            systemctl status amazon-cloudwatch-agent.service
             echo "Installing kubectl..."
             pushd /tmp
-            aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/amd64/kubectl" ./kubectl
-            aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/amd64/kubectl.sha256" ./kubectl.sha256
+            aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl" ./kubectl
+            aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl.sha256" ./kubectl.sha256
             openssl sha1 -sha256 ./kubectl
             chmod 755 ./kubectl
             mv ./kubectl /usr/local/bin/
@@ -752,8 +1112,8 @@ Resources:
             popd
             echo "Installing eksctl..."
             pushd /tmp
-            curl -fsSL "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C .
-            mv /tmp/eksctl /usr/local/bin
+            curl -fsSL "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_${!uname}_${!arch}.tar.gz" | tar xz -C .
+            mv ./eksctl /usr/local/bin
             eksctl completion bash > /etc/bash_completion.d/eksctl
             popd
             echo "Installing Carvel imgpkg..."
@@ -763,6 +1123,10 @@ Resources:
             usermod -aG docker $user
             mkdir -p /root/.docker
             su - $user -c "mkdir -p /home/$user/.docker"
+            pushd /tmp
+            curl -fsSL "https://github.com/docker/docker-credential-helpers/releases/download/v${DockerCredPassVersion}/docker-credential-pass-v${DockerCredPassVersion}-$arch.tar.gz" | tar xz -C .
+            mv docker-credential-pass /usr/local/bin/
+            popd
             cat <<EOF >> /root/.docker/config.json
             {
               "credHelpers": {
@@ -780,48 +1144,86 @@ Resources:
             echo "Downloading the VMware Tanzu Application Platform Quick Start scripts..."
             su - $user -c "mkdir -p \"$tap_dir/downloads\" \"$tap_dir/generated\" \"$tap_dir/src/inputs\" \"$tap_dir/src/resources\""
             pushd "$tap_dir/src"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/tap-main.sh" "./tap-main.sh"
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/tap-main.sh" ./tap-main.sh
             chmod +x ./tap-main.sh
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/functions.sh" "./functions.sh"
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/install-tools.sh" ./install-tools.sh
+            chmod +x ./install-tools.sh
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/functions.sh" ./functions.sh
             popd
             pushd "$tap_dir/src/inputs"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-config-internal-values.yaml" "./tap-config-internal-values.yaml"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values.yaml" "./tap-values.yaml"
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values.yaml" ./tap-values.yaml
+            cat <<EOF > ./tap-config-internal-values.yaml
+            #@data/values
+            ---
+            tanzunet:
+              server: ${TanzuNetRegistryServer}
+            cluster_essentials_bundle:
+              bundle: ${ClusterEssentialsBundleRepo}
+              file_hash: ${ClusterEssentialsBundleFileHash}
+              version: ${ClusterEssentialsBundleVersion}
+              file_id: ${ClusterEssentialsBundleFileId}
+            tap:
+              name: tap
+              namespace: tap-install
+              repository: ${TAPRepo}
+              version: ${TAPVersion}
+            EOF
             cat <<EOF > ./user-input-values.yaml
             tanzunet_secrets:
               credentials_arn: ${TanzuNetSecretCredentials}
               api_token_arn: ${TanzuNetSecretApiToken}
-            eks:
-              cluster_name: ${EKSQSStack.Outputs.EKSClusterName}
-            route53:
+            cluster:
+              name: ${EKSQSStack.Outputs.EKSClusterName}
+            dns:
               domain_name: ${TAPDomainName}
               zone_id: ${PrivateHostedZone.Id}
             repositories:
               tap_packages: ${TAPPackagesRepo.RepositoryUri}
               cluster_essentials: ${TAPClusterEssentialsBundleRepo.RepositoryUri}
               build_service: ${TAPBuildServiceRepo.RepositoryUri}
-              ootb_supply_chain: ${TAPSupplyChainRepo.RepositoryUri}
               workload:
-                name: tanzu-java-web-app-workload
-                namespace: tap-workload
-                repo1: ${TAPWorkloadRepo.RepositoryUri}
-                repo2: ${TAPWorkloadBundleRepo.RepositoryUri}
+                name: ${SampleAppName}
+                namespace: ${SampleAppNamespace}
+                repository: ${TAPWorkloadRepo.RepositoryUri}
+                bundle_repository: ${TAPWorkloadBundleRepo.RepositoryUri}
             EOF
             popd
             pushd "$tap_dir/src/resources"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/developer-namespace.yaml" "./developer-namespace.yaml"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/git-ssh-basic-auth.yaml" "./git-ssh-basic-auth.yaml"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/pipeline.yaml" "./pipeline.yaml"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/scan-policy.yaml" "./scan-policy.yaml"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/workload-aws.yaml" "./workload-aws.yaml"
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/developer-namespace.yaml" ./developer-namespace.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/git-ssh-basic-auth.yaml" ./git-ssh-basic-auth.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/pipeline.yaml" ./pipeline.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/scan-policy.yaml" ./scan-policy.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/workload-aws.yaml" ./workload-aws.yaml
+            cat <<EOF > ./workload-aws.yaml
+            ${SampleAppConfig}
+            EOF
             popd
+            chown -R $user:$user "$tap_dir"
+            echo "Installing pivnet CLI..."
             wget -O "$tap_dir/downloads/pivnet" "https://github.com/pivotal-cf/pivnet-cli/releases/download/v${PivNetVersion}/pivnet-linux-$(dpkg --print-architecture)-${PivNetVersion}"
             install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
+            echo "Installing tanzu CLI and staging tanzu-cluster-essentials..."
+            su - $user -c "$tap_dir/src/install-tools.sh"
+            echo "Installing TAP prerequisites..."
+            su - $user -c "$tap_dir/src/tap-main.sh -c prereqs"
+            echo "Creating local copies of key TAP container repos per VMware best practices..."
+            su - $user -c "$tap_dir/src/tap-main.sh -c relocate"
+            echo "Installing Tanzu Application Platform..."
+            su - $user -c "$tap_dir/src/tap-main.sh -c install"
+            echo "Completed successfully!"
           - AwsKubectlVersion: 1.22.6/2022-03-09
+            ClusterEssentialsBundleRepo: !Sub '${TanzuNetRegistryServer}/tanzu-cluster-essentials/cluster-essentials-bundle'
+            ClusterEssentialsBundleFileHash: !FindInMap [ClusterEssentialsBundle, !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion], FileHash]
+            ClusterEssentialsBundleFileId: !FindInMap [ClusterEssentialsBundle, !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion], FileId]
+            ClusterEssentialsBundleVersion: !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion]
+            DockerCredPassVersion: 0.6.4
             PivNetVersion: 3.0.1
+            SampleAppConfig: !FindInMap [SampleAppConfig, !Ref SampleAppName, Config]
+            SampleAppNamespace: !FindInMap [SampleAppProperties, Namespace, Name]
             QSS3BucketPath: !Sub
               - s3://${S3Bucket}/${QSS3KeyPrefix}tap-setup-scripts
               - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+            TAPRepo: !Sub '${TanzuNetRegistryServer}/tanzu-application-platform/tap-packages'
   BootstrapUbuntuEipAssociation:
     Type: AWS::EC2::EIPAssociation
     UpdateReplacePolicy: Delete
