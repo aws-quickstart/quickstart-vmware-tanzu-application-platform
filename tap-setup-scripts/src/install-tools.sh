@@ -15,7 +15,7 @@ function bootstrapEC2 {
 
 echo COMMAND=$cmd SKIPINIT=$skipinit SCRIPT_DIR=$SCRIPT_DIR
 export DOWNLOADS="$(dirname "$SCRIPT_DIR")/downloads"
-export INPUTS="$SCRIPT_DIR/inputs"
+export INPUTS="$(dirname "$SCRIPT_DIR")/src/inputs"
 export GENERATED="$(dirname "$SCRIPT_DIR")/generated"
-export RESOURCES="$SCRIPT_DIR/resources"
+export RESOURCES="$(dirname "$SCRIPT_DIR")/src/resources"
 bootstrapEC2
