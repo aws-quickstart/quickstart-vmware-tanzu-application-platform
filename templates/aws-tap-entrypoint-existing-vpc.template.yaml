@@ -1213,8 +1213,8 @@ Resources:
             echo "Completed successfully!"
           - AwsKubectlVersion: 1.22.6/2022-03-09
             ClusterEssentialsBundleRepo: !Sub '${TanzuNetRegistryServer}/tanzu-cluster-essentials/cluster-essentials-bundle'
-            ClusterEssentialsBundleFileHash: !FindInMap [ClusterEssentialsBundle, !Ref TAPVersion, FileHash]
-            ClusterEssentialsBundleFileId: !FindInMap [ClusterEssentialsBundle, !Ref TAPVersion, FileId]
+            ClusterEssentialsBundleFileHash: !FindInMap [ClusterEssentialsBundle, !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion], FileHash]
+            ClusterEssentialsBundleFileId: !FindInMap [ClusterEssentialsBundle, !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion], FileId]
             ClusterEssentialsBundleVersion: !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion]
             DockerCredPassVersion: 0.6.4
             PivNetVersion: 3.0.1
