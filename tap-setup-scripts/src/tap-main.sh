@@ -105,6 +105,7 @@ export DOWNLOADS="$(dirname "$SCRIPT_DIR")/downloads"
 export INPUTS="$SCRIPT_DIR/inputs"
 export GENERATED="$(dirname "$SCRIPT_DIR")/generated"
 export RESOURCES="$SCRIPT_DIR/resources"
+
 case $cmd in
 "install")
   tapInstallMain
