@@ -450,7 +450,8 @@ function relocateTAPPackages {
   banner "Relocating images, this will take time in minutes (30-45min)..."
 
   # TODO: Replace with a credential helper
-  printf "$TANZUNET_REGISTRY_PASSWORD" |
+  # allow TANZUNET_REGISTRY_PASSWORD  variable to contain special chars(& , %)
+  printf "%s\n" "$TANZUNET_REGISTRY_PASSWORD" |
     docker login --username $TANZUNET_REGISTRY_USERNAME --password-stdin $TANZUNET_REGISTRY_SERVER
 
   # --concurrency 2 or 1 is required for ECR
