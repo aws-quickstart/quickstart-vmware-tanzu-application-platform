@@ -63,16 +63,16 @@ function installTanzuCLI {
 
   mkdir -p $DOWNLOADS
 
-  if [[ ! -f /usr/local/bin/pivnet ]]
-  then
-    echo "Installing pivnet CLI"
+  # if [[ ! -f /usr/local/bin/pivnet ]]
+  # then
+  #   echo "Installing pivnet CLI"
 
-    PIVNET_VERSION=3.0.1
-    curl -fsSLo $DOWNLOADS/pivnet "https://github.com/pivotal-cf/pivnet-cli/releases/download/v$PIVNET_VERSION/pivnet-linux-$(dpkg --print-architecture)-$PIVNET_VERSION"
-    sudo install -o ubuntu -g ubuntu -m 0755 $DOWNLOADS/pivnet /usr/local/bin/pivnet
-  else
-    echo "pivnet CLI already present"
-  fi
+  #   PIVNET_VERSION=3.0.1
+  #   curl -fsSLo $DOWNLOADS/pivnet "https://github.com/pivotal-cf/pivnet-cli/releases/download/v$PIVNET_VERSION/pivnet-linux-$(dpkg --print-architecture)-$PIVNET_VERSION"
+  #   sudo install -o ubuntu -g ubuntu -m 0755 $DOWNLOADS/pivnet /usr/local/bin/pivnet
+  # else
+  #   echo "pivnet CLI already present"
+  # fi
 
   if [[ ! -f $DOWNLOADS/tanzu-cluster-essentials/install.sh ]]
   then
@@ -88,6 +88,10 @@ function installTanzuCLI {
 
     mkdir -p $DOWNLOADS/tanzu-cluster-essentials
     tar xvf $DOWNLOADS/$ESSENTIALS_FILE_NAME -C $DOWNLOADS/tanzu-cluster-essentials
+    sudo cp $DOWNLOADS/tanzu-cluster-essentials/imgpkg /usr/local/bin/
+    sudo cp $DOWNLOADS/tanzu-cluster-essentials/kapp /usr/local/bin/
+    sudo cp $DOWNLOADS/tanzu-cluster-essentials/kbld /usr/local/bin/
+    sudo cp $DOWNLOADS/tanzu-cluster-essentials/ytt /usr/local/bin/
   else
     echo "tanzu-cluster-essentials already present"
   fi
@@ -314,9 +318,9 @@ function tapInstallFull {
 
   if [[ -z $first_time ]]
   then
-    tanzu package install $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE || true
+    tanzu package install $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE
   else
-    tanzu package installed update $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE || true
+    tanzu package installed update $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE
   fi
 
   banner "Checking state of all packages"
@@ -451,8 +455,13 @@ function relocateTAPPackages {
 
   # TODO: Replace with a credential helper
   # allow TANZUNET_REGISTRY_PASSWORD  variable to contain special chars(& , %)
-  printf "%s\n" "$TANZUNET_REGISTRY_PASSWORD" |
-    docker login --username $TANZUNET_REGISTRY_USERNAME --password-stdin $TANZUNET_REGISTRY_SERVER
+  # printf "%s\n" "$TANZUNET_REGISTRY_PASSWORD" |
+  #   docker login --username $TANZUNET_REGISTRY_USERNAME --password-stdin $TANZUNET_REGISTRY_SERVER
+
+  # TODO
+  export IMGPKG_REGISTRY_HOSTNAME_0="$TANZUNET_REGISTRY_SERVER"
+  export IMGPKG_REGISTRY_USERNAME_0="$TANZUNET_REGISTRY_USERNAME"
+  export IMGPKG_REGISTRY_PASSWORD_0="$TANZUNET_REGISTRY_PASSWORD"
 
   # --concurrency 2 or 1 is required for ECR
   echo "Relocating Tanzu Cluster Essentials Bundle"

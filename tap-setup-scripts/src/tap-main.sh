@@ -23,7 +23,7 @@ function tapInstallMain {
     echo "Setup prerequisites..."
     installTanzuClusterEssentials
     createTapNamespace
-    createTapRegistrySecret
+    # createTapRegistrySecret
     loadPackageRepository
   fi
   tapInstallFull
