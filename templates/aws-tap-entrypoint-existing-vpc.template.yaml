@@ -1110,14 +1110,6 @@ Resources:
             kubectl completion bash > /etc/bash_completion.d/kubectl
             su - $user -c "aws eks update-kubeconfig --name ${EKSQSStack.Outputs.EKSClusterName}"
             popd
-            # echo "Installing eksctl..."
-            # pushd /tmp
-            # curl -fsSL "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_${!uname}_${!arch}.tar.gz" | tar xz -C .
-            # mv ./eksctl /usr/local/bin
-            # eksctl completion bash > /etc/bash_completion.d/eksctl
-            # popd
-            # echo "Installing Carvel imgpkg..."
-            # bash -c "set -eo pipefail; curl -fsSL https://carvel.dev/install.sh | bash"
             echo "Configuring Docker..."
             getent group docker || groupadd docker
             usermod -aG docker $user
@@ -1204,8 +1196,6 @@ Resources:
             install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
             echo "Installing tanzu CLI and staging tanzu-cluster-essentials..."
             su - $user -c "$tap_dir/src/install-tools.sh"
-            # echo "Installing TAP prerequisites..."
-            # su - $user -c "$tap_dir/src/tap-main.sh -c prereqs"
             echo "Creating local copies of key TAP container repos per VMware best practices..."
             su - $user -c "$tap_dir/src/tap-main.sh -c relocate"
             echo "Installing Tanzu Application Platform..."
