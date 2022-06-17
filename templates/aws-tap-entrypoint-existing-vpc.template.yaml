@@ -659,6 +659,10 @@ Mappings:
     # but underscores are not supported in CloudFormation mapping keys.
       Code: WS2019
       OS: Windows
+  KubernetesVersion:
+  # https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
+    '1.21':
+      AwsKubectlVersion: 1.22.6/2022-03-09
   TAPVersion:
     1.1.0:
       ClusterEssentialsBundleVersion: 1.1.0
@@ -1254,7 +1258,7 @@ Resources:
             echo "Installing Tanzu Application Platform..."
             su - $user -c "$tap_dir/src/tap-main.sh -c install"
             echo "Completed successfully!"
-          - AwsKubectlVersion: 1.22.6/2022-03-09
+          - AwsKubectlVersion: !FindInMap [KubernetesVersion, !Ref KubernetesVersion, AwsKubectlVersion]
             ClusterEssentialsBundleRepo: !Sub '${TanzuNetRegistryServer}/tanzu-cluster-essentials/cluster-essentials-bundle'
             ClusterEssentialsBundleFileHash: !FindInMap [ClusterEssentialsBundle, !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion], FileHash]
             ClusterEssentialsBundleFileId: !FindInMap [ClusterEssentialsBundle, !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion], FileId]
