@@ -239,7 +239,10 @@ Parameters:
       number.
   KubernetesVersion:
     Type: String
-    Description: Kubernetes control plane version.
+    Description: >-
+      The version of Kubernetes control plane version to deploy. The selected
+      version must be supported the selected version of TAP (reference:
+      https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
       - 1.21
     Default: 1.21
@@ -507,7 +510,10 @@ Parameters:
     Default: registry.tanzu.vmware.com
   TAPVersion:
     Type: String
-    Description: The version of TAP to deploy.
+    Description: >-
+      The version of TAP to deploy. The selected version must also support the
+      selected Kubernetes version (reference:
+      https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
       - 1.1.0
       - 1.1.1
@@ -568,6 +574,19 @@ Rules:
       AssertDescription: >-
         You must agree to all of the applicable VMware Tanzu Net
         end-user license agreements (EULAs).
+  TAPVersionRule:
+    Assertions:
+      - Assert: !Or
+        - !And
+          - !Equals [!Ref TAPVersion, 1.1.0]
+          - !Contains [[1.21, 1.22, 1.23], !Ref KubernetesVersion]
+        - !And
+          - !Equals [!Ref TAPVersion, 1.1.1]
+          - !Contains [[1.21, 1.22, 1.23], !Ref KubernetesVersion]
+        AssertDescription: >-
+          The VMware Tanzu Application Platform version selection is
+          incompatible with the Kubernetes version selection (reference:
+          https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
 Conditions:
   3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
   2AZDeployment: !Or
