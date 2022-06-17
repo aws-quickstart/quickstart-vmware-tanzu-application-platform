@@ -487,7 +487,7 @@ function printOutputParams {
   ]
 }
 EOF
-  aws route53 change-resource-record-sets --hosted-zone-id $ZONE_ID --change-batch "file://tap-gui-route53-wildcard-resource-record-set-config.json"
+  aws route53 change-resource-record-sets --hosted-zone-id $ZONE_ID --change-batch "file://./tap-gui-route53-wildcard-resource-record-set-config.json"
   popd
 
   tap_gui_url=$(yq -r .tap_gui.app_config.backend.baseUrl $GENERATED/tap-values.yaml)
