@@ -140,14 +140,16 @@ Parameters:
   AcceptEULAs:
     Type: String
     Description: >-
-      Choose 'Yes' to accept the following VMware TanzuNet
-      end-user license agreements (EULAs):
+      Choose 'Yes' if you have already accepted the following
+      VMware Tanzu Network end-user license agreements (EULAs):
       1/ Cluster Essentials for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/,
       2/ Tanzu Application Platform: https://network.tanzu.vmware.com/products/tanzu-application-platform/,
       3/ Tanzu Build Service and associated components: https://network.tanzu.vmware.com/products/build-service/,
       4/ Tanzu Build Service dependencies: https://network.tanzu.vmware.com/products/tbs-dependencies/,
       5/ Buildpacks for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-buildpacks-suite,
       6/ Stacks for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-stacks-suite.
+      TAP will fail to install successfully if the listed EULAs have not been
+      accepted for the specified VMware Tanzu Network user account.
     AllowedValues:
       - 'Yes'
       - 'No'
@@ -572,11 +574,10 @@ Parameters:
 Rules:
   AcceptEULAsRule:
     Assertions:
-    - Assert:
-        !Equals [!Ref AcceptEULAs, 'Yes']
-      AssertDescription: >-
-        You must agree to all of the applicable VMware Tanzu Net
-        end-user license agreements (EULAs).
+      - Assert: !Equals [!Ref AcceptEULAs, 'Yes']
+        AssertDescription: >-
+          You must agree to all of the applicable VMware Tanzu Network
+          end-user license agreements (EULAs) before proceeding.
   TAPVersionRule:
     Assertions:
       - Assert: !Or
