@@ -2,7 +2,7 @@
 set -e
 group=docker
 if [ $(id -gn) != $group ]; then
-  echo "execute as group docker"
+  echo "Executing as group '$group'..."
   exec sg $group "$0 $*"
 fi
 
