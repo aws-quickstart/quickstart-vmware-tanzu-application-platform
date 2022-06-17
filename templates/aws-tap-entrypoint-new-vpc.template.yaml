@@ -241,9 +241,8 @@ Parameters:
     Type: String
     Description: Kubernetes control plane version.
     AllowedValues:
-      - '1.20'
-      - '1.21'
-    Default: '1.21'
+      - 1.21
+    Default: 1.21
   NumberOfNodes:
     Type: Number
     Description: >-
