@@ -470,7 +470,7 @@ function printOutputParams {
   elb_hostname=$(kubectl get svc envoy -n tanzu-system-ingress -o jsonpath='{ .status.loadBalancer.ingress[0].hostname }')
   echo "Create Route53 DNS CNAME record for *.$DOMAIN_NAME with $elb_hostname"
 
-  pushd $INPUTS
+  pushd $GENERATED
   cat <<EOF > ./tap-gui-route53-wildcard-resource-record-set-config.json
 {
   "Comment": "UPSERT TAP GUI records",
