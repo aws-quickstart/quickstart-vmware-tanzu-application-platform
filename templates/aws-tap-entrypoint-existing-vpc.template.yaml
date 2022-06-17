@@ -14,7 +14,7 @@ Metadata:
     - Build
     - Cluster
     - Essentials
-    - Net
+    - Network
     - Platform
     - Service
     - Stacks
@@ -472,15 +472,18 @@ Parameters:
   TanzuNetUsername:
     Type: String
     Description: >-
-      The VMware Tanzu Net username (authentication ID or email address).
+      The VMware Tanzu Network username. To create an account, sign up here:
+      https://account.run.pivotal.io/z/uaa/sign-up.
     NoEcho: true
   TanzuNetPassword:
     Type: String
-    Description: The VMware Tanzu Net password (authentication key).
+    Description: The VMware Tanzu Network password.
     NoEcho: true
   TanzuNetApiToken:
     Type: String
-    Description: The VMware Tanzu Net API token.
+    Description: >-
+      The VMware Tanzu Network user account and authentication (UAA) API
+      refresh token (reference: https://network.pivotal.io/docs/api).
     NoEcho: true
   TanzuNetRegistryServer:
     Type: String
