@@ -1,6 +1,6 @@
 :quickstart-project-name: quickstart-vmware-tanzu-application-platform
 :quickstart-github-org: aws-quickstart
-:partner-product-name: Tanzu Application Platform
+:partner-product-name: VMware Tanzu Application Platform
 :partner-product-short-name: Tanzu Application Platform
 :partner-company-name: VMware, Inc.
 :doc-month: June
