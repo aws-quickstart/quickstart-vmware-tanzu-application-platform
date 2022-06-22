@@ -48,14 +48,14 @@ Metadata:
           - NumberOfNodes
           - MaxNumberOfNodes
       - Label:
-          default: VMware Tanzu Net configuration
+          default: VMware Tanzu Network configuration
         Parameters:
           - TanzuNetUsername
           - TanzuNetPassword
           - TanzuNetApiToken
           - AcceptEULAs
       - Label:
-          default: TAP configuration
+          default: VMware Tanzu Application Platform configuration
         Parameters:
           - TAPVersion
           - TAPDomainName
@@ -64,10 +64,10 @@ Metadata:
         Parameters:
           - SampleAppName
       - Label:
-          default: Bootstrap EC2 instance configuration
+          default: Linux bastion host / bootstrap instance configuration
         Parameters:
-          - BootstrapOS
-          - BootstrapSshPort
+          - LinuxBastionOS
+          - LinuxBastionSshPort
       - Label:
           default: AWS Quick Start S3 bucket configuration
         Parameters:
@@ -76,13 +76,13 @@ Metadata:
           - QSS3KeyPrefix
     ParameterLabels:
       AcceptEULAs:
-        default: Accept applicable VMware Tanzu EULAs
+        default: Have all VMware Tanzu EULAs been accepted?
       AvailabilityZones:
         default: Availability Zones
       NumberOfAZs:
         default: Number of Availability Zones
       KeyPairName:
-        default: SSH key name
+        default: EC2 key pair name
       VPCCIDR:
         default: VPC CIDR
       PrivateSubnet1CIDR:
@@ -99,9 +99,9 @@ Metadata:
         default: Public subnet 3 CIDR
       RemoteAccessCidr:
         default: Remote access CIDR
-      BootstrapOS:
+      LinuxBastionOS:
         default: OS
-      BootstrapSshPort:
+      LinuxBastionSshPort:
         default: SSH port
       TAPDomainName:
         default: Domain name
@@ -154,8 +154,8 @@ Parameters:
   TAPDomainName:
    Type: String
    Description: >-
-     Domain name that can be used for access to TAP and its
-     corresponding project URLs. Available within a private DNS Zone.
+     Private DNS domain name that will be used for accessing the TAP graphical
+     user interface (GUI) and project URLs.
   NumberOfAZs:
     Type: String
     Description: >-
@@ -223,13 +223,16 @@ Parameters:
   KeyPairName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: >-
-      The name of the SSH key that will be used to access the Bootstrap VM and
-      cluster nodes.
+      The name of the EC2 key pair that will be used for SSH access the Linux
+      bastion host / bootstrap instance and EKS cluster nodes, as well as for
+      encrypting the Windows bastion host password. As of 2022-06-20, only
+      RSA key types are supported due to Windows instances not supporting
+      ED25519 (reference:
+      https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
   EKSClusterName:
     Type: String
     Description: >-
-      The name of the cluster that will be created to contain the TAP
-      deployment.
+      The name of the EKS cluster where TAP will be deployed.
     MinLength: 1
     MaxLength: 100
     AllowedPattern: ^[0-9A-Za-z][A-Za-z0-9\-_]*
@@ -263,9 +266,7 @@ Parameters:
     Default: 6
   NodeInstanceType:
     Type: String
-    Description: >-
-      AWS EC2 instance type for each of the nodes deployed within the EKS
-      cluster for TAP.
+    Description: The EKS cluster node instance type.
     AllowedValues:
       - c4.4xlarge
       - c4.8xlarge
@@ -463,11 +464,11 @@ Parameters:
       - z1d.6xlarge
       - z1d.12xlarge
       - z1d.metal
-    ConstraintDescription: Must be a valid EC2 instance type.
+    ConstraintDescription: Must be a supported EC2 instance type.
     Default: m5.xlarge
   NodeVolumeSize:
     Type: Number
-    Description: Size of the node's root EBS volumes.
+    Description: Size of the EKS nodes' root EBS volumes.
     MinValue: 80
     MaxValue: 16384
     Default: 80
@@ -476,17 +477,17 @@ Parameters:
     Description: >-
       IPv4 CIDR block that will be allowed to access the Windows and Linux
       bastion hosts.
-  BootstrapOS:
+  LinuxBastionOS:
     Type: String
     Description: >-
-      Preferred operating system for the Bootstrap EC2 instance based on
-      available values.
+      The operating system for the Linux bastion host / bootstrap instance.
     AllowedValues:
       - Ubuntu-Server-22.04-LTS-HVM
     Default: Ubuntu-Server-22.04-LTS-HVM
-  BootstrapSshPort:
+  LinuxBastionSshPort:
     Type: Number
-    Description: TCP port to use for SSH traffic to the Bootstrap instance.
+    Description: >-
+      TCP port to use for the LinuxBastion instance's listening port.
     MinValue: 0
     MaxValue: 65535
     Default: 22
@@ -626,8 +627,8 @@ Resources:
           - !Ref AWS::NoValue
         PublicSubnet1Id: !GetAtt VPCStack.Outputs.PublicSubnet1ID
         RemoteAccessCidr: !Ref RemoteAccessCidr
-        BootstrapOS: !Ref BootstrapOS
-        BootstrapSshPort: !Ref BootstrapSshPort
+        LinuxBastionOS: !Ref LinuxBastionOS
+        LinuxBastionSshPort: !Ref LinuxBastionSshPort
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes

@@ -46,14 +46,14 @@ Metadata:
           - NumberOfNodes
           - MaxNumberOfNodes
       - Label:
-          default: VMware Tanzu Net configuration
+          default: VMware Tanzu Network configuration
         Parameters:
           - TanzuNetUsername
           - TanzuNetPassword
           - TanzuNetApiToken
           - AcceptEULAs
       - Label:
-          default: TAP configuration
+          default: VMware Tanzu Application Platform configuration
         Parameters:
           - TAPVersion
           - TAPDomainName
@@ -62,10 +62,10 @@ Metadata:
         Parameters:
           - SampleAppName
       - Label:
-          default: Bootstrap EC2 instance configuration
+          default: Linux bastion host / bootstrap instance configuration
         Parameters:
-          - BootstrapOS
-          - BootstrapSshPort
+          - LinuxBastionOS
+          - LinuxBastionSshPort
       - Label:
           default: AWS Quick Start S3 bucket configuration
         Parameters:
@@ -74,9 +74,9 @@ Metadata:
           - QSS3KeyPrefix
     ParameterLabels:
       AcceptEULAs:
-        default: Accept applicable VMware Tanzu EULAs
+        default: Have all VMware Tanzu EULAs been accepted?
       KeyPairName:
-        default: SSH key name
+        default: EC2 key pair name
       VpcId:
         default: VPC ID
       PrivateSubnet1Id:
@@ -89,9 +89,9 @@ Metadata:
         default: Public subnet 1 ID
       RemoteAccessCidr:
         default: Remote access CIDR
-      BootstrapOS:
+      LinuxBastionOS:
         default: OS
-      BootstrapSshPort:
+      LinuxBastionSshPort:
         default: SSH port
       TAPDomainName:
         default: Domain name
@@ -144,8 +144,8 @@ Parameters:
   TAPDomainName:
    Type: String
    Description: >-
-     Domain name that can be used for access to TAP and its
-     corresponding project URLs. Available within a private DNS Zone.
+     Private DNS domain name that will be used for accessing the TAP graphical
+     user interface (GUI) and project URLs.
   VpcId:
     Type: AWS::EC2::VPC::Id
     Description: >-
@@ -176,13 +176,16 @@ Parameters:
   KeyPairName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: >-
-      The name of the SSH key that will be used to access the Bootstrap VM and
-      cluster nodes.
+      The name of the EC2 key pair that will be used for SSH access the Linux
+      bastion host / bootstrap instance and EKS cluster nodes, as well as for
+      encrypting the Windows bastion host password. As of 2022-06-21, only
+      RSA key types are supported due to Windows instances not supporting
+      ED25519 (reference:
+      https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
   EKSClusterName:
     Type: String
     Description: >-
-      The name of the cluster that will be created to contain the TAP
-      deployment.
+      The name of the EKS cluster where TAP will be deployed.
     MinLength: 1
     MaxLength: 100
     AllowedPattern: ^[0-9A-Za-z][A-Za-z0-9\-_]*
@@ -216,9 +219,7 @@ Parameters:
     Default: 6
   NodeInstanceType:
     Type: String
-    Description: >-
-      AWS EC2 instance type for each of the nodes deployed within the EKS
-      cluster for TAP.
+    Description: The EKS cluster node instance type.
     AllowedValues:
       - c4.4xlarge
       - c4.8xlarge
@@ -416,11 +417,11 @@ Parameters:
       - z1d.6xlarge
       - z1d.12xlarge
       - z1d.metal
-    ConstraintDescription: Must be a valid EC2 instance type.
+    ConstraintDescription: Must be a supported EC2 instance type.
     Default: m5.xlarge
   NodeVolumeSize:
     Type: Number
-    Description: Size of the node's root EBS volumes.
+    Description: Size of the EKS nodes' root EBS volumes.
     MinValue: 80
     MaxValue: 16384
     Default: 80
@@ -430,17 +431,17 @@ Parameters:
       IPv4 CIDR block that will be permitted to connect to the Windows and
       Linux bastion hosts. We recommend that you set this value to a trusted
       network.
-  BootstrapOS:
+  LinuxBastionOS:
     Type: String
     Description: >-
-      Preferred operating system for the Bootstrap EC2 instance based on
-      available values.
+      The operating system for the Linux bastion host / bootstrap instance.
     AllowedValues:
       - Ubuntu-Server-22.04-LTS-HVM
     Default: Ubuntu-Server-22.04-LTS-HVM
-  BootstrapSshPort:
+  LinuxBastionSshPort:
     Type: Number
-    Description: TCP port to use for SSH traffic to the Bootstrap instance.
+    Description: >-
+      TCP port to use for the LinuxBastion instance's listening port.
     MinValue: 0
     MaxValue: 65535
     Default: 22
@@ -672,7 +673,7 @@ Mappings:
                 branch: main
 Conditions:
   3AZDeployment: !Not [!Equals [!Ref PrivateSubnet3Id, '']]
-  Ubuntu: !Equals [!FindInMap [AwsAmiNameMap, !Ref BootstrapOS, OS], Ubuntu]
+  Ubuntu: !Equals [!FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, OS], Ubuntu]
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
 Resources:
   TanzuNetSecretCredentials:
@@ -779,7 +780,7 @@ Resources:
           - !Ref AWS::NoValue
         RemoteAccessCIDR: !Ref RemoteAccessCidr
         EKSPublicAccessEndpoint: Disabled
-        AdditionalEKSAdminRoleArn: !GetAtt BootstrapIamRole.Arn
+        AdditionalEKSAdminRoleArn: !GetAtt LinuxBastionIamRole.Arn
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
@@ -802,41 +803,44 @@ Resources:
         MonitoringStack: None
         ALBIngressController: Enabled
         EfsStorageClass: Disabled
-  BootstrapSecurityGroup:
+  LinuxBastionSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enables SSH access to the Bootstrap instance
+      GroupDescription: >-
+        The TAP Linux bastion host / bootstrap instance security group.
       VpcId: !Ref VpcId
       Tags:
         - Key: Name
-          Value: TAPBootstrapSecurityGroup
+          Value: TAPLinuxBastionSecurityGroup
         - Key: Description
           Value: >-
-            VMware Tanzu Application Platform EKS cluster bootstrap security
-            group.
-  BootstrapSshIngressRule:
+            The VMware Tanzu Application Platform Linux bastion host /
+            bootstrap instance security group.
+  LinuxBastionSshIngressRule:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
-      Description: Allow SSH to Bootstrap instance
-      GroupId: !Ref BootstrapSecurityGroup
+      Description: Allow SSH to the Linux bastion host / bootstrap instance.
+      GroupId: !Ref LinuxBastionSecurityGroup
       IpProtocol: tcp
-      FromPort: !Ref BootstrapSshPort
-      ToPort: !Ref BootstrapSshPort
+      FromPort: !Ref LinuxBastionSshPort
+      ToPort: !Ref LinuxBastionSshPort
       CidrIp: !Ref RemoteAccessCidr
-  BootstrapDefaultEgressRule:
+  LinuxBastionDefaultEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
-      Description: Bootstrap instance egress
-      GroupId: !Ref BootstrapSecurityGroup
+      Description: Allow all egress.
+      GroupId: !Ref LinuxBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 0
       ToPort: 65535
       CidrIp: 0.0.0.0/0
-  BootstrapSshToNodesEgressRule:
+  LinuxBastionSshToNodesEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
-      Description: Allow SSH from Bootstrap instance to EKS nodes
-      GroupId: !Ref BootstrapSecurityGroup
+      Description: >-
+        Allow SSH from the Linux bastion host / bootstrap instance to the EKS
+        nodes.
+      GroupId: !Ref LinuxBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 22
       ToPort: 22
@@ -844,19 +848,21 @@ Resources:
   NodesSshIngressRule:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
-      Description: Allow SSH from Bootstrap instance to EKS nodes
+      Description: >-
+        Allow SSH from the Linux bastion host / bootstrap instance to the EKS
+        nodes.
       GroupId: !GetAtt EKSQSStack.Outputs.NodeGroupSecurityGroup
       IpProtocol: tcp
       ToPort: 22
       FromPort: 22
-      SourceSecurityGroupId: !Ref BootstrapSecurityGroup
-  BootstrapK8sToApiEgressRule:
+      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+  LinuxBastionK8sToApiEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
       Description: >-
-        Allow Kubernetes API traffic from Bootstrap instance to EKS control
-        plane
-      GroupId: !Ref BootstrapSecurityGroup
+        Allow the Linux bastion host / bootstrap instance to connect to the EKS
+        control plane for Kubernetes API traffic.
+      GroupId: !Ref LinuxBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 443
       ToPort: 443
@@ -865,29 +871,27 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
       Description: >-
-        Allow Kubernetes API traffic from Bootstrap instance to EKS control
-        plane
+        Allow the Linux bastion host / bootstrap instance to connect to the EKS
+        control plane for Kubernetes API traffic.
       GroupId: !GetAtt EKSQSStack.Outputs.ControlPlaneSecurityGroup
       IpProtocol: tcp
       ToPort: 443
       FromPort: 443
-      SourceSecurityGroupId: !Ref BootstrapSecurityGroup
-  BootstrapEIP:
+      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+  LinuxBastionEIP:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
       Tags:
         - Key: Name
-          Value: TAPBootstrapEIP
-  BootstrapIamRole:
+          Value: TAPLinuxBastionEIP
+  LinuxBastionIamRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub
-        - TAPBootstrapIamRole-${StackId}
+        - TAPLinuxBastionIamRole-${StackId}
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: >-
-        VMware Tanzu Application Platform EKS cluster bootstrap instance
-        IAM Role.
+      Description: Linux bastion host / bootstrap instance IAM Role.
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -896,7 +900,7 @@ Resources:
               Service: !Sub ec2.${AWS::URLSuffix}
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: BootstrapInstanceConfig
+        - PolicyName: TAPBootstrapInstanceConfig
           PolicyDocument:
             Version: 2012-10-17
             Statement:
@@ -1004,28 +1008,30 @@ Resources:
         - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM
         - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore
         - !Sub arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy
-  BootstrapInstanceProfile:
+  LinuxBastionInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       InstanceProfileName: !Sub
-        - TAPBootstrapInstanceProfile-${StackId}
+        - TAPLinuxBastionInstanceProfile-${StackId}
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Roles:
-        - !Ref BootstrapIamRole
-  BootstrapUbuntuInstance:
+        - !Ref LinuxBastionIamRole
+  UbuntuBastion:
+  # TODO: Implement CloudFormation helper scripts once Ubuntu 22.04 is
+  # supported.
     Type: AWS::EC2::Instance
     Condition: Ubuntu
     Properties:
       InstanceType: m5.large
-      IamInstanceProfile: !Ref BootstrapInstanceProfile
+      IamInstanceProfile: !Ref LinuxBastionInstanceProfile
       ImageId: !FindInMap
         - AwsAmiRegionMap
         - !Ref AWS::Region
-        - !FindInMap [AwsAmiNameMap, !Ref BootstrapOS, Code]
+        - !FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, Code]
       KeyName: !Ref KeyPairName
       Monitoring: true
       SecurityGroupIds:
-        - !Ref BootstrapSecurityGroup
+        - !Ref LinuxBastionSecurityGroup
       SubnetId: !Ref PublicSubnet1Id
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
@@ -1035,7 +1041,7 @@ Resources:
             Encrypted: true
       Tags:
         - Key: Name
-          Value: TAPBootstrapInstance
+          Value: TAPLinuxBastionInstance
         - Key: Description
           Value: >-
             VMware Tanzu Application Platform EKS cluster bootstrap instance.
@@ -1059,8 +1065,10 @@ Resources:
             apt-get -y remove containerd runc
             echo "Adding Docker CE repo..."
             mkdir -p /usr/local/share/keyrings/
-            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/local/share/keyrings/docker-archive-keyring.gpg --yes
-            printf "deb [arch=$arch signed-by=/usr/local/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
+              gpg --dearmor -o /usr/local/share/keyrings/docker-archive-keyring.gpg --yes
+            printf "deb [arch=$arch signed-by=/usr/local/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" |
+              tee /etc/apt/sources.list.d/docker.list
             echo "Updating & upgrading..."
             apt-get -y update
             apt-get -y upgrade
@@ -1135,7 +1143,7 @@ Resources:
             cp /root/.docker/config.json /home/$user/.docker/
             chown $user:$user /home/$user/.docker/config.json
             echo "Configuring the SSH listening port..."
-            printf "Port ${BootstrapSshPort}\n" > /etc/ssh/sshd_config.d/port.conf
+            printf "Port ${LinuxBastionSshPort}\n" > /etc/ssh/sshd_config.d/port.conf
             systemctl restart sshd.service
             systemctl status sshd.service
             echo "Downloading the VMware Tanzu Application Platform Quick Start scripts..."
@@ -1217,10 +1225,10 @@ Resources:
               - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
             TanzuNetRegistryServer: !FindInMap [TanzuNetRegistryServer, Server, Name]
             TAPRepo: tanzu-application-platform/tap-packages
-  BootstrapUbuntuEipAssociation:
+  UbuntuBastionEipAssociation:
     Type: AWS::EC2::EIPAssociation
     UpdateReplacePolicy: Delete
     Condition: Ubuntu
     Properties:
-      InstanceId: !Ref BootstrapUbuntuInstance
-      AllocationId: !GetAtt BootstrapEIP.AllocationId
+      InstanceId: !Ref UbuntuBastion
+      AllocationId: !GetAtt LinuxBastionEIP.AllocationId
