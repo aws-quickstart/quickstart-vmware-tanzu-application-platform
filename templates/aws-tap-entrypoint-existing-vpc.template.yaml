@@ -522,90 +522,90 @@ Mappings:
     # Ubuntu Server lookup: https://cloud-images.ubuntu.com/locator/ec2/
     af-south-1:
       US2204HVM: ami-08a1ff0efd6690ede
-      WS2019: ami-0f77ba8b49982274a
+      WS2022FullBase: ami-0bc997f7008192f44
     ap-east-1:
       US2204HVM: ami-0c5b035581d9859b0
-      WS2019: ami-05d5b07e402da14ea
+      WS2022FullBase: ami-0c87318b66586dbdf
     ap-northeast-1:
       US2204HVM: ami-055bb115702a738f5
-      WS2019: ami-0cb976b676f612e95
+      WS2022FullBase: ami-045926cadb8870a49
     ap-northeast-2:
       US2204HVM: ami-05b9c9c0fe2f5a62c
-      WS2019: ami-0752d0e702df110db
+      WS2022FullBase: ami-09e81229b42b8bce2
     ap-northeast-3:
       US2204HVM: ami-0b3874967694fae86
-      WS2019: ami-0d4568822d03d36f9
+      WS2022FullBase: ami-0760c9db34f185b18
     ap-south-1:
       US2204HVM: ami-00d095fb90db2fa00
-      WS2019: ami-0efb1b2509c97bef7
+      WS2022FullBase: ami-0ecc68457948da1bc
     ap-southeast-1:
       US2204HVM: ami-00c76c78e78a3dcd4
-      WS2019: ami-07d9bd7bc4f2370d0
+      WS2022FullBase: ami-0517d4980cf75758a
     ap-southeast-2:
       US2204HVM: ami-0251cb389d14767a2
-      WS2019: ami-015afa33ca41cea70
+      WS2022FullBase: ami-0066d7383237ba80b
     ap-southeast-3:
       US2204HVM: ami-0de46ab389596d621
-      WS2019: ami-059b2cb8a08e4a69b
+      WS2022FullBase: ami-068795edd0f6d9709
     ca-central-1:
       US2204HVM: ami-0204f3c59456ea9a1
-      WS2019: ami-0e986682a470aa2d8
+      WS2022FullBase: ami-01391a075996d6ef5
     # cn-north-1:
     #   US2204HVM:
-    #   WS2019: ami-0c13279a89d185b91
+    #   WS2022FullBase: ami-0c59d32872af42389
     # cn-northwest-1:
     #   US2204HVM:
-    #   WS2019: ami-0d8856caf43442eef
+    #   WS2022FullBase: ami-0e0d3d43301d7fa6e
     eu-central-1:
       US2204HVM: ami-04aa66cdfe687d427
-      WS2019: ami-0a3fab8f1f3c69832
+      WS2022FullBase: ami-081728af240ed77f2
     eu-north-1:
       US2204HVM: ami-0dbac3c76b4ead6c5
-      WS2019: ami-0ae55a32c1fff177c
+      WS2022FullBase: ami-037c67c58ad5a39b8
     eu-south-1:
       US2204HVM: ami-0fe7a5523599f4c08
-      WS2019: ami-03837acf9e5e9efb0
+      WS2022FullBase: ami-01687f6d4ba94e20d
     eu-west-1:
       US2204HVM: ami-07bd2fc45c8a8dd48
-      WS2019: ami-0f8f14284458dda65
+      WS2022FullBase: ami-00c920ab6ef8925b9
     eu-west-2:
       US2204HVM: ami-033c8ef001424a6d3
-      WS2019: ami-036dd4c9eacc59cf0
+      WS2022FullBase: ami-0727ea5edebc000a0
     eu-west-3:
       US2204HVM: ami-00e43f192e8c59874
-      WS2019: ami-0c043379a1e74144d
+      WS2022FullBase: ami-04163e35519631bc7
     me-south-1:
       US2204HVM: ami-0d49942d3daf970df
-      WS2019: ami-0380a39295ee45d5b
+      WS2022FullBase: ami-0079bcec052a1b365
     sa-east-1:
       US2204HVM: ami-0b54d646bcf381a79
-      WS2019: ami-0247589f5c970dc48
+      WS2022FullBase: ami-024a4831aa3511f47
     us-east-1:
       US2204HVM: ami-09db26f1ef0a9f406
-      WS2019: ami-0193dcf9aa4f5654e
+      WS2022FullBase: ami-0e1a729017e59e409
     us-east-2:
       US2204HVM: ami-07a683b72d6bd7da3
-      WS2019: ami-029c4a9e6f0a6b9e3
+      WS2022FullBase: ami-094a92978724fc94c
     us-gov-east-1:
       US2204HVM: ami-08fcbec75b43330b7
-      WS2019: ami-0f4346fe4a9d66391
+      WS2022FullBase: ami-0365c8f2a839fefed
     us-gov-west-1:
       US2204HVM: ami-04e77113f128920b2
-      WS2019: ami-070f960754631d355
+      WS2022FullBase: ami-0cc7aa87fbd1c3837
     us-west-1:
       US2204HVM: ami-09596c63850a1bd49
-      WS2019: ami-063f1c4fb6e4c511a
+      WS2022FullBase: ami-0397c20f71a12873b
     us-west-2:
       US2204HVM: ami-0437ae8a23be4e98b
-      WS2019: ami-0710ecdf2e1467a25
+      WS2022FullBase: ami-0280d580c37d161bf
   AwsAmiNameMap:
     Ubuntu-Server-22.04-LTS-HVM:
       Code: US2204HVM
       OS: Ubuntu
-    Windows-Server-2019-English-Full-Base-2022.05.25:
-    # Official AMI name is 'Windows_Server-2019-English-Full-Base-2022.05.25',
+    Windows-Server-2022-English-Full-Base-2022.06.15:
+    # Official AMI name is 'Windows_Server-2022-English-Full-Base-2022.06.15',
     # but underscores are not supported in CloudFormation mapping keys.
-      Code: WS2019
+      Code: WS2022FullBase
       OS: Windows
   TanzuNetRegistryServer:
     Server:
