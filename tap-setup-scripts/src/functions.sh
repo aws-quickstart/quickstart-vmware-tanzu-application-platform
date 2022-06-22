@@ -63,16 +63,16 @@ function installTanzuCLI {
 
   mkdir -p $DOWNLOADS
 
-  if [[ ! -f /usr/local/bin/pivnet ]]
-  then
-    echo "Installing pivnet CLI"
+  # if [[ ! -f /usr/local/bin/pivnet ]]
+  # then
+  #   echo "Installing pivnet CLI"
 
-    PIVNET_VERSION=3.0.1
-    curl -fsSLo $DOWNLOADS/pivnet "https://github.com/pivotal-cf/pivnet-cli/releases/download/v$PIVNET_VERSION/pivnet-linux-$(dpkg --print-architecture)-$PIVNET_VERSION"
-    sudo install -o ubuntu -g ubuntu -m 0755 $DOWNLOADS/pivnet /usr/local/bin/pivnet
-  else
-    echo "pivnet CLI already present"
-  fi
+  #   PIVNET_VERSION=3.0.1
+  #   curl -fsSLo $DOWNLOADS/pivnet "https://github.com/pivotal-cf/pivnet-cli/releases/download/v$PIVNET_VERSION/pivnet-linux-$(dpkg --print-architecture)-$PIVNET_VERSION"
+  #   sudo install -o ubuntu -g ubuntu -m 0755 $DOWNLOADS/pivnet /usr/local/bin/pivnet
+  # else
+  #   echo "pivnet CLI already present"
+  # fi
 
   if [[ ! -f $DOWNLOADS/tanzu-cluster-essentials/install.sh ]]
   then
@@ -88,6 +88,10 @@ function installTanzuCLI {
 
     mkdir -p $DOWNLOADS/tanzu-cluster-essentials
     tar xvf $DOWNLOADS/$ESSENTIALS_FILE_NAME -C $DOWNLOADS/tanzu-cluster-essentials
+    sudo cp $DOWNLOADS/tanzu-cluster-essentials/imgpkg /usr/local/bin/
+    sudo cp $DOWNLOADS/tanzu-cluster-essentials/kapp /usr/local/bin/
+    sudo cp $DOWNLOADS/tanzu-cluster-essentials/kbld /usr/local/bin/
+    sudo cp $DOWNLOADS/tanzu-cluster-essentials/ytt /usr/local/bin/
   else
     echo "tanzu-cluster-essentials already present"
   fi
@@ -134,11 +138,7 @@ function verifyTools {
   echo ''
   kbld version
   echo ''
-  kwt version
-  echo ''
   imgpkg version
-  echo ''
-  vendir version
   echo ''
   aws --version
   echo ''
@@ -151,8 +151,6 @@ function verifyTools {
   yq --version
   echo ''
   curl --version
-  echo ''
-  docker --version
   echo ''
   tanzu version
   tanzu plugin list
@@ -314,9 +312,9 @@ function tapInstallFull {
 
   if [[ -z $first_time ]]
   then
-    tanzu package install $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE || true
+    tanzu package install $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE
   else
-    tanzu package installed update $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE || true
+    tanzu package installed update $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE
   fi
 
   banner "Checking state of all packages"
@@ -449,10 +447,12 @@ function relocateTAPPackages {
 
   banner "Relocating images, this will take time in minutes (30-45min)..."
 
-  # TODO: Replace with a credential helper
-  # allow TANZUNET_REGISTRY_PASSWORD  variable to contain special chars(& , %)
-  printf "%s\n" "$TANZUNET_REGISTRY_PASSWORD" |
-    docker login --username $TANZUNET_REGISTRY_USERNAME --password-stdin $TANZUNET_REGISTRY_SERVER
+  # Replace “docker login” with IMGPKG_REGISTRY_HOSTNAME_0;
+  # see details https://carvel.dev/imgpkg/docs/v0.29.0/auth/#via-environment-variables.
+
+  export IMGPKG_REGISTRY_HOSTNAME_0="$TANZUNET_REGISTRY_SERVER"
+  export IMGPKG_REGISTRY_USERNAME_0="$TANZUNET_REGISTRY_USERNAME"
+  export IMGPKG_REGISTRY_PASSWORD_0="$TANZUNET_REGISTRY_PASSWORD"
 
   # --concurrency 2 or 1 is required for ECR
   echo "Relocating Tanzu Cluster Essentials Bundle"
@@ -487,9 +487,56 @@ function printOutputParams {
   ]
 }
 EOF
-  aws route53 change-resource-record-sets --hosted-zone-id $ZONE_ID --change-batch "file://$INPUTS/tap-gui-route53-wildcard-resource-record-set-config.json"
+  aws route53 change-resource-record-sets --hosted-zone-id $ZONE_ID --change-batch "file://tap-gui-route53-wildcard-resource-record-set-config.json"
   popd
 
   tap_gui_url=$(yq -r .tap_gui.app_config.backend.baseUrl $GENERATED/tap-values.yaml)
   echo "TAP GUI URL $tap_gui_url"
+}
+
+function runTestCases {
+  requireValue DEVELOPER_NAMESPACE SAMPLE_APP_NAME  DOMAIN_NAME
+
+  TAP_GUI_URL="http://tap-gui.${DOMAIN_NAME}"
+  WORKLOAD_URL="http://${SAMPLE_APP_NAME}.${DEVELOPER_NAMESPACE}.${DOMAIN_NAME}"
+
+  echo "Running Tests..."
+  echo TAP_GUI_URL $TAP_GUI_URL
+  echo WORKLOAD_URL $WORKLOAD_URL
+
+  #test-1:
+  rx_str=`curl -LI $TAP_GUI_URL  -o /dev/null -w '%{http_code}\n' -s`
+  expected_str="200"
+
+  echo "Test1: Access TAP GUI"
+  if [[ "$rx_str" == "$expected_str" ]]
+  then
+    echo "Test1 Pass"
+  else
+    echo "Test1 Fail"
+  fi
+
+  #test-2:
+  rx_str=`curl -LI  $WORKLOAD_URL -o /dev/null -w '%{http_code}\n' -s`
+  expected_str="200"
+
+  echo "Test2: Access Sample Workload GUI"
+  if [[ "$rx_str" == "$expected_str" ]]
+  then
+    echo "Test2 Pass"
+  else
+    echo "Test2 Fail"
+  fi
+
+  #test-3: workload output
+  rx_str=`curl -s $WORKLOAD_URL`
+  expected_str="Greetings from Spring Boot + Tanzu!"
+
+  echo "Test3: Verify Sample Workload Output"
+  if [[ "$rx_str" == "$expected_str" ]]
+  then
+    echo "Test3 Pass"
+  else
+    echo "Test3 Fail"
+  fi
 }
