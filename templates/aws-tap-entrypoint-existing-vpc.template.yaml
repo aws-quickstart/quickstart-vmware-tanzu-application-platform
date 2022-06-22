@@ -1263,6 +1263,111 @@ Resources:
     Properties:
       InstanceId: !Ref UbuntuBastion
       AllocationId: !GetAtt LinuxBastionEIP.AllocationId
+  WindowsBastionEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: TAPWindowsBastionEIP
+  WindowsBastionSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Windows bastion host security group.
+      VpcId: !Ref VpcId
+      Tags:
+        - Key: Name
+          Value: TAPWindowsBastionSecurityGroup
+        - Key: Description
+          Value: >-
+            Windows bastion security group for accessing the
+            VMware Tanzu Application Platform cluster GUI.
+  WindowsBastionRdpIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow RDP to bastion host
+      GroupId: !Ref WindowsBastionSecurityGroup
+      IpProtocol: tcp
+      FromPort: 3389
+      ToPort: 3389
+      CidrIp: !Ref RemoteAccessCidr
+  WindowsBastionDefaultEgressRule:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      Description: Windows bastion host default egress
+      GroupId: !Ref WindowsBastionSecurityGroup
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      CidrIp: 0.0.0.0/0
+  WindowsBastionIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub
+        - TAPWindowsBastionIamRole-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      Description: Windows bastion host IAM Role.
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub ec2.${AWS::URLSuffix}
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy
+  WindowsBastionInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub
+        - TAPWindowsBastionInstanceProfile-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      Roles:
+        - !Ref WindowsBastionIamRole
+  WindowsBastion:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.medium
+      IamInstanceProfile: !Ref WindowsBastionInstanceProfile
+      ImageId: !FindInMap [AwsAmiRegionMap, !Ref AWS::Region, WS2022FullBase]
+      KeyName: !Ref KeyPairName
+      SecurityGroupIds:
+        - !Ref WindowsBastionSecurityGroup
+      SubnetId: !Ref PublicSubnet1Id
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 80
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: TAPWindowsBastionInstance
+        - Key: Description
+          Value: >-
+            Windows bastion instance for accessing the
+            VMware Tanzu Application Platform cluster graphical user interface
+            (GUI).
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          Write-Host -Object 'Setting AWS Region environment variables...'
+          [System.Environment]::SetEnvironmentVariable('AWS_REGION','${AWS::Region}',[System.EnvironmentVariableTarget]::System)
+          [System.Environment]::SetEnvironmentVariable('AWS_DEFAULT_REGION','${AWS::Region}',[System.EnvironmentVariableTarget]::System)
+          Write-Host -Object 'Installing Chocolatey...'
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+          Invoke-Expression -Command ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          Write-Host -Object 'Installing Mozilla Firefox...'
+          choco install -y Firefox
+          </powershell>
+  WindowsBastionEipAssociation:
+    Type: AWS::EC2::EIPAssociation
+    UpdateReplacePolicy: Delete
+    Properties:
+      InstanceId: !Ref WindowsBastion
+      AllocationId: !GetAtt WindowsBastionEIP.AllocationId
 Rules:
   AcceptEULAs:
     Assertions:
