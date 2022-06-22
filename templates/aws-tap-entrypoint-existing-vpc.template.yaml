@@ -1014,7 +1014,7 @@ Resources:
         - !Ref LinuxBastionSecurityGroup
       SubnetId: !Ref PublicSubnet1Id
       BlockDeviceMappings:
-        - DeviceName: /dev/xvda
+        - DeviceName: /dev/sda1
           Ebs:
             VolumeSize: 50
             VolumeType: gp2
