@@ -167,11 +167,10 @@ function readUserInputs {
   DOMAIN_NAME=$(yq -r .dns.domain_name $INPUTS/user-input-values.yaml)
   ZONE_ID=$(yq -r .dns.zone_id $INPUTS/user-input-values.yaml)
 
-  TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN=$(yq -r .tanzunet_secrets.credentials_arn $INPUTS/user-input-values.yaml)
-  TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN=$(yq -r .tanzunet_secrets.api_token_arn $INPUTS/user-input-values.yaml)
-  TANZUNET_REGISTRY_USERNAME=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN" --query "SecretString" --output text | jq -r .username)
-  TANZUNET_REGISTRY_PASSWORD=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN" --query "SecretString" --output text | jq -r .password)
-  PIVNET_TOKEN=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN" --query "SecretString" --output text)
+  TANZUNET_REGISTRY_SECRETS_MANAGER_ARN=$(yq -r .tanzunet.secrets.credentials_arn $INPUTS/user-input-values.yaml)
+  TANZUNET_REGISTRY_USERNAME=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .username)
+  TANZUNET_REGISTRY_PASSWORD=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .password)
+  PIVNET_TOKEN=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .token)
 
   TAP_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.tap_packages $INPUTS/user-input-values.yaml)
   ESSENTIALS_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.cluster_essentials $INPUTS/user-input-values.yaml)

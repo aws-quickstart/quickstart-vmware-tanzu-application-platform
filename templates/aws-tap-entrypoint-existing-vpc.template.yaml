@@ -712,20 +712,13 @@ Resources:
       Name: !Sub
         - '${StackId}/TanzuNetCredentials'
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: The Tanzu Net username and password
+      Description: The VMware Tanzu Network credentials.
       SecretString: !Sub >-
         {
           "username": "${TanzuNetUsername}",
-          "password": "${TanzuNetPassword}"
+          "password": "${TanzuNetPassword}",
+          "token": "${TanzuNetApiToken}"
         }
-  TanzuNetSecretApiToken:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: !Sub
-        - '${StackId}/TanzuNetApiToken'
-        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: The Tanzu Net API token
-      SecretString: !Ref TanzuNetApiToken
   TAPPackagesRepo:
     Type: AWS::ECR::Repository
     UpdateReplacePolicy: Delete
