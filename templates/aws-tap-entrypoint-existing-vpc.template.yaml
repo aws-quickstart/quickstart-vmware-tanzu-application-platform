@@ -1019,6 +1019,7 @@ Resources:
             VolumeSize: 50
             VolumeType: gp2
             Encrypted: true
+            DeleteOnTermination: true
       Tags:
         - Key: Name
           Value: TAPLinuxBastionInstance
