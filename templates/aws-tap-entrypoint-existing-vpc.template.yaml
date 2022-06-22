@@ -687,6 +687,8 @@ Resources:
       RepositoryName: !Sub
         - '${StackId}/tanzu-cluster-essentials/bundle'
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      EncryptionConfiguration:
+        EncryptionType: AES256
   TAPBuildServiceRepo:
     Type: AWS::ECR::Repository
     UpdateReplacePolicy: Retain
@@ -695,6 +697,8 @@ Resources:
       RepositoryName: !Sub
         - '${StackId}/tap-build-service'
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      EncryptionConfiguration:
+        EncryptionType: AES256
   TAPWorkloadRepo:
     Type: AWS::ECR::Repository
     UpdateReplacePolicy: Retain
@@ -707,6 +711,8 @@ Resources:
           Suffix: !Sub
             - '${SampleAppName}-${Namespace}'
             - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
+      EncryptionConfiguration:
+        EncryptionType: AES256
   TAPWorkloadBundleRepo:
     Type: AWS::ECR::Repository
     UpdateReplacePolicy: Retain
@@ -719,6 +725,8 @@ Resources:
           Suffix: !Sub
             - '${SampleAppName}-${Namespace}'
             - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
+      EncryptionConfiguration:
+        EncryptionType: AES256
   PrivateHostedZone:
     Type: AWS::Route53::HostedZone
     DeletionPolicy: Delete
