@@ -53,7 +53,6 @@ Metadata:
           - TanzuNetUsername
           - TanzuNetPassword
           - TanzuNetApiToken
-          - TanzuNetRegistryServer
           - AcceptEULAs
       - Label:
           default: TAP configuration
@@ -124,8 +123,6 @@ Metadata:
         default: Password
       TanzuNetApiToken:
         default: API token
-      TanzuNetRegistryServer:
-        default: Server
       TAPVersion:
         default: Version
       SampleAppName:
@@ -509,10 +506,6 @@ Parameters:
       The VMware Tanzu Network user account and authentication (UAA) API
       refresh token (reference: https://network.pivotal.io/docs/api).
     NoEcho: true
-  TanzuNetRegistryServer:
-    Type: String
-    Description: The TanzuNet registry server.
-    Default: registry.tanzu.vmware.com
   TAPVersion:
     Type: String
     Description: >-
@@ -660,7 +653,6 @@ Resources:
         TanzuNetUsername: !Ref TanzuNetUsername
         TanzuNetPassword: !Ref TanzuNetPassword
         TanzuNetApiToken: !Ref TanzuNetApiToken
-        TanzuNetRegistryServer: !Ref TanzuNetRegistryServer
         TAPVersion: !Ref TAPVersion
         SampleAppName: !Ref SampleAppName
         QSS3BucketName: !Ref QSS3BucketName

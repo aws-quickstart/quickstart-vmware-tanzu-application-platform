@@ -52,7 +52,6 @@ Metadata:
           - TanzuNetUsername
           - TanzuNetPassword
           - TanzuNetApiToken
-          - TanzuNetRegistryServer
           - AcceptEULAs
       - Label:
           default: TAP configuration
@@ -121,8 +120,6 @@ Metadata:
         default: Password
       TanzuNetApiToken:
         default: API token
-      TanzuNetRegistryServer:
-        default: Server
       TAPVersion:
         default: Version
       SampleAppName:
@@ -487,10 +484,6 @@ Parameters:
       The VMware Tanzu Network user account and authentication (UAA) API
       refresh token (reference: https://network.pivotal.io/docs/api).
     NoEcho: true
-  TanzuNetRegistryServer:
-    Type: String
-    Description: The TanzuNet registry server.
-    Default: registry.tanzu.vmware.com
   TAPVersion:
     Type: String
     Description: >-
@@ -659,6 +652,9 @@ Mappings:
     # but underscores are not supported in CloudFormation mapping keys.
       Code: WS2019
       OS: Windows
+  TanzuNetRegistryServer:
+    Server:
+      Name: registry.tanzu.vmware.com
   KubernetesVersion:
   # https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
     '1.21':
@@ -1202,14 +1198,14 @@ Resources:
               secrets:
                 credentials_arn: ${TanzuNetSecretCredentials}
             cluster_essentials_bundle:
-              bundle: ${ClusterEssentialsBundleRepo}
+              bundle: ${TanzuNetRegistryServer}/${ClusterEssentialsBundleRepo}
               file_hash: ${ClusterEssentialsBundleFileHash}
               version: ${ClusterEssentialsBundleVersion}
               file_id: ${ClusterEssentialsBundleFileId}
             tap:
               name: tap
               namespace: tap-install
-              repository: ${TAPRepo}
+              repository: ${TanzuNetRegistryServer}/${TAPRepo}
               version: ${TAPVersion}
             cluster:
               name: ${EKSQSStack.Outputs.EKSClusterName}
@@ -1249,7 +1245,7 @@ Resources:
             su - $user -c "$tap_dir/src/tap-main.sh -c install"
             echo "Completed successfully!"
           - AwsKubectlVersion: !FindInMap [KubernetesVersion, !Ref KubernetesVersion, AwsKubectlVersion]
-            ClusterEssentialsBundleRepo: !Sub '${TanzuNetRegistryServer}/tanzu-cluster-essentials/cluster-essentials-bundle'
+            ClusterEssentialsBundleRepo: tanzu-cluster-essentials/cluster-essentials-bundle
             ClusterEssentialsBundleFileHash: !FindInMap [ClusterEssentialsBundle, !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion], FileHash]
             ClusterEssentialsBundleFileId: !FindInMap [ClusterEssentialsBundle, !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion], FileId]
             ClusterEssentialsBundleVersion: !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion]
@@ -1260,7 +1256,8 @@ Resources:
             QSS3BucketPath: !Sub
               - s3://${S3Bucket}/${QSS3KeyPrefix}tap-setup-scripts
               - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-            TAPRepo: !Sub '${TanzuNetRegistryServer}/tanzu-application-platform/tap-packages'
+            TanzuNetRegistryServer: !FindInMap [TanzuNetRegistryServer, Server, Name]
+            TAPRepo: tanzu-application-platform/tap-packages
   BootstrapUbuntuEipAssociation:
     Type: AWS::EC2::EIPAssociation
     UpdateReplacePolicy: Delete
