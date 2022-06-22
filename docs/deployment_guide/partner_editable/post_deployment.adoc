@@ -1,3 +1,131 @@
 // Include any postdeployment steps here, such as steps necessary to test that the deployment was successful. If there are no postdeployment steps, leave this file empty.
 
 == Postdeployment steps
+
+== Customer Responsibility
+
+After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured — including any required patches — to meet your security and other needs. For more information, see the https://aws.amazon.com/compliance/shared-responsibility-model/[AWS Shared Responsibility Model].
+
+== Parameter Reference
+
+=== Parameters for deploying a TAP cluster in a new VPC
+
+_Table 1: Tanzu Network Parameters_
+[cols="Parameter Label","Default Value","Description"]
+|===
+|Tanzu Net Username
+|none
+|The VMware Tanzu Net Username (authentication ID or email address)
+
+|Tanzu Net Password
+|none
+|The VMware Tanzu Net password (authentication key)
+
+|Tanzu Net API Token
+|none
+|The VMware Tanzu Net Refresh token for the defined user
+|===
+
+_Table 2: Basic Deployment Configurations_
+[cols="Parameter Label","Default Value","Description"]
+|===
+|Availability Zones
+|none
+|List of Availability Zones to use for the subnets in the VPC. Three Availability Zones are used for this deployment.
+
+|Number of Availability Zones
+|3
+|Number of Availability Zones to use in the VPC. This must match the value entered for the AvailabilityZones parameter.
+
+|Key Pay Name
+|none
+|The name of the SSH key that will be used to access the Bootstrap VM and cluster nodes.
+|===
+
+_Table 3: VPC Network Configurations_
+[cols="Parameter Label","Default Value","Description"]
+|===
+|VPC CIDR
+|10.0.0.0/16
+|CIDR block for the VPC
+
+|Private Subnet 1 CIDR
+|10.0.0.0/19
+|CIDR block for private subnet 1, located in Availability Zone 1
+
+|Private Subnet 2 CIDR
+|10.0.32.0/19
+|CIDR block for private subnet 2, located in Availability Zone 2
+
+|Private Subnet 3 CIDR
+|10.0.64.0/19
+|CIDR block for private subnet 3, located in Availability Zone 3
+
+|Public Subnet 1 CIDR
+|10.0.128.0/20
+|CIDR block for the public (DMZ) subnet 1, located in Availability Zone 1
+
+|Public Subnet 2 CIDR
+|10.0.144.0/20
+|CIDR block for the public (DMZ) subnet 2, located in Availability Zone 2
+
+|Public Subnet 3 CIDR
+|10.0.160.0/20
+|CIDR block for the public (DMZ) subnet 3, located in Availability Zone 3
+|===
+
+_Table 4: Amazon EKS Configurations_
+[cols="Parameter Label","Default Value","Description"]
+|===
+|EkS Cluster Name
+|none
+|The name of the cluster that will be created to contain the TAP deployment
+
+|Number of nodes
+|4
+|The number of nodes that will be the minimum and created for the TAP EKS cluster
+
+|Maximum number of nodes
+|6
+|The maximum number of nodes that will be available in an auto scaling scenario for the TAP EKS cluster
+
+|Instance Type
+|m5.xlarge
+|AWS EC2 instance type for each of the nodes deployed within the EKS cluster for TAP
+
+|Remote access CIDR
+|none
+|IP range that will be allowed to access the Bootstrap EC2 instance and EKS cluster once deployed
+|===
+
+_Table 5: Misc.  Configurations_
+[cols="Parameter Label","Default Value","Description"]
+|===
+|S3TAPConfigBucket
+|none
+|TAP requires an S3 bucket to store encrypted configuration information, this bucket name will be associated with a newly created S3 bucket for that purpose
+
+|TAP Domain Name
+|none
+|Domain name that can be used for access to TAP and its corresponding project URLs. Available within a private DNS Zone
+
+|QSS3BucketName
+|aws-quickstart
+|Name of the S3 bucket for your copy of the Quick Start assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Quick Start location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). See https://aws-quickstart.github.io/option1.html.
+
+|QSS3KeyPrefix
+|quickstart-vmware-tanzu-application-platform/
+|S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. See https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html and https://aws-quickstart.github.io/option1.html.
+
+|QSS3BucketRegion
+|us-east-1
+|AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template. Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. See https://aws-quickstart.github.io/option1.html.
+|===
+
+== Send us feedback
+
+To post feedback, submit feature ideas, or report bugs, use the Issues section of the https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform[GitHub repository] for this Quick Start. To submit code, see the https://aws-quickstart.github.io/[Quick Start Contributor’s Guide].
+
+== GitHub repository
+
+Visit our https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform[GitHub repository] to download the templates and scripts for this Quick Start, to post your comments, and to share your customizations with others.
