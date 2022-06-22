@@ -75,8 +75,6 @@ Metadata:
     ParameterLabels:
       AcceptEULAs:
         default: Accept applicable VMware Tanzu EULAs
-      NumberOfAZs:
-        default: Number of Availability Zones
       KeyPairName:
         default: SSH key name
       VpcId:
@@ -961,9 +959,7 @@ Resources:
                   - secretsmanager:GetSecretValue
                   - secretsmanager:ListSecretVersionIds
                   - secretsmanager:PutSecretValue
-                Resource:
-                  - !Ref TanzuNetSecretCredentials
-                  - !Ref TanzuNetSecretApiToken
+                Resource: !Ref TanzuNetSecretCredentials
               - Sid: ListSecretsAndGetRandomPassword
                 Effect: Allow
                 Action:
