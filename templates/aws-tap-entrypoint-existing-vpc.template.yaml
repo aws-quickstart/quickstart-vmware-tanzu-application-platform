@@ -1164,7 +1164,7 @@ Resources:
             curl -fsSL "https://github.com/docker/docker-credential-helpers/releases/download/v${DockerCredPassVersion}/docker-credential-pass-v${DockerCredPassVersion}-$arch.tar.gz" | tar xz -C .
             mv docker-credential-pass /usr/local/bin/
             popd
-            cat <<EOF >> /root/.docker/config.json
+            cat <<EOF > /root/.docker/config.json
             {
               "credHelpers": {
                 "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com": "ecr-login",
