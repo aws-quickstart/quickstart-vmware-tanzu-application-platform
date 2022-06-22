@@ -24,7 +24,6 @@ Metadata:
       - Label:
           default: Basic configuration
         Parameters:
-          - NumberOfAZs
           - KeyPairName
           - RemoteAccessCidr
       - Label:
@@ -90,10 +89,6 @@ Metadata:
         default: Private subnet 3 ID
       PublicSubnet1Id:
         default: Public subnet 1 ID
-      PublicSubnet2Id:
-        default: Public subnet 2 ID
-      PublicSubnet3Id:
-        default: Public subnet 3 ID
       RemoteAccessCidr:
         default: Remote access CIDR
       BootstrapOS:
@@ -153,35 +148,15 @@ Parameters:
    Description: >-
      Domain name that can be used for access to TAP and its
      corresponding project URLs. Available within a private DNS Zone.
-  NumberOfAZs:
-    Type: String
-    Description: >-
-      Number of Availability Zones to use in the VPC. This must match the value
-      entered for the AvailabilityZones parameter.
-    AllowedValues: [2, 3]
-    Default: 3
   VpcId:
     Type: AWS::EC2::VPC::Id
     Description: >-
       ID of your existing VPC (eg: vpc-0343606e).
   PublicSubnet1Id:
-    Type: String
+    Type: AWS::EC2::Subnet::Id
     Description: >-
       ID of the public subnet in Availability Zone 1 of your existing VPC
       (eg: subnet-a0246dcd).
-    Default: ''
-  PublicSubnet2Id:
-    Type: String
-    Description: >-
-      ID of the public subnet in Availability Zone 2 of your existing VPC
-      (eg: subnet-b1236eea).
-    Default: ''
-  PublicSubnet3Id:
-    Type: String
-    Description: >-
-      ID of the public subnet in Availability Zone 3 of your existing VPC
-      (eg: subnet-c3456aba).
-    Default: ''
   PrivateSubnet1Id:
     Type: AWS::EC2::Subnet::Id
     Description: >-
@@ -197,6 +172,8 @@ Parameters:
     Description: >-
       ID of the private subnet in Availability Zone 3 of your existing VPC
       (eg: subnet-abd39039).
+    AllowedPattern: ^(subnet-([0-9a-f]{8}|[0-9a-f]{17})|)$
+    ConstraintDescription: Must be a valid VPC subnet ID or blank.
     Default: ''
   KeyPairName:
     Type: AWS::EC2::KeyPair::KeyName
@@ -452,8 +429,9 @@ Parameters:
   RemoteAccessCidr:
     Type: String
     Description: >-
-      IP range that will be allowed to access the Bootstrap EC2 instance and
-      EKS cluster once deployed.
+      IPv4 CIDR block that will be permitted to connect to the Windows and
+      Linux bastion hosts. We recommend that you set this value to a trusted
+      network.
   BootstrapOS:
     Type: String
     Description: >-
@@ -695,10 +673,7 @@ Mappings:
               ref:
                 branch: main
 Conditions:
-  3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
-  2AZDeployment: !Or
-    - !Equals [!Ref NumberOfAZs, 2]
-    - !Equals [!Ref NumberOfAZs, 3]
+  3AZDeployment: !Not [!Equals [!Ref PrivateSubnet3Id, '']]
   Ubuntu: !Equals [!FindInMap [AwsAmiNameMap, !Ref BootstrapOS, OS], Ubuntu]
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
 Resources:
@@ -799,25 +774,13 @@ Resources:
         ConfigSetName: !Ref AWS::StackName
         VPCID: !Ref VpcId
         PrivateSubnet1ID: !Ref PrivateSubnet1Id
-        PrivateSubnet2ID: !If
-          - 2AZDeployment
-          - !Ref PrivateSubnet2Id
-          - !Ref AWS::NoValue
+        PrivateSubnet2ID: !Ref PrivateSubnet2Id
         PrivateSubnet3ID: !If
           - 3AZDeployment
           - !Ref PrivateSubnet3Id
           - !Ref AWS::NoValue
-        PublicSubnet1ID: !Ref PublicSubnet1Id
-        PublicSubnet2ID: !If
-          - 2AZDeployment
-          - !Ref PublicSubnet2Id
-          - !Ref AWS::NoValue
-        PublicSubnet3ID: !If
-          - 3AZDeployment
-          - !Ref PublicSubnet3Id
-          - !Ref AWS::NoValue
         RemoteAccessCIDR: !Ref RemoteAccessCidr
-        EKSPublicAccessEndpoint: Enabled
+        EKSPublicAccessEndpoint: Disabled
         AdditionalEKSAdminRoleArn: !GetAtt BootstrapIamRole.Arn
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes

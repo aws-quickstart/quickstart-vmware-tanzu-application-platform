@@ -474,8 +474,8 @@ Parameters:
   RemoteAccessCidr:
     Type: String
     Description: >-
-      IP range that will be allowed to access the Bootstrap EC2 instance and
-      EKS cluster once deployed.
+      IPv4 CIDR block that will be allowed to access the Windows and Linux
+      bastion hosts.
   BootstrapOS:
     Type: String
     Description: >-
@@ -586,9 +586,6 @@ Rules:
           https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
 Conditions:
   3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
-  2AZDeployment: !Or
-    - !Equals [!Ref NumberOfAZs, 2]
-    - !Equals [!Ref NumberOfAZs, 3]
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
 Resources:
   VPCStack:
@@ -622,23 +619,12 @@ Resources:
         AcceptEULAs: !Ref AcceptEULAs
         VpcId: !GetAtt VPCStack.Outputs.VPCID
         PrivateSubnet1Id: !GetAtt VPCStack.Outputs.PrivateSubnet1AID
-        PrivateSubnet2Id: !If
-          - 2AZDeployment
-          - !GetAtt VPCStack.Outputs.PrivateSubnet2AID
-          - !Ref AWS::NoValue
+        PrivateSubnet2Id: !GetAtt VPCStack.Outputs.PrivateSubnet2AID
         PrivateSubnet3Id: !If
           - 3AZDeployment
           - !GetAtt VPCStack.Outputs.PrivateSubnet3AID
           - !Ref AWS::NoValue
         PublicSubnet1Id: !GetAtt VPCStack.Outputs.PublicSubnet1ID
-        PublicSubnet2Id: !If
-          - 2AZDeployment
-          - !GetAtt VPCStack.Outputs.PublicSubnet2ID
-          - !Ref AWS::NoValue
-        PublicSubnet3Id: !If
-          - 3AZDeployment
-          - !GetAtt VPCStack.Outputs.PublicSubnet3ID
-          - !Ref AWS::NoValue
         RemoteAccessCidr: !Ref RemoteAccessCidr
         BootstrapOS: !Ref BootstrapOS
         BootstrapSshPort: !Ref BootstrapSshPort
