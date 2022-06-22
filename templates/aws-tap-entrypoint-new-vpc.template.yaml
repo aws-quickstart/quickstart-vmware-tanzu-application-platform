@@ -565,8 +565,14 @@ Parameters:
       Quick Start location. When using your own bucket, specify the Region.
       See https://aws-quickstart.github.io/option1.html.
     Default: us-east-1
+Mappings:
+  AwsAmiNameMap:
+    Ubuntu-Server-22.04-LTS-HVM:
+      Code: US2204HVM
+      OS: Ubuntu
 Conditions:
   3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
+  Ubuntu: !Equals [!FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, OS], Ubuntu]
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
 Resources:
   VPCStack:
@@ -625,6 +631,53 @@ Resources:
         QSS3BucketName: !Ref QSS3BucketName
         QSS3BucketRegion: !Ref QSS3BucketRegion
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
+Outputs:
+  LinuxBastionEIP:
+    Description: >-
+      The public IP address of the Linux bastion host / bootstrap instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.LinuxBastionEIP
+  UbuntuBastionAZ:
+    Condition: Ubuntu
+    Description: >-
+      The Availability Zone that the Ubuntu bastion host / bootstrap instance
+      is deployed in.
+    Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionAZ
+  UbuntuBastionId:
+    Condition: Ubuntu
+    Description: >-
+      The EC2 instance ID of the Ubuntu bastion host / bootstrap instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionId
+  UbuntuBastionPublicDnsName:
+    Condition: Ubuntu
+    Description: >-
+      The public DNS name of the Ubuntu bastion host / bootstrap instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionPublicDnsName
+  EKSClusterName:
+    Description: The Amazon EKS cluster name.
+    Value: !GetAtt ExistingVpcStack.Outputs.EKSClusterName
+  TAPGuiUrl:
+    Description: >-
+      The URL of the VMware Tanzu Application Platform GUI that is accessible
+      from within the VPC, such as the Windows bastion instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.TAPGuiUrl
+  TAPWorkloadUrl:
+    Description: >-
+      The URL of the VMware Tanzu Application Platform sample workload that is
+      accessible from within the VPC, such as the Windows bastion instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.TAPWorkloadUrl
+  WindowsBastionAZ:
+    Description: >-
+      The Availability Zone that the Windows bastion instance is deployed in.
+    Value: !GetAtt ExistingVpcStack.Outputs.WindowsBastionAZ
+  WindowsBastionId:
+    Description: The instance ID of the Windows bastion instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.WindowsBastionId
+  WindowsBastionEIP:
+    Description: The public IP address of the Windows bastion instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.WindowsBastionEIP
+  WindowsBastionPublicDnsName:
+    Description: The public DNS name of the Windows bastion instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.WindowsBastionPublicDnsName
 Rules:
   AcceptEULAs:
     Assertions:

@@ -1368,6 +1368,57 @@ Resources:
     Properties:
       InstanceId: !Ref WindowsBastion
       AllocationId: !GetAtt WindowsBastionEIP.AllocationId
+Outputs:
+  LinuxBastionEIP:
+    Description: >-
+      The public IP address of the Linux bastion host / bootstrap instance.
+    Value: !Ref LinuxBastionEIP
+  UbuntuBastionAZ:
+    Condition: Ubuntu
+    Description: >-
+      The Availability Zone that the Ubuntu bastion host / bootstrap instance
+      is deployed in.
+    Value: !GetAtt UbuntuBastion.AvailabilityZone
+  UbuntuBastionId:
+    Condition: Ubuntu
+    Description: >-
+      The EC2 instance ID of the Ubuntu bastion host / bootstrap instance.
+    Value: !Ref UbuntuBastion
+  UbuntuBastionPublicDnsName:
+    Condition: Ubuntu
+    Description: >-
+      The public DNS name of the Ubuntu bastion host / bootstrap instance.
+    Value: !GetAtt UbuntuBastion.PublicDnsName
+  UbuntuBastionUserDataLog:
+
+  EKSClusterName:
+    Description: The Amazon EKS cluster name.
+    Value: !GetAtt EKSQSStack.Outputs.EKSClusterName
+  TAPGuiUrl:
+    Description: >-
+      The URL of the VMware Tanzu Application Platform GUI that is accessible
+      from within the VPC, such as the Windows bastion instance.
+    Value: !Sub http://tap-gui.${TAPDomainName}
+  TAPWorkloadUrl:
+    Description: >-
+      The URL of the VMware Tanzu Application Platform sample workload that is
+      accessible from within the VPC, such as the Windows bastion instance.
+    Value: !Sub
+      - http://${SampleAppName}.${Namespace}.${TAPDomainName}
+      - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
+  WindowsBastionAZ:
+    Description: >-
+      The Availability Zone that the Windows bastion instance is deployed in.
+    Value: !GetAtt WindowsBastion.AvailabilityZone
+  WindowsBastionId:
+    Description: The instance ID of the Windows bastion instance.
+    Value: !Ref WindowsBastion
+  WindowsBastionEIP:
+    Description: The public IP address of the Windows bastion instance.
+    Value: !Ref WindowsBastionEIP
+  WindowsBastionPublicDnsName:
+    Description: The public DNS name of the Windows bastion instance.
+    Value: !GetAtt WindowsBastion.PublicDnsName
 Rules:
   AcceptEULAs:
     Assertions:
