@@ -669,8 +669,10 @@ Resources:
         }
   TAPPackagesRepo:
     Type: AWS::ECR::Repository
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
+    # TODO: Flip back to delete if/when possible for CloudFormation to delete
+    # ECR repos with images.
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
     Properties:
       RepositoryName: !Sub
         - '${StackId}/tanzu-application-platform/tap-packages'
@@ -679,24 +681,24 @@ Resources:
         EncryptionType: AES256
   TAPClusterEssentialsBundleRepo:
     Type: AWS::ECR::Repository
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
     Properties:
       RepositoryName: !Sub
         - '${StackId}/tanzu-cluster-essentials/bundle'
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
   TAPBuildServiceRepo:
     Type: AWS::ECR::Repository
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
     Properties:
       RepositoryName: !Sub
         - '${StackId}/tap-build-service'
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
   TAPWorkloadRepo:
     Type: AWS::ECR::Repository
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
     Properties:
       RepositoryName: !Sub
         - '${StackId}/${Prefix}/${Suffix}'
@@ -707,8 +709,8 @@ Resources:
             - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
   TAPWorkloadBundleRepo:
     Type: AWS::ECR::Repository
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
     Properties:
       RepositoryName: !Sub
         - '${StackId}/${Prefix}/${Suffix}-bundle'
