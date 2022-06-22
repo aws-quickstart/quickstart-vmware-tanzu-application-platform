@@ -819,6 +819,8 @@ Resources:
             bootstrap instance security group.
   LinuxBastionSshIngressRule:
     Type: AWS::EC2::SecurityGroupIngress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       Description: Allow SSH to the Linux bastion host / bootstrap instance.
       GroupId: !Ref LinuxBastionSecurityGroup
@@ -828,6 +830,8 @@ Resources:
       CidrIp: !Ref RemoteAccessCidr
   LinuxBastionDefaultEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       Description: Allow all egress.
       GroupId: !Ref LinuxBastionSecurityGroup
@@ -837,6 +841,8 @@ Resources:
       CidrIp: 0.0.0.0/0
   LinuxBastionSshToNodesEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       Description: >-
         Allow SSH from the Linux bastion host / bootstrap instance to the EKS
@@ -848,6 +854,8 @@ Resources:
       DestinationSecurityGroupId: !GetAtt EKSQSStack.Outputs.NodeGroupSecurityGroup
   NodesSshIngressRule:
     Type: AWS::EC2::SecurityGroupIngress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       Description: >-
         Allow SSH from the Linux bastion host / bootstrap instance to the EKS
@@ -859,6 +867,8 @@ Resources:
       SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
   LinuxBastionK8sToApiEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       Description: >-
         Allow the Linux bastion host / bootstrap instance to connect to the EKS
@@ -870,6 +880,8 @@ Resources:
       DestinationSecurityGroupId: !GetAtt EKSQSStack.Outputs.ControlPlaneSecurityGroup
   EKSControlPlaneApiIngressRule:
     Type: AWS::EC2::SecurityGroupIngress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       Description: >-
         Allow the Linux bastion host / bootstrap instance to connect to the EKS
