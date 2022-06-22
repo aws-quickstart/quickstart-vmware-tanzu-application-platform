@@ -13,6 +13,10 @@ After you successfully deploy this Quick Start, confirm that your resources and 
 _Table 1: Tanzu Network Parameters_
 [cols="Parameter Label","Default Value","Description"]
 |===
+|AcceptEULAs
+|none
+|Yes/No whether the required EULAs have been read and accepted before TAP is installed
+
 |Tanzu Net Username
 |none
 |The VMware Tanzu Net Username (authentication ID or email address)

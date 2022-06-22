@@ -16,6 +16,8 @@ Your AWS account is automatically signed up for all AWS services. You are charge
 
 Before you launch the Quick Start, review the following information and ensure that your account is properly configured. Otherwise, deployment might fail.
 
+*IMPORTANT:* An AWS SSH Key will need to be created before starting the deployment of this Quick Start as it is a required resources for the deployment to succeed.
+
 ==== Resource quotas
 
 If necessary, request https://console.aws.amazon.com/servicequotas/home?region=us-east-2#!/[service quota increases] for the following resources. You might need to request increases if your existing deployment currently uses these resources and if this Quick Start deployment could result in exceeding the default quotas. The https://console.aws.amazon.com/servicequotas/home?region=us-east-2#!/[Service Quotas console] displays your usage and quotas for some aspects of some services. For more information, see https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html[What is Service Quotas?] and https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html[AWS service quotas].
@@ -106,7 +108,3 @@ Before installing packages, you must accept the End User License Agreements (EUL
 
 * https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/#/releases/1011100[Cluster Essentials for VMware Tanzu]
 * https://network.tanzu.vmware.com/products/tanzu-application-platform/[Tanzu Application Platform]
-* https://network.tanzu.vmware.com/products/build-service/[Tanzu Build Service] and its associated components:
-** https://network.tanzu.vmware.com/products/tbs-dependencies/[Tanzu Build Service Dependencies]
-** https://network.tanzu.vmware.com/products/tanzu-buildpacks-suite[Buildpacks for VMware Tanzu]
-** https://network.tanzu.vmware.com/products/tanzu-stacks-suite[Stacks for VMware Tanzu]

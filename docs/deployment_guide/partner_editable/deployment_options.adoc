@@ -4,7 +4,7 @@
 
 1. Sign in to your AWS account at https://aws.amazon.com with an IAM user role that has the necessary permissions. For details, see Planning the deployment, earlier in this guide.
 
-2. Ensure that your AWS account is configured correctly, as discussed in the https://aws-quickstart.github.io/quickstart-databricks-unified-data-analytics-platform/#_technical_requirements[Technical requirements] section.
+2. Ensure that your AWS account is configured correctly, as discussed in the https://aws-quickstart.github.io/quickstart-vmware-tanzu-application-platform/#_technical_requirements[Technical requirements] section.
 
 == Launch the Quick Start
 
