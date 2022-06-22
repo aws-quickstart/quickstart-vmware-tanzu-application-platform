@@ -34,8 +34,6 @@ Metadata:
           - PrivateSubnet2Id
           - PrivateSubnet3Id
           - PublicSubnet1Id
-          - PublicSubnet2Id
-          - PublicSubnet3Id
       - Label:
           default: Amazon EKS configuration
         Parameters:
