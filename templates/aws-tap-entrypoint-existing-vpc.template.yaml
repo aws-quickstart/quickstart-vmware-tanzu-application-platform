@@ -1034,7 +1034,6 @@ Resources:
             arch=$(dpkg --print-architecture)
             uname=$(uname -s)
             tap_dir=/home/$user/tap-setup-scripts
-            tap_install_complete_filename=tap-install-complete
             cat <<EOF >> /etc/environment
             AWS_REGION=${AWS::Region}
             AWS_DEFAULT_REGION=${AWS::Region}
