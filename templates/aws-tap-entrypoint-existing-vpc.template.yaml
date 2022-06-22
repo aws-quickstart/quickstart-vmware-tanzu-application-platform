@@ -26,6 +26,7 @@ Metadata:
         Parameters:
           - NumberOfAZs
           - KeyPairName
+          - RemoteAccessCidr
       - Label:
           default: VPC network configuration
         Parameters:
@@ -45,7 +46,6 @@ Metadata:
           - NodeVolumeSize
           - NumberOfNodes
           - MaxNumberOfNodes
-          - RemoteAccessCidr
       - Label:
           default: VMware Tanzu Net configuration
         Parameters:
