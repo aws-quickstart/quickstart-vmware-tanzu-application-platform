@@ -565,26 +565,6 @@ Parameters:
       Quick Start location. When using your own bucket, specify the Region.
       See https://aws-quickstart.github.io/option1.html.
     Default: us-east-1
-Rules:
-  AcceptEULAsRule:
-    Assertions:
-      - Assert: !Equals [!Ref AcceptEULAs, 'Yes']
-        AssertDescription: >-
-          You must agree to all of the applicable VMware Tanzu Network
-          end-user license agreements (EULAs) before proceeding.
-  TAPVersionRule:
-    Assertions:
-      - Assert: !Or
-        - !And
-          - !Equals [!Ref TAPVersion, 1.1.0]
-          - !Contains [[1.21, 1.22, 1.23], !Ref KubernetesVersion]
-        - !And
-          - !Equals [!Ref TAPVersion, 1.1.1]
-          - !Contains [[1.21, 1.22, 1.23], !Ref KubernetesVersion]
-        AssertDescription: >-
-          The VMware Tanzu Application Platform version selection is
-          incompatible with the Kubernetes version selection (reference:
-          https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
 Conditions:
   3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
@@ -645,3 +625,19 @@ Resources:
         QSS3BucketName: !Ref QSS3BucketName
         QSS3BucketRegion: !Ref QSS3BucketRegion
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
+Rules:
+  AcceptEULAs:
+    Assertions:
+      - Assert: !Equals [!Ref AcceptEULAs, 'Yes']
+        AssertDescription: >-
+          You must agree to all of the applicable VMware Tanzu Network
+          end-user license agreements (EULAs) before proceeding.
+  TAP1.1Interop:
+    RuleCondition: !Contains [[1.1.0, 1.1.1], !Ref TAPVersion]
+    Assertions:
+      # The values below require quotes to force string comparison.
+      - Assert: !Contains [['1.21', '1.22', '1.23'], !Ref KubernetesVersion]
+        AssertDescription: >-
+          The VMware Tanzu Application Platform version selection is
+          incompatible with the Kubernetes version selection (reference:
+          https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
