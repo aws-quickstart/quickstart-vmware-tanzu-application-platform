@@ -172,6 +172,22 @@ function readUserInputs {
   TANZUNET_REGISTRY_PASSWORD=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .password)
   PIVNET_TOKEN=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .token)
 
+  TANZUNET_REGISTRY_SERVER=$(yq -r .tanzunet.server $INPUTS/user-input-values.yaml)
+
+  ESSENTIALS_BUNDLE=$(yq -r .cluster_essentials_bundle.bundle $INPUTS/user-input-values.yaml)
+  ESSENTIALS_FILE_HASH=$(yq -r .cluster_essentials_bundle.file_hash $INPUTS/user-input-values.yaml)
+  ESSENTIALS_VERSION=$(yq -r .cluster_essentials_bundle.version $INPUTS/user-input-values.yaml)
+  ESSENTIALS_FILE_ID=$(yq -r .cluster_essentials_bundle.file_id $INPUTS/user-input-values.yaml)
+
+  ESSENTIALS_URI="$ESSENTIALS_BUNDLE@$ESSENTIALS_FILE_HASH"
+
+  TAP_PACKAGE_NAME=$(yq -r .tap.name $INPUTS/user-input-values.yaml)
+  TAP_NAMESPACE=$(yq -r .tap.namespace $INPUTS/user-input-values.yaml)
+  TAP_REPOSITORY=$(yq -r .tap.repository $INPUTS/user-input-values.yaml)
+  TAP_VERSION=$(yq -r .tap.version $INPUTS/user-input-values.yaml)
+
+  TAP_URI="$TAP_REPOSITORY:$TAP_VERSION"
+
   TAP_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.tap_packages $INPUTS/user-input-values.yaml)
   ESSENTIALS_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.cluster_essentials $INPUTS/user-input-values.yaml)
   TBS_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.build_service $INPUTS/user-input-values.yaml)
@@ -180,26 +196,6 @@ function readUserInputs {
   DEVELOPER_NAMESPACE=$(yq -r .repositories.workload.namespace $INPUTS/user-input-values.yaml)
   SAMPLE_APP_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.workload.repository $INPUTS/user-input-values.yaml)
   SAMPLE_APP_BUNDLE_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.workload.bundle_repository $INPUTS/user-input-values.yaml)
-}
-
-function readTAPInternalValues {
-  banner "Reading $INPUTS/tap-config-internal-values.yaml"
-
-  TANZUNET_REGISTRY_SERVER=$(yq -r .tanzunet.server $INPUTS/tap-config-internal-values.yaml)
-
-  ESSENTIALS_BUNDLE=$(yq -r .cluster_essentials_bundle.bundle $INPUTS/tap-config-internal-values.yaml)
-  ESSENTIALS_FILE_HASH=$(yq -r .cluster_essentials_bundle.file_hash $INPUTS/tap-config-internal-values.yaml)
-  ESSENTIALS_VERSION=$(yq -r .cluster_essentials_bundle.version $INPUTS/tap-config-internal-values.yaml)
-  ESSENTIALS_FILE_ID=$(yq -r .cluster_essentials_bundle.file_id $INPUTS/tap-config-internal-values.yaml)
-
-  ESSENTIALS_URI="$ESSENTIALS_BUNDLE@$ESSENTIALS_FILE_HASH"
-
-  TAP_PACKAGE_NAME=$(yq -r .tap.name $INPUTS/tap-config-internal-values.yaml)
-  TAP_NAMESPACE=$(yq -r .tap.namespace $INPUTS/tap-config-internal-values.yaml)
-  TAP_REPOSITORY=$(yq -r .tap.repository $INPUTS/tap-config-internal-values.yaml)
-  TAP_VERSION=$(yq -r .tap.version $INPUTS/tap-config-internal-values.yaml)
-
-  TAP_URI="$TAP_REPOSITORY:$TAP_VERSION"
 }
 
 function parseUserInputs {
@@ -215,7 +211,7 @@ function parseUserInputs {
   rm -rf $GENERATED
   mkdir -p $GENERATED
 
-  cat $INPUTS/tap-config-internal-values.yaml $INPUTS/user-input-values.yaml > $GENERATED/user-input-values.yaml
+  cat $INPUTS/user-input-values.yaml > $GENERATED/user-input-values.yaml
 
   banner "Generating tap-values.yaml"
 

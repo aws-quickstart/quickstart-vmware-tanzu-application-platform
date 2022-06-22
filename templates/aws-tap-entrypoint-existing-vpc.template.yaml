@@ -1194,11 +1194,13 @@ Resources:
             popd
             pushd "$tap_dir/src/inputs"
             aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values.yaml" ./tap-values.yaml
-            cat <<EOF > ./tap-config-internal-values.yaml
+            cat <<EOF > ./user-input-values.yaml
             #@data/values
             ---
             tanzunet:
               server: ${TanzuNetRegistryServer}
+              secrets:
+                credentials_arn: ${TanzuNetSecretCredentials}
             cluster_essentials_bundle:
               bundle: ${ClusterEssentialsBundleRepo}
               file_hash: ${ClusterEssentialsBundleFileHash}
@@ -1209,11 +1211,6 @@ Resources:
               namespace: tap-install
               repository: ${TAPRepo}
               version: ${TAPVersion}
-            EOF
-            cat <<EOF > ./user-input-values.yaml
-            tanzunet_secrets:
-              credentials_arn: ${TanzuNetSecretCredentials}
-              api_token_arn: ${TanzuNetSecretApiToken}
             cluster:
               name: ${EKSQSStack.Outputs.EKSClusterName}
             dns:
