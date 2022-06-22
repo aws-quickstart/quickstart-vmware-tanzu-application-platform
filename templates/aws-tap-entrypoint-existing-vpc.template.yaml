@@ -1227,7 +1227,6 @@ Resources:
             aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/git-ssh-basic-auth.yaml" ./git-ssh-basic-auth.yaml
             aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/pipeline.yaml" ./pipeline.yaml
             aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/scan-policy.yaml" ./scan-policy.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/workload-aws.yaml" ./workload-aws.yaml
             cat <<EOF > ./workload-aws.yaml
             ${SampleAppConfig}
             EOF
