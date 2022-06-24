@@ -2,10 +2,6 @@
 
 For troubleshooting common Quick Start issues, refer to the https://fwd.aws/rA69w?[AWS Quick Start General Information Guide^] and https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html[Troubleshooting CloudFormation^].
 
-== TAP GUI Connectivity (optional)
-
-In order to validate and verify connectivity to the Tanzu Application Platform, a Windows based Bastion VM has been deployed into one of the Public Subnets. This VM can be used to access the URL provided within the Outputs tab after the Cloud Formation deployment is complete. The TAP GUI is not available via a public URL, but you can certainly connect a VPC or Direct Connect to the newly created VPC to allow for direct access from your enterprise network. 
-
 *Troubleshooting {partner-product-name} documentation*
 
 * https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html[Troubleshoot installing {partner-product-short-name}]

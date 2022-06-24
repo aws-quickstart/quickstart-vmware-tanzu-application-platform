@@ -137,3 +137,14 @@ The following values should be available to use from the *Outputs* tab:
 |AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template. Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. See https://aws-quickstart.github.io/option1.html.
 |===
 
+== Postdeployment steps
+
+After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured — including any required patches — to meet your security and other needs.
+For more information, see the https://aws.amazon.com/compliance/shared-responsibility-model/[AWS Shared Responsibility Model].
+
+=== Access the GUI
+
+The {partner-product-name} website graphical user interface (GUI) can be accessed via the Amazon EC2 Windows bastion host instance that is deployed into one of the public subnets.
+Retrieve the password for the Windows bastion host instance using https://aws.amazon.com/premiumsupport/knowledge-center/retrieve-windows-admin-password/[this guide], and then connect to it using https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/connecting_to_windows_instance.html[this guide].
+The Windows bastion host is intended for users to access the {partner-product-short-name} URL provided within the Outputs tab of the CloudFormation deployment, once the {partner-product-short-name} installation is complete.
+The {partner-product-name} GUI is not available via a public URL, but you can connect a Site to Site VPN or AWS Direct Connect to the VPC to allow for direct access from your enterprise network.
