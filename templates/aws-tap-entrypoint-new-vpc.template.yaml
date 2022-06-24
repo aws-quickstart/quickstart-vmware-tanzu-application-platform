@@ -25,6 +25,7 @@ Metadata:
           default: VMware Tanzu Network configuration
         Parameters:
           - AcceptEULAs
+          - AcceptCEIP
           - TanzuNetUsername
           - TanzuNetPassword
           - TanzuNetApiToken
@@ -77,6 +78,8 @@ Metadata:
     ParameterLabels:
       AcceptEULAs:
         default: Have all VMware Tanzu EULAs been accepted?
+      AcceptCEIP:
+        default: Have you read and accept the VMware CEIP policy?
       AvailabilityZones:
         default: Availability Zones
       NumberOfAZs:
@@ -147,6 +150,16 @@ Parameters:
       6/ Stacks for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-stacks-suite.
       TAP will fail to install successfully if the listed EULAs have not been
       accepted for the specified VMware Tanzu Network user account.
+    AllowedValues:
+      - 'Yes'
+      - 'No'
+    Default: 'No'
+  AcceptCEIP:
+    Type: String
+    Description: >-
+      Choose 'Yes' if you have read and accept the VMware customer experience
+      improvement program (CEIP) policy
+      (https://www.vmware.com/solutions/trustvmware/ceip.html).
     AllowedValues:
       - 'Yes'
       - 'No'
@@ -604,6 +617,7 @@ Resources:
           S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
       Parameters:
         AcceptEULAs: !Ref AcceptEULAs
+        AcceptCEIP: !Ref AcceptCEIP
         VpcId: !GetAtt VPCStack.Outputs.VPCID
         PrivateSubnet1Id: !GetAtt VPCStack.Outputs.PrivateSubnet1AID
         PrivateSubnet2Id: !GetAtt VPCStack.Outputs.PrivateSubnet2AID
@@ -685,6 +699,13 @@ Rules:
         AssertDescription: >-
           You must agree to all of the applicable VMware Tanzu Network
           end-user license agreements (EULAs) before proceeding.
+  AcceptCEIP:
+    Assertions:
+      - Assert: !Equals [!Ref AcceptCEIP, 'Yes']
+        AssertDescription: >-
+          You must acknowledge that you have read and accept the VMware
+          Customer Experience Improvement Program (CEIP) policy before you can
+          proceed with the installation.
   TAP1.1Interop:
     RuleCondition: !Contains [[1.1.0, 1.1.1], !Ref TAPVersion]
     Assertions:

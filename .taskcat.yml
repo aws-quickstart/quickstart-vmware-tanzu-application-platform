@@ -5,6 +5,7 @@ project:
   template: templates/aws-tap-entrypoint-new-vpc.template.yaml
   parameters:
     AcceptEULAs: --override--
+    AcceptCEIP: --override--
     AvailabilityZones: $[taskcat_genaz_3]
     NumberOfAZs: 3
     KeyPairName: --override--
@@ -24,4 +25,4 @@ project:
 tests:
   default:
     regions:
-      - us-east-1
+      - us-west-2
