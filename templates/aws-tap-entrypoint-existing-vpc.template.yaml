@@ -532,72 +532,71 @@ Parameters:
     Default: us-east-1
 Mappings:
   AwsAmiRegionMap:
-    # Ubuntu Server lookup: https://cloud-images.ubuntu.com/locator/ec2/
     af-south-1:
-      US2204HVM: ami-08a1ff0efd6690ede
+      US2204HVM: ami-04f0408f494c0c285
       WS2022FullBase: ami-0bc997f7008192f44
     ap-east-1:
-      US2204HVM: ami-0c5b035581d9859b0
+      US2204HVM: ami-006e830ecf3449b97
       WS2022FullBase: ami-0c87318b66586dbdf
     ap-northeast-1:
-      US2204HVM: ami-055bb115702a738f5
+      US2204HVM: ami-0a054d6fbb2cc67ee
       WS2022FullBase: ami-045926cadb8870a49
     ap-northeast-2:
-      US2204HVM: ami-05b9c9c0fe2f5a62c
+      US2204HVM: ami-0818e9b70ba516e4c
       WS2022FullBase: ami-09e81229b42b8bce2
     ap-northeast-3:
-      US2204HVM: ami-0b3874967694fae86
+      US2204HVM: ami-069f7cc82ef9ffee0
       WS2022FullBase: ami-0760c9db34f185b18
     ap-south-1:
-      US2204HVM: ami-00d095fb90db2fa00
+      US2204HVM: ami-0c1d7eb198a14f4b7
       WS2022FullBase: ami-0ecc68457948da1bc
     ap-southeast-1:
-      US2204HVM: ami-00c76c78e78a3dcd4
+      US2204HVM: ami-07dd115509093305a
       WS2022FullBase: ami-0517d4980cf75758a
     ap-southeast-2:
-      US2204HVM: ami-0251cb389d14767a2
+      US2204HVM: ami-07cba5a9c6484ecc6
       WS2022FullBase: ami-0066d7383237ba80b
     ap-southeast-3:
       US2204HVM: ami-0de46ab389596d621
-      WS2022FullBase: ami-068795edd0f6d9709
+      WS2022FullBase: ami-080c8096bf5726733
     ca-central-1:
       US2204HVM: ami-0204f3c59456ea9a1
-      WS2022FullBase: ami-01391a075996d6ef5
-    # cn-north-1:
-    #   US2204HVM:
-    #   WS2022FullBase: ami-0c59d32872af42389
-    # cn-northwest-1:
-    #   US2204HVM:
-    #   WS2022FullBase: ami-0e0d3d43301d7fa6e
+      WS2022FullBase: ami-031c78e49d3c474aa
+    cn-north-1:
+      US2204HVM: ami-0a5b1cd4564f86427
+      WS2022FullBase: ami-0c59d32872af42389
+    cn-northwest-1:
+      US2204HVM: ami-09fcf3b4295bfce3a
+      WS2022FullBase: ami-0e0d3d43301d7fa6e
     eu-central-1:
-      US2204HVM: ami-04aa66cdfe687d427
+      US2204HVM: ami-0d06de6bae4839627
       WS2022FullBase: ami-081728af240ed77f2
     eu-north-1:
-      US2204HVM: ami-0dbac3c76b4ead6c5
+      US2204HVM: ami-086a5679c50b4ff6f
       WS2022FullBase: ami-037c67c58ad5a39b8
     eu-south-1:
-      US2204HVM: ami-0fe7a5523599f4c08
+      US2204HVM: ami-00806d185ec911bf1
       WS2022FullBase: ami-01687f6d4ba94e20d
     eu-west-1:
-      US2204HVM: ami-07bd2fc45c8a8dd48
+      US2204HVM: ami-0c0aa81a5fab62093
       WS2022FullBase: ami-00c920ab6ef8925b9
     eu-west-2:
-      US2204HVM: ami-033c8ef001424a6d3
+      US2204HVM: ami-0510e632102e49c91
       WS2022FullBase: ami-0727ea5edebc000a0
     eu-west-3:
-      US2204HVM: ami-00e43f192e8c59874
+      US2204HVM: ami-0c29d914e1049d227
       WS2022FullBase: ami-04163e35519631bc7
     me-south-1:
-      US2204HVM: ami-0d49942d3daf970df
+      US2204HVM: ami-02065623a94764b7c
       WS2022FullBase: ami-0079bcec052a1b365
     sa-east-1:
-      US2204HVM: ami-0b54d646bcf381a79
+      US2204HVM: ami-0c8ba8486b94b44c3
       WS2022FullBase: ami-024a4831aa3511f47
     us-east-1:
-      US2204HVM: ami-09db26f1ef0a9f406
+      US2204HVM: ami-0f65ab0fd913bc7be
       WS2022FullBase: ami-0e1a729017e59e409
     us-east-2:
-      US2204HVM: ami-07a683b72d6bd7da3
+      US2204HVM: ami-079b3f6abda6a6372
       WS2022FullBase: ami-094a92978724fc94c
     us-gov-east-1:
       US2204HVM: ami-08fcbec75b43330b7
@@ -606,18 +605,22 @@ Mappings:
       US2204HVM: ami-04e77113f128920b2
       WS2022FullBase: ami-0cc7aa87fbd1c3837
     us-west-1:
-      US2204HVM: ami-09596c63850a1bd49
+      US2204HVM: ami-08daca4640726cc73
       WS2022FullBase: ami-0397c20f71a12873b
     us-west-2:
-      US2204HVM: ami-0437ae8a23be4e98b
+      US2204HVM: ami-0c21533018816e490
       WS2022FullBase: ami-0280d580c37d161bf
   AwsAmiNameMap:
     Ubuntu-Server-22.04-LTS-HVM:
+    # Official AMI names are:
+    # Commercial: 'ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20220616'
+    # GovCloud: 'ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20220420'
+    # Greater China Region: 'ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20220604'
+    # Alternative: Ubuntu Server lookup: https://cloud-images.ubuntu.com/locator/ec2/
       Code: US2204HVM
       OS: Ubuntu
     Windows-Server-2022-English-Full-Base-2022.06.15:
-    # Official AMI name is 'Windows_Server-2022-English-Full-Base-2022.06.15',
-    # but underscores are not supported in CloudFormation mapping keys.
+    # Official AMI name is 'Windows_Server-2022-English-Full-Base-2022.06.15'
       Code: WS2022FullBase
       OS: Windows
   TanzuNetRegistryServer:
