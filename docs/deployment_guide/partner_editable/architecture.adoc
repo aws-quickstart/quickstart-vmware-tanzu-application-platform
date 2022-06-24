@@ -11,7 +11,7 @@ image::../docs/deployment_guide/images/architecture_diagram.png[Architecture]
 
 As shown in <<architecture1>>, this Quick Start sets up the following:
 
-* A highly available architecture that spans two or more Availability Zones.
+* A highly available architecture that spans either two or three Availability Zones.
 * A virtual private cloud (VPC) configured with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS.
 * In the public subnets:
 ** Managed network address translation (NAT) gateways to allow outbound internet access for resources in the private subnets.
