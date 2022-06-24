@@ -59,37 +59,30 @@ One of the requirements for this Quick Start is a {partner-registry} account wit
 If you do not already have a valid {partner-registry} login, then you can start by going https://network.pivotal.io/[here].
 Once on this web page, you will need to perform the following steps:
 
-. Click on "Sign In" link in the top right corner
+. Click on "Sign In" link in the top right corner. +
+// NOTE: The ' +' at the end of the ordered list item above adds a hard line break so that the image is not rendered inline with the text
+  image:../docs/deployment_guide/images/TanzuNetLogin.png[{partner-registry} sign in]
 
-image::TanzuNetLogin.jpg[]
+. Click on the "Create Account" link. +
+  image:../docs/deployment_guide/images/TanzuNetCreateLogin.png[{partner-registry} create account link,40%]
 
-[start=2]
-. Click on the "Create Account" link
-
-image::TanzuNetCreateLogin.jpg[]
-
-[start=3]
-. Fill in all the necessary fields to complete the process and then login using the newly created user
-
-image::TanzuNetworkFields.jpg[]
+. Fill in all the necessary fields to complete the process and then login using the newly created user. +
+  image:../docs/deployment_guide/images/TanzuNetworkFields.png[{partner-registry} create account fields,40%]
 
 ==== Generate a {partner-registry} API token
 
 In addition to the actual {partner-registry} credentials, this Quick Start will also need an API token from the {partner-registry} site.
 This API token will allow for the downloading all of the required packages to install the {partner-product-short-name}.
 
-. Click on the drop-down next to your login name and click on "Edit Profile"
+. Click on the drop-down next to your login name and click on "Edit Profile". +
+// NOTE: The ' +' at the end of the ordered list item above adds a hard line break so that the image is not rendered inline with the text
+  image:../docs/deployment_guide/images/EditProfile.png[{partner-registry} edit profile]
 
-image::EditProfile.jpg[]
+. To create an API token you will need to use the "Request new refresh token" button. +
+  image:../docs/deployment_guide/images/RefreshToken.png[{partner-registry} request new refresh token]
 
-[start=2]
-. To create an API token you will need to use the "Update Refresh Token" button. 
-
-image::RefreshToken.jpg[]
-
-Before deploying this Quick Start, you must accept all of the following End User License Agreements (EULAs) for the {partner-registry} account used for the deployment, or else the deployment will fail during the {partner-product-short-name} bootstrap installation process run from the Linux bastion host:
-
-image::ResultsToken.jpg[]
+. Make sure to copy the long string that is provided and have that available when asked for the parameters during the running of the Quick Start. +
+  image:../docs/deployment_guide/images/ResultsToken.png[{partner-registry} retrieve refresh token]
 
 === EULAs
 
