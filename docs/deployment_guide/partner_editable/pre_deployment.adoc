@@ -1,16 +1,6 @@
 //Include any predeployment steps here, such as signing up for a Marketplace AMI or making any changes to a partner account. If there are no predeployment steps, leave this file empty.
 
-== Planning the Deployment
-
-=== Specialized Knowledge
-
-This deployment requires a moderate level of familiarity with AWS services. If you’re new to AWS, see https://aws.amazon.com/getting-started/[Getting Started Resource Center] and https://aws.amazon.com/training/[AWS Training and Certification] These sites provide materials for learning how to design, deploy, and operate your infrastructure and applications on the AWS Cloud.
-
-=== AWS Account
-
-If you don’t already have an AWS account, create one at https://aws.amazon.com by following the on-screen instructions. Part of the sign-up process involves receiving a phone call and entering a PIN using the phone keypad.
-
-Your AWS account is automatically signed up for all AWS services. You are charged only for the services you use.
+== Predeployment steps
 
 === Technical Requirements
 
@@ -59,10 +49,6 @@ If necessary, request https://console.aws.amazon.com/servicequotas/home?region=u
 |Route 53 Private Zone
 |1
 |===
-
-==== IAM Permissions
-
-Before launching the Quick Start, you must sign in to the AWS Management Console with IAM permissions for the resources that the templates deploy. The AdministratorAccess managed policy within IAM provides sufficient permissions, although your organization may choose to use a custom policy with more restrictions. For more information, see https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_job-functions.html[AWS managed policies for job functions].
 
 === {partner-registry} account
 
