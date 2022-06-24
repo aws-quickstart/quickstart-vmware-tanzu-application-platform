@@ -15,19 +15,19 @@ The following values should be available to use from the *Outputs* tab:
 |Parameter Label |Default Value |Description
 
 |AcceptEULAs
-|none
+|*Requires input*
 |Yes/No whether the required EULAs have been read and accepted before {partner-product-short-name} is installed.
 
 |{partner-registry} username
-|none
+|*Requires input*
 |The {partner-registry} username (authentication ID or email address).
 
 |{partner-registry} password
-|none
+|*Requires input*
 |The {partner-registry} password (authentication key).
 
 |{partner-registry} API Token
-|none
+|*Requires input*
 |The {partner-registry} refresh token for the defined user.
 |===
 
@@ -37,7 +37,7 @@ The following values should be available to use from the *Outputs* tab:
 |Parameter Label |Default Value |Description
 
 |Availability Zones
-|none
+|*Requires input*
 |List of Availability Zones to use for the subnets in the VPC. Three Availability Zones are used for this deployment.
 
 |Number of Availability Zones
@@ -45,7 +45,7 @@ The following values should be available to use from the *Outputs* tab:
 |Number of Availability Zones to use in the VPC. This must match the value entered for the AvailabilityZones parameter.
 
 |Key Pay Name
-|none
+|*Requires input*
 |The name of the SSH key that will be used to access the Bootstrap VM and cluster nodes.
 |===
 
@@ -89,7 +89,7 @@ The following values should be available to use from the *Outputs* tab:
 |Parameter Label |Default Value |Description
 
 |EkS Cluster Name
-|none
+|*Requires input*
 |The name of the cluster that will be created to contain the {partner-product-short-name} deployment.
 
 |Number of nodes
@@ -119,7 +119,7 @@ The following values should be available to use from the *Outputs* tab:
 |TAP requires an S3 bucket to store encrypted configuration information, this bucket name will be associated with a newly created S3 bucket for that purpose
 
 |{partner-product-short-name} domain name
-|none
+|*Requires input*
 |Domain name that can be used for access to {partner-product-name} and its corresponding project URLs. Available within a private DNS Zone.
 |===
 
