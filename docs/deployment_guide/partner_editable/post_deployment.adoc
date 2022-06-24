@@ -38,15 +38,19 @@ The following values should be available to use from the *Outputs* tab:
 
 |Availability Zones
 |*Requires input*
-|List of Availability Zones to use for the subnets in the VPC. Three Availability Zones are used for this deployment.
+|List of Availability Zones to use for the subnets in the VPC. Either two or three Availability Zones are used for this deployment.
 
 |Number of Availability Zones
 |3
-|Number of Availability Zones to use in the VPC. This must match the value entered for the AvailabilityZones parameter.
+|Number of Availability Zones to use in the VPC. This must match the value entered for the Availability Zones parameter.
 
-|Key Pay Name
+|Key Pair Name
 |*Requires input*
-|The name of the SSH key that will be used to access the Bootstrap VM and cluster nodes.
+|The name of the Amazon EC2 Key Pair that will be used for accessing the Linux and Windows bastion hosts, and the Amazon EKS cluster nodes.
+
+|Remote access CIDR
+|*Requires input*
+|IPv4 CIDR block that will be allowed to connect to the Amazon EC2 Linux and Windows bastion host instances once deployed.
 |===
 
 [%autowidth.stretch]
@@ -60,27 +64,27 @@ The following values should be available to use from the *Outputs* tab:
 
 |Private Subnet 1 CIDR
 |10.0.0.0/19
-|CIDR block for private subnet 1, located in Availability Zone 1
+|CIDR block for private subnet 1, located in Availability Zone 1.
 
 |Private Subnet 2 CIDR
 |10.0.32.0/19
-|CIDR block for private subnet 2, located in Availability Zone 2
+|CIDR block for private subnet 2, located in Availability Zone 2.
 
 |Private Subnet 3 CIDR
 |10.0.64.0/19
-|CIDR block for private subnet 3, located in Availability Zone 3
+|CIDR block for private subnet 3, located in Availability Zone 3.
 
 |Public Subnet 1 CIDR
 |10.0.128.0/20
-|CIDR block for the public (DMZ) subnet 1, located in Availability Zone 1
+|CIDR block for the public (DMZ) subnet 1, located in Availability Zone 1.
 
 |Public Subnet 2 CIDR
 |10.0.144.0/20
-|CIDR block for the public (DMZ) subnet 2, located in Availability Zone 2
+|CIDR block for the public (DMZ) subnet 2, located in Availability Zone 2.
 
 |Public Subnet 3 CIDR
 |10.0.160.0/20
-|CIDR block for the public (DMZ) subnet 3, located in Availability Zone 3
+|CIDR block for the public (DMZ) subnet 3, located in Availability Zone 3.
 |===
 
 [%autowidth.stretch]
@@ -88,7 +92,7 @@ The following values should be available to use from the *Outputs* tab:
 |===
 |Parameter Label |Default Value |Description
 
-|EkS Cluster Name
+|EKS cluster name
 |*Requires input*
 |The name of the cluster that will be created to contain the {partner-product-short-name} deployment.
 
@@ -103,20 +107,12 @@ The following values should be available to use from the *Outputs* tab:
 |Instance Type
 |m5.xlarge
 |Amazon EC2 instance type for each of the nodes deployed within the {partner-product-short-name} EKS cluster.
-
-|Remote access CIDR
-|none
-|IP range that will be allowed to access the Bootstrap EC2 instance and EKS cluster once deployed
 |===
 
 [%autowidth.stretch]
 .{partner-product-name} configuration
 |===
 |Parameter Label |Default Value |Description
-
-|S3TAPConfigBucket
-|none
-|TAP requires an S3 bucket to store encrypted configuration information, this bucket name will be associated with a newly created S3 bucket for that purpose
 
 |{partner-product-short-name} domain name
 |*Requires input*
