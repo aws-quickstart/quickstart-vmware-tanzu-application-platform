@@ -10,7 +10,3 @@ This Quick Start provides the following deployment options:
 
 This Quick Start provides separate templates for these options.
 It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instance types, and {partner-product-short-name} settings.
-
-The following values should be available to use from the Outputs tab:
-* Elastic IP of Bootstrap VM
-* TAP GUI URL

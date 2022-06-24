@@ -1,5 +1,10 @@
 // Include any postdeployment steps here, such as steps necessary to test that the deployment was successful. If there are no postdeployment steps, leave this file empty.
 
+The following values should be available to use from the *Outputs* tab:
+
+. The Elastic IP addresses associated with the Amazon EC2 Linux and Windows bastion host instances.
+. The {partner-product-short-name} website GUI URL that you can access from the Windows bastion host instance.
+
 == Postdeployment steps
 
 == Customer Responsibility
