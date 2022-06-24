@@ -4,7 +4,8 @@
 
 === Technical Requirements
 
-Before you launch the Quick Start, review the following information and ensure that your account is properly configured. Otherwise, deployment might fail.
+Before you launch the Quick Start, review the following information and ensure that your account is properly configured.
+Otherwise, the deployment might fail.
 
 [IMPORTANT]
 ====
