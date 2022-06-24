@@ -8,26 +8,26 @@ After you successfully deploy this Quick Start, confirm that your resources and 
 
 == Parameter Reference
 
-=== Parameters for deploying a TAP cluster in a new VPC
+==== Parameters for deploying a {partner-product-short-name} cluster in a new VPC
 
-_Table 1: Tanzu Network Parameters_
+_Table 1: {partner-registry} configuration_
 [cols="Parameter Label","Default Value","Description"]
 |===
 |AcceptEULAs
 |none
-|Yes/No whether the required EULAs have been read and accepted before TAP is installed
+|Yes/No whether the required EULAs have been read and accepted before {partner-product-short-name} is installed.
 
-|Tanzu Net Username
+|{partner-registry} username
 |none
-|The VMware Tanzu Net Username (authentication ID or email address)
+|The {partner-registry} username (authentication ID or email address).
 
-|Tanzu Net Password
+|{partner-registry} password
 |none
-|The VMware Tanzu Net password (authentication key)
+|The {partner-registry} password (authentication key).
 
-|Tanzu Net API Token
+|{partner-registry} API Token
 |none
-|The VMware Tanzu Net Refresh token for the defined user
+|The {partner-registry} refresh token for the defined user.
 |===
 
 _Table 2: Basic Deployment Configurations_
@@ -83,35 +83,41 @@ _Table 4: Amazon EKS Configurations_
 |===
 |EkS Cluster Name
 |none
-|The name of the cluster that will be created to contain the TAP deployment
+|The name of the cluster that will be created to contain the {partner-product-short-name} deployment.
 
 |Number of nodes
 |4
-|The number of nodes that will be the minimum and created for the TAP EKS cluster
+|The number of nodes that will be the minimum and created for the {partner-product-short-name} EKS cluster.
 
 |Maximum number of nodes
 |6
-|The maximum number of nodes that will be available in an auto scaling scenario for the TAP EKS cluster
+|The maximum number of nodes that will be available in an auto scaling scenario for the {partner-product-short-name} EKS cluster.
 
 |Instance Type
 |m5.xlarge
-|AWS EC2 instance type for each of the nodes deployed within the EKS cluster for TAP
+|Amazon EC2 instance type for each of the nodes deployed within the {partner-product-short-name} EKS cluster.
 
 |Remote access CIDR
 |none
 |IP range that will be allowed to access the Bootstrap EC2 instance and EKS cluster once deployed
 |===
 
-_Table 5: Misc.  Configurations_
+_Table 5: {partner-product-name} configuration_
 [cols="Parameter Label","Default Value","Description"]
 |===
 |S3TAPConfigBucket
 |none
 |TAP requires an S3 bucket to store encrypted configuration information, this bucket name will be associated with a newly created S3 bucket for that purpose
 
-|TAP Domain Name
+|{partner-product-short-name} domain name
 |none
-|Domain name that can be used for access to TAP and its corresponding project URLs. Available within a private DNS Zone
+|Domain name that can be used for access to {partner-product-name} and its corresponding project URLs. Available within a private DNS Zone.
+|===
+
+_Table 6: AWS Quick Start S3 bucket configuration_
+[%autowidth]
+|===
+|Parameter Label |Default Value |Description
 
 |QSS3BucketName
 |aws-quickstart
@@ -122,7 +128,7 @@ _Table 5: Misc.  Configurations_
 |S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. See https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html and https://aws-quickstart.github.io/option1.html.
 
 |QSS3BucketRegion
-|us-east-1
+|{default_deployment_region}
 |AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template. Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. See https://aws-quickstart.github.io/option1.html.
 |===
 

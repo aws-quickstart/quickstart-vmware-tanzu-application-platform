@@ -62,13 +62,14 @@ If necessary, request https://console.aws.amazon.com/servicequotas/home?region=u
 
 Before launching the Quick Start, you must sign in to the AWS Management Console with IAM permissions for the resources that the templates deploy. The AdministratorAccess managed policy within IAM provides sufficient permissions, although your organization may choose to use a custom policy with more restrictions. For more information, see https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_job-functions.html[AWS managed policies for job functions].
 
-==== Prepare your Tanzu Network Account
+=== {partner-registry} account
 
-One of the requirements for this QuickStart to deploy automatically will be that you have already created a Tanzu Network Login and received an API token to use by the automation scripts. 
+One of the requirements for this Quick Start is a {partner-registry} account with a username, password, and generated a https://network.pivotal.io/docs/api[user account and authentication (UAA) refresh API token].
 
-===== Create new Tanzu Network Login
+==== Create a new {partner-registry} login
 
-If you do not already have a valid Tanzu Network login, then you can start by going here: https://network.pivotal.io/[VMWare Tanzu Network]. Once on this web page, you will need to perform the following steps:
+If you do not already have a valid {partner-registry} login, then you can start by going https://network.pivotal.io/[here].
+Once on this web page, you will need to perform the following steps:
 
 . Click on "Sign In" link in the top right corner
 
@@ -84,9 +85,10 @@ image::TanzuNetCreateLogin.jpg[]
 
 image::TanzuNetworkFields.jpg[]
 
-===== Retrieve API Token for Tanzu Network Login
+==== Generate a {partner-registry} API token
 
-In addition to the actual Tanzu Network credentials, this QuickStart will also need an API token from the Tanzu Network site. This API token will allow for the downloading all of the required packages to install the Tanzu Application Platform.
+In addition to the actual {partner-registry} credentials, this Quick Start will also need an API token from the {partner-registry} site.
+This API token will allow for the downloading all of the required packages to install the {partner-product-short-name}.
 
 . Click on the drop-down next to your login name and click on "Edit Profile"
 
@@ -97,14 +99,16 @@ image::EditProfile.jpg[]
 
 image::RefreshToken.jpg[]
 
-[start=3]
-. Make sure to copy the long string that is provided and have that available when asked for the parameters during the running of the Quick Start
+Before deploying this Quick Start, you must accept all of the following End User License Agreements (EULAs) for the {partner-registry} account used for the deployment, or else the deployment will fail during the {partner-product-short-name} bootstrap installation process run from the Linux bastion host:
 
 image::ResultsToken.jpg[]
 
-===== Accept all of the required EULA agreements
+=== EULAs
 
-Before installing packages, you must accept the End User License Agreements (EULAs). For each of the following components, accept or confirm that you have accepted the EULA:
+[IMPORTANT]
+====
+Before deploying this Quick Start, you must accept all of the following End User License Agreements (EULAs) for the {partner-registry} account used for the deployment, or else the deployment will fail during the {partner-product-short-name} bootstrap installation process run from the Linux bastion host.
+====
 
-* https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/#/releases/1011100[Cluster Essentials for VMware Tanzu]
-* https://network.tanzu.vmware.com/products/tanzu-application-platform/[Tanzu Application Platform]
+. https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for {partner-company-short-name} {partner-product-family}]
+. https://network.tanzu.vmware.com/products/tanzu-application-platform/[{partner-product-short-name}]
