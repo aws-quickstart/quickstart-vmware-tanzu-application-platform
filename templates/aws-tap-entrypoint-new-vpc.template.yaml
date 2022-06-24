@@ -77,7 +77,7 @@ Metadata:
           - QSS3KeyPrefix
     ParameterLabels:
       AcceptEULAs:
-        default: Have all VMware Tanzu EULAs been accepted?
+        default: Have all applicable VMware Tanzu Network EULAs been accepted?
       AcceptCEIP:
         default: Have you read and accept the VMware CEIP policy?
       AvailabilityZones:
