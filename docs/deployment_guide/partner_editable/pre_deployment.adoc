@@ -20,7 +20,7 @@ You might need to request increases if your existing deployment currently uses t
 The https://console.aws.amazon.com/servicequotas/home/[Service Quotas console] displays your usage and quotas for some aspects of some services.
 For more information, see https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html[What is Service Quotas?] and https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html[AWS service quotas].
 
-[%autowidth.stretch]
+[%autowidth]
 |===
 |Resource |This deployment uses
 
