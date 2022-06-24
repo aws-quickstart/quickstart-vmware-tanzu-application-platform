@@ -31,22 +31,22 @@ If necessary, request https://console.aws.amazon.com/servicequotas/home?region=u
 |NAT Gateways
 |3
 
-|S3 Buckets
-|1
-
 |ECR Repositories
-|4
+|5
 
 |EKS Clusters
 |1
 
-|Secrets
-|3
-
-|EC2 (m5.xlarge)
+|Secrets Manager secrets
 |1
 
-|Route 53 Private Zone
+|EC2 instance (m5.xlarge)
+|1
+
+|EC2 instance (t3.medium)
+|1
+
+|Route 53 Private Hosted Zone
 |1
 |===
 
