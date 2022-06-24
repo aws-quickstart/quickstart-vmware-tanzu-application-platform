@@ -100,3 +100,21 @@ Before deploying this Quick Start, you must accept all of the following End User
 
 . https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for {partner-company-short-name} {partner-product-family}]
 . https://network.tanzu.vmware.com/products/tanzu-application-platform/[{partner-product-short-name}]
+
+=== Telemetry
+
+{partner-product-name} participates in the {partner-company-short-name} Customer Experience Improvement Program (CEIP).
+As part of CEIP, {partner-company-short-name} collects technical information about your organization's use of {partner-company-short-name} products and services in association with your organization's {partner-company-short-name} license keys.
+For information about CEIP, see the http://www.vmware.com/trustvmware/ceip.html[Trust & Assurance Center].
+You may join or leave CEIP at any time.
+The CEIP Standard Participation Level provides {partner-company-short-name} with information to improve its products and services, identify and fix problems, and advise you on how to best deploy and use {partner-company-short-name} products.
+For example, this information can enable a proactive product deployment discussion with your {partner-company-short-name} account team or {partner-company-short-name} support team to help resolve your issues.
+This information cannot directly identify any individual.
+
+[IMPORTANT]
+====
+You must acknowledge that you have read the {partner-company-short-name} CEIP policy before you can proceed with the installation.
+====
+
+For more information, see https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-install.html#install-profile[Install your {partner-product-short-name} profile].
+To opt out of telemetry participation after installation, see https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-opting-out-telemetry.html[Opting out of telemetry collection].

@@ -4,9 +4,3 @@ There is no cost to use this Quick Start, but you will be billed for any AWS ser
 
 If you want to purchase a license for {partner-product-name}, please reach out to https://tanzu.vmware.com/contact[https://tanzu.vmware.com/contact].
 To learn more about {partner-product-short-name}, please visit https://tanzu.vmware.com/application-platform[https://tanzu.vmware.com/application-platform].
-
-== Telemetry
-
-Tanzu Application Platform participates in the VMware Customer Experience Improvement Program (CEIP). As part of CEIP, VMware collects technical information about your organization’s use of VMware products and services in association with your organization’s VMware license keys. For information about CEIP, see the http://www.vmware.com/trustvmware/ceip.html[Trust & Assurance Center]. You may join or leave CEIP at any time. The CEIP Standard Participation Level provides VMware with information to improve its products and services, identify and fix problems, and advise you on how to best deploy and use VMware products. For example, this information can enable a proactive product deployment discussion with your VMware account team or VMware support team to help resolve your issues. This information cannot directly identify any individual.
-
-You must acknowledge that you have read the VMware CEIP policy before you can proceed with the installation. For more information, see https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-install.html#install-profile[Install your Tanzu Application Platform] profile. To opt out of telemetry participation after installation, see https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-opting-out-telemetry.html[Opting out of telemetry collection].
