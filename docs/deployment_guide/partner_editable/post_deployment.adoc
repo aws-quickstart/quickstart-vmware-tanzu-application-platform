@@ -10,9 +10,11 @@ After you successfully deploy this Quick Start, confirm that your resources and 
 
 ==== Parameters for deploying a {partner-product-short-name} cluster in a new VPC
 
-_Table 1: {partner-registry} configuration_
-[cols="Parameter Label","Default Value","Description"]
+[%autowidth.stretch]
+.{partner-registry} configuration
 |===
+|Parameter Label |Default Value |Description
+
 |AcceptEULAs
 |none
 |Yes/No whether the required EULAs have been read and accepted before {partner-product-short-name} is installed.
@@ -30,9 +32,11 @@ _Table 1: {partner-registry} configuration_
 |The {partner-registry} refresh token for the defined user.
 |===
 
-_Table 2: Basic Deployment Configurations_
-[cols="Parameter Label","Default Value","Description"]
+[%autowidth.stretch]
+.Basic deployment configuration
 |===
+|Parameter Label |Default Value |Description
+
 |Availability Zones
 |none
 |List of Availability Zones to use for the subnets in the VPC. Three Availability Zones are used for this deployment.
@@ -46,9 +50,11 @@ _Table 2: Basic Deployment Configurations_
 |The name of the SSH key that will be used to access the Bootstrap VM and cluster nodes.
 |===
 
-_Table 3: VPC Network Configurations_
-[cols="Parameter Label","Default Value","Description"]
+[%autowidth.stretch]
+.VPC network configuration
 |===
+|Parameter Label |Default Value |Description
+
 |VPC CIDR
 |10.0.0.0/16
 |CIDR block for the VPC
@@ -78,9 +84,11 @@ _Table 3: VPC Network Configurations_
 |CIDR block for the public (DMZ) subnet 3, located in Availability Zone 3
 |===
 
-_Table 4: Amazon EKS Configurations_
-[cols="Parameter Label","Default Value","Description"]
+[%autowidth.stretch]
+.Amazon EKS configuration
 |===
+|Parameter Label |Default Value |Description
+
 |EkS Cluster Name
 |none
 |The name of the cluster that will be created to contain the {partner-product-short-name} deployment.
@@ -102,9 +110,11 @@ _Table 4: Amazon EKS Configurations_
 |IP range that will be allowed to access the Bootstrap EC2 instance and EKS cluster once deployed
 |===
 
-_Table 5: {partner-product-name} configuration_
-[cols="Parameter Label","Default Value","Description"]
+[%autowidth.stretch]
+.{partner-product-name} configuration
 |===
+|Parameter Label |Default Value |Description
+
 |S3TAPConfigBucket
 |none
 |TAP requires an S3 bucket to store encrypted configuration information, this bucket name will be associated with a newly created S3 bucket for that purpose
@@ -114,8 +124,8 @@ _Table 5: {partner-product-name} configuration_
 |Domain name that can be used for access to {partner-product-name} and its corresponding project URLs. Available within a private DNS Zone.
 |===
 
-_Table 6: AWS Quick Start S3 bucket configuration_
-[%autowidth]
+[%autowidth.stretch]
+.AWS Quick Start S3 bucket configuration
 |===
 |Parameter Label |Default Value |Description
 
