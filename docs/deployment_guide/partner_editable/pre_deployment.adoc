@@ -6,7 +6,12 @@
 
 Before you launch the Quick Start, review the following information and ensure that your account is properly configured. Otherwise, deployment might fail.
 
-*IMPORTANT:* An AWS SSH Key will need to be created before starting the deployment of this Quick Start as it is a required resources for the deployment to succeed.
+[IMPORTANT]
+====
+An https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html[Amazon EC2 Key Pair] is required for the deployment of this Quick Start, and *the key type must be RSA, not ED25519*.
+As of June 23rd, 2022, Amazon EC2 Windows instances do not yet support ED25519 keys.
+If a Key Pair of type ED25519 is selected for this deployment, the CloudFormation stack will still deploy successfully, but you will not be able to retrieve the Windows bastion host's automatically generated password.
+====
 
 ==== Resource quotas
 
