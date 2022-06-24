@@ -22,6 +22,22 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
+          default: VMware Tanzu Network configuration
+        Parameters:
+          - AcceptEULAs
+          - TanzuNetUsername
+          - TanzuNetPassword
+          - TanzuNetApiToken
+      - Label:
+          default: VMware Tanzu Application Platform configuration
+        Parameters:
+          - TAPVersion
+          - TAPDomainName
+      - Label:
+          default: Sample app configuration
+        Parameters:
+          - SampleAppName
+      - Label:
           default: Basic configuration
         Parameters:
           - KeyPairName
@@ -43,22 +59,6 @@ Metadata:
           - NodeVolumeSize
           - NumberOfNodes
           - MaxNumberOfNodes
-      - Label:
-          default: VMware Tanzu Network configuration
-        Parameters:
-          - TanzuNetUsername
-          - TanzuNetPassword
-          - TanzuNetApiToken
-          - AcceptEULAs
-      - Label:
-          default: VMware Tanzu Application Platform configuration
-        Parameters:
-          - TAPVersion
-          - TAPDomainName
-      - Label:
-          default: Sample app configuration
-        Parameters:
-          - SampleAppName
       - Label:
           default: Linux bastion host / bootstrap instance configuration
         Parameters:
