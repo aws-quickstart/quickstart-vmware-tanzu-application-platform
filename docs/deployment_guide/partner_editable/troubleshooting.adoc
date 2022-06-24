@@ -1,3 +1,33 @@
 //Add any unique troubleshooting steps here.
 
 For troubleshooting common Quick Start issues, refer to the https://fwd.aws/rA69w?[AWS Quick Start General Information Guide^] and https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html[Troubleshooting CloudFormation^].
+
+*Troubleshooting {partner-product-name} documentation*
+
+* https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html[Troubleshoot installing {partner-product-short-name}]
+* https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-troubleshooting-tap-troubleshoot-using-tap.html[Troubleshoot using {partner-product-short-name}]
+
+*I can't access the {partner-product-short-name} GUI*
+
+First, check that the CloudFormation stack deployment completed successfully.
+If the stack deployed successfully, then review the {partner-product-short-name} bootstrap logs by going to the https://console.aws.amazon.com/cloudwatch/home[CloudWatch Logs console] > Log groups > `+/aws/quickstart/tanzu-application-platform/<instance ID>+` (where `+<instance ID>+` is the ID of the Amazon EC2 Linux bastion host instance) > `+/var/log/cloud-init-output.log log+` stream, and check whether this completed successfully.
+These logs can also be found in the `+/var/log/cloud-init-output.log+` file on the Linux bastion host.
+
+If the {partner-product-name} bootstrap process completed successfully, then the issue might be the location you are connecting from.
+The {partner-product-short-name} website GUI URL can only be accessed from endpoints with a route to the private VPC network, such as from the Amazon EC2 Windows bastion host instance.
+
+*It's been more than 4 minutes, but the administrator password still isn't available for the Windows bastion host instance*
+
+Verify that the Amazon EC2 Key Pair selected for the deployment is of type RSA, not ED25519.
+As of June 23rd, 2022, Amazon EC2 Windows instances do not yet support ED25519 keys (https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[reference]).
+If a Key Pair of type ED25519 is selected for this deployment, the CloudFormation stack will still deploy successfully, but you will not be able to retrieve the Windows bastion host's automatically generated password.
+
+Options include:
+
+. https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html[Reset the Windows administrator password using EC2 Launch v2]
+. https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html[Update the CloudFormation stack] to use a Key Pair with the supported type: RSA.
+  Implementing this option requires replacing all Amazon EC2 instances that use this key, which includes both the Windows and Linux bastion hosts, as well as the EKS nodes (https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname[reference]).
+. Customize the CloudFormation template to use a separate Key Pair for the Windows bastion host and then update the CloudFormation stack.
+  Implementing this option will only replace the Windows bastion host instance.
+  Instructions for implementing this are beyond the scope of this guide.
+. Contact https://aws.amazon.com/contact-us/[AWS Technical support]

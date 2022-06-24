@@ -1,3 +1,125 @@
 //Include any predeployment steps here, such as signing up for a Marketplace AMI or making any changes to a partner account. If there are no predeployment steps, leave this file empty.
 
 == Predeployment steps
+
+=== Technical Requirements
+
+Before you launch the Quick Start, review the following information and ensure that your account is properly configured.
+Otherwise, the deployment might fail.
+
+[IMPORTANT]
+====
+An https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html[Amazon EC2 Key Pair] is required for the deployment of this Quick Start, and *the key type must be RSA, not ED25519* (https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[reference]).
+Additional information is available in the link:#_troubleshooting[Troubleshooting section].
+====
+
+==== Resource quotas
+
+If necessary, request https://console.aws.amazon.com/servicequotas/home/[service quota increases] for the following resources.
+You might need to request increases if your existing deployment currently uses these resources and if this Quick Start deployment could result in exceeding the default quotas.
+The https://console.aws.amazon.com/servicequotas/home/[Service Quotas console] displays your usage and quotas for some aspects of some services.
+For more information, see https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html[What is Service Quotas?] and https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html[AWS service quotas].
+
+[%autowidth]
+|===
+|Resource |This deployment uses
+
+|VPCs
+|1
+
+|Subnets
+|6
+
+|Security Groups
+|2
+
+|Internet Gateways
+|1
+
+|NAT Gateways
+|3
+
+|ECR Repositories
+|5
+
+|EKS Clusters
+|1
+
+|Secrets Manager secrets
+|1
+
+|EC2 instance (m5.xlarge)
+|1
+
+|EC2 instance (t3.medium)
+|1
+
+|Route 53 Private Hosted Zone
+|1
+|===
+
+=== {partner-registry} account
+
+One of the requirements for this Quick Start is a {partner-registry} account with a username, password, and generated a https://network.pivotal.io/docs/api[user account and authentication (UAA) refresh API token].
+
+==== Create a new {partner-registry} login
+
+If you do not already have a valid {partner-registry} login, then you can start by going https://network.pivotal.io/[here].
+Once on this web page, you will need to perform the following steps:
+
+. Click on "Sign In" link in the top right corner. +
+// NOTE: The ' +' at the end of the ordered list item above adds a hard line break so that the image is not rendered inline with the text
+  image:../docs/deployment_guide/images/TanzuNetLogin.png[{partner-registry} sign in]
+
+. Click on the "Create Account" link. +
+  image:../docs/deployment_guide/images/TanzuNetCreateLogin.png[{partner-registry} create account link,40%]
+
+. Fill in all the necessary fields to complete the process and then login using the newly created user. +
+  image:../docs/deployment_guide/images/TanzuNetworkFields.png[{partner-registry} create account fields,40%]
+
+==== Generate a {partner-registry} API token
+
+In addition to the actual {partner-registry} credentials, this Quick Start will also need an API token from the {partner-registry} site.
+This API token will allow for the downloading all of the required packages to install the {partner-product-short-name}.
+
+. Click on the drop-down next to your login name and click on "Edit Profile". +
+// NOTE: The ' +' at the end of the ordered list item above adds a hard line break so that the image is not rendered inline with the text
+  image:../docs/deployment_guide/images/EditProfile.png[{partner-registry} edit profile]
+
+. To create an API token you will need to use the "Request new refresh token" button. +
+  image:../docs/deployment_guide/images/RefreshToken.png[{partner-registry} request new refresh token]
+
+. Make sure to copy the long string that is provided and have that available when asked for the parameters during the running of the Quick Start. +
+  image:../docs/deployment_guide/images/ResultsToken.png[{partner-registry} retrieve refresh token]
+
+=== EULAs
+
+[IMPORTANT]
+====
+Before deploying this Quick Start, you must accept all of the following End User License Agreements (EULAs) for the {partner-registry} account used for the deployment, or else the deployment will fail during the {partner-product-short-name} bootstrap installation process run from the Linux bastion host.
+====
+
+. https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for {partner-company-short-name} {partner-product-family}]
+. https://network.tanzu.vmware.com/products/tanzu-application-platform/[{partner-product-short-name}]
+. https://network.tanzu.vmware.com/products/build-service/[{partner-product-family} Build Service and associated components]
+. https://network.tanzu.vmware.com/products/tbs-dependencies/[{partner-product-family} Build Service dependencies]
+. https://network.tanzu.vmware.com/products/tanzu-buildpacks-suite[Buildpacks for {partner-company-short-name} {partner-product-family}]
+. https://network.tanzu.vmware.com/products/tanzu-stacks-suite[Stacks for {partner-company-short-name} {partner-product-family}]
+
+=== Telemetry
+
+{partner-product-name} participates in the {partner-company-short-name} Customer Experience Improvement Program (CEIP).
+As part of CEIP, {partner-company-short-name} collects technical information about your organization's use of {partner-company-short-name} products and services in association with your organization's {partner-company-short-name} license keys.
+For information about CEIP, see the http://www.vmware.com/trustvmware/ceip.html[Trust & Assurance Center].
+You may join or leave CEIP at any time.
+The CEIP Standard Participation Level provides {partner-company-short-name} with information to improve its products and services, identify and fix problems, and advise you on how to best deploy and use {partner-company-short-name} products.
+For example, this information can enable a proactive product deployment discussion with your {partner-company-short-name} account team or {partner-company-short-name} support team to help resolve your issues.
+This information cannot directly identify any individual.
+
+[IMPORTANT]
+====
+You must acknowledge that you have read the {partner-company-short-name} CEIP policy before you can proceed with the installation.
+====
+
+For more information, see https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-install.html#install-profile[Install your {partner-product-short-name} profile].
+To opt out of telemetry participation after installation, see https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-opting-out-telemetry.html[Opting out of telemetry collection].
