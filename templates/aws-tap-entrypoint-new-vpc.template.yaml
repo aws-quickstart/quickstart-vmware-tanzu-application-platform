@@ -692,6 +692,11 @@ Outputs:
   WindowsBastionPublicDnsName:
     Description: The public DNS name of the Windows bastion instance.
     Value: !GetAtt ExistingVpcStack.Outputs.WindowsBastionPublicDnsName
+  TAPLogGroup:
+    Description: >-
+      The Amazon CloudWatch Logs log group where the Tanzu Application Platform
+      bootstrap logs are stored.
+    Value: !GetAtt ExistingVpcStack.Outputs.TAPLogGroup
 Rules:
   AcceptEULAs:
     Assertions:
