@@ -6,7 +6,7 @@
 :partner-product-short-name: {partner-product-family} Application Platform
 :partner-company-name: VMware, Inc.
 :partner-registry: {partner-company-short-name} {partner-product-family} Network
-:doc-month: June
+:doc-month: July
 :doc-year: 2022
 :partner-contributors: Brian C Harrison and Satya Dillikar, {partner-company-name}
 // :other-contributors: Akua Mansa, Trek10

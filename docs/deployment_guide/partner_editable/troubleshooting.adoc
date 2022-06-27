@@ -10,8 +10,10 @@ For troubleshooting common Quick Start issues, refer to the https://fwd.aws/rA69
 *I can't access the {partner-product-short-name} GUI*
 
 First, check that the CloudFormation stack deployment completed successfully.
-If the stack deployed successfully, then review the {partner-product-short-name} bootstrap logs by going to the https://console.aws.amazon.com/cloudwatch/home[CloudWatch Logs console] > Log groups > `+/aws/quickstart/tanzu-application-platform/<instance ID>+` (where `+<instance ID>+` is the ID of the Amazon EC2 Linux bastion host instance) > `+/var/log/cloud-init-output.log log+` stream, and check whether this completed successfully.
+If the stack deployed successfully, then review the {partner-product-short-name} bootstrap logs by going to the https://console.aws.amazon.com/cloudwatch/home[CloudWatch Logs console] > Log groups > `+/aws/quickstart/tanzu-application-platform/<stack ID>+` log group > `+<instance ID>_/var/log/cloud-init-output.log+` log stream, and check whether this completed successfully.
 These logs can also be found in the `+/var/log/cloud-init-output.log+` file on the Linux bastion host.
+
+TIP: `+<stack ID>+` used in the CloudWatch log group name is the ID of the AWS CloudFormation stack, and `+<instance ID>+` used in the CloudWatch log stream name is the ID of the Amazon EC2 Linux bastion host, respectively.
 
 If the {partner-product-name} bootstrap process completed successfully, then the issue might be the location you are connecting from.
 The {partner-product-short-name} website GUI URL can only be accessed from endpoints with a route to the private VPC network, such as from the Amazon EC2 Windows bastion host instance.

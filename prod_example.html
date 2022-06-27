@@ -879,7 +879,7 @@ p.footer-text a{color:#d7d8d8}
 </div>
 </div>
 <div class="paragraph text-center">
-<p><strong>June 2022</strong><br>
+<p><strong>July 2022</strong><br>
 <em>Brian C Harrison and Satya Dillikar, VMware, Inc.</em><br>
 <em>Elvis Pappachen, AWS VMware Partner team</em><br>
 <em>Troy Lindsay, AWS Integration &amp; Automation team</em><br></p>
@@ -1257,6 +1257,9 @@ This API token will allow for the downloading all of the required packages to in
 </li>
 <li>
 <p><a href="https://network.tanzu.vmware.com/products/tanzu-buildpacks-suite">Buildpacks for VMware Tanzu</a></p>
+</li>
+<li>
+<p><a href="https://network.tanzu.vmware.com/products/tanzu-python-buildpack">Python Buildpack for VMware Tanzu</a></p>
 </li>
 <li>
 <p><a href="https://network.tanzu.vmware.com/products/tanzu-stacks-suite">Stacks for VMware Tanzu</a></p>
@@ -1638,8 +1641,20 @@ The VMware Tanzu Application Platform GUI is not available via a public URL, but
 </div>
 <div class="paragraph">
 <p>First, check that the CloudFormation stack deployment completed successfully.
-If the stack deployed successfully, then review the Tanzu Application Platform bootstrap logs by going to the <a href="https://console.aws.amazon.com/cloudwatch/home">CloudWatch Logs console</a> &gt; Log groups &gt; <code>/aws/quickstart/tanzu-application-platform/&lt;instance ID&gt;</code> (where <code>&lt;instance ID&gt;</code> is the ID of the Amazon EC2 Linux bastion host instance) &gt; <code>/var/log/cloud-init-output.log log</code> stream, and check whether this completed successfully.
+If the stack deployed successfully, then review the Tanzu Application Platform bootstrap logs by going to the <a href="https://console.aws.amazon.com/cloudwatch/home">CloudWatch Logs console</a> &gt; Log groups &gt; <code>/aws/quickstart/tanzu-application-platform/&lt;stack ID&gt;</code> log group &gt; <code>&lt;instance ID&gt;_/var/log/cloud-init-output.log</code> log stream, and check whether this completed successfully.
 These logs can also be found in the <code>/var/log/cloud-init-output.log</code> file on the Linux bastion host.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<code>&lt;stack ID&gt;</code> used in the CloudWatch log group name is the ID of the AWS CloudFormation stack, and <code>&lt;instance ID&gt;</code> used in the CloudWatch log stream name is the ID of the Amazon EC2 Linux bastion host, respectively.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>If the VMware Tanzu Application Platform bootstrap process completed successfully, then the issue might be the location you are connecting from.
