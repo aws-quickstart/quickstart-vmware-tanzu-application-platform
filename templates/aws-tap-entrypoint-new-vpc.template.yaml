@@ -141,13 +141,8 @@ Parameters:
     Type: String
     Description: >-
       Choose 'Yes' if you have already accepted the following
-      VMware Tanzu Network end-user license agreements (EULAs):
-      1/ Cluster Essentials for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/,
-      2/ Tanzu Application Platform: https://network.tanzu.vmware.com/products/tanzu-application-platform/,
-      3/ Tanzu Build Service and associated components: https://network.tanzu.vmware.com/products/build-service/,
-      4/ Tanzu Build Service dependencies: https://network.tanzu.vmware.com/products/tbs-dependencies/,
-      5/ Buildpacks for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-buildpacks-suite,
-      6/ Stacks for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-stacks-suite.
+      VMware Tanzu Network end-user license agreements (EULAs) listed in:
+      https://aws-quickstart.github.io/quickstart-vmware-tanzu-application-platform/#_eulas.
       TAP will fail to install successfully if the listed EULAs have not been
       accepted for the specified VMware Tanzu Network user account.
     AllowedValues:
