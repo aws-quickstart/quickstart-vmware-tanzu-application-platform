@@ -11,7 +11,7 @@ The following values should be available to use from the *Outputs* tab:
 
 [%autowidth.stretch]
 .{partner-registry} configuration
-|===
+|====
 |Parameter Label |Default Value |Description
 
 |AcceptEULAs
@@ -29,11 +29,11 @@ The following values should be available to use from the *Outputs* tab:
 |{partner-registry} API Token
 |*Requires input*
 |The {partner-registry} refresh token for the defined user.
-|===
+|====
 
 [%autowidth.stretch]
 .Basic deployment configuration
-|===
+|====
 |Parameter Label |Default Value |Description
 
 |Availability Zones
@@ -53,11 +53,11 @@ This must match the value entered for the Availability Zones parameter.
 |Remote access CIDR
 |*Requires input*
 |IPv4 CIDR block that will be allowed to connect to the Amazon EC2 Linux and Windows bastion host instances once deployed.
-|===
+|====
 
 [%autowidth.stretch]
 .VPC network configuration
-|===
+|====
 |Parameter Label |Default Value |Description
 
 |VPC CIDR
@@ -87,11 +87,11 @@ This must match the value entered for the Availability Zones parameter.
 |Public Subnet 3 CIDR
 |10.0.160.0/20
 |CIDR block for the public (DMZ) subnet 3, located in Availability Zone 3.
-|===
+|====
 
 [%autowidth.stretch]
 .Amazon EKS configuration
-|===
+|====
 |Parameter Label |Default Value |Description
 
 |EKS cluster name
@@ -109,22 +109,22 @@ This must match the value entered for the Availability Zones parameter.
 |Instance Type
 |m5.xlarge
 |Amazon EC2 instance type for each of the nodes deployed within the {partner-product-short-name} EKS cluster.
-|===
+|====
 
 [%autowidth.stretch]
 .{partner-product-name} configuration
-|===
+|====
 |Parameter Label |Default Value |Description
 
 |{partner-product-short-name} domain name
 |*Requires input*
 |Domain name that can be used for access to {partner-product-name} and its corresponding project URLs.
 Available within a private DNS Zone.
-|===
+|====
 
 [%autowidth.stretch]
 .AWS Quick Start S3 bucket configuration
-|===
+|====
 |Parameter Label |Default Value |Description
 
 |QSS3BucketName
@@ -151,7 +151,7 @@ Keep the default Region unless you are customizing the template.
 Changing this Region updates code references to point to a new Quick Start location.
 When using your own bucket, specify the Region.
 See https://aws-quickstart.github.io/option1.html.
-|===
+|====
 
 == Postdeployment steps
 
