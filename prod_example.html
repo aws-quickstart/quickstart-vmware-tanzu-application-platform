@@ -1029,16 +1029,15 @@ AWS Cloud.</p>
 For a complete list of the Tanzu Application Platform packages, please see the <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-install-components.html#verify-the-installed-packages-1">documentation</a>.</p>
 </li>
 <li>
-<p>2 Classic Load Balancers attached to the private subnets.
-Both load balancers direct traffic to the Contour Envoy pod configured as a Kubernetes object.
-The Contour Envoy container provides both ingress and reverse proxy for the Tanzu Application Platform pods.</p>
+<p>A Network Load Balancer (NLB) attached to the private subnets, which direct traffic to the Contour Envoy pod configured as a Kubernetes object.
+The Contour Envoy container provides both ingress and reverse proxy for the Tanzu Application Platform pods for the:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>1 load balancer is used for the Tanzu Application Platform website GUI.</p>
+<p>Tanzu Application Platform website GUI.</p>
 </li>
 <li>
-<p>1 load balancer is used for the Tanzu Application Platform Supply Chain Security Tools metadata store.</p>
+<p>Tanzu Application Platform Supply Chain Security Tools metadata store.</p>
 </li>
 </ul>
 </div>
