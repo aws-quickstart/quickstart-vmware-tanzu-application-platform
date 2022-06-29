@@ -48,9 +48,11 @@ metadata_store:
   app_service_type: ClusterIP
 
 contour:
+  infrastructure_provider: aws
   envoy:
     service:
-      type: LoadBalancer
+      aws:
+        LBType: nlb
 
 cnrs:
   domain_name: #@ data.values.dns.domain_name
