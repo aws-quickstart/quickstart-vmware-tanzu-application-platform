@@ -490,6 +490,7 @@ Parameters:
     AllowedValues:
       - 1.1.0
       - 1.1.1
+      - 1.2.0-build.15
     Default: 1.1.1
   SampleAppName:
     Type: String
@@ -610,6 +611,8 @@ Mappings:
     1.1.0:
       ClusterEssentialsBundleVersion: 1.1.0
     1.1.1:
+      ClusterEssentialsBundleVersion: 1.1.0
+    1.2.0-build.15:
       ClusterEssentialsBundleVersion: 1.1.0
   ClusterEssentialsBundle:
     1.1.0:
@@ -1060,13 +1063,22 @@ Resources:
             apt-get -y update
             apt-get -y upgrade
             echo "Installing system dependencies..."
-            apt-get -y install amazon-ecr-credential-helper awscli ca-certificates containerd.io curl docker-ce \
+            apt-get -y install amazon-ecr-credential-helper unzip ca-certificates containerd.io curl docker-ce \
               docker-ce-cli docker-compose-plugin git gnupg gnupg2 jq lsb-release openssl pass perl python3-pip \
-              python3-setuptools sed sudo traceroute uuid-runtime vim wget
+              python3-setuptools sed sudo traceroute uuid-runtime vim wget apt-transport-https
             echo "Installing python dependencies for $user..."
             su - $user -c "mkdir -p /home/$user/.local/bin; source /home/$user/.profile; python3 -m pip install --upgrade pip setuptools wheel yq"
             echo "Updating certificate authority certificates..."
             update-ca-certificates
+            echo "Installing aws cli"
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+            echo "Installing Kubectl..."
+            sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+            echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+            sudo apt-get -y update
+            sudo apt-get install -y kubectl
             echo "Installing Amazon CloudWatch agent..."
             mkdir -p /opt/aws/amazon-cloudwatch-agent/etc/
             cat <<EOF >> /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
@@ -1100,16 +1112,14 @@ Resources:
             systemctl enable amazon-cloudwatch-agent.service
             systemctl start amazon-cloudwatch-agent.service
             systemctl status amazon-cloudwatch-agent.service
-            echo "Installing kubectl..."
+            echo "Installing eksctl..."
             pushd /tmp
-            aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl" ./kubectl
-            aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl.sha256" ./kubectl.sha256
-            openssl sha1 -sha256 ./kubectl
-            chmod 755 ./kubectl
-            mv ./kubectl /usr/local/bin/
-            kubectl completion bash > /etc/bash_completion.d/kubectl
-            su - $user -c "aws eks update-kubeconfig --name ${EKSQSStack.Outputs.EKSClusterName}"
+            curl -fsSL "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_${!uname}_${!arch}.tar.gz" | tar xz -C .
+            mv ./eksctl /usr/local/bin
+            eksctl completion bash > /etc/bash_completion.d/eksctl
             popd
+            echo "Installing Carvel imgpkg..."
+            bash -c "set -eo pipefail; curl -fsSL https://carvel.dev/install.sh | bash"
             echo "Configuring Docker..."
             getent group docker || groupadd docker
             usermod -aG docker $user
@@ -1196,6 +1206,8 @@ Resources:
             install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
             echo "Installing tanzu CLI and staging tanzu-cluster-essentials..."
             su - $user -c "$tap_dir/src/install-tools.sh"
+            echo "Installing TAP prerequisites..."
+            su - $user -c "$tap_dir/src/tap-main.sh -c prereqs"
             echo "Creating local copies of key TAP container repos per VMware best practices..."
             su - $user -c "$tap_dir/src/tap-main.sh -c relocate"
             echo "Installing Tanzu Application Platform..."

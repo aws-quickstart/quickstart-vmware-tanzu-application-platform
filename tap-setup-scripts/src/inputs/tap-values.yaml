@@ -8,12 +8,12 @@ buildservice:
   kp_default_repository_password: #@ data.values.ecr_registry.password
   tanzunet_username: #@ data.values.tanzunet.username
   tanzunet_password: #@ data.values.tanzunet.password
+  pull_from_kp_default_repo: true
   enable_automatic_dependency_updates: false
-  descriptor_name: full
 
-supply_chain: testing_scanning
+supply_chain: testing
 
-ootb_supply_chain_testing_scanning:
+ootb_supply_chain_testing:
   registry:
     server: #@ data.values.repositories.workload.server
     repository: #@ data.values.repositories.workload.ootb_repo_prefix
