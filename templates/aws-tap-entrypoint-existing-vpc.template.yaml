@@ -1065,7 +1065,7 @@ Resources:
             echo "Installing system dependencies..."
             apt-get -y install amazon-ecr-credential-helper unzip ca-certificates containerd.io curl docker-ce \
               docker-ce-cli docker-compose-plugin git gnupg gnupg2 jq lsb-release openssl pass perl python3-pip \
-              python3-setuptools sed sudo traceroute uuid-runtime vim wget apt-transport-https
+              python3-setuptools sed sudo traceroute uuid-runtime vim wget
             echo "Installing python dependencies for $user..."
             su - $user -c "mkdir -p /home/$user/.local/bin; source /home/$user/.profile; python3 -m pip install --upgrade pip setuptools wheel yq"
             echo "Updating certificate authority certificates..."
@@ -1074,11 +1074,6 @@ Resources:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
-            echo "Installing Kubectl..."
-            sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-            echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-            sudo apt-get -y update
-            sudo apt-get install -y kubectl
             echo "Installing Amazon CloudWatch agent..."
             mkdir -p /opt/aws/amazon-cloudwatch-agent/etc/
             cat <<EOF >> /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
@@ -1112,14 +1107,16 @@ Resources:
             systemctl enable amazon-cloudwatch-agent.service
             systemctl start amazon-cloudwatch-agent.service
             systemctl status amazon-cloudwatch-agent.service
-            echo "Installing eksctl..."
+            echo "Installing kubectl..."
             pushd /tmp
-            curl -fsSL "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_${!uname}_${!arch}.tar.gz" | tar xz -C .
-            mv ./eksctl /usr/local/bin
-            eksctl completion bash > /etc/bash_completion.d/eksctl
+            aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl" ./kubectl
+            aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl.sha256" ./kubectl.sha256
+            openssl sha1 -sha256 ./kubectl
+            chmod 755 ./kubectl
+            mv ./kubectl /usr/local/bin/
+            kubectl completion bash > /etc/bash_completion.d/kubectl
+            su - $user -c "aws eks update-kubeconfig --name ${EKSQSStack.Outputs.EKSClusterName}"
             popd
-            echo "Installing Carvel imgpkg..."
-            bash -c "set -eo pipefail; curl -fsSL https://carvel.dev/install.sh | bash"
             echo "Configuring Docker..."
             getent group docker || groupadd docker
             usermod -aG docker $user
