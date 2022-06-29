@@ -43,7 +43,9 @@ tap_gui:
       baseUrl: #@ "http://tap-gui.{}".format(data.values.dns.domain_name)
 
 metadata_store:
-  app_service_type: LoadBalancer
+  ingressEnabled: true
+  ingressDomain: #@ data.values.dns.domain_name
+  app_service_type: ClusterIP
 
 contour:
   envoy:
