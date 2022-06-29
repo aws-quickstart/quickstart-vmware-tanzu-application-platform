@@ -15,16 +15,16 @@ tap:
   repository: registry.tanzu.vmware.com/tanzu-application-platform/tap-packages
   version: 1.1.1
 cluster:
-  name:
+  name: example-tap-eks-cluster
 dns:
-  domain_name:
-  zone_id:
+  domain_name: tap.local
+  zone_id: Z0123456789ABCDEFGHIJ
 repositories:
-  tap_packages:
-  cluster_essentials:
-  build_service:
+  tap_packages: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tanzu-application-platform/tap-packages
+  cluster_essentials: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tanzu-cluster-essentials/bundle
+  build_service: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tap-build-service
   workload:
-    name:
-    namespace:
-    repository:
-    bundle_repository:
+    name: tanzu-java-web-app-workload
+    namespace: tap-workload
+    repository: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tap-supply-chain/tanzu-java-web-app-workload-tap-workload
+    bundle_repository: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tap-supply-chain/tanzu-java-web-app-workload-tap-workload-bundle
