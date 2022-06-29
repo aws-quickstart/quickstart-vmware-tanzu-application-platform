@@ -1203,8 +1203,6 @@ Resources:
             install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
             echo "Installing tanzu CLI and staging tanzu-cluster-essentials..."
             su - $user -c "$tap_dir/src/install-tools.sh"
-            echo "Installing TAP prerequisites..."
-            su - $user -c "$tap_dir/src/tap-main.sh -c prereqs"
             echo "Creating local copies of key TAP container repos per VMware best practices..."
             su - $user -c "$tap_dir/src/tap-main.sh -c relocate"
             echo "Installing Tanzu Application Platform..."
