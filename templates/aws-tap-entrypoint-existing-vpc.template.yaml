@@ -1050,21 +1050,33 @@ Resources:
         Description: >-
           VMware Tanzu Application Platform role to allow Tanzu Build Service
           to write to ECR
-        AssumeRolePolicyDocument:
-          Statement:
-          - Action:
-            - sts:AssumeRoleWithWebIdentity
-            Condition:
-              StringEquals:
-                oidc.eks.us-west-1.amazonaws.com/id/86DF33965076F45CF73F8AC4B1BAC1DE:sub: sts.amazonaws.com
-                oidc.eks.us-west-1.amazonaws.com/id/86DF33965076F45CF73F8AC4B1BAC1DE:sub: system:serviceaccount:kpack:controller
-            Effect: Allow
-            Principal:
-              Federated: !Sub 
-                - arn:aws:iam::${AWSAccountId}:${oidc}
-                - AWSAccountID: ${AWS::AccountId}
-                - oidc: !GetAtt EKSQSStack.Outputs.OIDCIssuerURL
-          Version: '2012-10-17'
+        AssumeRolePolicyDocument: !Sub
+                - |
+                  {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Federated": "${IamOidcProviderArn}"
+                            },
+                            "Action": "sts:AssumeRoleWithWebIdentity",
+                            "Condition": {
+                                "StringEquals": {
+                                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
+                                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kpack:controller"
+                                }
+                            }
+                        }
+                    ]
+                  }
+                - IamOidcProviderArn: !Join
+                    - ''
+                    - - 'arn:aws:iam::'
+                      - !Ref AWS::AccountId
+                      - ':oidc-provider/'
+                      - !Select [1, !Split ["//", !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
+                  OidcProviderEndpoint: !Select [1, !Split ["//", !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
         Policies:
           - PolicyName: TapECRAdmin
             PolicyDocument:
