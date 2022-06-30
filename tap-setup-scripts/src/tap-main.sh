@@ -2,7 +2,7 @@
 set -e
 group=docker
 if [ $(id -gn) != $group ]; then
-  echo "execute as group docker"
+  echo "Executing as group '$group'..."
   exec sg $group "$0 $*"
 fi
 
@@ -12,7 +12,6 @@ source "$SCRIPT_DIR/functions.sh"
 function tapInstallMain {
   banner "TAP Install..."
   readUserInputs
-  readTAPInternalValues
   verifyK8ClusterAccess
   parseUserInputs
 
@@ -39,7 +38,6 @@ function tapInstallMain {
 function tapUninstallMain {
   banner "TAP uninstall..."
   readUserInputs
-  readTAPInternalValues
   verifyK8ClusterAccess
   parseUserInputs
 
@@ -56,7 +54,6 @@ function tapUninstallMain {
 function tapRelocateMain {
   banner "TAP relocate..."
   readUserInputs
-  readTAPInternalValues
   parseUserInputs
   relocateTAPPackages
   echo "TAP relocate done..."
@@ -66,7 +63,6 @@ function tapTestPreReqs {
   banner "TAP test prerequisites..."
 
   readUserInputs
-  readTAPInternalValues
   parseUserInputs
 
   verifyK8ClusterAccess
