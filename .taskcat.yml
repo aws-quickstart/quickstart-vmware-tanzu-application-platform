@@ -17,6 +17,7 @@ project:
     TanzuNetUsername: --override--
     TanzuNetPassword: --override--
     TanzuNetApiToken: --override--
+    TanzuNetRelocateImages: --override--
     TAPDomainName: --override--
     QSS3BucketName: $[taskcat_autobucket]
     QSS3BucketRegion: $[taskcat_current_region]

@@ -29,6 +29,7 @@ Metadata:
           - TanzuNetUsername
           - TanzuNetPassword
           - TanzuNetApiToken
+          - TanzuNetRelocateImages
       - Label:
           default: VMware Tanzu Application Platform configuration
         Parameters:
@@ -114,6 +115,8 @@ Metadata:
         default: Password
       TanzuNetApiToken:
         default: API token
+      TanzuNetRelocateImages:
+        default: Relocate TAP Images
       TAPVersion:
         default: Version
       SampleAppName:
@@ -467,6 +470,23 @@ Parameters:
       The VMware Tanzu Network user account and authentication (UAA) API
       refresh token (reference: https://network.pivotal.io/docs/api).
     NoEcho: true
+  TanzuNetRelocateImages:
+    Type: String
+    Description: >-
+      Relocate TAP images to your ECR registry from VMware Tanzu Network registry
+      before attempting installation.
+
+      If you choose not to relocate images, Tanzu Application Platform depends
+      directly on VMware Tanzu Network for continued operation. VMware recommends
+      relocating images because there are no uptime guarantees for installations
+      that depend directly on VMware Tanzu Network in this manner.
+      The option to skip relocation is documented for purposes of evaluation and
+      proof-of-concept only.
+
+    AllowedValues:
+      - 'Yes'
+      - 'No'
+    Default: 'No'
   TAPVersion:
     Type: String
     Description: >-
@@ -1256,8 +1276,12 @@ Resources:
             install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
             echo "Installing tanzu CLI and staging tanzu-cluster-essentials..."
             su - $user -c "$tap_dir/src/install-tools.sh"
-            echo "Creating local copies of key TAP container repos per VMware best practices..."
-            su - $user -c "$tap_dir/src/tap-main.sh -c relocate"
+            echo TanzuNetRelocateImages ${TanzuNetRelocateImages}
+            if [[ "${TanzuNetRelocateImages}" == "Yes" ]]
+            then
+              echo "Creating local copies of key TAP container repos per VMware best practices..."
+              su - $user -c "$tap_dir/src/tap-main.sh -c relocate"
+            fi
             echo "Installing Tanzu Application Platform..."
             su - $user -c "$tap_dir/src/tap-main.sh -c install"
             echo "Completed successfully!"
