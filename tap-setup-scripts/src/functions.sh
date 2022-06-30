@@ -167,11 +167,26 @@ function readUserInputs {
   DOMAIN_NAME=$(yq -r .dns.domain_name $INPUTS/user-input-values.yaml)
   ZONE_ID=$(yq -r .dns.zone_id $INPUTS/user-input-values.yaml)
 
-  TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN=$(yq -r .tanzunet_secrets.credentials_arn $INPUTS/user-input-values.yaml)
-  TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN=$(yq -r .tanzunet_secrets.api_token_arn $INPUTS/user-input-values.yaml)
-  TANZUNET_REGISTRY_USERNAME=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN" --query "SecretString" --output text | jq -r .username)
-  TANZUNET_REGISTRY_PASSWORD=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_CREDENTIALS_SECRET_ARN" --query "SecretString" --output text | jq -r .password)
-  PIVNET_TOKEN=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_API_TOKEN_SECRET_ARN" --query "SecretString" --output text)
+  TANZUNET_REGISTRY_SECRETS_MANAGER_ARN=$(yq -r .tanzunet.secrets.credentials_arn $INPUTS/user-input-values.yaml)
+  TANZUNET_REGISTRY_USERNAME=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .username)
+  TANZUNET_REGISTRY_PASSWORD=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .password)
+  PIVNET_TOKEN=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .token)
+
+  TANZUNET_REGISTRY_SERVER=$(yq -r .tanzunet.server $INPUTS/user-input-values.yaml)
+
+  ESSENTIALS_BUNDLE=$(yq -r .cluster_essentials_bundle.bundle $INPUTS/user-input-values.yaml)
+  ESSENTIALS_FILE_HASH=$(yq -r .cluster_essentials_bundle.file_hash $INPUTS/user-input-values.yaml)
+  ESSENTIALS_VERSION=$(yq -r .cluster_essentials_bundle.version $INPUTS/user-input-values.yaml)
+  ESSENTIALS_FILE_ID=$(yq -r .cluster_essentials_bundle.file_id $INPUTS/user-input-values.yaml)
+
+  ESSENTIALS_URI="$ESSENTIALS_BUNDLE@$ESSENTIALS_FILE_HASH"
+
+  TAP_PACKAGE_NAME=$(yq -r .tap.name $INPUTS/user-input-values.yaml)
+  TAP_NAMESPACE=$(yq -r .tap.namespace $INPUTS/user-input-values.yaml)
+  TAP_REPOSITORY=$(yq -r .tap.repository $INPUTS/user-input-values.yaml)
+  TAP_VERSION=$(yq -r .tap.version $INPUTS/user-input-values.yaml)
+
+  TAP_URI="$TAP_REPOSITORY:$TAP_VERSION"
 
   TAP_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.tap_packages $INPUTS/user-input-values.yaml)
   ESSENTIALS_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.cluster_essentials $INPUTS/user-input-values.yaml)
@@ -181,26 +196,6 @@ function readUserInputs {
   DEVELOPER_NAMESPACE=$(yq -r .repositories.workload.namespace $INPUTS/user-input-values.yaml)
   SAMPLE_APP_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.workload.repository $INPUTS/user-input-values.yaml)
   SAMPLE_APP_BUNDLE_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.workload.bundle_repository $INPUTS/user-input-values.yaml)
-}
-
-function readTAPInternalValues {
-  banner "Reading $INPUTS/tap-config-internal-values.yaml"
-
-  TANZUNET_REGISTRY_SERVER=$(yq -r .tanzunet.server $INPUTS/tap-config-internal-values.yaml)
-
-  ESSENTIALS_BUNDLE=$(yq -r .cluster_essentials_bundle.bundle $INPUTS/tap-config-internal-values.yaml)
-  ESSENTIALS_FILE_HASH=$(yq -r .cluster_essentials_bundle.file_hash $INPUTS/tap-config-internal-values.yaml)
-  ESSENTIALS_VERSION=$(yq -r .cluster_essentials_bundle.version $INPUTS/tap-config-internal-values.yaml)
-  ESSENTIALS_FILE_ID=$(yq -r .cluster_essentials_bundle.file_id $INPUTS/tap-config-internal-values.yaml)
-
-  ESSENTIALS_URI="$ESSENTIALS_BUNDLE@$ESSENTIALS_FILE_HASH"
-
-  TAP_PACKAGE_NAME=$(yq -r .tap.name $INPUTS/tap-config-internal-values.yaml)
-  TAP_NAMESPACE=$(yq -r .tap.namespace $INPUTS/tap-config-internal-values.yaml)
-  TAP_REPOSITORY=$(yq -r .tap.repository $INPUTS/tap-config-internal-values.yaml)
-  TAP_VERSION=$(yq -r .tap.version $INPUTS/tap-config-internal-values.yaml)
-
-  TAP_URI="$TAP_REPOSITORY:$TAP_VERSION"
 }
 
 function parseUserInputs {
@@ -216,7 +211,7 @@ function parseUserInputs {
   rm -rf $GENERATED
   mkdir -p $GENERATED
 
-  cat $INPUTS/tap-config-internal-values.yaml $INPUTS/user-input-values.yaml > $GENERATED/user-input-values.yaml
+  cat $INPUTS/user-input-values.yaml > $GENERATED/user-input-values.yaml
 
   banner "Generating tap-values.yaml"
 
@@ -470,7 +465,7 @@ function printOutputParams {
   elb_hostname=$(kubectl get svc envoy -n tanzu-system-ingress -o jsonpath='{ .status.loadBalancer.ingress[0].hostname }')
   echo "Create Route53 DNS CNAME record for *.$DOMAIN_NAME with $elb_hostname"
 
-  pushd $INPUTS
+  pushd $GENERATED
   cat <<EOF > ./tap-gui-route53-wildcard-resource-record-set-config.json
 {
   "Comment": "UPSERT TAP GUI records",
@@ -487,7 +482,7 @@ function printOutputParams {
   ]
 }
 EOF
-  aws route53 change-resource-record-sets --hosted-zone-id $ZONE_ID --change-batch "file://tap-gui-route53-wildcard-resource-record-set-config.json"
+  aws route53 change-resource-record-sets --hosted-zone-id $ZONE_ID --change-batch "file://./tap-gui-route53-wildcard-resource-record-set-config.json"
   popd
 
   tap_gui_url=$(yq -r .tap_gui.app_config.backend.baseUrl $GENERATED/tap-values.yaml)

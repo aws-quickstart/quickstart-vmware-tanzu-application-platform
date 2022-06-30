@@ -14,7 +14,7 @@ Metadata:
     - Build
     - Cluster
     - Essentials
-    - Net
+    - Network
     - Platform
     - Service
     - Stacks
@@ -22,10 +22,27 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
+          default: VMware Tanzu Network configuration
+        Parameters:
+          - AcceptEULAs
+          - AcceptCEIP
+          - TanzuNetUsername
+          - TanzuNetPassword
+          - TanzuNetApiToken
+      - Label:
+          default: VMware Tanzu Application Platform configuration
+        Parameters:
+          - TAPVersion
+          - TAPDomainName
+      - Label:
+          default: Sample app configuration
+        Parameters:
+          - SampleAppName
+      - Label:
           default: Basic configuration
         Parameters:
-          - NumberOfAZs
           - KeyPairName
+          - RemoteAccessCidr
       - Label:
           default: VPC network configuration
         Parameters:
@@ -34,8 +51,6 @@ Metadata:
           - PrivateSubnet2Id
           - PrivateSubnet3Id
           - PublicSubnet1Id
-          - PublicSubnet2Id
-          - PublicSubnet3Id
       - Label:
           default: Amazon EKS configuration
         Parameters:
@@ -45,29 +60,11 @@ Metadata:
           - NodeVolumeSize
           - NumberOfNodes
           - MaxNumberOfNodes
-          - RemoteAccessCidr
       - Label:
-          default: VMware Tanzu Net configuration
+          default: Linux bastion host / bootstrap instance configuration
         Parameters:
-          - TanzuNetUsername
-          - TanzuNetPassword
-          - TanzuNetApiToken
-          - TanzuNetRegistryServer
-          - AcceptEULAs
-      - Label:
-          default: TAP configuration
-        Parameters:
-          - TAPVersion
-          - TAPDomainName
-      - Label:
-          default: Sample app configuration
-        Parameters:
-          - SampleAppName
-      - Label:
-          default: Bootstrap EC2 instance configuration
-        Parameters:
-          - BootstrapOS
-          - BootstrapSshPort
+          - LinuxBastionOS
+          - LinuxBastionSshPort
       - Label:
           default: AWS Quick Start S3 bucket configuration
         Parameters:
@@ -76,11 +73,11 @@ Metadata:
           - QSS3KeyPrefix
     ParameterLabels:
       AcceptEULAs:
-        default: Accept applicable VMware Tanzu EULAs
-      NumberOfAZs:
-        default: Number of Availability Zones
+        default: Have all applicable VMware Tanzu Network EULAs been accepted?
+      AcceptCEIP:
+        default: Have you read and accept the VMware CEIP policy?
       KeyPairName:
-        default: SSH key name
+        default: EC2 key pair name
       VpcId:
         default: VPC ID
       PrivateSubnet1Id:
@@ -91,15 +88,11 @@ Metadata:
         default: Private subnet 3 ID
       PublicSubnet1Id:
         default: Public subnet 1 ID
-      PublicSubnet2Id:
-        default: Public subnet 2 ID
-      PublicSubnet3Id:
-        default: Public subnet 3 ID
       RemoteAccessCidr:
         default: Remote access CIDR
-      BootstrapOS:
+      LinuxBastionOS:
         default: OS
-      BootstrapSshPort:
+      LinuxBastionSshPort:
         default: SSH port
       TAPDomainName:
         default: Domain name
@@ -121,8 +114,6 @@ Metadata:
         default: Password
       TanzuNetApiToken:
         default: API token
-      TanzuNetRegistryServer:
-        default: Server
       TAPVersion:
         default: Version
       SampleAppName:
@@ -137,14 +128,21 @@ Parameters:
   AcceptEULAs:
     Type: String
     Description: >-
-      Choose 'Yes' to accept the following VMware Tanzu Net
-      end-user license agreements (EULAs):
-      1/ Cluster Essentials for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-cluster-essentials,
-      2/ Tanzu Application Platform: https://network.tanzu.vmware.com/products/tanzu-application-platform,
-      3/ Tanzu Build Service and associated components: https://network.tanzu.vmware.com/products/build-service,
-      4/ Tanzu Build Service dependencies: https://network.tanzu.vmware.com/products/tbs-dependencies,
-      5/ Buildpacks for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-buildpacks-suite,
-      6/ Stacks for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-stacks-suite.
+      Choose 'Yes' if you have already accepted the following
+      VMware Tanzu Network end-user license agreements (EULAs) listed in:
+      https://aws-quickstart.github.io/quickstart-vmware-tanzu-application-platform/#_eulas.
+      TAP will fail to install successfully if the listed EULAs have not been
+      accepted for the specified VMware Tanzu Network user account.
+    AllowedValues:
+      - 'Yes'
+      - 'No'
+    Default: 'No'
+  AcceptCEIP:
+    Type: String
+    Description: >-
+      Choose 'Yes' if you have read and accept the VMware customer experience
+      improvement program (CEIP) policy
+      (https://www.vmware.com/solutions/trustvmware/ceip.html).
     AllowedValues:
       - 'Yes'
       - 'No'
@@ -152,37 +150,17 @@ Parameters:
   TAPDomainName:
    Type: String
    Description: >-
-     Domain name that can be used for access to TAP and its
-     corresponding project URLs. Available within a private DNS Zone.
-  NumberOfAZs:
-    Type: String
-    Description: >-
-      Number of Availability Zones to use in the VPC. This must match the value
-      entered for the AvailabilityZones parameter.
-    AllowedValues: [2, 3]
-    Default: 3
+     Private DNS domain name that will be used for accessing the TAP graphical
+     user interface (GUI) and project URLs.
   VpcId:
     Type: AWS::EC2::VPC::Id
     Description: >-
       ID of your existing VPC (eg: vpc-0343606e).
   PublicSubnet1Id:
-    Type: String
+    Type: AWS::EC2::Subnet::Id
     Description: >-
       ID of the public subnet in Availability Zone 1 of your existing VPC
       (eg: subnet-a0246dcd).
-    Default: ''
-  PublicSubnet2Id:
-    Type: String
-    Description: >-
-      ID of the public subnet in Availability Zone 2 of your existing VPC
-      (eg: subnet-b1236eea).
-    Default: ''
-  PublicSubnet3Id:
-    Type: String
-    Description: >-
-      ID of the public subnet in Availability Zone 3 of your existing VPC
-      (eg: subnet-c3456aba).
-    Default: ''
   PrivateSubnet1Id:
     Type: AWS::EC2::Subnet::Id
     Description: >-
@@ -198,17 +176,22 @@ Parameters:
     Description: >-
       ID of the private subnet in Availability Zone 3 of your existing VPC
       (eg: subnet-abd39039).
+    AllowedPattern: ^(subnet-([0-9a-f]{8}|[0-9a-f]{17})|)$
+    ConstraintDescription: Must be a valid VPC subnet ID or blank.
     Default: ''
   KeyPairName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: >-
-      The name of the SSH key that will be used to access the Bootstrap VM and
-      cluster nodes.
+      The name of the EC2 key pair that will be used for SSH access the Linux
+      bastion host / bootstrap instance and EKS cluster nodes, as well as for
+      encrypting the Windows bastion host password. As of 2022-06-21, only
+      RSA key types are supported due to Windows instances not supporting
+      ED25519 (reference:
+      https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
   EKSClusterName:
     Type: String
     Description: >-
-      The name of the cluster that will be created to contain the TAP
-      deployment.
+      The name of the EKS cluster where TAP will be deployed.
     MinLength: 1
     MaxLength: 100
     AllowedPattern: ^[0-9A-Za-z][A-Za-z0-9\-_]*
@@ -217,11 +200,13 @@ Parameters:
       number.
   KubernetesVersion:
     Type: String
-    Description: Kubernetes control plane version.
+    Description: >-
+      The version of Kubernetes control plane version to deploy. The selected
+      version must be supported the selected version of TAP (reference:
+      https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
-      - '1.20'
-      - '1.21'
-    Default: '1.21'
+      - 1.21
+    Default: 1.21
   NumberOfNodes:
     Type: Number
     Description: >-
@@ -240,9 +225,7 @@ Parameters:
     Default: 6
   NodeInstanceType:
     Type: String
-    Description: >-
-      AWS EC2 instance type for each of the nodes deployed within the EKS
-      cluster for TAP.
+    Description: The EKS cluster node instance type.
     AllowedValues:
       - c4.4xlarge
       - c4.8xlarge
@@ -440,53 +423,56 @@ Parameters:
       - z1d.6xlarge
       - z1d.12xlarge
       - z1d.metal
-    ConstraintDescription: Must be a valid EC2 instance type.
+    ConstraintDescription: Must be a supported EC2 instance type.
     Default: m5.xlarge
   NodeVolumeSize:
     Type: Number
-    Description: Size of the node's root EBS volumes.
+    Description: Size of the EKS nodes' root EBS volumes.
     MinValue: 80
     MaxValue: 16384
     Default: 80
   RemoteAccessCidr:
     Type: String
     Description: >-
-      IP range that will be allowed to access the Bootstrap EC2 instance and
-      EKS cluster once deployed.
-  BootstrapOS:
+      IPv4 CIDR block that will be permitted to connect to the Windows and
+      Linux bastion hosts. We recommend that you set this value to a trusted
+      network.
+  LinuxBastionOS:
     Type: String
     Description: >-
-      Preferred operating system for the Bootstrap EC2 instance based on
-      available values.
+      The operating system for the Linux bastion host / bootstrap instance.
     AllowedValues:
       - Ubuntu-Server-22.04-LTS-HVM
     Default: Ubuntu-Server-22.04-LTS-HVM
-  BootstrapSshPort:
+  LinuxBastionSshPort:
     Type: Number
-    Description: TCP port to use for SSH traffic to the Bootstrap instance.
+    Description: >-
+      TCP port to use for the LinuxBastion instance's listening port.
     MinValue: 0
     MaxValue: 65535
     Default: 22
   TanzuNetUsername:
     Type: String
     Description: >-
-      The VMware Tanzu Net username (authentication ID or email address).
+      The VMware Tanzu Network username. To create an account, sign up here:
+      https://account.run.pivotal.io/z/uaa/sign-up.
     NoEcho: true
   TanzuNetPassword:
     Type: String
-    Description: The VMware Tanzu Net password (authentication key).
+    Description: The VMware Tanzu Network password.
     NoEcho: true
   TanzuNetApiToken:
     Type: String
-    Description: The VMware Tanzu Net API token.
+    Description: >-
+      The VMware Tanzu Network user account and authentication (UAA) API
+      refresh token (reference: https://network.pivotal.io/docs/api).
     NoEcho: true
-  TanzuNetRegistryServer:
-    Type: String
-    Description: The TanzuNet registry server.
-    Default: registry.tanzu.vmware.com
   TAPVersion:
     Type: String
-    Description: The version of TAP to deploy.
+    Description: >-
+      The version of TAP to deploy. The selected version must also support the
+      selected Kubernetes version (reference:
+      https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
       - 1.1.0
       - 1.1.1
@@ -539,73 +525,106 @@ Parameters:
       Quick Start location. When using your own bucket, specify the Region.
       See https://aws-quickstart.github.io/option1.html.
     Default: us-east-1
-Rules:
-  AcceptEULAsRule:
-    Assertions:
-    - Assert:
-        !Equals [!Ref AcceptEULAs, 'Yes']
-      AssertDescription: >-
-        You must agree to all of the following applicable VMware TanzuNet
-        end-user license agreements (EULAs).
 Mappings:
   AwsAmiRegionMap:
-    # Ubuntu Server lookup: https://cloud-images.ubuntu.com/locator/ec2/
     af-south-1:
-      US2204HVM: ami-08a1ff0efd6690ede
+      US2204HVM: ami-04f0408f494c0c285
+      WS2022FullBase: ami-0bc997f7008192f44
     ap-east-1:
-      US2204HVM: ami-0c5b035581d9859b0
+      US2204HVM: ami-006e830ecf3449b97
+      WS2022FullBase: ami-0c87318b66586dbdf
     ap-northeast-1:
-      US2204HVM: ami-055bb115702a738f5
+      US2204HVM: ami-0a054d6fbb2cc67ee
+      WS2022FullBase: ami-045926cadb8870a49
     ap-northeast-2:
-      US2204HVM: ami-05b9c9c0fe2f5a62c
+      US2204HVM: ami-0818e9b70ba516e4c
+      WS2022FullBase: ami-09e81229b42b8bce2
     ap-northeast-3:
-      US2204HVM: ami-0b3874967694fae86
+      US2204HVM: ami-069f7cc82ef9ffee0
+      WS2022FullBase: ami-0760c9db34f185b18
     ap-south-1:
-      US2204HVM: ami-00d095fb90db2fa00
+      US2204HVM: ami-0c1d7eb198a14f4b7
+      WS2022FullBase: ami-0ecc68457948da1bc
     ap-southeast-1:
-      US2204HVM: ami-00c76c78e78a3dcd4
+      US2204HVM: ami-07dd115509093305a
+      WS2022FullBase: ami-0517d4980cf75758a
     ap-southeast-2:
-      US2204HVM: ami-0251cb389d14767a2
+      US2204HVM: ami-07cba5a9c6484ecc6
+      WS2022FullBase: ami-0066d7383237ba80b
     ap-southeast-3:
       US2204HVM: ami-0de46ab389596d621
+      WS2022FullBase: ami-080c8096bf5726733
     ca-central-1:
       US2204HVM: ami-0204f3c59456ea9a1
-    # cn-north-1:
-    #   US2204HVM:
-    # cn-northwest-1:
-    #   US2204HVM:
+      WS2022FullBase: ami-031c78e49d3c474aa
+    cn-north-1:
+      US2204HVM: ami-0a5b1cd4564f86427
+      WS2022FullBase: ami-0c59d32872af42389
+    cn-northwest-1:
+      US2204HVM: ami-09fcf3b4295bfce3a
+      WS2022FullBase: ami-0e0d3d43301d7fa6e
     eu-central-1:
-      US2204HVM: ami-04aa66cdfe687d427
+      US2204HVM: ami-0d06de6bae4839627
+      WS2022FullBase: ami-081728af240ed77f2
     eu-north-1:
-      US2204HVM: ami-0dbac3c76b4ead6c5
+      US2204HVM: ami-086a5679c50b4ff6f
+      WS2022FullBase: ami-037c67c58ad5a39b8
     eu-south-1:
-      US2204HVM: ami-0fe7a5523599f4c08
+      US2204HVM: ami-00806d185ec911bf1
+      WS2022FullBase: ami-01687f6d4ba94e20d
     eu-west-1:
-      US2204HVM: ami-07bd2fc45c8a8dd48
+      US2204HVM: ami-0c0aa81a5fab62093
+      WS2022FullBase: ami-00c920ab6ef8925b9
     eu-west-2:
-      US2204HVM: ami-033c8ef001424a6d3
+      US2204HVM: ami-0510e632102e49c91
+      WS2022FullBase: ami-0727ea5edebc000a0
     eu-west-3:
-      US2204HVM: ami-00e43f192e8c59874
+      US2204HVM: ami-0c29d914e1049d227
+      WS2022FullBase: ami-04163e35519631bc7
     me-south-1:
-      US2204HVM: ami-0d49942d3daf970df
+      US2204HVM: ami-02065623a94764b7c
+      WS2022FullBase: ami-0079bcec052a1b365
     sa-east-1:
-      US2204HVM: ami-0b54d646bcf381a79
+      US2204HVM: ami-0c8ba8486b94b44c3
+      WS2022FullBase: ami-024a4831aa3511f47
     us-east-1:
-      US2204HVM: ami-09db26f1ef0a9f406
+      US2204HVM: ami-0f65ab0fd913bc7be
+      WS2022FullBase: ami-0e1a729017e59e409
     us-east-2:
-      US2204HVM: ami-07a683b72d6bd7da3
+      US2204HVM: ami-079b3f6abda6a6372
+      WS2022FullBase: ami-094a92978724fc94c
     us-gov-east-1:
       US2204HVM: ami-08fcbec75b43330b7
+      WS2022FullBase: ami-0365c8f2a839fefed
     us-gov-west-1:
       US2204HVM: ami-04e77113f128920b2
+      WS2022FullBase: ami-0cc7aa87fbd1c3837
     us-west-1:
-      US2204HVM: ami-09596c63850a1bd49
+      US2204HVM: ami-08daca4640726cc73
+      WS2022FullBase: ami-0397c20f71a12873b
     us-west-2:
-      US2204HVM: ami-0437ae8a23be4e98b
-  LinuxAmiNameMap:
+      US2204HVM: ami-0c21533018816e490
+      WS2022FullBase: ami-0280d580c37d161bf
+  AwsAmiNameMap:
     Ubuntu-Server-22.04-LTS-HVM:
+    # Official AMI names are:
+    # Commercial: 'ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20220616'
+    # GovCloud: 'ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20220420'
+    # Greater China Region: 'ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20220604'
+    # Alternative: Ubuntu Server lookup: https://cloud-images.ubuntu.com/locator/ec2/
       Code: US2204HVM
       OS: Ubuntu
+    Windows-Server-2022-English-Full-Base-2022.06.15:
+    # Official AMI name is 'Windows_Server-2022-English-Full-Base-2022.06.15'
+      Code: WS2022FullBase
+      OS: Windows
+  TanzuNetRegistryServer:
+    Server:
+      Name: registry.tanzu.vmware.com
+  KubernetesVersion:
+  # https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
+    '1.21':
+      AwsKubectlVersion: 1.22.6/2022-03-09
   TAPVersion:
     1.1.0:
       ClusterEssentialsBundleVersion: 1.1.0
@@ -642,11 +661,8 @@ Mappings:
               ref:
                 branch: main
 Conditions:
-  3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
-  2AZDeployment: !Or
-    - !Equals [!Ref NumberOfAZs, 2]
-    - !Equals [!Ref NumberOfAZs, 3]
-  Ubuntu: !Equals [!FindInMap [LinuxAmiNameMap, !Ref BootstrapOS, OS], Ubuntu]
+  3AZDeployment: !Not [!Equals [!Ref PrivateSubnet3Id, '']]
+  Ubuntu: !Equals [!FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, OS], Ubuntu]
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
 Resources:
   TanzuNetSecretCredentials:
@@ -655,24 +671,19 @@ Resources:
       Name: !Sub
         - '${StackId}/TanzuNetCredentials'
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: The Tanzu Net username and password
+      Description: The VMware Tanzu Network credentials.
       SecretString: !Sub >-
         {
           "username": "${TanzuNetUsername}",
-          "password": "${TanzuNetPassword}"
+          "password": "${TanzuNetPassword}",
+          "token": "${TanzuNetApiToken}"
         }
-  TanzuNetSecretApiToken:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: !Sub
-        - '${StackId}/TanzuNetApiToken'
-        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: The Tanzu Net API token
-      SecretString: !Ref TanzuNetApiToken
   TAPPackagesRepo:
     Type: AWS::ECR::Repository
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
+    # TODO: Flip back to delete if/when possible for CloudFormation to delete
+    # ECR repos with images.
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
     Properties:
       RepositoryName: !Sub
         - '${StackId}/tanzu-application-platform/tap-packages'
@@ -681,24 +692,28 @@ Resources:
         EncryptionType: AES256
   TAPClusterEssentialsBundleRepo:
     Type: AWS::ECR::Repository
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
     Properties:
       RepositoryName: !Sub
         - '${StackId}/tanzu-cluster-essentials/bundle'
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      EncryptionConfiguration:
+        EncryptionType: AES256
   TAPBuildServiceRepo:
     Type: AWS::ECR::Repository
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
     Properties:
       RepositoryName: !Sub
         - '${StackId}/tap-build-service'
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      EncryptionConfiguration:
+        EncryptionType: AES256
   TAPWorkloadRepo:
     Type: AWS::ECR::Repository
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
     Properties:
       RepositoryName: !Sub
         - '${StackId}/${Prefix}/${Suffix}'
@@ -707,10 +722,12 @@ Resources:
           Suffix: !Sub
             - '${SampleAppName}-${Namespace}'
             - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
+      EncryptionConfiguration:
+        EncryptionType: AES256
   TAPWorkloadBundleRepo:
     Type: AWS::ECR::Repository
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
     Properties:
       RepositoryName: !Sub
         - '${StackId}/${Prefix}/${Suffix}-bundle'
@@ -719,6 +736,8 @@ Resources:
           Suffix: !Sub
             - '${SampleAppName}-${Namespace}'
             - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
+      EncryptionConfiguration:
+        EncryptionType: AES256
   PrivateHostedZone:
     Type: AWS::Route53::HostedZone
     DeletionPolicy: Delete
@@ -729,6 +748,19 @@ Resources:
       VPCs:
         - VPCId: !Ref VpcId
           VPCRegion: !Ref AWS::Region
+  PlaceholderDnsRecord:
+  # The value of this record will be updated during the installation process
+    Type: AWS::Route53::RecordSet
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Delete
+    Properties:
+      Type: CNAME
+      Name: !Sub '*.${TAPDomainName}'
+      HostedZoneId: !Ref PrivateHostedZone
+      Comment: VMware Tanzu Application Platform wildcard record
+      TTL: 60
+      ResourceRecords:
+        - tap-gui.localdomain
   EKSAdvancedConfigStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -753,26 +785,14 @@ Resources:
         ConfigSetName: !Ref AWS::StackName
         VPCID: !Ref VpcId
         PrivateSubnet1ID: !Ref PrivateSubnet1Id
-        PrivateSubnet2ID: !If
-          - 2AZDeployment
-          - !Ref PrivateSubnet2Id
-          - !Ref AWS::NoValue
+        PrivateSubnet2ID: !Ref PrivateSubnet2Id
         PrivateSubnet3ID: !If
           - 3AZDeployment
           - !Ref PrivateSubnet3Id
           - !Ref AWS::NoValue
-        PublicSubnet1ID: !Ref PublicSubnet1Id
-        PublicSubnet2ID: !If
-          - 2AZDeployment
-          - !Ref PublicSubnet2Id
-          - !Ref AWS::NoValue
-        PublicSubnet3ID: !If
-          - 3AZDeployment
-          - !Ref PublicSubnet3Id
-          - !Ref AWS::NoValue
         RemoteAccessCIDR: !Ref RemoteAccessCidr
-        EKSPublicAccessEndpoint: Enabled
-        AdditionalEKSAdminRoleArn: !GetAtt BootstrapIamRole.Arn
+        EKSPublicAccessEndpoint: Disabled
+        AdditionalEKSAdminRoleArn: !GetAtt LinuxBastionIamRole.Arn
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
@@ -795,92 +815,115 @@ Resources:
         MonitoringStack: None
         ALBIngressController: Enabled
         EfsStorageClass: Disabled
-  BootstrapSecurityGroup:
+  TAPLogGroup:
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub
+        - /aws/quickstart/vmware-tanzu-application-platform/${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+  LinuxBastionSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enables SSH access to the Bootstrap instance
+      GroupDescription: >-
+        The TAP Linux bastion host / bootstrap instance security group.
       VpcId: !Ref VpcId
       Tags:
         - Key: Name
-          Value: TAPBootstrapSecurityGroup
+          Value: TAPLinuxBastionSecurityGroup
         - Key: Description
           Value: >-
-            VMware Tanzu Application Platform EKS cluster bootstrap security
-            group.
-  BootstrapSshIngressRule:
+            The VMware Tanzu Application Platform Linux bastion host /
+            bootstrap instance security group.
+  LinuxBastionSshIngressRule:
     Type: AWS::EC2::SecurityGroupIngress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
-      Description: Allow SSH to Bootstrap instance
-      GroupId: !Ref BootstrapSecurityGroup
+      Description: Allow SSH to the Linux bastion host / bootstrap instance.
+      GroupId: !Ref LinuxBastionSecurityGroup
       IpProtocol: tcp
-      FromPort: !Ref BootstrapSshPort
-      ToPort: !Ref BootstrapSshPort
+      FromPort: !Ref LinuxBastionSshPort
+      ToPort: !Ref LinuxBastionSshPort
       CidrIp: !Ref RemoteAccessCidr
-  BootstrapDefaultEgressRule:
+  LinuxBastionDefaultEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
-      Description: Bootstrap instance egress
-      GroupId: !Ref BootstrapSecurityGroup
+      Description: Allow all egress.
+      GroupId: !Ref LinuxBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 0
       ToPort: 65535
       CidrIp: 0.0.0.0/0
-  BootstrapSshToNodesEgressRule:
+  LinuxBastionSshToNodesEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
-      Description: Allow SSH from Bootstrap instance to EKS nodes
-      GroupId: !Ref BootstrapSecurityGroup
+      Description: >-
+        Allow SSH from the Linux bastion host / bootstrap instance to the EKS
+        nodes.
+      GroupId: !Ref LinuxBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 22
       ToPort: 22
       DestinationSecurityGroupId: !GetAtt EKSQSStack.Outputs.NodeGroupSecurityGroup
   NodesSshIngressRule:
     Type: AWS::EC2::SecurityGroupIngress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
-      Description: Allow SSH from Bootstrap instance to EKS nodes
+      Description: >-
+        Allow SSH from the Linux bastion host / bootstrap instance to the EKS
+        nodes.
       GroupId: !GetAtt EKSQSStack.Outputs.NodeGroupSecurityGroup
       IpProtocol: tcp
       ToPort: 22
       FromPort: 22
-      SourceSecurityGroupId: !Ref BootstrapSecurityGroup
-  BootstrapK8sToApiEgressRule:
+      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+  LinuxBastionK8sToApiEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       Description: >-
-        Allow Kubernetes API traffic from Bootstrap instance to EKS control
-        plane
-      GroupId: !Ref BootstrapSecurityGroup
+        Allow the Linux bastion host / bootstrap instance to connect to the EKS
+        control plane for Kubernetes API traffic.
+      GroupId: !Ref LinuxBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 443
       ToPort: 443
       DestinationSecurityGroupId: !GetAtt EKSQSStack.Outputs.ControlPlaneSecurityGroup
   EKSControlPlaneApiIngressRule:
     Type: AWS::EC2::SecurityGroupIngress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Properties:
       Description: >-
-        Allow Kubernetes API traffic from Bootstrap instance to EKS control
-        plane
+        Allow the Linux bastion host / bootstrap instance to connect to the EKS
+        control plane for Kubernetes API traffic.
       GroupId: !GetAtt EKSQSStack.Outputs.ControlPlaneSecurityGroup
       IpProtocol: tcp
       ToPort: 443
       FromPort: 443
-      SourceSecurityGroupId: !Ref BootstrapSecurityGroup
-  BootstrapEIP:
+      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+  LinuxBastionEIP:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
       Tags:
         - Key: Name
-          Value: TAPBootstrapEIP
-  BootstrapIamRole:
+          Value: TAPLinuxBastionEIP
+  LinuxBastionIamRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub
-        - TAPBootstrapIamRole-${StackId}
+        - TAPLinuxBastionIamRole-${StackId}
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: >-
-        VMware Tanzu Application Platform EKS cluster bootstrap instance
-        IAM Role.
+      Description: Linux bastion host / bootstrap instance IAM Role.
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -889,7 +932,7 @@ Resources:
               Service: !Sub ec2.${AWS::URLSuffix}
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: BootstrapInstanceConfig
+        - PolicyName: TAPBootstrapInstanceConfig
           PolicyDocument:
             Version: 2012-10-17
             Statement:
@@ -952,9 +995,7 @@ Resources:
                   - secretsmanager:GetSecretValue
                   - secretsmanager:ListSecretVersionIds
                   - secretsmanager:PutSecretValue
-                Resource:
-                  - !Ref TanzuNetSecretCredentials
-                  - !Ref TanzuNetSecretApiToken
+                Resource: !Ref TanzuNetSecretCredentials
               - Sid: ListSecretsAndGetRandomPassword
                 Effect: Allow
                 Action:
@@ -999,38 +1040,41 @@ Resources:
         - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM
         - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore
         - !Sub arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy
-  BootstrapInstanceProfile:
+  LinuxBastionInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       InstanceProfileName: !Sub
-        - TAPBootstrapInstanceProfile-${StackId}
+        - TAPLinuxBastionInstanceProfile-${StackId}
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Roles:
-        - !Ref BootstrapIamRole
-  BootstrapUbuntuInstance:
+        - !Ref LinuxBastionIamRole
+  UbuntuBastion:
+  # TODO: Implement CloudFormation helper scripts once Ubuntu 22.04 is
+  # supported.
     Type: AWS::EC2::Instance
     Condition: Ubuntu
     Properties:
       InstanceType: m5.large
-      IamInstanceProfile: !Ref BootstrapInstanceProfile
+      IamInstanceProfile: !Ref LinuxBastionInstanceProfile
       ImageId: !FindInMap
         - AwsAmiRegionMap
         - !Ref AWS::Region
-        - !FindInMap [LinuxAmiNameMap, !Ref BootstrapOS, Code]
+        - !FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, Code]
       KeyName: !Ref KeyPairName
       Monitoring: true
       SecurityGroupIds:
-        - !Ref BootstrapSecurityGroup
+        - !Ref LinuxBastionSecurityGroup
       SubnetId: !Ref PublicSubnet1Id
       BlockDeviceMappings:
-        - DeviceName: /dev/xvda
+        - DeviceName: /dev/sda1
           Ebs:
             VolumeSize: 50
             VolumeType: gp2
             Encrypted: true
+            DeleteOnTermination: true
       Tags:
         - Key: Name
-          Value: TAPBootstrapInstance
+          Value: TAPLinuxBastionInstance
         - Key: Description
           Value: >-
             VMware Tanzu Application Platform EKS cluster bootstrap instance.
@@ -1041,9 +1085,8 @@ Resources:
             set -xe
             user=ubuntu
             arch=$(dpkg --print-architecture)
-            uname=$(uname -s)
+            uname=$(uname -m)
             tap_dir=/home/$user/tap-setup-scripts
-            tap_install_complete_filename=tap-install-complete
             cat <<EOF >> /etc/environment
             AWS_REGION=${AWS::Region}
             AWS_DEFAULT_REGION=${AWS::Region}
@@ -1054,15 +1097,23 @@ Resources:
             apt-get -y remove containerd runc
             echo "Adding Docker CE repo..."
             mkdir -p /usr/local/share/keyrings/
-            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/local/share/keyrings/docker-archive-keyring.gpg --yes
-            printf "deb [arch=$arch signed-by=/usr/local/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
+              gpg --dearmor -o /usr/local/share/keyrings/docker-archive-keyring.gpg --yes
+            printf "deb [arch=$arch signed-by=/usr/local/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" |
+              tee /etc/apt/sources.list.d/docker.list
             echo "Updating & upgrading..."
             apt-get -y update
             apt-get -y upgrade
             echo "Installing system dependencies..."
-            apt-get -y install amazon-ecr-credential-helper awscli ca-certificates containerd.io curl docker-ce \
+            apt-get -y install amazon-ecr-credential-helper ca-certificates containerd.io curl docker-ce \
               docker-ce-cli docker-compose-plugin git gnupg gnupg2 jq lsb-release openssl pass perl python3-pip \
-              python3-setuptools sed sudo traceroute uuid-runtime vim wget
+              python3-setuptools sed sudo traceroute unzip uuid-runtime vim wget
+            echo "Installing aws cli..."
+            pushd /tmp
+            wget -O "./awscliv2.zip" "https://awscli.amazonaws.com/awscli-exe-linux-$uname.zip"
+            unzip ./awscliv2.zip
+            ./aws/install
+            popd
             echo "Installing python dependencies for $user..."
             su - $user -c "mkdir -p /home/$user/.local/bin; source /home/$user/.profile; python3 -m pip install --upgrade pip setuptools wheel yq"
             echo "Updating certificate authority certificates..."
@@ -1086,6 +1137,19 @@ Resources:
                   "swap": {
                     "measurement": [
                       "swap_used_percent"
+                    ]
+                  }
+                }
+              },
+              "logs": {
+                "logs_collected": {
+                  "files": {
+                    "collect_list": [
+                      {
+                        "file_path": "/var/log/cloud-init-output.log",
+                        "log_group_name": "${TAPLogGroup}",
+                        "log_stream_name": "{instance_id}_/var/log/cloud-init-output.log"
+                      }
                     ]
                   }
                 }
@@ -1119,7 +1183,7 @@ Resources:
             curl -fsSL "https://github.com/docker/docker-credential-helpers/releases/download/v${DockerCredPassVersion}/docker-credential-pass-v${DockerCredPassVersion}-$arch.tar.gz" | tar xz -C .
             mv docker-credential-pass /usr/local/bin/
             popd
-            cat <<EOF >> /root/.docker/config.json
+            cat <<EOF > /root/.docker/config.json
             {
               "credHelpers": {
                 "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com": "ecr-login",
@@ -1130,7 +1194,7 @@ Resources:
             cp /root/.docker/config.json /home/$user/.docker/
             chown $user:$user /home/$user/.docker/config.json
             echo "Configuring the SSH listening port..."
-            printf "Port ${BootstrapSshPort}\n" > /etc/ssh/sshd_config.d/port.conf
+            printf "Port ${LinuxBastionSshPort}\n" > /etc/ssh/sshd_config.d/port.conf
             systemctl restart sshd.service
             systemctl status sshd.service
             echo "Downloading the VMware Tanzu Application Platform Quick Start scripts..."
@@ -1144,26 +1208,23 @@ Resources:
             popd
             pushd "$tap_dir/src/inputs"
             aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values.yaml" ./tap-values.yaml
-            cat <<EOF > ./tap-config-internal-values.yaml
+            cat <<EOF > ./user-input-values.yaml
             #@data/values
             ---
             tanzunet:
               server: ${TanzuNetRegistryServer}
+              secrets:
+                credentials_arn: ${TanzuNetSecretCredentials}
             cluster_essentials_bundle:
-              bundle: ${ClusterEssentialsBundleRepo}
+              bundle: ${TanzuNetRegistryServer}/${ClusterEssentialsBundleRepo}
               file_hash: ${ClusterEssentialsBundleFileHash}
               version: ${ClusterEssentialsBundleVersion}
               file_id: ${ClusterEssentialsBundleFileId}
             tap:
               name: tap
               namespace: tap-install
-              repository: ${TAPRepo}
+              repository: ${TanzuNetRegistryServer}/${TAPRepo}
               version: ${TAPVersion}
-            EOF
-            cat <<EOF > ./user-input-values.yaml
-            tanzunet_secrets:
-              credentials_arn: ${TanzuNetSecretCredentials}
-              api_token_arn: ${TanzuNetSecretApiToken}
             cluster:
               name: ${EKSQSStack.Outputs.EKSClusterName}
             dns:
@@ -1185,7 +1246,6 @@ Resources:
             aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/git-ssh-basic-auth.yaml" ./git-ssh-basic-auth.yaml
             aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/pipeline.yaml" ./pipeline.yaml
             aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/scan-policy.yaml" ./scan-policy.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/workload-aws.yaml" ./workload-aws.yaml
             cat <<EOF > ./workload-aws.yaml
             ${SampleAppConfig}
             EOF
@@ -1201,8 +1261,8 @@ Resources:
             echo "Installing Tanzu Application Platform..."
             su - $user -c "$tap_dir/src/tap-main.sh -c install"
             echo "Completed successfully!"
-          - AwsKubectlVersion: 1.22.6/2022-03-09
-            ClusterEssentialsBundleRepo: !Sub '${TanzuNetRegistryServer}/tanzu-cluster-essentials/cluster-essentials-bundle'
+          - AwsKubectlVersion: !FindInMap [KubernetesVersion, !Ref KubernetesVersion, AwsKubectlVersion]
+            ClusterEssentialsBundleRepo: tanzu-cluster-essentials/cluster-essentials-bundle
             ClusterEssentialsBundleFileHash: !FindInMap [ClusterEssentialsBundle, !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion], FileHash]
             ClusterEssentialsBundleFileId: !FindInMap [ClusterEssentialsBundle, !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion], FileId]
             ClusterEssentialsBundleVersion: !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion]
@@ -1213,11 +1273,194 @@ Resources:
             QSS3BucketPath: !Sub
               - s3://${S3Bucket}/${QSS3KeyPrefix}tap-setup-scripts
               - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-            TAPRepo: !Sub '${TanzuNetRegistryServer}/tanzu-application-platform/tap-packages'
-  BootstrapUbuntuEipAssociation:
+            TanzuNetRegistryServer: !FindInMap [TanzuNetRegistryServer, Server, Name]
+            TAPRepo: tanzu-application-platform/tap-packages
+  UbuntuBastionEipAssociation:
     Type: AWS::EC2::EIPAssociation
     UpdateReplacePolicy: Delete
     Condition: Ubuntu
     Properties:
-      InstanceId: !Ref BootstrapUbuntuInstance
-      AllocationId: !GetAtt BootstrapEIP.AllocationId
+      InstanceId: !Ref UbuntuBastion
+      AllocationId: !GetAtt LinuxBastionEIP.AllocationId
+  WindowsBastionEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: TAPWindowsBastionEIP
+  WindowsBastionSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Windows bastion host security group.
+      VpcId: !Ref VpcId
+      Tags:
+        - Key: Name
+          Value: TAPWindowsBastionSecurityGroup
+        - Key: Description
+          Value: >-
+            Windows bastion security group for accessing the
+            VMware Tanzu Application Platform cluster GUI.
+  WindowsBastionRdpIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Allow RDP to bastion host
+      GroupId: !Ref WindowsBastionSecurityGroup
+      IpProtocol: tcp
+      FromPort: 3389
+      ToPort: 3389
+      CidrIp: !Ref RemoteAccessCidr
+  WindowsBastionDefaultEgressRule:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      Description: Windows bastion host default egress
+      GroupId: !Ref WindowsBastionSecurityGroup
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      CidrIp: 0.0.0.0/0
+  WindowsBastionIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub
+        - TAPWindowsBastionIamRole-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      Description: Windows bastion host IAM Role.
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub ec2.${AWS::URLSuffix}
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy
+  WindowsBastionInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub
+        - TAPWindowsBastionInstanceProfile-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      Roles:
+        - !Ref WindowsBastionIamRole
+  WindowsBastion:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.medium
+      IamInstanceProfile: !Ref WindowsBastionInstanceProfile
+      ImageId: !FindInMap [AwsAmiRegionMap, !Ref AWS::Region, WS2022FullBase]
+      KeyName: !Ref KeyPairName
+      SecurityGroupIds:
+        - !Ref WindowsBastionSecurityGroup
+      SubnetId: !Ref PublicSubnet1Id
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 80
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: TAPWindowsBastionInstance
+        - Key: Description
+          Value: >-
+            Windows bastion instance for accessing the
+            VMware Tanzu Application Platform cluster graphical user interface
+            (GUI).
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          Write-Host -Object 'Setting AWS Region environment variables...'
+          [System.Environment]::SetEnvironmentVariable('AWS_REGION','${AWS::Region}',[System.EnvironmentVariableTarget]::System)
+          [System.Environment]::SetEnvironmentVariable('AWS_DEFAULT_REGION','${AWS::Region}',[System.EnvironmentVariableTarget]::System)
+          Write-Host -Object 'Installing Chocolatey...'
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+          Invoke-Expression -Command ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          Write-Host -Object 'Installing Mozilla Firefox...'
+          choco install -y Firefox
+          </powershell>
+  WindowsBastionEipAssociation:
+    Type: AWS::EC2::EIPAssociation
+    UpdateReplacePolicy: Delete
+    Properties:
+      InstanceId: !Ref WindowsBastion
+      AllocationId: !GetAtt WindowsBastionEIP.AllocationId
+Outputs:
+  LinuxBastionEIP:
+    Description: >-
+      The public IP address of the Linux bastion host / bootstrap instance.
+    Value: !Ref LinuxBastionEIP
+  UbuntuBastionAZ:
+    Condition: Ubuntu
+    Description: >-
+      The Availability Zone that the Ubuntu bastion host / bootstrap instance
+      is deployed in.
+    Value: !GetAtt UbuntuBastion.AvailabilityZone
+  UbuntuBastionId:
+    Condition: Ubuntu
+    Description: >-
+      The EC2 instance ID of the Ubuntu bastion host / bootstrap instance.
+    Value: !Ref UbuntuBastion
+  UbuntuBastionPublicDnsName:
+    Condition: Ubuntu
+    Description: >-
+      The public DNS name of the Ubuntu bastion host / bootstrap instance.
+    Value: !GetAtt UbuntuBastion.PublicDnsName
+  EKSClusterName:
+    Description: The Amazon EKS cluster name.
+    Value: !GetAtt EKSQSStack.Outputs.EKSClusterName
+  TAPGuiUrl:
+    Description: >-
+      The URL of the VMware Tanzu Application Platform GUI that is accessible
+      from within the VPC, such as the Windows bastion instance.
+    Value: !Sub http://tap-gui.${TAPDomainName}
+  TAPWorkloadUrl:
+    Description: >-
+      The URL of the VMware Tanzu Application Platform sample workload that is
+      accessible from within the VPC, such as the Windows bastion instance.
+    Value: !Sub
+      - http://${SampleAppName}.${Namespace}.${TAPDomainName}
+      - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
+  WindowsBastionAZ:
+    Description: >-
+      The Availability Zone that the Windows bastion instance is deployed in.
+    Value: !GetAtt WindowsBastion.AvailabilityZone
+  WindowsBastionId:
+    Description: The instance ID of the Windows bastion instance.
+    Value: !Ref WindowsBastion
+  WindowsBastionEIP:
+    Description: The public IP address of the Windows bastion instance.
+    Value: !Ref WindowsBastionEIP
+  WindowsBastionPublicDnsName:
+    Description: The public DNS name of the Windows bastion instance.
+    Value: !GetAtt WindowsBastion.PublicDnsName
+  TAPLogGroup:
+    Description: >-
+      The Amazon CloudWatch Logs log group where the Tanzu Application Platform
+      bootstrap logs are stored.
+    Value: !Ref TAPLogGroup
+Rules:
+  AcceptEULAs:
+    Assertions:
+      - Assert: !Equals [!Ref AcceptEULAs, 'Yes']
+        AssertDescription: >-
+          You must agree to all of the applicable VMware Tanzu Network
+          end-user license agreements (EULAs) before proceeding.
+  AcceptCEIP:
+    Assertions:
+      - Assert: !Equals [!Ref AcceptCEIP, 'Yes']
+        AssertDescription: >-
+          You must acknowledge that you have read and accept the VMware
+          Customer Experience Improvement Program (CEIP) policy before you can
+          proceed with the installation.
+  TAP1.1Interop:
+    RuleCondition: !Contains [[1.1.0, 1.1.1], !Ref TAPVersion]
+    Assertions:
+      # The values below require quotes to force string comparison.
+      - Assert: !Contains [['1.21', '1.22', '1.23'], !Ref KubernetesVersion]
+        AssertDescription: >-
+          The VMware Tanzu Application Platform version selection is
+          incompatible with the Kubernetes version selection (reference:
+          https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
