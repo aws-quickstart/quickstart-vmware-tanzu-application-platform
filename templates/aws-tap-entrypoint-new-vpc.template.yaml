@@ -128,7 +128,7 @@ Metadata:
       TanzuNetApiToken:
         default: API token
       TanzuNetRelocateImages:
-        default: Relocate TAP Images
+        default: Relocate TAP images
       TAPVersion:
         default: Version
       SampleAppName:
