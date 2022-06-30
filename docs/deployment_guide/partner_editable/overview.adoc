@@ -1,5 +1,5 @@
 This Quick Start deploys {partner-product-name} on the AWS Cloud.
-If you are unfamiliar with AWS Quick Starts, refer to the https://fwd.aws/rA69w?[AWS Quick Start General Information Guide^].
+This guide covers the steps necessary to deploy this Quick Start.
 
 This Quick Start reference deployment guide provides step-by-step instructions for deploying the {partner-product-short-name} within a Amazon Elastic Kubernetes Service (Amazon EKS) clusters.
 
