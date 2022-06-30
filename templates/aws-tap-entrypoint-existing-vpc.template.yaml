@@ -1041,6 +1041,42 @@ Resources:
         - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM
         - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore
         - !Sub arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy
+  TAPkpackIAMRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: !Sub
+          - TAPkpackIAMRole-${StackId}
+          - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+        Description: >-
+          VMware Tanzu Application Platform role to allow Tanzu Build Service
+          to write to ECR
+        AssumeRolePolicyDocument:
+          Statement:
+          - Action:
+            - sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                oidc.eks.us-west-1.amazonaws.com/id/86DF33965076F45CF73F8AC4B1BAC1DE:sub: sts.amazonaws.com
+                oidc.eks.us-west-1.amazonaws.com/id/86DF33965076F45CF73F8AC4B1BAC1DE:sub: system:serviceaccount:kpack:controller
+            Effect: Allow
+            Principal:
+              Federated: !Sub 
+                - arn:aws:iam::${AWSAccountId}:${oidc}
+                - AWSAccountID: ${AWS::AccountId}
+                - oidc: !GetAtt EKSQSStack.Outputs.OIDCIssuerURL
+          Version: '2012-10-17'
+        Policies:
+          - PolicyName: TapECRAdmin
+            PolicyDocument:
+              Version: 2012-10-17
+              Statement:
+                - Sid: TapECRAdmin
+                  Effect: Allow
+                  Action:
+                    - ecr:*
+                    - sts:*
+                    - ecr-public:*
+                  Resource: '*'                
   LinuxBastionInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
