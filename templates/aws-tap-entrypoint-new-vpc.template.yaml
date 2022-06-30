@@ -528,9 +528,9 @@ Parameters:
       directly on VMware Tanzu Network for continued operation. VMware recommends
       relocating images because there are no uptime guarantees for installations
       that depend directly on VMware Tanzu Network in this manner.
+
       The option to skip relocation is documented for purposes of evaluation and
       proof-of-concept only.
-
     AllowedValues:
       - 'Yes'
       - 'No'
