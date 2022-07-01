@@ -1063,8 +1063,12 @@ Resources:
                             "Action": "sts:AssumeRoleWithWebIdentity",
                             "Condition": {
                                 "StringEquals": {
-                                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
-                                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kpack:controller"
+                                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com"
+                                },
+                                "StringLike": {
+                                    "${OidcProviderEndpoint}:sub": [
+                                      "system:serviceaccount:kpack:controller",
+                                      "system:serviceaccount:build-service:dependency-updater-controller-serviceaccount" ]
                                 }
                             }
                         }
@@ -1104,11 +1108,22 @@ Resources:
     Condition: Ubuntu
     Properties:
       InstanceType: m5.large
+<<<<<<< HEAD
       IamInstanceProfile: !Ref LinuxBastionInstanceProfile
       ImageId: !FindInMap
         - AwsAmiRegionMap
         - !Ref AWS::Region
         - !FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, Code]
+=======
+      IamInstanceProfile: !Ref BootstrapInstanceProfile
+      ImageId: ami-085284d24fe829cd0
+      # ami-09596c63850a1bd49 
+      # ami-085284d24fe829cd0
+      #!FindInMap
+      #  - AwsAmiRegionMap
+      #  - !Ref AWS::Region
+      #  - !FindInMap [LinuxAmiNameMap, !Ref BootstrapOS, Code]
+>>>>>>> Support kpack and dep updater on iam policy
       KeyName: !Ref KeyPairName
       Monitoring: true
       SecurityGroupIds:
@@ -1276,6 +1291,8 @@ Resources:
               version: ${TAPVersion}
             cluster:
               name: ${EKSQSStack.Outputs.EKSClusterName}
+            buildservice:
+              kpack_arn: ${TAPkpackIAMRole.Arn}
             dns:
               domain_name: ${TAPDomainName}
               zone_id: ${PrivateHostedZone.Id}
@@ -1283,7 +1300,6 @@ Resources:
               tap_packages: ${TAPPackagesRepo.RepositoryUri}
               cluster_essentials: ${TAPClusterEssentialsBundleRepo.RepositoryUri}
               build_service: ${TAPBuildServiceRepo.RepositoryUri}
-              build_service_arn: ${TAPkpackIAMRole.Arn}
               workload:
                 name: ${SampleAppName}
                 namespace: ${SampleAppNamespace}
