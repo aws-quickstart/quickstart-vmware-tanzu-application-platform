@@ -1283,6 +1283,7 @@ Resources:
               tap_packages: ${TAPPackagesRepo.RepositoryUri}
               cluster_essentials: ${TAPClusterEssentialsBundleRepo.RepositoryUri}
               build_service: ${TAPBuildServiceRepo.RepositoryUri}
+              build_service_arn: ${TAPkpackIAMRole.Arn}
               workload:
                 name: ${SampleAppName}
                 namespace: ${SampleAppNamespace}
