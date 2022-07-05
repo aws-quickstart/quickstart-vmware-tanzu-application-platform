@@ -1040,7 +1040,15 @@ Resources:
       ManagedPolicyArns:
         - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM
         - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy                          
+  LinuxBastionInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub
+        - TAPLinuxBastionInstanceProfile-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      Roles:
+        - !Ref LinuxBastionIamRole
   TAPkpackIAMRole:
       Type: AWS::IAM::Role
       Properties:
@@ -1139,15 +1147,7 @@ Resources:
                     - ecr:*
                     - sts:*
                     - ecr-public:*
-                  Resource: '*'                           
-  LinuxBastionInstanceProfile::
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      InstanceProfileName: !Sub
-        - TAPLinuxBastionInstanceProfile-${StackId}
-        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Roles:
-        - !Ref LinuxBastionIamRole
+                  Resource: '*' 
   UbuntuBastion:
   # TODO: Implement CloudFormation helper scripts once Ubuntu 22.04 is
   # supported.
