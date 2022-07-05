@@ -522,10 +522,8 @@ Parameters:
       selected Kubernetes version (reference:
       https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
-      - 1.1.0
-      - 1.1.1
-      - 1.2.0-build.15
-    Default: 1.1.1
+      - 1.2.0
+    Default: 1.2.0
   SampleAppName:
     Type: String
     Description: The sample application to deploy in your cluster.
