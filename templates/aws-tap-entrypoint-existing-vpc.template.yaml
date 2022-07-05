@@ -1092,8 +1092,55 @@ Resources:
                     - ecr:*
                     - sts:*
                     - ecr-public:*
-                  Resource: '*'                
-  LinuxBastionInstanceProfile:
+                  Resource: '*'
+  TAPdemoworkloadIAMRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: !Sub
+          - TAPdemoworkloadIAMRole-${StackId}
+          - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+        Description: >-
+          VMware Tanzu Application Platform role to create a demo workload
+        AssumeRolePolicyDocument: !Sub
+                - |
+                  {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Federated": "${IamOidcProviderArn}"
+                            },
+                            "Action": "sts:AssumeRoleWithWebIdentity",
+                            "Condition": {
+                                "StringEquals": {
+                                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
+                                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:tap-workload:default"
+                                }
+                            }
+                        }
+                    ]
+                  }
+                - IamOidcProviderArn: !Join
+                    - ''
+                    - - 'arn:aws:iam::'
+                      - !Ref AWS::AccountId
+                      - ':oidc-provider/'
+                      - !Select [1, !Split ["//", !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
+                  OidcProviderEndpoint: !Select [1, !Split ["//", !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
+        Policies:
+          - PolicyName: TapECRAdmin
+            PolicyDocument:
+              Version: 2012-10-17
+              Statement:
+                - Sid: TapECRAdmin
+                  Effect: Allow
+                  Action:
+                    - ecr:*
+                    - sts:*
+                    - ecr-public:*
+                  Resource: '*'                           
+  LinuxBastionInstanceProfile::
     Type: AWS::IAM::InstanceProfile
     Properties:
       InstanceProfileName: !Sub
@@ -1108,22 +1155,11 @@ Resources:
     Condition: Ubuntu
     Properties:
       InstanceType: m5.large
-<<<<<<< HEAD
       IamInstanceProfile: !Ref LinuxBastionInstanceProfile
       ImageId: !FindInMap
         - AwsAmiRegionMap
         - !Ref AWS::Region
         - !FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, Code]
-=======
-      IamInstanceProfile: !Ref BootstrapInstanceProfile
-      ImageId: ami-085284d24fe829cd0
-      # ami-09596c63850a1bd49 
-      # ami-085284d24fe829cd0
-      #!FindInMap
-      #  - AwsAmiRegionMap
-      #  - !Ref AWS::Region
-      #  - !FindInMap [LinuxAmiNameMap, !Ref BootstrapOS, Code]
->>>>>>> Support kpack and dep updater on iam policy
       KeyName: !Ref KeyPairName
       Monitoring: true
       SecurityGroupIds:
@@ -1305,6 +1341,7 @@ Resources:
                 namespace: ${SampleAppNamespace}
                 repository: ${TAPWorkloadRepo.RepositoryUri}
                 bundle_repository: ${TAPWorkloadBundleRepo.RepositoryUri}
+                arn: ${TAPdemoworkloadIAMRole.Arn}
             EOF
             popd
             pushd "$tap_dir/src/resources"

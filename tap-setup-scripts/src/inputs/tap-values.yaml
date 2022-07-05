@@ -60,4 +60,3 @@ cnrs:
 
 grype:
   namespace: #@ data.values.repositories.workload.namespace
-  targetImagePullSecret: registry-credentials
