@@ -30,7 +30,7 @@ function tapInstallMain {
   tapWorkloadInstallFull
   printOutputParams
   # wait till the workload to go through the supply-chain
-  sleep 120
+  sleep 240
   runTestCases
   echo "TAP install done..."
 }

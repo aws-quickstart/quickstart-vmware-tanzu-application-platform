@@ -307,9 +307,9 @@ function tapInstallFull {
 
   if [[ -z $first_time ]]
   then
-    tanzu package install $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE
+    tanzu package install $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE || true
   else
-    tanzu package installed update $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE
+    tanzu package installed update $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE || true
   fi
 
   banner "Checking state of all packages"

@@ -475,14 +475,8 @@ Parameters:
     Description: >-
       Relocate TAP images to your ECR registry from VMware Tanzu Network registry
       before attempting installation.
-
       If you choose not to relocate images, Tanzu Application Platform depends
-      directly on VMware Tanzu Network for continued operation. VMware recommends
-      relocating images because there are no uptime guarantees for installations
-      that depend directly on VMware Tanzu Network in this manner.
-      The option to skip relocation is documented for purposes of evaluation and
-      proof-of-concept only.
-
+      directly on VMware Tanzu Network for continued operation.
     AllowedValues:
       - 'Yes'
       - 'No'
