@@ -708,7 +708,7 @@ Rules:
           Customer Experience Improvement Program (CEIP) policy before you can
           proceed with the installation.
   TAP1.1Interop:
-    RuleCondition: !Contains [[1.1.0, 1.1.1], !Ref TAPVersion]
+    RuleCondition: !Contains [[1.1.0, 1.1.1, 1.2.0], !Ref TAPVersion]
     Assertions:
       # The values below require quotes to force string comparison.
       - Assert: !Contains [['1.21', '1.22', '1.23'], !Ref KubernetesVersion]
