@@ -7,7 +7,6 @@ source "$SCRIPT_DIR/functions.sh"
 function bootstrapEC2 {
   banner "Bootstrap EC2 instance with tools..."
   readUserInputs
-  readTAPInternalValues
   installTanzuCLI
   verifyTools
   echo "Bootstrap EC2 instance done..."

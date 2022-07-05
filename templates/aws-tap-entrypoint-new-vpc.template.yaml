@@ -14,7 +14,7 @@ Metadata:
     - Build
     - Cluster
     - Essentials
-    - Net
+    - Network
     - Platform
     - Service
     - Stacks
@@ -22,11 +22,29 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
+          default: VMware Tanzu Network configuration
+        Parameters:
+          - AcceptEULAs
+          - AcceptCEIP
+          - TanzuNetUsername
+          - TanzuNetPassword
+          - TanzuNetApiToken
+      - Label:
+          default: VMware Tanzu Application Platform configuration
+        Parameters:
+          - TAPVersion
+          - TAPDomainName
+      - Label:
+          default: Sample app configuration
+        Parameters:
+          - SampleAppName
+      - Label:
           default: Basic configuration
         Parameters:
           - AvailabilityZones
           - NumberOfAZs
           - KeyPairName
+          - RemoteAccessCidr
       - Label:
           default: VPC network configuration
         Parameters:
@@ -46,29 +64,11 @@ Metadata:
           - NodeVolumeSize
           - NumberOfNodes
           - MaxNumberOfNodes
-          - RemoteAccessCidr
       - Label:
-          default: VMware Tanzu Net configuration
+          default: Linux bastion host / bootstrap instance configuration
         Parameters:
-          - TanzuNetUsername
-          - TanzuNetPassword
-          - TanzuNetApiToken
-          - TanzuNetRegistryServer
-          - AcceptEULAs
-      - Label:
-          default: TAP configuration
-        Parameters:
-          - TAPVersion
-          - TAPDomainName
-      - Label:
-          default: Sample app configuration
-        Parameters:
-          - SampleAppName
-      - Label:
-          default: Bootstrap EC2 instance configuration
-        Parameters:
-          - BootstrapOS
-          - BootstrapSshPort
+          - LinuxBastionOS
+          - LinuxBastionSshPort
       - Label:
           default: AWS Quick Start S3 bucket configuration
         Parameters:
@@ -77,13 +77,15 @@ Metadata:
           - QSS3KeyPrefix
     ParameterLabels:
       AcceptEULAs:
-        default: Accept applicable VMware Tanzu EULAs
+        default: Have all applicable VMware Tanzu Network EULAs been accepted?
+      AcceptCEIP:
+        default: Have you read and accept the VMware CEIP policy?
       AvailabilityZones:
         default: Availability Zones
       NumberOfAZs:
         default: Number of Availability Zones
       KeyPairName:
-        default: SSH key name
+        default: EC2 key pair name
       VPCCIDR:
         default: VPC CIDR
       PrivateSubnet1CIDR:
@@ -100,9 +102,9 @@ Metadata:
         default: Public subnet 3 CIDR
       RemoteAccessCidr:
         default: Remote access CIDR
-      BootstrapOS:
+      LinuxBastionOS:
         default: OS
-      BootstrapSshPort:
+      LinuxBastionSshPort:
         default: SSH port
       TAPDomainName:
         default: Domain name
@@ -124,8 +126,6 @@ Metadata:
         default: Password
       TanzuNetApiToken:
         default: API token
-      TanzuNetRegistryServer:
-        default: Server
       TAPVersion:
         default: Version
       SampleAppName:
@@ -140,14 +140,21 @@ Parameters:
   AcceptEULAs:
     Type: String
     Description: >-
-      Choose 'Yes' to accept the following VMware TanzuNet
-      end-user license agreements (EULAs):
-      1/ Cluster Essentials for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/,
-      2/ Tanzu Application Platform: https://network.tanzu.vmware.com/products/tanzu-application-platform/,
-      3/ Tanzu Build Service and associated components: https://network.tanzu.vmware.com/products/build-service/,
-      4/ Tanzu Build Service dependencies: https://network.tanzu.vmware.com/products/tbs-dependencies/,
-      5/ Buildpacks for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-buildpacks-suite,
-      6/ Stacks for VMware Tanzu: https://network.tanzu.vmware.com/products/tanzu-stacks-suite.
+      Choose 'Yes' if you have already accepted the following
+      VMware Tanzu Network end-user license agreements (EULAs) listed in:
+      https://aws-quickstart.github.io/quickstart-vmware-tanzu-application-platform/#_eulas.
+      TAP will fail to install successfully if the listed EULAs have not been
+      accepted for the specified VMware Tanzu Network user account.
+    AllowedValues:
+      - 'Yes'
+      - 'No'
+    Default: 'No'
+  AcceptCEIP:
+    Type: String
+    Description: >-
+      Choose 'Yes' if you have read and accept the VMware customer experience
+      improvement program (CEIP) policy
+      (https://www.vmware.com/solutions/trustvmware/ceip.html).
     AllowedValues:
       - 'Yes'
       - 'No'
@@ -155,8 +162,8 @@ Parameters:
   TAPDomainName:
    Type: String
    Description: >-
-     Domain name that can be used for access to TAP and its
-     corresponding project URLs. Available within a private DNS Zone.
+     Private DNS domain name that will be used for accessing the TAP graphical
+     user interface (GUI) and project URLs.
   NumberOfAZs:
     Type: String
     Description: >-
@@ -224,13 +231,16 @@ Parameters:
   KeyPairName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: >-
-      The name of the SSH key that will be used to access the Bootstrap VM and
-      cluster nodes.
+      The name of the EC2 key pair that will be used for SSH access the Linux
+      bastion host / bootstrap instance and EKS cluster nodes, as well as for
+      encrypting the Windows bastion host password. As of 2022-06-20, only
+      RSA key types are supported due to Windows instances not supporting
+      ED25519 (reference:
+      https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
   EKSClusterName:
     Type: String
     Description: >-
-      The name of the cluster that will be created to contain the TAP
-      deployment.
+      The name of the EKS cluster where TAP will be deployed.
     MinLength: 1
     MaxLength: 100
     AllowedPattern: ^[0-9A-Za-z][A-Za-z0-9\-_]*
@@ -239,11 +249,13 @@ Parameters:
       number.
   KubernetesVersion:
     Type: String
-    Description: Kubernetes control plane version.
+    Description: >-
+      The version of Kubernetes control plane version to deploy. The selected
+      version must be supported the selected version of TAP (reference:
+      https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
-      - '1.20'
-      - '1.21'
-    Default: '1.21'
+      - 1.21
+    Default: 1.21
   NumberOfNodes:
     Type: Number
     Description: >-
@@ -262,9 +274,7 @@ Parameters:
     Default: 6
   NodeInstanceType:
     Type: String
-    Description: >-
-      AWS EC2 instance type for each of the nodes deployed within the EKS
-      cluster for TAP.
+    Description: The EKS cluster node instance type.
     AllowedValues:
       - c4.4xlarge
       - c4.8xlarge
@@ -462,53 +472,55 @@ Parameters:
       - z1d.6xlarge
       - z1d.12xlarge
       - z1d.metal
-    ConstraintDescription: Must be a valid EC2 instance type.
+    ConstraintDescription: Must be a supported EC2 instance type.
     Default: m5.xlarge
   NodeVolumeSize:
     Type: Number
-    Description: Size of the node's root EBS volumes.
+    Description: Size of the EKS nodes' root EBS volumes.
     MinValue: 80
     MaxValue: 16384
     Default: 80
   RemoteAccessCidr:
     Type: String
     Description: >-
-      IP range that will be allowed to access the Bootstrap EC2 instance and
-      EKS cluster once deployed.
-  BootstrapOS:
+      IPv4 CIDR block that will be allowed to access the Windows and Linux
+      bastion hosts.
+  LinuxBastionOS:
     Type: String
     Description: >-
-      Preferred operating system for the Bootstrap EC2 instance based on
-      available values.
+      The operating system for the Linux bastion host / bootstrap instance.
     AllowedValues:
       - Ubuntu-Server-22.04-LTS-HVM
     Default: Ubuntu-Server-22.04-LTS-HVM
-  BootstrapSshPort:
+  LinuxBastionSshPort:
     Type: Number
-    Description: TCP port to use for SSH traffic to the Bootstrap instance.
+    Description: >-
+      TCP port to use for the LinuxBastion instance's listening port.
     MinValue: 0
     MaxValue: 65535
     Default: 22
   TanzuNetUsername:
     Type: String
     Description: >-
-      The VMware Tanzu Net username (authentication ID or email address).
+      The VMware Tanzu Network username. To create an account, sign up here:
+      https://account.run.pivotal.io/z/uaa/sign-up.
     NoEcho: true
   TanzuNetPassword:
     Type: String
-    Description: The VMware Tanzu Net password (authentication key).
+    Description: The VMware Tanzu Network password.
     NoEcho: true
   TanzuNetApiToken:
     Type: String
-    Description: The VMware Tanzu Net API token.
+    Description: >-
+      The VMware Tanzu Network user account and authentication (UAA) API
+      refresh token (reference: https://network.pivotal.io/docs/api).
     NoEcho: true
-  TanzuNetRegistryServer:
-    Type: String
-    Description: The TanzuNet registry server.
-    Default: registry.tanzu.vmware.com
   TAPVersion:
     Type: String
-    Description: The version of TAP to deploy.
+    Description: >-
+      The version of TAP to deploy. The selected version must also support the
+      selected Kubernetes version (reference:
+      https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
       - 1.1.0
       - 1.1.1
@@ -562,19 +574,14 @@ Parameters:
       Quick Start location. When using your own bucket, specify the Region.
       See https://aws-quickstart.github.io/option1.html.
     Default: us-east-1
-Rules:
-  AcceptEULAsRule:
-    Assertions:
-    - Assert:
-        !Equals [!Ref AcceptEULAs, 'Yes']
-      AssertDescription: >-
-        You must agree to all of the applicable VMware Tanzu Net
-        end-user license agreements (EULAs).
+Mappings:
+  AwsAmiNameMap:
+    Ubuntu-Server-22.04-LTS-HVM:
+      Code: US2204HVM
+      OS: Ubuntu
 Conditions:
   3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
-  2AZDeployment: !Or
-    - !Equals [!Ref NumberOfAZs, 2]
-    - !Equals [!Ref NumberOfAZs, 3]
+  Ubuntu: !Equals [!FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, OS], Ubuntu]
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
 Resources:
   VPCStack:
@@ -606,28 +613,18 @@ Resources:
           S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
       Parameters:
         AcceptEULAs: !Ref AcceptEULAs
+        AcceptCEIP: !Ref AcceptCEIP
         VpcId: !GetAtt VPCStack.Outputs.VPCID
         PrivateSubnet1Id: !GetAtt VPCStack.Outputs.PrivateSubnet1AID
-        PrivateSubnet2Id: !If
-          - 2AZDeployment
-          - !GetAtt VPCStack.Outputs.PrivateSubnet2AID
-          - !Ref AWS::NoValue
+        PrivateSubnet2Id: !GetAtt VPCStack.Outputs.PrivateSubnet2AID
         PrivateSubnet3Id: !If
           - 3AZDeployment
           - !GetAtt VPCStack.Outputs.PrivateSubnet3AID
           - !Ref AWS::NoValue
         PublicSubnet1Id: !GetAtt VPCStack.Outputs.PublicSubnet1ID
-        PublicSubnet2Id: !If
-          - 2AZDeployment
-          - !GetAtt VPCStack.Outputs.PublicSubnet2ID
-          - !Ref AWS::NoValue
-        PublicSubnet3Id: !If
-          - 3AZDeployment
-          - !GetAtt VPCStack.Outputs.PublicSubnet3ID
-          - !Ref AWS::NoValue
         RemoteAccessCidr: !Ref RemoteAccessCidr
-        BootstrapOS: !Ref BootstrapOS
-        BootstrapSshPort: !Ref BootstrapSshPort
+        LinuxBastionOS: !Ref LinuxBastionOS
+        LinuxBastionSshPort: !Ref LinuxBastionSshPort
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
@@ -639,9 +636,83 @@ Resources:
         TanzuNetUsername: !Ref TanzuNetUsername
         TanzuNetPassword: !Ref TanzuNetPassword
         TanzuNetApiToken: !Ref TanzuNetApiToken
-        TanzuNetRegistryServer: !Ref TanzuNetRegistryServer
         TAPVersion: !Ref TAPVersion
         SampleAppName: !Ref SampleAppName
         QSS3BucketName: !Ref QSS3BucketName
         QSS3BucketRegion: !Ref QSS3BucketRegion
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
+Outputs:
+  LinuxBastionEIP:
+    Description: >-
+      The public IP address of the Linux bastion host / bootstrap instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.LinuxBastionEIP
+  UbuntuBastionAZ:
+    Condition: Ubuntu
+    Description: >-
+      The Availability Zone that the Ubuntu bastion host / bootstrap instance
+      is deployed in.
+    Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionAZ
+  UbuntuBastionId:
+    Condition: Ubuntu
+    Description: >-
+      The EC2 instance ID of the Ubuntu bastion host / bootstrap instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionId
+  UbuntuBastionPublicDnsName:
+    Condition: Ubuntu
+    Description: >-
+      The public DNS name of the Ubuntu bastion host / bootstrap instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionPublicDnsName
+  EKSClusterName:
+    Description: The Amazon EKS cluster name.
+    Value: !GetAtt ExistingVpcStack.Outputs.EKSClusterName
+  TAPGuiUrl:
+    Description: >-
+      The URL of the VMware Tanzu Application Platform GUI that is accessible
+      from within the VPC, such as the Windows bastion instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.TAPGuiUrl
+  TAPWorkloadUrl:
+    Description: >-
+      The URL of the VMware Tanzu Application Platform sample workload that is
+      accessible from within the VPC, such as the Windows bastion instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.TAPWorkloadUrl
+  WindowsBastionAZ:
+    Description: >-
+      The Availability Zone that the Windows bastion instance is deployed in.
+    Value: !GetAtt ExistingVpcStack.Outputs.WindowsBastionAZ
+  WindowsBastionId:
+    Description: The instance ID of the Windows bastion instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.WindowsBastionId
+  WindowsBastionEIP:
+    Description: The public IP address of the Windows bastion instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.WindowsBastionEIP
+  WindowsBastionPublicDnsName:
+    Description: The public DNS name of the Windows bastion instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.WindowsBastionPublicDnsName
+  TAPLogGroup:
+    Description: >-
+      The Amazon CloudWatch Logs log group where the Tanzu Application Platform
+      bootstrap logs are stored.
+    Value: !GetAtt ExistingVpcStack.Outputs.TAPLogGroup
+Rules:
+  AcceptEULAs:
+    Assertions:
+      - Assert: !Equals [!Ref AcceptEULAs, 'Yes']
+        AssertDescription: >-
+          You must agree to all of the applicable VMware Tanzu Network
+          end-user license agreements (EULAs) before proceeding.
+  AcceptCEIP:
+    Assertions:
+      - Assert: !Equals [!Ref AcceptCEIP, 'Yes']
+        AssertDescription: >-
+          You must acknowledge that you have read and accept the VMware
+          Customer Experience Improvement Program (CEIP) policy before you can
+          proceed with the installation.
+  TAP1.1Interop:
+    RuleCondition: !Contains [[1.1.0, 1.1.1], !Ref TAPVersion]
+    Assertions:
+      # The values below require quotes to force string comparison.
+      - Assert: !Contains [['1.21', '1.22', '1.23'], !Ref KubernetesVersion]
+        AssertDescription: >-
+          The VMware Tanzu Application Platform version selection is
+          incompatible with the Kubernetes version selection (reference:
+          https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).

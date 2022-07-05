@@ -1,0 +1,30 @@
+#@data/values
+---
+tanzunet:
+  server: registry.tanzu.vmware.com
+  secrets:
+    credentials_arn:
+cluster_essentials_bundle:
+  bundle: registry.tanzu.vmware.com/tanzu-cluster-essentials/cluster-essentials-bundle
+  file_hash: sha256:ab0a3539da241a6ea59c75c0743e9058511d7c56312ea3906178ec0f3491f51d
+  version: 1.1.0
+  file_id: 1191987
+tap:
+  name: tap
+  namespace: tap-install
+  repository: registry.tanzu.vmware.com/tanzu-application-platform/tap-packages
+  version: 1.1.1
+cluster:
+  name: example-tap-eks-cluster
+dns:
+  domain_name: tap.local
+  zone_id: Z0123456789ABCDEFGHIJ
+repositories:
+  tap_packages: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tanzu-application-platform/tap-packages
+  cluster_essentials: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tanzu-cluster-essentials/bundle
+  build_service: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tap-build-service
+  workload:
+    name: tanzu-java-web-app-workload
+    namespace: tap-workload
+    repository: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tap-supply-chain/tanzu-java-web-app-workload-tap-workload
+    bundle_repository: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tap-supply-chain/tanzu-java-web-app-workload-tap-workload-bundle
