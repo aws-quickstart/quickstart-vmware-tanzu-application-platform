@@ -8,6 +8,65 @@ In order to validate and verify connectivity to the Tanzu Application Platform, 
 
 == Troubleshoot TAP Deployment
 
-*Installation: you can view some common installation troubleshooting steps within the official VM Ware TAP documentation https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html[here].
+*Installation: you can view some common installation troubleshooting steps within the official VMware TAP documentation https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html[here].
 
-*Usage: you can view some common usage troubleshooting steps within the official VM Ware TAP documentation https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-troubleshooting-tap-troubleshoot-using-tap.html[here].
+*Usage: you can view some common usage troubleshooting steps within the official VMware TAP documentation https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-troubleshooting-tap-troubleshoot-using-tap.html[here].
+
+
+*Problem:*
+
+Failure to accept an End User License Agreement error
+
+*Explanation:*
+
+You cannot access the Tanzu Application Platform or one of its components from VMware Tanzu Network before accepting the relevant EULA in VMware Tanzu Network.
+
+*Solution:*
+
+Follow the steps in Accept the End User License Agreements in Installing the Tanzu CLI https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-install-tanzu-cli.html[here].
+
+SSH into the EC2 instance (TAPLinuxBastionInstance)
+
+you can see the error details in .status.usefulErrorMessage by running:
+
+----
+tanzu package installed list -A
+tanzu package installed get <PACKAGE-NAME>  --namespace tap-install
+----
+where PACKAGE-NAME is the name of the package to target.
+
+Run below commands
+
+. (optional) If you have chosen to relocate TAP images to ECR
+
+  /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c relocate
+
+. Run TAP install
+
+  /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install
+
+*Problem:*
+
+After TAP installation is complete, one or more packages fails to reconcile
+
+*Explanation:*
+
+Often, the cause is one of the following:
+
+  - Your infrastructure provider takes longer to perform tasks than the timeout value allows.
+  - A race condition between components exists.
+
+*Solution:*
+
+SSH into the EC2 instance (TAPLinuxBastionInstance)
+
+Verify the installation status by running:
+----
+tanzu package installed list -A
+----
+
+If the installation has stopped running, one or more reconciliations have likely failed.
+Run below command
+----
+/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install
+----
