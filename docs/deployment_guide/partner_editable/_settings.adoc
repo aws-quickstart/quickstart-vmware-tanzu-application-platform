@@ -1,14 +1,17 @@
 :quickstart-project-name: quickstart-vmware-tanzu-application-platform
 :quickstart-github-org: aws-quickstart
-:partner-product-name: VMware Tanzu Application Platform
-:partner-product-short-name: Tanzu Application Platform
+:partner-company-short-name: VMware
+:partner-product-family: Tanzu
+:partner-product-name: {partner-company-short-name} {partner-product-family} Application Platform
+:partner-product-short-name: {partner-product-family} Application Platform
 :partner-company-name: VMware, Inc.
-:doc-month: June
+:partner-registry: {partner-company-short-name} {partner-product-family} Network
+:doc-month: July
 :doc-year: 2022
 :partner-contributors: Brian C Harrison and Satya Dillikar, {partner-company-name}
 // :other-contributors: Akua Mansa, Trek10
 :aws-contributors: Elvis Pappachen, AWS VMware Partner team
 :aws-ia-contributors: Troy Lindsay, AWS Integration & Automation team
-:deployment_time: 45 minutes
+:deployment_time: 2 hours
 :default_deployment_region: us-east-1
 // :private_repo:

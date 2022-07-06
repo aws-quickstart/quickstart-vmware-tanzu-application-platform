@@ -11,13 +11,24 @@ image::../docs/deployment_guide/images/architecture_diagram.png[Architecture]
 
 As shown in <<architecture1>>, this Quick Start sets up the following:
 
-* A highly available architecture that spans two or more Availability Zones.
+* A highly available architecture that spans either two or three Availability Zones.
 * A virtual private cloud (VPC) configured with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS.
 * In the public subnets:
 ** Managed network address translation (NAT) gateways to allow outbound internet access for resources in the private subnets.
-** In one public subnet, a Linux Bootstrap EC2 instance to allow Secure Shell (SSH) access to the Amazon Kubernetes Service node group in public and private subnets.
-** An Amazon EKS cluster, which creates the Kubernetes control plane.
-* In the private subnets a group of Kubernetes nodes.
-* 4 Elastic Container Registry repositories to be used by Tanzu Application Platform.
-* S3 bucket to be used for encrypted storage of configuration files.
-* Using the Bootstrap VM (EC2) the Tanzu Application Platform will automatically be deployed into the EKS cluster.
+** In one public subnet:
+*** An Amazon Elastic Cloud Compute (Amazon EC2) Linux instance that is used for bootstraping the installation of {partner-product-name} in an Amazon Elastic Kubernetes Service (Amazon EKS) cluster, and also serves as a bastion host for administrators.
+*** An Amazon EC2 Windows instance that is used as a bastion host for end users to access the {partner-product-short-name} website graphical user interface (GUI).
+* In the private subnets:
+** A group of Amazon EKS nodes in an Auto Scaling Group with Contour Envoy ingress controller pods and the {partner-product-short-name} installation.
+   For a complete list of the {partner-product-short-name} packages, please see the https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-install-components.html#verify-the-installed-packages-1[documentation].
+** A Network Load Balancer (NLB) attached to the private subnets, which direct traffic to the Contour Envoy pod configured as a Kubernetes object.
+   The Contour Envoy container provides both ingress and reverse proxy for the {partner-product-short-name} pods for the:
+*** {partner-product-short-name} website GUI.
+*** {partner-product-short-name} Supply Chain Security Tools metadata store.
+* Amazon EKS for creating the Kubernetes control plane cluster that runs {partner-product-short-name}, Contour Envoy, and other containerized applications.
+* An Amazon Route 53 private hosted zone used by the {partner-product-short-name} website GUI.
+* 5 Amazon Elastic Container Registry (Amazon ECR) private repositories.
+** 3 are used for the installation of {partner-product-name}.
+** 2 are used for the installation of the sample workload.
+* AWS Secrets Manager for securely storing the {partner-registry} credentials for the {partner-product-short-name} cluster.
+* Amazon CloudWatch for storing the Linux bastion host's performance metrics and {partner-product-short-name} bootstrap logs sent via the CloudWatch agent.
