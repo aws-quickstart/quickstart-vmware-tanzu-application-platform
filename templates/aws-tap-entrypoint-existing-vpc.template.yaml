@@ -1097,9 +1097,23 @@ Resources:
                 - Sid: TapECRAdmin
                   Effect: Allow
                   Action:
-                    - ecr:*
-                    - sts:*
-                    - ecr-public:*
+                    - ecr:BatchCheckLayerAvailability
+                    - ecr:BatchGetImage
+                    - ecr:CompleteLayerUpload
+                    - ecr:GetAuthorizationToken
+                    - ecr:GetDownloadUrlForLayer
+                    - ecr:InitiateLayerUpload
+                    - ecr:PutImage
+                    - ecr:UploadLayerPart
+                    - sts:AssumeRoleWithWebIdentity
+                    - ecr-public:BatchCheckLayerAvailability
+                    - ecr-public:BatchGetImage
+                    - ecr-public:CompleteLayerUpload
+                    - ecr-public:GetAuthorizationToken
+                    - ecr-public:GetDownloadUrlForLayer
+                    - ecr-public:InitiateLayerUpload
+                    - ecr-public:PutImage
+                    - ecr-public:UploadLayerPart
                   Resource: '*'
   TAPdemoworkloadIAMRole:
       Type: AWS::IAM::Role
@@ -1144,9 +1158,21 @@ Resources:
                 - Sid: TapECRAdmin
                   Effect: Allow
                   Action:
-                    - ecr:*
-                    - sts:*
-                    - ecr-public:*
+                    - ecr:UploadLayerPart
+                    - ecr:BatchCheckLayerAvailability
+                    - ecr:CompleteLayerUpload
+                    - ecr:InitiateLayerUpload
+                    - ecr:PutImage
+                    - ecr:GetAuthorizationToken
+                    - ecr:GetDownloadUrlForLayer
+                    - ecr:BatchGetImage
+                    - sts:AssumeRoleWithWebIdentity
+                    - ecr-public:UploadLayerPart
+                    - ecr-public:BatchCheckLayerAvailability
+                    - ecr-public:CompleteLayerUpload
+                    - ecr-public:InitiateLayerUpload
+                    - ecr-public:PutImage
+                    - ecr-public:GetAuthorizationToken
                   Resource: '*' 
   UbuntuBastion:
   # TODO: Implement CloudFormation helper scripts once Ubuntu 22.04 is
