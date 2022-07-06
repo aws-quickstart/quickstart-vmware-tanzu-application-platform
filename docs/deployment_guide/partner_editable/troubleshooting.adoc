@@ -2,12 +2,21 @@
 
 For troubleshooting common Quick Start issues, refer to the https://fwd.aws/rA69w?[AWS Quick Start General Information Guide^] and https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html[Troubleshooting CloudFormation^].
 
-*Troubleshooting {partner-product-name} documentation*
+[.big]*Troubleshooting {partner-product-name} documentation*
 
 * https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html[Troubleshoot installing {partner-product-short-name}]
 * https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-troubleshooting-tap-troubleshoot-using-tap.html[Troubleshoot using {partner-product-short-name}]
 
-*I can't access the {partner-product-short-name} GUI*
+[.big]*I can't access the {partner-product-short-name} GUI*
+
+*Explanation*
+
+Potential causes include:
+
+* The deployment failed to complete successfully.
+* Accessing the site from a location that doesn't have connectivity to the {partner-product-short-name} GUI.
+
+*Solution*
 
 First, check that the CloudFormation stack deployment completed successfully.
 If the stack deployed successfully, then review the {partner-product-short-name} bootstrap logs by going to the https://console.aws.amazon.com/cloudwatch/home[CloudWatch Logs console] > Log groups > `+/aws/quickstart/tanzu-application-platform/<stack ID>+` log group > `+<instance ID>_/var/log/cloud-init-output.log+` log stream, and check whether this completed successfully.
@@ -18,13 +27,72 @@ TIP: `+<stack ID>+` used in the CloudWatch log group name is the ID of the AWS C
 If the {partner-product-name} bootstrap process completed successfully, then the issue might be the location you are connecting from.
 The {partner-product-short-name} website GUI URL can only be accessed from endpoints with a route to the private VPC network, such as from the Amazon EC2 Windows bastion host instance.
 
-*It's been more than 4 minutes, but the administrator password still isn't available for the Windows bastion host instance*
+[.big]*{partner-product-short-name} installation failed with a EULA error*
 
-Verify that the Amazon EC2 Key Pair selected for the deployment is of type RSA, not ED25519.
+*Explanation*
+
+You must accept the relevant End User License Agreements (EULAs) before you can download the {partner-product-short-name} packages from the {partner-registry}.
+
+*Solution*
+
+Follow the steps in https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements].
+
+SSH into the Linux bastion host instance, and then run the following commands to find additional details about the `+.status.usefulErrorMessage+` error:
+
+----
+tanzu package installed list -A
+tanzu package installed get <PACKAGE-NAME> --namespace tap-install
+----
+
+TIP: `+<PACKAGE-NAME>+` is the name of the package to target.
+
+Run the following commands:
+
+. (Optional) If you have chosen to relocate {partner-product-short-name} images to Amazon ECR and this did not complete successfully, run (takes 30-45 minutes):
+
+  /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c relocate
+
+. Run the {partner-product-short-name} install:
+
+  /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install
+
+[.big]*One or more {partner-product-short-name} packages fails to reconcile*
+
+*Explanation*
+
+Potential causes include:
+
+* An infrastructure issue causing the task to take longer to run than the timeout value allows.
+* A race condition between components.
+
+*Solution*
+
+SSH into the Linux bastion host instance, and verify the installation status by running:
+
+----
+tanzu package installed list -A
+----
+
+If the installation has stopped running, one or more reconciliations have likely failed.
+If so, run the following command
+
+----
+/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install
+----
+
+[.big]*It's been more than 4 minutes, but the Windows bastion host administrator password still isn't available*
+
+*Explanation*
+
+An Amazon EC2 Key Pair of type ED25519 was likely selected for the deployment, not RSA.
 As of June 23rd, 2022, Amazon EC2 Windows instances do not yet support ED25519 keys (https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[reference]).
 If a Key Pair of type ED25519 is selected for this deployment, the CloudFormation stack will still deploy successfully, but you will not be able to retrieve the Windows bastion host's automatically generated password.
 
-Options include:
+*Solution*
+
+Verify that the Amazon EC2 Key Pair selected for the deployment is of type RSA, not ED25519.
+
+Options to remediate include:
 
 . https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html[Reset the Windows administrator password using EC2 Launch v2]
 . https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html[Update the CloudFormation stack] to use a Key Pair with the supported type: RSA.

@@ -1642,7 +1642,7 @@ The VMware Tanzu Application Platform GUI is not available via a public URL, but
 <p>For troubleshooting common Quick Start issues, refer to the <a href="https://fwd.aws/rA69w?" target="_blank" rel="noopener">AWS Quick Start General Information Guide</a> and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html" target="_blank" rel="noopener">Troubleshooting CloudFormation</a>.</p>
 </div>
 <div class="paragraph">
-<p><strong>Troubleshooting VMware Tanzu Application Platform documentation</strong></p>
+<p><strong class="big">Troubleshooting VMware Tanzu Application Platform documentation</strong></p>
 </div>
 <div class="ulist">
 <ul>
@@ -1655,7 +1655,26 @@ The VMware Tanzu Application Platform GUI is not available via a public URL, but
 </ul>
 </div>
 <div class="paragraph">
-<p><strong>I can&#8217;t access the Tanzu Application Platform GUI</strong></p>
+<p><strong class="big">I can&#8217;t access the Tanzu Application Platform GUI</strong></p>
+</div>
+<div class="paragraph">
+<p><strong>Explanation</strong></p>
+</div>
+<div class="paragraph">
+<p>Potential causes include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The deployment failed to complete successfully.</p>
+</li>
+<li>
+<p>Accessing the site from a location that doesn&#8217;t have connectivity to the Tanzu Application Platform GUI.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Solution</strong></p>
 </div>
 <div class="paragraph">
 <p>First, check that the CloudFormation stack deployment completed successfully.
@@ -1679,15 +1698,122 @@ These logs can also be found in the <code>/var/log/cloud-init-output.log</code> 
 The Tanzu Application Platform website GUI URL can only be accessed from endpoints with a route to the private VPC network, such as from the Amazon EC2 Windows bastion host instance.</p>
 </div>
 <div class="paragraph">
-<p><strong>It&#8217;s been more than 4 minutes, but the administrator password still isn&#8217;t available for the Windows bastion host instance</strong></p>
+<p><strong class="big">Tanzu Application Platform installation failed with a EULA error</strong></p>
 </div>
 <div class="paragraph">
-<p>Verify that the Amazon EC2 Key Pair selected for the deployment is of type RSA, not ED25519.
+<p><strong>Explanation</strong></p>
+</div>
+<div class="paragraph">
+<p>You must accept the relevant End User License Agreements (EULAs) before you can download the Tanzu Application Platform packages from the VMware Tanzu Network.</p>
+</div>
+<div class="paragraph">
+<p><strong>Solution</strong></p>
+</div>
+<div class="paragraph">
+<p>Follow the steps in <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0">Accept the End User License Agreements</a>.</p>
+</div>
+<div class="paragraph">
+<p>SSH into the Linux bastion host instance, and then run the following commands to find additional details about the <code>.status.usefulErrorMessage</code> error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>tanzu package installed list -A
+tanzu package installed get &lt;PACKAGE-NAME&gt; --namespace tap-install</pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<code>&lt;PACKAGE-NAME&gt;</code> is the name of the package to target.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Run the following commands:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>(Optional) If you have chosen to relocate Tanzu Application Platform images to Amazon ECR and this did not complete successfully, run (takes 30-45 minutes):</p>
+<div class="literalblock">
+<div class="content">
+<pre>/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c relocate</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Run the Tanzu Application Platform install:</p>
+<div class="literalblock">
+<div class="content">
+<pre>/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><strong class="big">One or more Tanzu Application Platform packages fails to reconcile</strong></p>
+</div>
+<div class="paragraph">
+<p><strong>Explanation</strong></p>
+</div>
+<div class="paragraph">
+<p>Potential causes include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>An infrastructure issue causing the task to take longer to run than the timeout value allows.</p>
+</li>
+<li>
+<p>A race condition between components.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Solution</strong></p>
+</div>
+<div class="paragraph">
+<p>SSH into the Linux bastion host instance, and verify the installation status by running:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>tanzu package installed list -A</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the installation has stopped running, one or more reconciliations have likely failed.
+If so, run the following command</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong class="big">It&#8217;s been more than 4 minutes, but the Windows bastion host administrator password still isn&#8217;t available</strong></p>
+</div>
+<div class="paragraph">
+<p><strong>Explanation</strong></p>
+</div>
+<div class="paragraph">
+<p>An Amazon EC2 Key Pair of type ED25519 was likely selected for the deployment, not RSA.
 As of June 23rd, 2022, Amazon EC2 Windows instances do not yet support ED25519 keys (<a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html">reference</a>).
 If a Key Pair of type ED25519 is selected for this deployment, the CloudFormation stack will still deploy successfully, but you will not be able to retrieve the Windows bastion host&#8217;s automatically generated password.</p>
 </div>
 <div class="paragraph">
-<p>Options include:</p>
+<p><strong>Solution</strong></p>
+</div>
+<div class="paragraph">
+<p>Verify that the Amazon EC2 Key Pair selected for the deployment is of type RSA, not ED25519.</p>
+</div>
+<div class="paragraph">
+<p>Options to remediate include:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
