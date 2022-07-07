@@ -22,15 +22,17 @@ function tapInstallMain {
     echo "Setup prerequisites..."
     installTanzuClusterEssentials
     createTapNamespace
-    # EKS nodes have read-only access, hence tap-registry secret is not necessary
-    # createTapRegistrySecret
+    if [[ $TANZUNET_RELOCATE_IMAGES != "Yes" ]]
+    then
+      createTapRegistrySecret
+    fi
     loadPackageRepository
   fi
   tapInstallFull
   tapWorkloadInstallFull
   printOutputParams
   # wait till the workload to go through the supply-chain
-  sleep 120
+  sleep 360
   runTestCases
   echo "TAP install done..."
 }
@@ -64,7 +66,6 @@ function tapTestPreReqs {
 
   readUserInputs
   parseUserInputs
-
   verifyK8ClusterAccess
 
   echo "TAP test prerequisites done..."

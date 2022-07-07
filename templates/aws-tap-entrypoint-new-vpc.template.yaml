@@ -5,6 +5,7 @@ Description: >-
   **WARNING** This template creates AWS resources. You will be billed for the
   AWS resources used if you create a stack from this template. (qs-1t1t2psqo)
 Metadata:
+  LICENSE: Apache License, Version 2.0
   QuickStartDocumentation:
     EntrypointName: Launch into a new VPC
     Order: 1
@@ -29,6 +30,7 @@ Metadata:
           - TanzuNetUsername
           - TanzuNetPassword
           - TanzuNetApiToken
+          - TanzuNetRelocateImages
       - Label:
           default: VMware Tanzu Application Platform configuration
         Parameters:
@@ -126,6 +128,8 @@ Metadata:
         default: Password
       TanzuNetApiToken:
         default: API token
+      TanzuNetRelocateImages:
+        default: Relocate TAP images
       TAPVersion:
         default: Version
       SampleAppName:
@@ -515,6 +519,17 @@ Parameters:
       The VMware Tanzu Network user account and authentication (UAA) API
       refresh token (reference: https://network.pivotal.io/docs/api).
     NoEcho: true
+  TanzuNetRelocateImages:
+    Type: String
+    Description: >-
+      Relocate TAP images to your ECR registry from VMware Tanzu Network registry
+      before attempting installation.
+      If you choose not to relocate images, Tanzu Application Platform depends
+      directly on VMware Tanzu Network for continued operation.
+    AllowedValues:
+      - 'Yes'
+      - 'No'
+    Default: 'No'
   TAPVersion:
     Type: String
     Description: >-
@@ -634,6 +649,7 @@ Resources:
         TanzuNetUsername: !Ref TanzuNetUsername
         TanzuNetPassword: !Ref TanzuNetPassword
         TanzuNetApiToken: !Ref TanzuNetApiToken
+        TanzuNetRelocateImages: !Ref TanzuNetRelocateImages
         TAPVersion: !Ref TAPVersion
         SampleAppName: !Ref SampleAppName
         QSS3BucketName: !Ref QSS3BucketName

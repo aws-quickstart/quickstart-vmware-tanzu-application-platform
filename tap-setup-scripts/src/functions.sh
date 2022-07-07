@@ -173,7 +173,7 @@ function readUserInputs {
   PIVNET_TOKEN=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .token)
 
   TANZUNET_REGISTRY_SERVER=$(yq -r .tanzunet.server $INPUTS/user-input-values.yaml)
-
+  TANZUNET_RELOCATE_IMAGES=$(yq -r .tanzunet.relocate_images $INPUTS/user-input-values.yaml)
   ESSENTIALS_BUNDLE=$(yq -r .cluster_essentials_bundle.bundle $INPUTS/user-input-values.yaml)
   ESSENTIALS_FILE_HASH=$(yq -r .cluster_essentials_bundle.file_hash $INPUTS/user-input-values.yaml)
   ESSENTIALS_VERSION=$(yq -r .cluster_essentials_bundle.version $INPUTS/user-input-values.yaml)
@@ -228,17 +228,35 @@ function parseUserInputs {
 }
 
 function installTanzuClusterEssentials {
-  requireValue TAP_VERSION ESSENTIALS_ECR_REGISTRY_REPOSITORY ESSENTIALS_FILE_HASH \
-    ECR_REGISTRY_HOSTNAME ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD
+  requireValue TAP_VERSION ESSENTIALS_ECR_REGISTRY_REPOSITORY \
+    ESSENTIALS_FILE_HASH TANZUNET_RELOCATE_IMAGES \
+    ECR_REGISTRY_HOSTNAME ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD \
+    ESSENTIALS_BUNDLE TANZUNET_REGISTRY_SERVER \
+    TANZUNET_REGISTRY_USERNAME TANZUNET_REGISTRY_PASSWORD
 
   banner "Deploy kapp, secretgen configuration bundle & install tanzu CLI"
 
   pushd $DOWNLOADS/tanzu-cluster-essentials
   # tanzu-cluster-essentials install.sh script needs INSTALL_BUNDLE & below INSTALL_XXX params
-  INSTALL_BUNDLE=$ESSENTIALS_ECR_REGISTRY_REPOSITORY@$ESSENTIALS_FILE_HASH \
-    INSTALL_REGISTRY_HOSTNAME=$ECR_REGISTRY_HOSTNAME \
-    INSTALL_REGISTRY_USERNAME=$ECR_REGISTRY_USERNAME \
-    INSTALL_REGISTRY_PASSWORD=$ECR_REGISTRY_PASSWORD ./install.sh --yes
+
+  ESSENTIALS_REGISTRY_REPOSITORY=$ESSENTIALS_BUNDLE
+  ESSENTIALS_REGISTRY_HOSTNAME=$TANZUNET_REGISTRY_SERVER
+  ESSENTIALS_REGISTRY_USERNAME=$TANZUNET_REGISTRY_USERNAME
+  ESSENTIALS_REGISTRY_PASSWORD=$TANZUNET_REGISTRY_PASSWORD
+
+  if [[ $TANZUNET_RELOCATE_IMAGES == "Yes" ]]
+  then
+    echo "Changed ESSENTIALS_REGISTRY_REPOSITORY to ECR Repository"
+    ESSENTIALS_REGISTRY_REPOSITORY=$ESSENTIALS_ECR_REGISTRY_REPOSITORY
+    ESSENTIALS_REGISTRY_HOSTNAME=$ECR_REGISTRY_HOSTNAME
+    ESSENTIALS_REGISTRY_USERNAME=$ECR_REGISTRY_USERNAME
+    ESSENTIALS_REGISTRY_PASSWORD=$ECR_REGISTRY_PASSWORD
+  fi
+
+  INSTALL_BUNDLE=$ESSENTIALS_REGISTRY_REPOSITORY@$ESSENTIALS_FILE_HASH \
+    INSTALL_REGISTRY_HOSTNAME=$ESSENTIALS_REGISTRY_HOSTNAME \
+    INSTALL_REGISTRY_USERNAME=$ESSENTIALS_REGISTRY_USERNAME \
+    INSTALL_REGISTRY_PASSWORD=$ESSENTIALS_REGISTRY_PASSWORD ./install.sh --yes
   popd
 }
 
@@ -266,8 +284,15 @@ function createTapNamespace {
 }
 
 function loadPackageRepository {
-  requireValue TAP_ECR_REGISTRY_REPOSITORY TAP_VERSION TAP_NAMESPACE
+  requireValue TAP_REPOSITORY TAP_ECR_REGISTRY_REPOSITORY TAP_VERSION \
+  TAP_NAMESPACE TANZUNET_RELOCATE_IMAGES
 
+  TAP_REGISTRY_REPOSITORY=$TAP_REPOSITORY
+  if [[ $TANZUNET_RELOCATE_IMAGES == "Yes" ]]
+  then
+    echo "Changed TAP_REGISTRY_REPOSITORY to ECR Repository"
+    TAP_REGISTRY_REPOSITORY=$TAP_ECR_REGISTRY_REPOSITORY
+  fi
   banner "Removing any current TAP package repository"
 
   tanzu package repository delete tanzu-tap-repository -n $TAP_NAMESPACE --yes || true
@@ -276,7 +301,7 @@ function loadPackageRepository {
   banner "Adding TAP package repository"
 
   tanzu package repository add tanzu-tap-repository \
-      --url $TAP_ECR_REGISTRY_REPOSITORY:$TAP_VERSION \
+      --url $TAP_REGISTRY_REPOSITORY:$TAP_VERSION \
       --namespace $TAP_NAMESPACE
   tanzu package repository get tanzu-tap-repository --namespace $TAP_NAMESPACE
   while [[ $(tanzu package available list --namespace $TAP_NAMESPACE -o json) == '[]' ]]
@@ -287,6 +312,21 @@ function loadPackageRepository {
 }
 
 function createTapRegistrySecret {
+  requireValue TANZUNET_REGISTRY_USERNAME TANZUNET_REGISTRY_PASSWORD TANZUNET_REGISTRY_SERVER TAP_NAMESPACE
+
+  banner "Creating tap-registry registry secret"
+
+  tanzu secret registry delete tap-registry --namespace $TAP_NAMESPACE -y
+  waitForRemoval kubectl get secret tap-registry --namespace $TAP_NAMESPACE -o json
+
+  tanzu secret registry add tap-registry \
+    --username "$TANZUNET_REGISTRY_USERNAME" --password "$TANZUNET_REGISTRY_PASSWORD" \
+    --server $TANZUNET_REGISTRY_SERVER \
+    --export-to-all-namespaces --namespace $TAP_NAMESPACE --yes
+}
+
+# This function is not used - can be removed
+function createTapECRRegistrySecret {
   requireValue ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD ECR_REGISTRY_HOSTNAME TAP_NAMESPACE
 
   banner "Creating tap-registry registry secret"
@@ -309,9 +349,9 @@ function tapInstallFull {
 
   if [[ -z $first_time ]]
   then
-    tanzu package install $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE
+    tanzu package install $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE || true
   else
-    tanzu package installed update $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE
+    tanzu package installed update $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE || true
   fi
 
   banner "Checking state of all packages"
