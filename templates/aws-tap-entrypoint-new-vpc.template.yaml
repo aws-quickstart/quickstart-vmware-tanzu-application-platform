@@ -705,8 +705,8 @@ Rules:
           You must acknowledge that you have read and accept the VMware
           Customer Experience Improvement Program (CEIP) policy before you can
           proceed with the installation.
-  TAP1.1Interop:
-    RuleCondition: !Contains [[1.1.0, 1.1.1, 1.2.0], !Ref TAPVersion]
+  TAP1.2Interop:
+    RuleCondition: !Contains [[1.2.0], !Ref TAPVersion]
     Assertions:
       # The values below require quotes to force string comparison.
       - Assert: !Contains [['1.21', '1.22', '1.23'], !Ref KubernetesVersion]
