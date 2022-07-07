@@ -191,7 +191,7 @@ function readUserInputs {
   TAP_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.tap_packages $INPUTS/user-input-values.yaml)
   ESSENTIALS_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.cluster_essentials $INPUTS/user-input-values.yaml)
   TBS_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.build_service $INPUTS/user-input-values.yaml)
-  TBS_IAM_ROLE_ARN=$(yq -r .build_service.kpack_arn $INPUTS/user-input-values.yaml)
+  TBS_IAM_ROLE_ARN=$(yq -r .build_service.buildservice_arn $INPUTS/user-input-values.yaml)
   DEV_NAMESPACE_ARN=$(yq -r .repositories.workload.arn $INPUTS/user-input-values.yaml)
 
   SAMPLE_APP_NAME=$(yq -r .repositories.workload.name $INPUTS/user-input-values.yaml)

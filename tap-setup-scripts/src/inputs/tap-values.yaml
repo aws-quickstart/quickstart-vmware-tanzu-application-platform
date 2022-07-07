@@ -4,7 +4,7 @@ profile: full
 ceip_policy_disclosed: true # Installation fails if this is set to 'false'
 buildservice:
   kp_default_repository: #@ data.values.repositories.build_service
-  kp_default_repository_aws_iam_role_arn: #@ data.values.buildservice.kpack_arn
+  kp_default_repository_aws_iam_role_arn: #@ data.values.buildservice.buildservice_arn
   tanzunet_username: #@ data.values.tanzunet.username
   tanzunet_password: #@ data.values.tanzunet.password
   enable_automatic_dependency_updates: false

@@ -1049,11 +1049,11 @@ Resources:
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Roles:
         - !Ref LinuxBastionIamRole
-  TAPkpackIAMRole:
+  TAPBuildServiceIAMRole:
       Type: AWS::IAM::Role
       Properties:
         RoleName: !Sub
-          - TAPkpackIAMRole-${StackId}
+          - TAPBuildServiceIAMRole-${StackId}
           - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
         Description: >-
           VMware Tanzu Application Platform role to allow Tanzu Build Service
@@ -1090,11 +1090,11 @@ Resources:
                       - !Select [1, !Split ["//", !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
                   OidcProviderEndpoint: !Select [1, !Split ["//", !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
         Policies:
-          - PolicyName: TapECRAdmin
+          - PolicyName: TapECRBuildService
             PolicyDocument:
               Version: 2012-10-17
               Statement:
-                - Sid: TapECRAdmin
+                - Sid: TapECRBuildService
                   Effect: Allow
                   Action:
                     - ecr:BatchCheckLayerAvailability
@@ -1114,7 +1114,7 @@ Resources:
                     - ecr-public:InitiateLayerUpload
                     - ecr-public:PutImage
                     - ecr-public:UploadLayerPart
-                  Resource: '*'
+                  Resource: !GetAtt TAPBuildServiceRepo.Arn
   TAPdemoworkloadIAMRole:
       Type: AWS::IAM::Role
       Properties:
@@ -1151,11 +1151,11 @@ Resources:
                       - !Select [1, !Split ["//", !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
                   OidcProviderEndpoint: !Select [1, !Split ["//", !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
         Policies:
-          - PolicyName: TapECRAdmin
+          - PolicyName: TapECRWorkload
             PolicyDocument:
               Version: 2012-10-17
               Statement:
-                - Sid: TapECRAdmin
+                - Sid: TapECRWorkload
                   Effect: Allow
                   Action:
                     - ecr:UploadLayerPart
@@ -1173,7 +1173,7 @@ Resources:
                     - ecr-public:InitiateLayerUpload
                     - ecr-public:PutImage
                     - ecr-public:GetAuthorizationToken
-                  Resource: '*' 
+                  Resource: '*'
   UbuntuBastion:
   # TODO: Implement CloudFormation helper scripts once Ubuntu 22.04 is
   # supported.
