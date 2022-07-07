@@ -1227,6 +1227,7 @@ Resources:
             ---
             tanzunet:
               server: ${TanzuNetRegistryServer}
+              relocate_images: "${TanzuNetRelocateImages}"
               secrets:
                 credentials_arn: ${TanzuNetSecretCredentials}
             cluster_essentials_bundle:
