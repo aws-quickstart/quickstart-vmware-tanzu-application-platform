@@ -1354,7 +1354,7 @@ Resources:
             cluster:
               name: ${EKSQSStack.Outputs.EKSClusterName}
             buildservice:
-              kpack_arn: ${TAPkpackIAMRole.Arn}
+              buildservice_arn: ${TAPBuildServiceIAMRole.Arn}
             dns:
               domain_name: ${TAPDomainName}
               zone_id: ${PrivateHostedZone.Id}
