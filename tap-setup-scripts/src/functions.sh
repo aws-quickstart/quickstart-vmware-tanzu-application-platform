@@ -191,6 +191,8 @@ function readUserInputs {
   TAP_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.tap_packages $INPUTS/user-input-values.yaml)
   ESSENTIALS_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.cluster_essentials $INPUTS/user-input-values.yaml)
   TBS_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.build_service $INPUTS/user-input-values.yaml)
+  TBS_IAM_ROLE_ARN=$(yq -r .build_service.buildservice_arn $INPUTS/user-input-values.yaml)
+  DEV_NAMESPACE_ARN=$(yq -r .repositories.workload.arn $INPUTS/user-input-values.yaml)
 
   SAMPLE_APP_NAME=$(yq -r .repositories.workload.name $INPUTS/user-input-values.yaml)
   DEVELOPER_NAMESPACE=$(yq -r .repositories.workload.namespace $INPUTS/user-input-values.yaml)
@@ -355,17 +357,14 @@ function tapInstallFull {
 
 function tapWorkloadInstallFull {
   requireValue ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD ECR_REGISTRY_HOSTNAME \
-    DEVELOPER_NAMESPACE SAMPLE_APP_NAME
+    DEVELOPER_NAMESPACE SAMPLE_APP_NAME DEV_NAMESPACE_ARN
 
   banner "Installing Sample Workload"
-
-  # 'registry-credentials' is used in tap-values.yaml & developer-namespace.yaml files
-  tanzu secret registry add registry-credentials --username ${ECR_REGISTRY_USERNAME} --password ${ECR_REGISTRY_PASSWORD} \
-    --server ${ECR_REGISTRY_HOSTNAME} --namespace ${DEVELOPER_NAMESPACE}
 
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/developer-namespace.yaml
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/pipeline.yaml
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/scan-policy.yaml
+  kubectl -n $DEVELOPER_NAMESPACE annotate serviceaccount default eks.amazonaws.com/role-arn=$DEV_NAMESPACE_ARN
 
   tanzu apps workload apply -f $RESOURCES/workload-aws.yaml -n $DEVELOPER_NAMESPACE --yes
 }
