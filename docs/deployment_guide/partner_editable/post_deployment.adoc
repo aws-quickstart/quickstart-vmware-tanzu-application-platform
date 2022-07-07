@@ -29,6 +29,10 @@ The following values should be available to use from the *Outputs* tab:
 |{partner-registry} API Token
 |*Requires input*
 |The {partner-registry} refresh token for the defined user.
+
+|{partner-registry} Relocate Images
+|*Requires input*
+|Yes/No whether to relocate {partner-product-short-name} images to your Amazon ECR private registry from VMware Tanzu Network registry before attempting installation.
 |====
 
 [%autowidth.stretch]
