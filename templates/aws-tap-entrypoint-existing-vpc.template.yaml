@@ -625,10 +625,6 @@ Mappings:
     '1.21':
       AwsKubectlVersion: 1.22.6/2022-03-09
   TAPVersion:
-    1.1.0:
-      ClusterEssentialsBundleVersion: 1.1.0
-    1.1.1:
-      ClusterEssentialsBundleVersion: 1.1.0
     1.2.0:
       ClusterEssentialsBundleVersion: 1.1.0
   ClusterEssentialsBundle:
