@@ -2,6 +2,7 @@
 ---
 tanzunet:
   server: registry.tanzu.vmware.com
+  relocate_images: "Yes"
   secrets:
     credentials_arn:
 cluster_essentials_bundle:
