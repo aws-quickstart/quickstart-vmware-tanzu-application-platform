@@ -7,14 +7,13 @@ tanzunet:
     credentials_arn:
 cluster_essentials_bundle:
   bundle: registry.tanzu.vmware.com/tanzu-cluster-essentials/cluster-essentials-bundle
-  file_hash: sha256:ab0a3539da241a6ea59c75c0743e9058511d7c56312ea3906178ec0f3491f51d
-  version: 1.1.0
-  file_id: 1191987
+  file_hash: sha256:c7c4cb124c06ca0b6a5a6c31617781fd5b4513e03df1cb49d5d19e91c7166644
+  version: 1.2.0-rc.1
 tap:
   name: tap
   namespace: tap-install
   repository: registry.tanzu.vmware.com/tanzu-application-platform/tap-packages
-  version: 1.1.1
+  version: 1.2.0
 cluster:
   name: example-tap-eks-cluster
 dns:
