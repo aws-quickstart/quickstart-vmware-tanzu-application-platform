@@ -1175,7 +1175,9 @@ Resources:
                     - ecr-public:InitiateLayerUpload
                     - ecr-public:PutImage
                     - ecr-public:GetAuthorizationToken
-                  Resource: '*'
+                  Resource:
+                    - !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:*
+                    - !Sub arn:${AWS::Partition}:ecr-public::${AWS::AccountId}:*
   UbuntuBastion:
   # TODO: Implement CloudFormation helper scripts once Ubuntu 22.04 is
   # supported.
