@@ -1251,6 +1251,9 @@ Resources:
                 Resource:
                   - !GetAtt TAPWorkloadRepo.Arn
                   - !GetAtt TAPWorkloadBundleRepo.Arn
+                    # Allows TAP to deploy & manage new workloads from other
+                    # repos post-deployment.
+                  - !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/*
   UbuntuBastion:
   # TODO: Implement CloudFormation helper scripts once Ubuntu 22.04 is
   # supported.
