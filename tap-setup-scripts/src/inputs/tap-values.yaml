@@ -4,16 +4,17 @@ profile: full
 ceip_policy_disclosed: true # Installation fails if this is set to 'false'
 buildservice:
   kp_default_repository: #@ data.values.repositories.build_service
-  kp_default_repository_username: #@ data.values.ecr_registry.username
-  kp_default_repository_password: #@ data.values.ecr_registry.password
+  kp_default_repository_aws_iam_role_arn: #@ data.values.buildservice.buildservice_arn
   tanzunet_username: #@ data.values.tanzunet.username
   tanzunet_password: #@ data.values.tanzunet.password
   enable_automatic_dependency_updates: false
-  descriptor_name: full
 
-supply_chain: testing_scanning
+supply_chain: testing
 
-ootb_supply_chain_testing_scanning:
+ootb_templates:
+  iaas_auth: true
+
+ootb_supply_chain_testing:
   registry:
     server: #@ data.values.repositories.workload.server
     repository: #@ data.values.repositories.workload.ootb_repo_prefix
@@ -59,4 +60,3 @@ cnrs:
 
 grype:
   namespace: #@ data.values.repositories.workload.namespace
-  targetImagePullSecret: registry-credentials
