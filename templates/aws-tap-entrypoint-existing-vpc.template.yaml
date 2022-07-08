@@ -1060,7 +1060,7 @@ Resources:
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Roles:
         - !Ref LinuxBastionIamRole
-  TAPBuildServiceIAMRole:
+  TAPBuildServiceIamRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub
@@ -1097,87 +1097,150 @@ Resources:
         - IamOidcProviderArn: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider
           OidcProviderEndpoint: !Select [1, !Split ["//", !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
       Policies:
-        - PolicyName: TapECRBuildService
+        - PolicyName: TAPEcrBuildService
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Sid: TAPEcrBuildService
+              - Sid: TAPEcrBuildServiceGlobal
                 Effect: Allow
                 Action:
+                  - ecr:DescribeRegistry
+                  - ecr:GetAuthorizationToken
+                  - ecr:GetRegistryPolicy
+                  - ecr:PutRegistryPolicy
+                  - ecr:PutReplicationConfiguration
+                  - ecr:DeleteRegistryPolicy
+                Resource: '*'
+              - Sid: TAPEcrBuildServiceScoped
+                Effect: Allow
+                Action:
+                  - ecr:DescribeImages
+                  - ecr:ListImages
                   - ecr:BatchCheckLayerAvailability
                   - ecr:BatchGetImage
-                  - ecr:CompleteLayerUpload
-                  - ecr:GetAuthorizationToken
+                  - ecr:BatchGetRepositoryScanningConfiguration
+                  - ecr:DescribeImageReplicationStatus
+                  - ecr:DescribeImageScanFindings
+                  - ecr:DescribeRepositories
                   - ecr:GetDownloadUrlForLayer
+                  - ecr:GetLifecyclePolicy
+                  - ecr:GetLifecyclePolicyPreview
+                  - ecr:GetRegistryScanningConfiguration
+                  - ecr:GetRepositoryPolicy
+                  - ecr:ListTagsForResource
+                  - ecr:TagResource
+                  - ecr:UntagResource
+                  - ecr:BatchDeleteImage
+                  - ecr:BatchImportUpstreamImage
+                  - ecr:CompleteLayerUpload
+                  - ecr:CreatePullThroughCacheRule
+                  - ecr:CreateRepository
+                  - ecr:DeleteLifecyclePolicy
+                  - ecr:DeletePullThroughCacheRule
+                  - ecr:DeleteRepository
                   - ecr:InitiateLayerUpload
                   - ecr:PutImage
+                  - ecr:PutImageScanningConfiguration
+                  - ecr:PutImageTagMutability
+                  - ecr:PutLifecyclePolicy
+                  - ecr:PutRegistryScanningConfiguration
+                  - ecr:ReplicateImage
+                  - ecr:StartImageScan
+                  - ecr:StartLifecyclePolicyPreview
                   - ecr:UploadLayerPart
-                  - sts:AssumeRoleWithWebIdentity
-                  - ecr-public:BatchCheckLayerAvailability
-                  - ecr-public:BatchGetImage
-                  - ecr-public:CompleteLayerUpload
-                  - ecr-public:GetAuthorizationToken
-                  - ecr-public:GetDownloadUrlForLayer
-                  - ecr-public:InitiateLayerUpload
-                  - ecr-public:PutImage
-                  - ecr-public:UploadLayerPart
-                Resource: !GetAtt TAPBuildServiceRepo.Arn
+                  - ecr:DeleteRepositoryPolicy
+                  - ecr:SetRepositoryPolicy
+                Resource:
+                  - !GetAtt TAPBuildServiceRepo.Arn
+                  - !GetAtt TAPClusterEssentialsBundleRepo.Arn
+                  - !GetAtt TAPPackagesRepo.Arn
   TAPWorkloadIamRole:
-      Type: AWS::IAM::Role
-      Properties:
-        RoleName: !Sub
-          - TAPWorkloadIamRole-${StackId}
-          - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-        Description: >-
-          VMware Tanzu Application Platform role to create a workload.
-        AssumeRolePolicyDocument: !Sub
-          - |
-            {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Effect": "Allow",
-                  "Principal": {
-                    "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
-                  },
-                  "Action": "sts:AssumeRoleWithWebIdentity",
-                  "Condition": {
-                    "StringEquals": {
-                      "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
-                      "${OidcProviderEndpoint}:sub": "system:serviceaccount:tap-workload:default"
-                    }
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub
+        - TAPWorkloadIamRole-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      Description: >-
+        VMware Tanzu Application Platform role to create a workload.
+      AssumeRolePolicyDocument: !Sub
+        - |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
+                },
+                "Action": "sts:AssumeRoleWithWebIdentity",
+                "Condition": {
+                  "StringEquals": {
+                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
+                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:tap-workload:default"
                   }
                 }
-              ]
-            }
-          - IamOidcProviderArn: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider
-            OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
-        Policies:
-          - PolicyName: TAPEcrWorkload
-            PolicyDocument:
-              Version: 2012-10-17
-              Statement:
-                - Sid: TapECRWorkload
-                  Effect: Allow
-                  Action:
-                    - ecr:UploadLayerPart
-                    - ecr:BatchCheckLayerAvailability
-                    - ecr:CompleteLayerUpload
-                    - ecr:InitiateLayerUpload
-                    - ecr:PutImage
-                    - ecr:GetAuthorizationToken
-                    - ecr:GetDownloadUrlForLayer
-                    - ecr:BatchGetImage
-                    - sts:AssumeRoleWithWebIdentity
-                    - ecr-public:UploadLayerPart
-                    - ecr-public:BatchCheckLayerAvailability
-                    - ecr-public:CompleteLayerUpload
-                    - ecr-public:InitiateLayerUpload
-                    - ecr-public:PutImage
-                    - ecr-public:GetAuthorizationToken
-                  Resource:
-                    - !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:*
-                    - !Sub arn:${AWS::Partition}:ecr-public::${AWS::AccountId}:*
+              }
+            ]
+          }
+        - IamOidcProviderArn: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider
+          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
+      Policies:
+        - PolicyName: TAPEcrWorkload
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: TAPEcrWorkloadGlobal
+                Effect: Allow
+                Action:
+                  - ecr:DescribeRegistry
+                  - ecr:GetAuthorizationToken
+                  - ecr:GetRegistryPolicy
+                  - ecr:PutRegistryPolicy
+                  - ecr:PutReplicationConfiguration
+                  - ecr:DeleteRegistryPolicy
+                Resource: '*'
+              - Sid: TAPEcrWorkloadScoped
+                Effect: Allow
+                Action:
+                  - ecr:DescribeImages
+                  - ecr:ListImages
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:BatchGetImage
+                  - ecr:BatchGetRepositoryScanningConfiguration
+                  - ecr:DescribeImageReplicationStatus
+                  - ecr:DescribeImageScanFindings
+                  - ecr:DescribeRepositories
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:GetLifecyclePolicy
+                  - ecr:GetLifecyclePolicyPreview
+                  - ecr:GetRegistryScanningConfiguration
+                  - ecr:GetRepositoryPolicy
+                  - ecr:ListTagsForResource
+                  - ecr:TagResource
+                  - ecr:UntagResource
+                  - ecr:BatchDeleteImage
+                  - ecr:BatchImportUpstreamImage
+                  - ecr:CompleteLayerUpload
+                  - ecr:CreatePullThroughCacheRule
+                  - ecr:CreateRepository
+                  - ecr:DeleteLifecyclePolicy
+                  - ecr:DeletePullThroughCacheRule
+                  - ecr:DeleteRepository
+                  - ecr:InitiateLayerUpload
+                  - ecr:PutImage
+                  - ecr:PutImageScanningConfiguration
+                  - ecr:PutImageTagMutability
+                  - ecr:PutLifecyclePolicy
+                  - ecr:PutRegistryScanningConfiguration
+                  - ecr:ReplicateImage
+                  - ecr:StartImageScan
+                  - ecr:StartLifecyclePolicyPreview
+                  - ecr:UploadLayerPart
+                  - ecr:DeleteRepositoryPolicy
+                  - ecr:SetRepositoryPolicy
+                Resource:
+                  - !GetAtt TAPWorkloadRepo.Arn
+                  - !GetAtt TAPWorkloadBundleRepo.Arn
   UbuntuBastion:
   # TODO: Implement CloudFormation helper scripts once Ubuntu 22.04 is
   # supported.
@@ -1359,7 +1422,7 @@ Resources:
             cluster:
               name: ${EKSQSStack.Outputs.EKSClusterName}
             buildservice:
-              buildservice_arn: ${TAPBuildServiceIAMRole.Arn}
+              buildservice_arn: ${TAPBuildServiceIamRole.Arn}
             dns:
               domain_name: ${TAPDomainName}
               zone_id: ${PrivateHostedZone.Id}
