@@ -59,26 +59,22 @@ function waitForRemoval {
 }
 
 function installTanzuCLI {
+  requireValue ESSENTIALS_VERSION TAP_VERSION
+
   banner "Downloading kapp, secretgen configuration bundle & tanzu cli"
 
   mkdir -p $DOWNLOADS
-
-  # if [[ ! -f /usr/local/bin/pivnet ]]
-  # then
-  #   echo "Installing pivnet CLI"
-
-  #   PIVNET_VERSION=3.0.1
-  #   curl -fsSLo $DOWNLOADS/pivnet "https://github.com/pivotal-cf/pivnet-cli/releases/download/v$PIVNET_VERSION/pivnet-linux-$(dpkg --print-architecture)-$PIVNET_VERSION"
-  #   sudo install -o ubuntu -g ubuntu -m 0755 $DOWNLOADS/pivnet /usr/local/bin/pivnet
-  # else
-  #   echo "pivnet CLI already present"
-  # fi
 
   if [[ ! -f $DOWNLOADS/tanzu-cluster-essentials/install.sh ]]
   then
     pivnet login --api-token="$PIVNET_TOKEN"
 
     ESSENTIALS_FILE_NAME="tanzu-cluster-essentials-linux-$(dpkg --print-architecture)-$ESSENTIALS_VERSION.tgz"
+
+    ESSENTIALS_FILE_ID=$(pivnet product-files \
+      -p tanzu-cluster-essentials \
+      -r $ESSENTIALS_VERSION \
+     --format=json | jq ".[] | select(.name == \"$ESSENTIALS_FILE_NAME\").id" )
 
     pivnet download-product-files \
       --download-dir $DOWNLOADS \
@@ -177,7 +173,6 @@ function readUserInputs {
   ESSENTIALS_BUNDLE=$(yq -r .cluster_essentials_bundle.bundle $INPUTS/user-input-values.yaml)
   ESSENTIALS_FILE_HASH=$(yq -r .cluster_essentials_bundle.file_hash $INPUTS/user-input-values.yaml)
   ESSENTIALS_VERSION=$(yq -r .cluster_essentials_bundle.version $INPUTS/user-input-values.yaml)
-  ESSENTIALS_FILE_ID=$(yq -r .cluster_essentials_bundle.file_id $INPUTS/user-input-values.yaml)
 
   ESSENTIALS_URI="$ESSENTIALS_BUNDLE@$ESSENTIALS_FILE_HASH"
 
