@@ -675,6 +675,9 @@ Mappings:
 Conditions:
   3AZDeployment: !Not [!Equals [!Ref PrivateSubnet3Id, '']]
   Ubuntu: !Equals [!FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, OS], Ubuntu]
+  # TODO: Finish building logic to only deploy ECR-related resources if when
+  # necessary.
+  # UseEcr: !Equals [!Ref TanzuNetRelocateImages, 'Yes']
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
 Resources:
   TanzuNetSecretCredentials:
@@ -694,6 +697,7 @@ Resources:
     Type: AWS::ECR::Repository
     # TODO: Flip back to delete if/when possible for CloudFormation to delete
     # ECR repos with images.
+    # Condition: UseEcr
     UpdateReplacePolicy: Retain
     DeletionPolicy: Retain
     Properties:
@@ -704,6 +708,7 @@ Resources:
         EncryptionType: AES256
   TAPClusterEssentialsBundleRepo:
     Type: AWS::ECR::Repository
+    # Condition: UseEcr
     UpdateReplacePolicy: Retain
     DeletionPolicy: Retain
     Properties:
@@ -714,6 +719,7 @@ Resources:
         EncryptionType: AES256
   TAPBuildServiceRepo:
     Type: AWS::ECR::Repository
+    # Condition: UseEcr
     UpdateReplacePolicy: Retain
     DeletionPolicy: Retain
     Properties:
@@ -724,6 +730,7 @@ Resources:
         EncryptionType: AES256
   TAPWorkloadRepo:
     Type: AWS::ECR::Repository
+    # Condition: UseEcr
     UpdateReplacePolicy: Retain
     DeletionPolicy: Retain
     Properties:
@@ -738,6 +745,7 @@ Resources:
         EncryptionType: AES256
   TAPWorkloadBundleRepo:
     Type: AWS::ECR::Repository
+    # Condition: UseEcr
     UpdateReplacePolicy: Retain
     DeletionPolicy: Retain
     Properties:
@@ -1062,6 +1070,7 @@ Resources:
         - !Ref LinuxBastionIamRole
   TAPBuildServiceIamRole:
     Type: AWS::IAM::Role
+    # Condition: UseEcr
     Properties:
       RoleName: !Sub
         - TAPBuildServiceIamRole-${StackId}
@@ -1156,6 +1165,7 @@ Resources:
                   - !GetAtt TAPPackagesRepo.Arn
   TAPWorkloadIamRole:
     Type: AWS::IAM::Role
+    # Condition: UseEcr
     Properties:
       RoleName: !Sub
         - TAPWorkloadIamRole-${StackId}
