@@ -1105,27 +1105,21 @@ Resources:
             PolicyDocument:
               Version: 2012-10-17
               Statement:
+                - Sid: GetAuthTokenAndAssumeRole
+                  Effect: Allow
+                  Action: 
+                    - ecr-public:GetAuthorizationToken
+                    - ecr:GetAuthorizationToken
+                    - sts:AssumeRoleWithWebIdentity
+                  Resource: '*'
                 - Sid: TapECRBuildService
                   Effect: Allow
                   Action:
-                    - ecr:BatchCheckLayerAvailability
-                    - ecr:BatchGetImage
-                    - ecr:CompleteLayerUpload
-                    - ecr:GetAuthorizationToken
-                    - ecr:GetDownloadUrlForLayer
-                    - ecr:InitiateLayerUpload
-                    - ecr:PutImage
-                    - ecr:UploadLayerPart
-                    - sts:AssumeRoleWithWebIdentity
-                    - ecr-public:BatchCheckLayerAvailability
-                    - ecr-public:BatchGetImage
-                    - ecr-public:CompleteLayerUpload
-                    - ecr-public:GetAuthorizationToken
-                    - ecr-public:GetDownloadUrlForLayer
-                    - ecr-public:InitiateLayerUpload
-                    - ecr-public:PutImage
-                    - ecr-public:UploadLayerPart
-                  Resource: !GetAtt TAPBuildServiceRepo.Arn
+                    - ecr:*
+                    - ecr-public:*
+                  Resource:
+                    - !GetAtt TAPBuildServiceRepo.Arn
+                    - !GetAtt TAPPackagesRepo.Arn
   TAPdemoworkloadIAMRole:
       Type: AWS::IAM::Role
       Properties:
