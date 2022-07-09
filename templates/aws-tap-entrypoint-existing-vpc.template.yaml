@@ -760,7 +760,10 @@ Resources:
         EncryptionType: AES256
   PrivateHostedZone:
     Type: AWS::Route53::HostedZone
-    DeletionPolicy: Delete
+    # TODO: Flip back to delete if/when possible for CloudFormation to delete
+    # Route 53 hosted zones with records.
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
     Properties:
       HostedZoneConfig:
         Comment: VMware Tanzu Application Platform hosted zone
@@ -768,19 +771,6 @@ Resources:
       VPCs:
         - VPCId: !Ref VpcId
           VPCRegion: !Ref AWS::Region
-  PlaceholderDnsRecord:
-  # The value of this record will be updated during the installation process
-    Type: AWS::Route53::RecordSet
-    UpdateReplacePolicy: Retain
-    DeletionPolicy: Delete
-    Properties:
-      Type: CNAME
-      Name: !Sub '*.${TAPDomainName}'
-      HostedZoneId: !Ref PrivateHostedZone
-      Comment: VMware Tanzu Application Platform wildcard record
-      TTL: 60
-      ResourceRecords:
-        - tap-gui.localdomain
   EKSAdvancedConfigStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -1163,6 +1153,13 @@ Resources:
                   - !GetAtt TAPBuildServiceRepo.Arn
                   - !GetAtt TAPClusterEssentialsBundleRepo.Arn
                   - !GetAtt TAPPackagesRepo.Arn
+                  - !GetAtt TAPWorkloadRepo.Arn
+                  - !GetAtt TAPWorkloadBundleRepo.Arn
+                  - !Sub
+                    # Allows TAP to deploy & manage new workloads from other
+                    # repos with the stack ID prefix post-deployment.
+                      - arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${StackId}/*
+                      - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
   TAPWorkloadIamRole:
     Type: AWS::IAM::Role
     # Condition: UseEcr
@@ -1251,9 +1248,11 @@ Resources:
                 Resource:
                   - !GetAtt TAPWorkloadRepo.Arn
                   - !GetAtt TAPWorkloadBundleRepo.Arn
+                  - !Sub
                     # Allows TAP to deploy & manage new workloads from other
-                    # repos post-deployment.
-                  - !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/*
+                    # repos with the stack ID prefix post-deployment.
+                      - arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${StackId}/*
+                      - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
   UbuntuBastion:
   # TODO: Implement CloudFormation helper scripts once Ubuntu 22.04 is
   # supported.
