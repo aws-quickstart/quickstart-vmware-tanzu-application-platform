@@ -4,8 +4,8 @@ For troubleshooting common Quick Start issues, refer to the https://fwd.aws/rA69
 
 [.big]*Troubleshooting {partner-product-name} documentation*
 
-* https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html[Troubleshoot installing {partner-product-short-name}]
-* https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-troubleshooting-tap-troubleshoot-using-tap.html[Troubleshoot using {partner-product-short-name}]
+* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html[Troubleshoot installing {partner-product-short-name}]
+* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-troubleshooting-tap-troubleshoot-using-tap.html[Troubleshoot using {partner-product-short-name}]
 
 [.big]*I can't access the {partner-product-short-name} GUI*
 
@@ -35,7 +35,7 @@ You must accept the relevant End User License Agreements (EULAs) before you can 
 
 *Solution*
 
-Follow the steps in https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements].
+Follow the steps in https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements].
 
 SSH into the Linux bastion host instance, and then run the following commands to find additional details about the `+.status.usefulErrorMessage+` error:
 
