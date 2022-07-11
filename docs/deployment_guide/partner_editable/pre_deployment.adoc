@@ -60,11 +60,11 @@ For more information, see https://docs.aws.amazon.com/servicequotas/latest/userg
 
 === {partner-registry} account
 
-One of the requirements for this Quick Start is a {partner-registry} account with a username, password, and generated a https://network.pivotal.io/docs/api[user account and authentication (UAA) refresh API token].
+One of the requirements for this Quick Start is a {partner-registry} account with a username, password, and generated a https://network.tanzu.vmware.com/docs/api[user account and authentication (UAA) refresh API token].
 
 ==== Create a new {partner-registry} login
 
-If you do not already have a valid {partner-registry} login, then you can start by going https://network.pivotal.io/[here].
+If you do not already have a valid {partner-registry} login, then you can start by going https://network.tanzu.vmware.com/[here].
 Once on this web page, you will need to perform the following steps:
 
 . Click on "Sign In" link in the top right corner. +
@@ -117,5 +117,5 @@ This information cannot directly identify any individual.
 You must acknowledge that you have read the {partner-company-short-name} CEIP policy before you can proceed with the installation.
 ====
 
-For more information, see https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-install.html#install-profile[Install your {partner-product-short-name} profile].
-To opt out of telemetry participation after installation, see https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-opting-out-telemetry.html[Opting out of telemetry collection].
+For more information, see https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install.html#install-your-tanzu-application-platform-profile-1[Install your {partner-product-short-name} profile].
+To opt out of telemetry participation after installation, see https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-opting-out-telemetry.html[Opting out of telemetry collection].
