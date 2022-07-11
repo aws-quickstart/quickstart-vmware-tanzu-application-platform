@@ -523,6 +523,34 @@ EOF
   echo "TAP GUI URL $tap_gui_url"
 }
 
+function deleteRoute53Record {
+  # envoy loadbalancer ip
+  requireValue GENERATED DOMAIN_NAME ZONE_ID
+
+  elb_hostname=$(kubectl get svc envoy -n tanzu-system-ingress -o jsonpath='{ .status.loadBalancer.ingress[0].hostname }')
+  echo "Delete Route53 DNS CNAME record for *.$DOMAIN_NAME with $elb_hostname"
+
+  pushd $GENERATED
+  cat <<EOF > ./tap-gui-route53-wildcard-resource-record-delete-config.json
+{
+  "Comment": "DELETE TAP GUI records",
+  "Changes": [
+    {
+      "Action": "DELETE",
+        "ResourceRecordSet": {
+          "Name": "*.$DOMAIN_NAME",
+          "Type": "CNAME",
+          "TTL": 300,
+        "ResourceRecords": [{ "Value": "$elb_hostname"}]
+      }
+    }
+  ]
+}
+EOF
+  aws route53 change-resource-record-sets --hosted-zone-id $ZONE_ID --change-batch "file://./tap-gui-route53-wildcard-resource-record-delete-config.json"
+  popd
+}
+
 function runTestCases {
   requireValue DEVELOPER_NAMESPACE SAMPLE_APP_NAME  DOMAIN_NAME
 

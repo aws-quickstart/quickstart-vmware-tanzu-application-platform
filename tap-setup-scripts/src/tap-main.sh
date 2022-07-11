@@ -49,7 +49,7 @@ function tapUninstallMain {
   deletePackageRepository
   deleteTanzuClusterEssentials
   deleteTapNamespace
-
+  deleteRoute53Record
   echo "TAP uninstall done..."
 }
 
