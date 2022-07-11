@@ -101,11 +101,6 @@ Before deploying this Quick Start, you must accept all of the following End User
 
 . https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for {partner-company-short-name} {partner-product-family}]
 . https://network.tanzu.vmware.com/products/tanzu-application-platform/[{partner-product-short-name}]
-. https://network.tanzu.vmware.com/products/build-service/[{partner-product-family} Build Service and associated components]
-. https://network.tanzu.vmware.com/products/tbs-dependencies/[{partner-product-family} Build Service dependencies]
-. https://network.tanzu.vmware.com/products/tanzu-buildpacks-suite[Buildpacks for {partner-company-short-name} {partner-product-family}]
-. https://network.tanzu.vmware.com/products/tanzu-python-buildpack[Python Buildpack for {partner-company-short-name} {partner-product-family}]
-. https://network.tanzu.vmware.com/products/tanzu-stacks-suite[Stacks for {partner-company-short-name} {partner-product-family}]
 
 === Telemetry
 
