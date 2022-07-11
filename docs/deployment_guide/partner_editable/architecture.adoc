@@ -20,7 +20,7 @@ As shown in <<architecture1>>, this Quick Start sets up the following:
 *** An Amazon EC2 Windows instance that is used as a bastion host for end users to access the {partner-product-short-name} website graphical user interface (GUI).
 * In the private subnets:
 ** A group of Amazon EKS nodes in an Auto Scaling Group with Contour Envoy ingress controller pods and the {partner-product-short-name} installation.
-   For a complete list of the {partner-product-short-name} packages, please see the https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-install-components.html#verify-the-installed-packages-1[documentation].
+   For a complete list of the {partner-product-short-name} packages, please see the https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-components.html#verify-the-installed-packages-1[documentation].
 ** A Network Load Balancer (NLB) attached to the private subnets, which direct traffic to the Contour Envoy pod configured as a Kubernetes object.
    The Contour Envoy container provides both ingress and reverse proxy for the {partner-product-short-name} pods for the:
 *** {partner-product-short-name} website GUI.
