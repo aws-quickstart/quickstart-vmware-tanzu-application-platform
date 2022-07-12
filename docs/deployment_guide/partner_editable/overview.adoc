@@ -18,4 +18,4 @@ It is an application aware platform that is modular so teams can customize it ba
 
 This Quick Start is for users who want a repeatable, customizable reference deployment for {partner-product-short-name} on Amazon EKS using AWS CloudFormation.
 
-For advanced information about the product that this Quick Start deploys, refer to the https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-overview.html[documentation].
+For advanced information about the product that this Quick Start deploys, refer to the https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-overview.html[documentation].
