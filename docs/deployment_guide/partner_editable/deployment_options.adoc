@@ -3,10 +3,10 @@
 This Quick Start provides the following deployment options:
 
 // Template direct template links
-* https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform/blob/main/templates/aws-tap-entrypoint-existing-vpc.template.yaml[Deploy {partner-product-short-name} into a new VPC^].
+* https://aws-quickstart.s3.amazonaws.com/quickstart-vmware-tanzu-application-platform/templates/aws-tap-entrypoint-existing-vpc.template.yaml[Deploy {partner-product-short-name} into a new VPC^].
   This option builds a new AWS environment that consists of the VPC, subnets, NAT gateways, security groups, bastion hosts, and other infrastructure components.
   It then deploys {partner-product-short-name} into this new VPC.
-* https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform/blob/main/templates/aws-tap-entrypoint-new-vpc.template.yaml[Deploy {partner-product-short-name} into an existing VPC^].
+* https://aws-quickstart.s3.amazonaws.com/quickstart-vmware-tanzu-application-platform/templates/aws-tap-entrypoint-new-vpc.template.yaml[Deploy {partner-product-short-name} into an existing VPC^].
   This option provisions {partner-product-short-name} in your existing AWS infrastructure.
 
 This Quick Start provides separate templates for these options.
