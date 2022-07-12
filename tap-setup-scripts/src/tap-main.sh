@@ -43,13 +43,13 @@ function tapUninstallMain {
   verifyK8ClusterAccess
   parseUserInputs
 
+  deleteRoute53Record
   tapWorkloadUninstallFull
   tapUninstallFull
   deleteTapRegistrySecret
   deletePackageRepository
   deleteTanzuClusterEssentials
   deleteTapNamespace
-
   echo "TAP uninstall done..."
 }
 
