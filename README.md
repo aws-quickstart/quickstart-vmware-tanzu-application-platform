@@ -1,4 +1,4 @@
-# quickstart-vmware-tanzu-application-platform—Quick Start
+# VMware Tanzu Application Platform Quick Start
 
 For architectural details, step-by-step instructions, and customization options, see the [deployment guide](https://aws-quickstart.github.io/quickstart-vmware-tanzu-application-platform/).
 
