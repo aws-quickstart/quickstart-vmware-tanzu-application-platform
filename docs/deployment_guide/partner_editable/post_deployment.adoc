@@ -1,10 +1,4 @@
 // Include any postdeployment steps here, such as steps necessary to test that the deployment was successful. If there are no postdeployment steps, leave this file empty.
-
-The following values should be available to use from the *Outputs* tab:
-
-. The Elastic IP addresses associated with the Amazon EC2 Linux and Windows bastion host instances.
-. The {partner-product-short-name} website GUI URL that you can access from the Windows bastion host instance.
-
 === Parameter reference
 
 ==== Parameters for deploying a {partner-product-short-name} cluster in a new VPC
@@ -12,17 +6,25 @@ The following values should be available to use from the *Outputs* tab:
 [%autowidth.stretch]
 .{partner-registry} configuration
 |====
-|Parameter Label |Default Value |Description
+|Parameter |Parameter Label |Default Value |Description
 
-|AcceptEULAs
-|*Requires input*
-|Yes/No whether the required EULAs have been read and accepted before {partner-product-short-name} is installed.
+|`AcceptEULAs`
+|Have all applicable VMware Tanzu Network EULAs been accepted?
+|No
+|Choose 'Yes' if you have already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for VMware Tanzu] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[VMWare Tanzu Application Platform] end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
 
-|{partner-registry} username
-|*Requires input*
-|The {partner-registry} username (authentication ID or email address).
+|`AcceptCEIP`
+|Have you read and accept the VMware CEIP policy?
+|No
+|Choose 'Yes' if you have read and accepted the https://www.vmware.com/solutions/trustvmware/ceip.html[VMware customer experience improvement program (CEIP) policy].
 
-|{partner-registry} password
+|`TanzuNetUsername`
+|Username
+|
+|VMware Tanzu Network username. To create an account, sign up at https://account.run.pivotal.io/z/uaa/sign-up.
+
+|`Tan`
+|VMware Tanzu Network password.
 |*Requires input*
 |The {partner-registry} password (authentication key).
 
@@ -159,8 +161,12 @@ See https://aws-quickstart.github.io/option1.html.
 
 == Postdeployment steps
 
-After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured — including any required patches — to meet your security and other needs.
-For more information, see the https://aws.amazon.com/compliance/shared-responsibility-model/[AWS Shared Responsibility Model].
+The following values should be available to use from the *Outputs* tab:
+
+. The Elastic IP addresses associated with the Amazon EC2 Linux and Windows bastion host instances.
+. The {partner-product-short-name} website GUI URL that you can access from the Windows bastion host instance.
+
+After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured — including any required patches — to meet your security and other needs. For more information, see the https://aws.amazon.com/compliance/shared-responsibility-model/[AWS Shared Responsibility Model].
 
 === Access the GUI
 
