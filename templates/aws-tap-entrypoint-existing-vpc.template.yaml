@@ -140,8 +140,8 @@ Parameters:
   AcceptCEIP:
     Type: String
     Description: >-
-      Choose 'Yes' if you have read and accept the VMware customer experience
-      improvement program (CEIP) policy. For more information, refer to https://www.vmware.com/solutions/trustvmware/ceip.html.
+      Choose 'Yes' if you have read and accepted the [VMware customer experience
+      improvement program (CEIP) policy](https://www.vmware.com/solutions/trustvmware/ceip.html).
     AllowedValues:
       - 'Yes'
       - 'No'
@@ -185,11 +185,11 @@ Parameters:
       bastion host / bootstrap instance and EKS cluster nodes, and for
       encrypting the Windows bastion host password. As of June 21, 2022, only
       RSA key types are supported due to Windows instances not supporting
-      ED25519. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html.
+      ED25519. For more information, refer to [Amazon EC2 key pairs and Windows instances](https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
   EKSClusterName:
     Type: String
     Description: >-
-      The name of the EKS cluster where TAP is deployed.
+      The name of the EKS cluster where TAP will be deployed.
     MinLength: 1
     MaxLength: 100
     AllowedPattern: ^[0-9A-Za-z][A-Za-z0-9\-_]*
@@ -200,7 +200,7 @@ Parameters:
     Type: String
     Description: >-
       The version of Kubernetes control plane version to deploy. The selected
-      version must be supported the selected version of TAP. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3.
+      version must be supported the selected version of TAP. For more information, refer to [Kubernetes cluster requirements](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
       - 1.21
     Default: 1.21
