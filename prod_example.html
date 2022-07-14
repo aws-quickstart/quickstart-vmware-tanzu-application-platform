@@ -1083,19 +1083,16 @@ The Contour Envoy container provides both ingress and reverse proxy for the Tanz
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://aws-quickstart.s3.amazonaws.com/quickstart-vmware-tanzu-application-platform/templates/aws-tap-entrypoint-new-vpc.template.yaml" target="_blank" rel="noopener">Deploy Tanzu Application Platform into a new VPC</a>.
-This option builds a new AWS environment that consists of the VPC, subnets, NAT gateways, security groups, bastion hosts, and other infrastructure components.
+<p><a href="https://fwd.aws/DJ34n?" target="_blank" rel="noopener">Deploy Tanzu Application Platform into a new VPC</a>. This option builds a new AWS environment that consists of the VPC, subnets, NAT gateways, security groups, bastion hosts, and other infrastructure components.
 It then deploys Tanzu Application Platform into this new VPC.</p>
 </li>
 <li>
-<p><a href="https://aws-quickstart.s3.amazonaws.com/quickstart-vmware-tanzu-application-platform/templates/aws-tap-entrypoint-existing-vpc.template.yaml" target="_blank" rel="noopener">Deploy Tanzu Application Platform into an existing VPC</a>.
-This option provisions Tanzu Application Platform in your existing AWS infrastructure.</p>
+<p><a href="https://fwd.aws/DdRVe?" target="_blank" rel="noopener">Deploy Tanzu Application Platform into an existing VPC</a>. This option provisions Tanzu Application Platform in your existing AWS infrastructure.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>This Quick Start provides separate templates for these options.
-It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instance types, and Tanzu Application Platform settings.</p>
+<p>This Quick Start provides separate templates for these options. It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instance types, and Tanzu Application Platform settings.</p>
 </div>
 </div>
 </div>
@@ -1105,8 +1102,7 @@ It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instanc
 <div class="sect2">
 <h3 id="_technical_requirements">Technical Requirements</h3>
 <div class="paragraph">
-<p>Before you launch the Quick Start, review the following information and ensure that your account is properly configured.
-Otherwise, the deployment might fail.</p>
+<p>Before you launch the Quick Start, review the following information and ensure that your account is properly configured. Otherwise, the deployment might fail.</p>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -1116,8 +1112,7 @@ Otherwise, the deployment might fail.</p>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>An <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html">Amazon EC2 Key Pair</a> is required for the deployment of this Quick Start, and <strong>the key type must be RSA, not ED25519</strong> (<a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html">reference</a>).
-Additional information is available in the <a href="#_troubleshooting">Troubleshooting section</a>.</p>
+<p>An <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html">Amazon EC2 Key Pair</a> is required for the deployment of this Quick Start, and the key type must be RSA, not ED25519. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html">Amazon EC2 key pairs and Windows instances</a> and <a href="#_troubleshooting">Troubleshooting</a>, later in this guide.</p>
 </div>
 </td>
 </tr>
@@ -1126,10 +1121,7 @@ Additional information is available in the <a href="#_troubleshooting">Troublesh
 <div class="sect3">
 <h4 id="_resource_quotas">Resource quotas</h4>
 <div class="paragraph">
-<p>If necessary, request <a href="https://console.aws.amazon.com/servicequotas/home/">service quota increases</a> for the following resources.
-You might need to request increases if your existing deployment currently uses these resources and if this Quick Start deployment could result in exceeding the default quotas.
-The <a href="https://console.aws.amazon.com/servicequotas/home/">Service Quotas console</a> displays your usage and quotas for some aspects of some services.
-For more information, see <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html">What is Service Quotas?</a> and <a href="https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html">AWS service quotas</a>.</p>
+<p>If necessary, request <a href="https://console.aws.amazon.com/servicequotas/home/">service quota increases</a> for the following resources. You might need to request increases if your existing deployment currently uses these resources and if this Quick Start deployment could result in exceeding the default quotas. The <a href="https://console.aws.amazon.com/servicequotas/home/">Service Quotas console</a> displays your usage and quotas for some aspects of some services. For more information, refer to <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html">What is Service Quotas?</a> and <a href="https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html">AWS service quotas</a>.</p>
 </div>
 <table class="tableblock frame-all grid-all fit-content">
 <colgroup>
@@ -1348,19 +1340,6 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 </li>
 </ol>
 </div>
-<div class="paragraph">
-<p>The following values should be available to use from the <strong>Outputs</strong> tab:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>The Elastic IP addresses associated with the Amazon EC2 Linux and Windows bastion host instances.</p>
-</li>
-<li>
-<p>The Tanzu Application Platform website GUI URL that you can access from the Windows bastion host instance.</p>
-</li>
-</ol>
-</div>
 <div class="sect2">
 <h3 id="_parameter_reference">Parameter reference</h3>
 <div class="sect3">
@@ -1371,9 +1350,11 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <col>
 <col>
 <col>
+<col>
 </colgroup>
 <thead>
 <tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
 <th class="tableblock halign-left valign-top">Parameter Label</th>
 <th class="tableblock halign-left valign-top">Default Value</th>
 <th class="tableblock halign-left valign-top">Description</th>
@@ -1381,17 +1362,26 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AcceptEULAs</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Requires input</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Yes/No whether the required EULAs have been read and accepted before Tanzu Application Platform is installed.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>AcceptEULAs</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Have all applicable VMware Tanzu Network EULAs been accepted?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose 'Yes' if you have already accepted the <a href="https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/">Cluster Essentials for VMware Tanzu</a> and <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/">VMWare Tanzu Application Platform</a> end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network username</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Requires input</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The VMware Tanzu Network username (authentication ID or email address).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>AcceptCEIP</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Have you read and accept the VMware CEIP policy?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose 'Yes' if you have read and accepted the <a href="https://www.vmware.com/solutions/trustvmware/ceip.html">VMware customer experience improvement program (CEIP) policy</a>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network password</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetUsername</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Username</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network username. To create an account, sign up at <a href="https://account.run.pivotal.io/z/uaa/sign-up" class="bare">https://account.run.pivotal.io/z/uaa/sign-up</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Tan</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network password.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Requires input</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The VMware Tanzu Network password (authentication key).</p></td>
 </tr>
@@ -1399,11 +1389,7 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network API Token</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Requires input</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The VMware Tanzu Network refresh token for the defined user.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network Relocate Images</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Requires input</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Yes/No whether to relocate Tanzu Application Platform images to your Amazon ECR private registry from VMware Tanzu Network registry before attempting installation.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1611,8 +1597,20 @@ See <a href="https://aws-quickstart.github.io/option1.html" class="bare">https:/
 <h2 id="_postdeployment_steps">Postdeployment steps</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured — including any required patches — to meet your security and other needs.
-For more information, see the <a href="https://aws.amazon.com/compliance/shared-responsibility-model/">AWS Shared Responsibility Model</a>.</p>
+<p>The following values should be available to use from the <strong>Outputs</strong> tab:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The Elastic IP addresses associated with the Amazon EC2 Linux and Windows bastion host instances.</p>
+</li>
+<li>
+<p>The Tanzu Application Platform website GUI URL that you can access from the Windows bastion host instance.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured — including any required patches — to meet your security and other needs. For more information, see the <a href="https://aws.amazon.com/compliance/shared-responsibility-model/">AWS Shared Responsibility Model</a>.</p>
 </div>
 <div class="sect2">
 <h3 id="_access_the_gui">Access the GUI</h3>
