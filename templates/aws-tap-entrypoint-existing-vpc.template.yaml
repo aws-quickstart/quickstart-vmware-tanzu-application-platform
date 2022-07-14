@@ -132,7 +132,7 @@ Parameters:
   AcceptEULAs:
     Type: String
     Description: >-
-      Choose 'Yes' if you have already accepted the [Cluster Essentials for VMware Tanzu](https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/) and [VMWare Tanzu Application Platform](https://network.tanzu.vmware.com/products/tanzu-application-platform/) end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
+      Choose 'Yes' if you have already accepted the Cluster Essentials for VMware Tanzu(https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/) and VMWare Tanzu Application Platform (https://network.tanzu.vmware.com/products/tanzu-application-platform/) end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
     AllowedValues:
       - 'Yes'
       - 'No'
@@ -140,8 +140,8 @@ Parameters:
   AcceptCEIP:
     Type: String
     Description: >-
-      Choose 'Yes' if you have read and accepted the [VMware customer experience
-      improvement program (CEIP) policy](https://www.vmware.com/solutions/trustvmware/ceip.html).
+      Choose 'Yes' if you have read and accepted the VMware customer experience
+      improvement program (CEIP) policy (https://www.vmware.com/solutions/trustvmware/ceip.html).
     AllowedValues:
       - 'Yes'
       - 'No'
@@ -185,7 +185,7 @@ Parameters:
       bastion host / bootstrap instance and EKS cluster nodes, and for
       encrypting the Windows bastion host password. As of June 21, 2022, only
       RSA key types are supported due to Windows instances not supporting
-      ED25519. For more information, refer to [Amazon EC2 key pairs and Windows instances](https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
+      ED25519. For more information, refer to Amazon EC2 key pairs and Windows instances (https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
   EKSClusterName:
     Type: String
     Description: >-
@@ -200,7 +200,7 @@ Parameters:
     Type: String
     Description: >-
       The version of Kubernetes control plane version to deploy. The selected
-      version must be supported the selected version of TAP. For more information, refer to [Kubernetes cluster requirements](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
+      version must be supported the selected version of TAP. For more information, refer to Kubernetes cluster requirements (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
       - 1.21
     Default: 1.21
@@ -460,7 +460,7 @@ Parameters:
     Type: String
     Description: >-
       VMware Tanzu Network user account and authentication (UAA) API
-      refresh token. For more information, refer to [VMWare Tanzu Network API Documentation(https://network.pivotal.io/docs/api).
+      refresh token. For more information, refer to VMWare Tanzu Network API Documentation (https://network.pivotal.io/docs/api).
     NoEcho: true
   TanzuNetRelocateImages:
     Type: String
@@ -474,7 +474,7 @@ Parameters:
     Type: String
     Description: >-
       Version of TAP to deploy. The selected version must also support the
-      selected Kubernetes version. For more information, refer to [Kubernetes cluster requirements](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
+      selected Kubernetes version. For more information, refer to Kubernetes cluster requirements (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
       - 1.2.0
     Default: 1.2.0
