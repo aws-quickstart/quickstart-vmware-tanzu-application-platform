@@ -207,16 +207,14 @@ Parameters:
   NumberOfNodes:
     Type: Number
     Description: >-
-      Minimum number of nodes created for the TAP EKS cluster.
-      cluster.
+      Minimum number of nodes to create for the TAP EKS cluster.
     MinValue: 4
     MaxValue: 450
     Default: 4
   MaxNumberOfNodes:
     Type: Number
     Description: >-
-      Maximum number of nodes that will be available in an auto-scaling
-      scenario for the TAP EKS cluster.
+      Maximum number of available nodes for the TAP EKS cluster in an auto-scaling scenario.
     MinValue: 4
     MaxValue: 450
     Default: 6
@@ -424,7 +422,7 @@ Parameters:
     Default: m5.xlarge
   NodeVolumeSize:
     Type: Number
-    Description: Size of the EKS nodes' root EBS volumes.
+    Description: Amazon EBS root volume size for Amazon EKS nodes.
     MinValue: 80
     MaxValue: 16384
     Default: 80
@@ -462,14 +460,12 @@ Parameters:
     Type: String
     Description: >-
       VMware Tanzu Network user account and authentication (UAA) API
-      refresh token. For more information, refer to https://network.pivotal.io/docs/api.
+      refresh token. For more information, refer to [VMWare Tanzu Network API Documentation(https://network.pivotal.io/docs/api).
     NoEcho: true
   TanzuNetRelocateImages:
     Type: String
     Description: >-
-      Choose Yes to relocate TAP images to your ECR registry from the VMware Tanzu Network registry
-      before attempting installation. If you choose not to relocate images, Tanzu Application Platform depends
-      directly on the VMware Tanzu Network registry for its continued operation.
+      Choose Yes to relocate TAP images from the VMware Tanzu Network registry to your ECR registry from before attempting installation. If you do not relocate images, Tanzu Application Platform will depend directly on the VMware Tanzu Network registry for its continued operation.
     AllowedValues:
       - 'Yes'
       - 'No'
@@ -478,13 +474,13 @@ Parameters:
     Type: String
     Description: >-
       Version of TAP to deploy. The selected version must also support the
-      selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3.
+      selected Kubernetes version. For more information, refer to [Kubernetes cluster requirements](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
       - 1.2.0
     Default: 1.2.0
   SampleAppName:
     Type: String
-    Description: Sample application to deploy to your EKS cluster.
+    Description: Sample application to deploy into your Amazon EKS cluster.
     AllowedValues:
       - tanzu-java-web-app-workload
     Default: tanzu-java-web-app-workload
@@ -1645,6 +1641,9 @@ Outputs:
       The Amazon CloudWatch Logs log group where the Tanzu Application Platform
       bootstrap logs are stored.
     Value: !Ref TAPLogGroup
+  Postdeployment:
+    Description: See the deployment guide for postdeployment steps.
+    Value: https://fwd.aws/gDY8k?
 Rules:
   AcceptEULAs:
     Assertions:
