@@ -144,11 +144,7 @@ Parameters:
   AcceptEULAs:
     Type: String
     Description: >-
-      Choose 'Yes' if you have already accepted the following
-      VMware Tanzu Network end-user license agreements (EULAs) listed in:
-      https://aws-quickstart.github.io/quickstart-vmware-tanzu-application-platform/#_eulas.
-      TAP will fail to install successfully if the listed EULAs have not been
-      accepted for the specified VMware Tanzu Network user account.
+      Choose 'Yes' if you have already accepted the VMware Tanzu Network end-user license agreements (EULAs) listed in https://aws-quickstart.github.io/quickstart-vmware-tanzu-application-platform/#_eulas. TAP will fail to install successfully if the EULAs have not been accepted for the specified VMware Tanzu Network user account.
     AllowedValues:
       - 'Yes'
       - 'No'

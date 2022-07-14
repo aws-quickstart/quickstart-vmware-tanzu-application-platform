@@ -132,11 +132,7 @@ Parameters:
   AcceptEULAs:
     Type: String
     Description: >-
-      Choose 'Yes' if you have already accepted the following
-      VMware Tanzu Network end-user license agreements (EULAs) listed in:
-      https://aws-quickstart.github.io/quickstart-vmware-tanzu-application-platform/#_eulas.
-      TAP will fail to install successfully if the listed EULAs have not been
-      accepted for the specified VMware Tanzu Network user account.
+      Choose 'Yes' if you have already accepted the [Cluster Essentials for VMware Tanzu](https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/) and [VMWare Tanzu Application Platform](https://network.tanzu.vmware.com/products/tanzu-application-platform/) end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
     AllowedValues:
       - 'Yes'
       - 'No'
@@ -145,8 +141,7 @@ Parameters:
     Type: String
     Description: >-
       Choose 'Yes' if you have read and accept the VMware customer experience
-      improvement program (CEIP) policy
-      (https://www.vmware.com/solutions/trustvmware/ceip.html).
+      improvement program (CEIP) policy. For more information, refer to https://www.vmware.com/solutions/trustvmware/ceip.html.
     AllowedValues:
       - 'Yes'
       - 'No'
@@ -159,43 +154,42 @@ Parameters:
   VpcId:
     Type: AWS::EC2::VPC::Id
     Description: >-
-      ID of your existing VPC (eg: vpc-0343606e).
+      ID of your existing VPC (for example, vpc-0343606e).
   PublicSubnet1Id:
     Type: AWS::EC2::Subnet::Id
     Description: >-
       ID of the public subnet in Availability Zone 1 of your existing VPC
-      (eg: subnet-a0246dcd).
+      (for example, subnet-a0246dcd).
   PrivateSubnet1Id:
     Type: AWS::EC2::Subnet::Id
     Description: >-
       ID of the private subnet in Availability Zone 1 of your existing VPC
-      (eg: subnet-fe9a8b32).
+      (for example, subnet-fe9a8b32).
   PrivateSubnet2Id:
     Type: AWS::EC2::Subnet::Id
     Description: >-
       ID of the private subnet in Availability Zone 2 of your existing VPC
-      (eg: subnet-be8b01ea).
+      (for example, subnet-be8b01ea).
   PrivateSubnet3Id:
     Type: String
     Description: >-
       ID of the private subnet in Availability Zone 3 of your existing VPC
-      (eg: subnet-abd39039).
+      (for example, subnet-abd39039).
     AllowedPattern: ^(subnet-([0-9a-f]{8}|[0-9a-f]{17})|)$
     ConstraintDescription: Must be a valid VPC subnet ID or blank.
     Default: ''
   KeyPairName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: >-
-      The name of the EC2 key pair that will be used for SSH access the Linux
-      bastion host / bootstrap instance and EKS cluster nodes, as well as for
-      encrypting the Windows bastion host password. As of 2022-06-21, only
+      The name of the EC2 key pair that will be used for SSH access to the Linux
+      bastion host / bootstrap instance and EKS cluster nodes, and for
+      encrypting the Windows bastion host password. As of June 21, 2022, only
       RSA key types are supported due to Windows instances not supporting
-      ED25519 (reference:
-      https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
+      ED25519. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html.
   EKSClusterName:
     Type: String
     Description: >-
-      The name of the EKS cluster where TAP will be deployed.
+      The name of the EKS cluster where TAP is deployed.
     MinLength: 1
     MaxLength: 100
     AllowedPattern: ^[0-9A-Za-z][A-Za-z0-9\-_]*
@@ -206,15 +200,14 @@ Parameters:
     Type: String
     Description: >-
       The version of Kubernetes control plane version to deploy. The selected
-      version must be supported the selected version of TAP (reference:
-      https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
+      version must be supported the selected version of TAP. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3.
     AllowedValues:
       - 1.21
     Default: 1.21
   NumberOfNodes:
     Type: Number
     Description: >-
-      The number of nodes that will be the minimum and created for the TAP EKS
+      Minimum number of nodes created for the TAP EKS cluster.
       cluster.
     MinValue: 4
     MaxValue: 450
@@ -222,14 +215,14 @@ Parameters:
   MaxNumberOfNodes:
     Type: Number
     Description: >-
-      The maximum number of nodes that will be available in an auto scaling
+      Maximum number of nodes that will be available in an auto-scaling
       scenario for the TAP EKS cluster.
     MinValue: 4
     MaxValue: 450
     Default: 6
   NodeInstanceType:
     Type: String
-    Description: The EKS cluster node instance type.
+    Description: EKS cluster node instance type.
     AllowedValues:
       - c4.4xlarge
       - c4.8xlarge
@@ -438,27 +431,27 @@ Parameters:
   RemoteAccessCidr:
     Type: String
     Description: >-
-      IPv4 CIDR block that will be permitted to connect to the Windows and
+      IPv4 CIDR block permitted to connect to the Windows and
       Linux bastion hosts. We recommend that you set this value to a trusted
       network.
   LinuxBastionOS:
     Type: String
     Description: >-
-      The operating system for the Linux bastion host / bootstrap instance.
+      Operating system for the Linux bastion host / bootstrap instance.
     AllowedValues:
       - Ubuntu-Server-22.04-LTS-HVM
     Default: Ubuntu-Server-22.04-LTS-HVM
   LinuxBastionSshPort:
     Type: Number
     Description: >-
-      TCP port to use for the LinuxBastion instance's listening port.
+      TCP port to use for the Linux bastion host listening port.
     MinValue: 0
     MaxValue: 65535
     Default: 22
   TanzuNetUsername:
     Type: String
     Description: >-
-      The VMware Tanzu Network username. To create an account, sign up here:
+      VMware Tanzu Network username. To create an account, sign up at
       https://account.run.pivotal.io/z/uaa/sign-up.
     NoEcho: true
   TanzuNetPassword:
@@ -468,16 +461,15 @@ Parameters:
   TanzuNetApiToken:
     Type: String
     Description: >-
-      The VMware Tanzu Network user account and authentication (UAA) API
-      refresh token (reference: https://network.pivotal.io/docs/api).
+      VMware Tanzu Network user account and authentication (UAA) API
+      refresh token. For more information, refer to https://network.pivotal.io/docs/api.
     NoEcho: true
   TanzuNetRelocateImages:
     Type: String
     Description: >-
-      Relocate TAP images to your ECR registry from VMware Tanzu Network registry
-      before attempting installation.
-      If you choose not to relocate images, Tanzu Application Platform depends
-      directly on VMware Tanzu Network for continued operation.
+      Choose Yes to relocate TAP images to your ECR registry from the VMware Tanzu Network registry
+      before attempting installation. If you choose not to relocate images, Tanzu Application Platform depends
+      directly on the VMware Tanzu Network registry for its continued operation.
     AllowedValues:
       - 'Yes'
       - 'No'
@@ -485,15 +477,14 @@ Parameters:
   TAPVersion:
     Type: String
     Description: >-
-      The version of TAP to deploy. The selected version must also support the
-      selected Kubernetes version (reference:
-      https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
+      Version of TAP to deploy. The selected version must also support the
+      selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3.
     AllowedValues:
       - 1.2.0
     Default: 1.2.0
   SampleAppName:
     Type: String
-    Description: The sample application to deploy in your cluster.
+    Description: Sample application to deploy to your EKS cluster.
     AllowedValues:
       - tanzu-java-web-app-workload
     Default: tanzu-java-web-app-workload
