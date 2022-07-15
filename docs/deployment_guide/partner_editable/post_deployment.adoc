@@ -155,18 +155,18 @@
 
 |`NodeVolumeSize`
 |Volume size
-|
-|
+|`80`
+|Amazon EBS root volume size for Amazon EKS nodes.
 
 |`NumberOfNodes`
 |Number of nodes
-|
-|
+|`4`
+|Minimum number of nodes to create for the TAP EKS cluster.
 
 |`MaxNumberOfNodes`
 |Maximum number of nodes
-|
-|
+|`6`
+|Maximum number of available nodes for the TAP EKS cluster in auto scaling.
 |====
 
 [%autowidth.stretch]
@@ -176,13 +176,13 @@
 
 |`LinuxBastionOS`
 |OS
-|
-|
+|`Ubuntu-Server-22.04-LTS-HVM`
+|Operating system for the Linux bastion host/bootstrap instance.
 
 |`LinuxBastionSshPort`
 |SSH port
-|
-|
+|`22`
+|TCP port to use for the Linux bastion host listening port.
 |====
 
 [%autowidth.stretch]
@@ -192,18 +192,18 @@
 
 |`QSS3BucketName`
 |Name
-|
-|
+|`aws-quickstart`
+|Name of the S3 bucket for your copy of the Quick Start assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Quick Start location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to https://aws-quickstart.github.io/option1.html.
 
 |`QSS3BucketRegion`
 |Region
-|
-|
+|`us-east-1`
+|AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.  Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. For more information, refer to https://aws-quickstart.github.io/option1.html.
 
 |`QSS3KeyPrefix`
 |Key prefix
 |
-|
+|S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html and https://aws-quickstart.github.io/option1.html.
 |====
 
 //Edit after completing new VPC parameters; open template I have locally to the side
