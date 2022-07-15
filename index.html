@@ -862,8 +862,8 @@ p.footer-text a{color:#d7d8d8}
 <ul class="sectlevel2">
 <li><a href="#_technical_requirements">Technical Requirements</a></li>
 <li><a href="#_vmware_tanzu_network_account">VMware Tanzu Network account</a></li>
-<li><a href="#_eulas">EULAs</a></li>
-<li><a href="#_telemetry">Telemetry</a></li>
+<li><a href="#_accept_vmware_eulas">Accept VMware EULAs</a></li>
+<li><a href="#_vmware_customer_experience_improvement_program_ceip">VMWare Customer Experience Improvement Program (CEIP)</a></li>
 </ul>
 </li>
 <li><a href="#_deployment_steps">Deployment steps</a>
@@ -873,10 +873,17 @@ p.footer-text a{color:#d7d8d8}
 </li>
 <li><a href="#_postdeployment_steps">Postdeployment steps</a>
 <ul class="sectlevel2">
-<li><a href="#_access_the_gui">Access the GUI</a></li>
+<li><a href="#_cloudformation_outputs">CloudFormation outputs</a></li>
+<li><a href="#_security_configuration_and_management_tasks">Security configuration and management tasks</a></li>
+<li><a href="#_access_the_vmware_tanzu_application_platform_user_interface">Access the VMware Tanzu Application Platform user interface</a></li>
 </ul>
 </li>
-<li><a href="#_troubleshooting">Troubleshooting</a></li>
+<li><a href="#_troubleshooting">Troubleshooting</a>
+<ul class="sectlevel2">
+<li><a href="#_vmware_tanzu_application_platform_documentation">VMware Tanzu Application Platform documentation</a></li>
+<li><a href="#_faq">FAQ</a></li>
+</ul>
+</li>
 <li><a href="#_feedback">Feedback</a></li>
 <li><a href="#_notices">Notices</a></li>
 </ul>
@@ -924,39 +931,7 @@ Refer to the <a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-
 <h2 id="_overview">Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This Quick Start deploys VMware Tanzu Application Platform on the AWS Cloud.
-This guide covers the steps necessary to deploy this Quick Start.</p>
-</div>
-<div class="paragraph">
-<p>This Quick Start reference deployment guide provides step-by-step instructions for deploying the Tanzu Application Platform within a Amazon Elastic Kubernetes Service (Amazon EKS) clusters.</p>
-</div>
-<div class="paragraph">
-<p>VMware Tanzu Application Platform is a packaged set of components that helps developers and operators to more easily build, deploy, and manage apps on a Kubernetes platform.</p>
-</div>
-<div class="paragraph">
-<p>Tanzu Application Platform simplifies workflows in both the inner loop and outer loop of Kubernetes-based app development:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Inner Loop: The inner loop describes a developer&#8217;s local development environment where they code and test apps.
-The activities that take place in the inner loop include writing code, committing to a version control system, deploying to a development or staging environment, testing, and then making additional code changes.</p>
-</li>
-<li>
-<p>Outer Loop: The outer loop describes the steps to deploy apps to production and maintain them over time.
-For example, on a cloud-native platform, the outer loop includes activities such as building container images, adding container security, and configuring continuous integration (CI) and continuous delivery (CD) pipelines.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>VMware Tanzu Application Platform provides development teams a pre-paved path to production to get code running on any Kubernetes enabling security and scale.
-It is an application aware platform that is modular so teams can customize it based on their organization&#8217;s preferences.</p>
-</div>
-<div class="paragraph">
-<p>This Quick Start is for users who want a repeatable, customizable reference deployment for Tanzu Application Platform on Amazon EKS using AWS CloudFormation.</p>
-</div>
-<div class="paragraph">
-<p>For advanced information about the product that this Quick Start deploys, refer to the <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-overview.html">documentation</a>.</p>
+<p>This Quick Start deploys VMware Tanzu Application Platform on the AWS Cloud. This Quick Start is for users who want a repeatable, customizable reference deployment for <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/info">VMWare Tanzu Application Platform</a> on Amazon EKS using AWS CloudFormation. This guide provides instructions for deploying the Tanzu Application Platform to Amazon Elastic Kubernetes Service (Amazon EKS) clusters.</p>
 </div>
 </div>
 </div>
@@ -1144,23 +1119,23 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">6</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Security Groups</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Security groups</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Internet Gateways</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Internet gateways</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">NAT Gateways</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NAT gateways</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ECR Repositories</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon ECR repositories</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">EKS Clusters</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EKS clusters</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 </tr>
 <tr>
@@ -1176,7 +1151,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Route 53 Private Hosted Zone</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Route 53 private hosted zones</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 </tr>
 </tbody>
@@ -1186,27 +1161,29 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <div class="sect2">
 <h3 id="_vmware_tanzu_network_account">VMware Tanzu Network account</h3>
 <div class="paragraph">
-<p>One of the requirements for this Quick Start is a VMware Tanzu Network account with a username, password, and generated a <a href="https://network.tanzu.vmware.com/docs/api">user account and authentication (UAA) refresh API token</a>.</p>
+<p>This Quick Start requires a VMware Tanzu Network account with a username, password, and generated a <a href="https://network.tanzu.vmware.com/docs/api">user account and authentication (UAA) refresh API token</a>.</p>
 </div>
 <div class="sect3">
 <h4 id="_create_a_new_vmware_tanzu_network_login">Create a new VMware Tanzu Network login</h4>
 <div class="paragraph">
-<p>If you do not already have a valid VMware Tanzu Network login, then you can start by going <a href="https://network.tanzu.vmware.com/">here</a>.
-Once on this web page, you will need to perform the following steps:</p>
+<p>Complete the following steps to create a VMware Tanzu Network login.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Click on "Sign In" link in the top right corner.<br>
-<span class="image"><img src="docs/deployment_guide/images/TanzuNetLogin.png" alt="VMware Tanzu Network sign in"></span></p>
+<p>Navigate to <a href="https://network.tanzu.vmware.com/" class="bare">https://network.tanzu.vmware.com/</a>.</p>
 </li>
 <li>
-<p>Click on the "Create Account" link.<br>
-<span class="image"><img src="docs/deployment_guide/images/TanzuNetCreateLogin.png" alt="VMware Tanzu Network create account link" width="40%"></span></p>
+<p>Choose <strong>Sign In</strong>.</p>
 </li>
 <li>
-<p>Fill in all the necessary fields to complete the process and then login using the newly created user.<br>
-<span class="image"><img src="docs/deployment_guide/images/TanzuNetworkFields.png" alt="VMware Tanzu Network create account fields" width="40%"></span></p>
+<p>Choose <strong>Create account</strong>.</p>
+</li>
+<li>
+<p>On the <strong>Create your VMware Account</strong> page, complete the form and choose <strong>Sign Up</strong>.</p>
+</li>
+<li>
+<p>Log in to VMWare using the new user credentials.</p>
 </li>
 </ol>
 </div>
@@ -1214,29 +1191,31 @@ Once on this web page, you will need to perform the following steps:</p>
 <div class="sect3">
 <h4 id="_generate_a_vmware_tanzu_network_api_token">Generate a VMware Tanzu Network API token</h4>
 <div class="paragraph">
-<p>In addition to the actual VMware Tanzu Network credentials, this Quick Start will also need an API token from the VMware Tanzu Network site.
-This API token will allow for the downloading all of the required packages to install the Tanzu Application Platform.</p>
+<p>This Quick Start requires an API token from the VMware Tanzu Network site to download the packages required to install Tanzu Application Platform.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Click on the drop-down next to your login name and click on "Edit Profile".<br>
-<span class="image"><img src="docs/deployment_guide/images/EditProfile.png" alt="VMware Tanzu Network edit profile"></span></p>
+<p>Log in to <a href="https://network.tanzu.vmware.com/">VMWare Tanzu Network</a>.</p>
 </li>
 <li>
-<p>To create an API token you will need to use the "Request new refresh token" button.<br>
-<span class="image"><img src="docs/deployment_guide/images/RefreshToken.png" alt="VMware Tanzu Network request new refresh token"></span></p>
+<p>Choose <strong>Edit Profile</strong> from the dropdown list next to your username.</p>
 </li>
 <li>
-<p>Make sure to copy the long string that is provided and have that available when asked for the parameters during the running of the Quick Start.<br>
-<span class="image"><img src="docs/deployment_guide/images/ResultsToken.png" alt="VMware Tanzu Network retrieve refresh token"></span></p>
+<p>Choose <strong>Request new refresh token</strong>.</p>
+</li>
+<li>
+<p>Copy the refesh token. Enter it for the <code>API Token</code> (<code>TanzuApiToken</code>) parameter during deployment.</p>
 </li>
 </ol>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_eulas">EULAs</h3>
+<h3 id="_accept_vmware_eulas">Accept VMware EULAs</h3>
+<div class="paragraph">
+<p>Before deploying this Quick Start, you must accept the following VMware End User License Agreements (EULAs) for the VMware Tanzu Network account used for the deployment. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0">Accept the End User License Agreements</a>.</p>
+</div>
 <div class="admonitionblock important">
 <table>
 <tr>
@@ -1245,33 +1224,20 @@ This API token will allow for the downloading all of the required packages to in
 </td>
 <td class="content">
 <div class="paragraph">
-<p>Before deploying this Quick Start, you must accept all of the following End User License Agreements (EULAs) for the VMware Tanzu Network account used for the deployment, or else the deployment will fail during the Tanzu Application Platform bootstrap installation process run from the Linux bastion host.</p>
+<p>Failure to accept the EULAs before deployment will result in the failure of the Tanzu Application Platform installation.</p>
 </div>
 </td>
 </tr>
 </table>
 </div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p><a href="https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/">Cluster Essentials for VMware Tanzu</a></p>
-</li>
-<li>
-<p><a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/">Tanzu Application Platform</a></p>
-</li>
-</ol>
-</div>
 </div>
 <div class="sect2">
-<h3 id="_telemetry">Telemetry</h3>
+<h3 id="_vmware_customer_experience_improvement_program_ceip">VMWare Customer Experience Improvement Program (CEIP)</h3>
 <div class="paragraph">
-<p>VMware Tanzu Application Platform participates in the VMware Customer Experience Improvement Program (CEIP).
-As part of CEIP, VMware collects technical information about your organization&#8217;s use of VMware products and services in association with your organization&#8217;s VMware license keys.
-For information about CEIP, see the <a href="http://www.vmware.com/trustvmware/ceip.html">Trust &amp; Assurance Center</a>.
-You may join or leave CEIP at any time.
-The CEIP Standard Participation Level provides VMware with information to improve its products and services, identify and fix problems, and advise you on how to best deploy and use VMware products.
-For example, this information can enable a proactive product deployment discussion with your VMware account team or VMware support team to help resolve your issues.
-This information cannot directly identify any individual.</p>
+<p>VMware Tanzu Application Platform participates in the <a href="https://www.vmware.com/solutions/trustvmware/ceip.html">VMware customer experience improvement program (CEIP)</a>. As part of CEIP, VMware collects technical information about your organization&#8217;s use of VMware products and services in association with your organization&#8217;s VMware license keys.</p>
+</div>
+<div class="paragraph">
+<p>You may join or leave CEIP at any time. The CEIP Standard Participation Level provides VMware with information to improve its products and services, identify and fix problems, and advise you on how to best deploy and use VMware products. For example, this information can enable a proactive product deployment discussion with your VMware account team or VMware support team to help resolve your issues. This information cannot directly identify any individual.</p>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -1288,8 +1254,7 @@ This information cannot directly identify any individual.</p>
 </table>
 </div>
 <div class="paragraph">
-<p>For more information, see <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install.html#install-your-tanzu-application-platform-profile-1">Install your Tanzu Application Platform profile</a>.
-To opt out of telemetry participation after installation, see <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-opting-out-telemetry.html">Opting out of telemetry collection</a>.</p>
+<p>For more information, see <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install.html#install-your-tanzu-application-platform-profile-1">Install your Tanzu Application Platform profile</a>. To opt out of telemetry participation after installation, see <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-opting-out-telemetry.html">Opting out of telemetry collection</a>.</p>
 </div>
 </div>
 </div>
@@ -1343,7 +1308,7 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <div class="sect2">
 <h3 id="_parameter_reference">Parameter reference</h3>
 <div class="sect3">
-<h4 id="_parameters_for_deploying_a_tanzu_application_platform_cluster_in_a_new_vpc">Parameters for deploying a Tanzu Application Platform cluster in a new VPC</h4>
+<h4 id="_parameters_for_deploying_a_tanzu_application_platform_cluster_to_a_new_vpc">Parameters for deploying a Tanzu Application Platform cluster to a new VPC</h4>
 <table class="tableblock frame-all grid-all fit-content stretch">
 <caption class="title">Table 1. VMware Tanzu Network configuration</caption>
 <colgroup>
@@ -1364,14 +1329,14 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>AcceptEULAs</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Have all applicable VMware Tanzu Network EULAs been accepted?</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choose 'Yes' if you have already accepted the <a href="https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/">Cluster Essentials for VMware Tanzu</a> and <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/">VMWare Tanzu Application Platform</a> end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you have already accepted the <a href="https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/">Cluster Essentials for VMware Tanzu</a> and <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/">VMWare Tanzu Application Platform</a> end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>AcceptCEIP</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Have you read and accept the VMware CEIP policy?</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choose 'Yes' if you have read and accepted the <a href="https://www.vmware.com/solutions/trustvmware/ceip.html">VMware customer experience improvement program (CEIP) policy</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you have read and accepted the <a href="https://www.vmware.com/solutions/trustvmware/ceip.html">VMware customer experience improvement program (CEIP) policy</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetUsername</code></p></td>
@@ -1380,28 +1345,36 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network username. To create an account, sign up at <a href="https://account.run.pivotal.io/z/uaa/sign-up" class="bare">https://account.run.pivotal.io/z/uaa/sign-up</a>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Tan</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetPassword</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Password</p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network password.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Requires input</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The VMware Tanzu Network password (authentication key).</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network API Token</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Requires input</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The VMware Tanzu Network refresh token for the defined user.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network Relocate Images</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuApiToken</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">API Token</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to <a href="https://network.pivotal.io/docs/api">VMWare Tanzu Network API Documentation</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetRelocateImages</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Relocate TAP images</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> to relocate TAP images from the VMware Tanzu Network registry to your ECR registry from before attempting installation. If you do not relocate images, Tanzu Application Platform will depend directly on the VMware Tanzu Network registry for its continued operation.</p></td>
 </tr>
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 2. Basic deployment configuration</caption>
+<caption class="title">Table 2. VMware Tanzu Application Platform configuration</caption>
 <colgroup>
+<col>
 <col>
 <col>
 <col>
 </colgroup>
 <thead>
 <tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
 <th class="tableblock halign-left valign-top">Parameter Label</th>
 <th class="tableblock halign-left valign-top">Default Value</th>
 <th class="tableblock halign-left valign-top">Description</th>
@@ -1409,38 +1382,98 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPVersion</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Version</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.2.0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Version of TAP to deploy. The selected version must also support the       selected Kubernetes version. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3">Kubernetes cluster requirements</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPDomainName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Domain name</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Private DNS domain name that will be used for accessing the TAP graphical user interface (GUI) and project URLs.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all fit-content stretch">
+<caption class="title">Table 3. Sample app configuration</caption>
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Parameter Label</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SampleAppName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tanzu-java-web-app-workload</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of sample application to deploy into the Amazon EKS cluster.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all fit-content stretch">
+<caption class="title">Table 4. Basic configuration</caption>
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Parameter Label</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>AvailabilityZones</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Availability Zones</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Requires input</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">List of Availability Zones to use for the subnets in the VPC.
-Either two or three Availability Zones are used for this deployment.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">List of Availability Zones to use for the subnets in the VPC. Three Availability Zones are used for this deployment.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NumberOfAZs</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of Availability Zones</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of Availability Zones to use in the VPC.
-This must match the value entered for the Availability Zones parameter.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>3</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of Availability Zones to use in the VPC. This must match the value entered for the <code>AvailabilityZones</code> parameter.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Key Pair Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Requires input</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the Amazon EC2 Key Pair that will be used for accessing the Linux and Windows bastion hosts, and the Amazon EKS cluster nodes.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>KeyPairName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EC2 key pair name</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html">Amazon EC2 key pairs and Windows instances</a>.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>RemoteAccessCidr</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Remote access CIDR</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Requires input</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IPv4 CIDR block that will be allowed to connect to the Amazon EC2 Linux and Windows bastion host instances once deployed.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IPv4 CIDR block permitted to connect to the Windows and Linux bastion hosts. We recommend that you set this value to a trusted network.</p></td>
 </tr>
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 3. VPC network configuration</caption>
+<caption class="title">Table 5. Default VPC configuration</caption>
 <colgroup>
+<col>
 <col>
 <col>
 <col>
 </colgroup>
 <thead>
 <tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
 <th class="tableblock halign-left valign-top">Parameter Label</th>
 <th class="tableblock halign-left valign-top">Default Value</th>
 <th class="tableblock halign-left valign-top">Description</th>
@@ -1448,51 +1481,60 @@ This must match the value entered for the Availability Zones parameter.</p></td>
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>VPCCIDR</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">VPC CIDR</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10.0.0.0/16</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the VPC</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.0.0/16</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the VPC.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Private Subnet 1 CIDR</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10.0.0.0/19</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PrivateSubnet1CIDR</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Private subnet 1 CIDR</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.0.0/19</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 1, located in Availability Zone 1.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Private Subnet 2 CIDR</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10.0.32.0/19</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PrivateSubnet2CIDR</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Private subnet 2 CIDR</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.32.0/19</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 2, located in Availability Zone 2.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Private Subnet 3 CIDR</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10.0.64.0/19</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PrivateSubnet3CIDR</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Private subnet 3 CIDR</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.64.0/19</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 3, located in Availability Zone 3.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Public Subnet 1 CIDR</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10.0.128.0/20</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the public (DMZ) subnet 1, located in Availability Zone 1.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PublicSubnet1CIDR</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Public subnet 1 CIDR</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.128.0/20</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the public subnet 1, located in Availability Zone 1.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Public Subnet 2 CIDR</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10.0.144.0/20</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the public (DMZ) subnet 2, located in Availability Zone 2.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PublicSubnet2CIDR</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Public subnet 2 CIDR</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.144.0/20</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the public subnet 2, located in Availability Zone 2.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Public Subnet 3 CIDR</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10.0.160.0/20</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the public (DMZ) subnet 3, located in Availability Zone 3.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PublicSubnet3CIDR</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Public subnet 3 CIDR</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.160.0/20</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the public subnet 3, located in Availability Zone 3.</p></td>
 </tr>
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 4. Amazon EKS configuration</caption>
+<caption class="title">Table 6. Amazon EKS configuration</caption>
 <colgroup>
+<col>
 <col>
 <col>
 <col>
 </colgroup>
 <thead>
 <tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
 <th class="tableblock halign-left valign-top">Parameter Label</th>
 <th class="tableblock halign-left valign-top">Default Value</th>
 <th class="tableblock halign-left valign-top">Description</th>
@@ -1500,36 +1542,54 @@ This must match the value entered for the Availability Zones parameter.</p></td>
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>EKSClusterName</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">EKS cluster name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Requires input</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the cluster that will be created to contain the Tanzu Application Platform deployment.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the EKS cluster where TAP will be deployed.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>KubernetesVersion</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Kubernetes version</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.21</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Version of Kubernetes control plane to deploy. The selected version must be supported the selected version of TAP. For more information, refer to Kubernetes cluster requirements (<a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3" class="bare">https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3</a>).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NodeInstanceType</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>m5.xlarge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EKS cluster node instance type.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NodeVolumeSize</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Volume size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>80</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EBS root volume size for Amazon EKS nodes.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NumberOfNodes</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of nodes</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The number of nodes that will be the minimum and created for the Tanzu Application Platform EKS cluster.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>4</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Minimum number of nodes to create for the TAP EKS cluster.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MaxNumberOfNodes</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of nodes</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">6</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of nodes that will be available in an auto scaling scenario for the Tanzu Application Platform EKS cluster.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instance Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">m5.xlarge</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EC2 instance type for each of the nodes deployed within the Tanzu Application Platform EKS cluster.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>6</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of available nodes for the TAP EKS cluster in auto scaling.</p></td>
 </tr>
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 5. VMware Tanzu Application Platform configuration</caption>
+<caption class="title">Table 7. Linux bastion host/bootstrap instance configuration</caption>
 <colgroup>
+<col>
 <col>
 <col>
 <col>
 </colgroup>
 <thead>
 <tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
 <th class="tableblock halign-left valign-top">Parameter Label</th>
 <th class="tableblock halign-left valign-top">Default Value</th>
 <th class="tableblock halign-left valign-top">Description</th>
@@ -1537,22 +1597,30 @@ This must match the value entered for the Availability Zones parameter.</p></td>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Tanzu Application Platform domain name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Requires input</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Domain name that can be used for access to VMware Tanzu Application Platform and its corresponding project URLs.
-Available within a private DNS Zone.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LinuxBastionOS</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Ubuntu-Server-22.04-LTS-HVM</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Operating system for the Linux bastion host/bootstrap instance.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LinuxBastionSshPort</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SSH port</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>22</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TCP port to use for the Linux bastion host listening port.</p></td>
 </tr>
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 6. AWS Quick Start S3 bucket configuration</caption>
+<caption class="title">Table 8. AWS Quick Start S3 bucket configuration</caption>
 <colgroup>
+<col>
 <col>
 <col>
 <col>
 </colgroup>
 <thead>
 <tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
 <th class="tableblock halign-left valign-top">Parameter Label</th>
 <th class="tableblock halign-left valign-top">Default Value</th>
 <th class="tableblock halign-left valign-top">Description</th>
@@ -1560,32 +1628,339 @@ Available within a private DNS Zone.</p></td>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">QSS3BucketName</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">aws-quickstart</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the S3 bucket for your copy of the Quick Start assets.
-Keep the default name unless you are customizing the template.
-Changing the name updates code references to point to a new Quick Start location.
-This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-).
-See <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>QSS3BucketName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>aws-quickstart</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the S3 bucket for your copy of the Quick Start assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Quick Start location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">QSS3KeyPrefix</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">quickstart-vmware-tanzu-application-platform/</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets.
-Keep the default prefix unless you are customizing the template.
-Changing this prefix updates code references to point to a new Quick Start location.
-This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/).
-End with a forward slash.
-See <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html" class="bare">https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html</a> and <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>QSS3BucketRegion</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Region</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>us-east-1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.  Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. For more information, refer to <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">QSS3BucketRegion</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">us-east-1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted.
-Keep the default Region unless you are customizing the template.
-Changing this Region updates code references to point to a new Quick Start location.
-When using your own bucket, specify the Region.
-See <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>QSS3KeyPrefix</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Key prefix</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html" class="bare">https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html</a> and <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_parameters_for_deploying_a_tanzu_application_platform_cluster_to_an_existing_vpc">Parameters for deploying a Tanzu Application Platform cluster to an existing VPC</h4>
+<table class="tableblock frame-all grid-all fit-content stretch">
+<caption class="title">Table 9. VMware Tanzu Network configuration</caption>
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Parameter Label</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>AcceptEULAs</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Have all applicable VMware Tanzu Network EULAs been accepted?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you have already accepted the <a href="https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/">Cluster Essentials for VMware Tanzu</a> and <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/">VMWare Tanzu Application Platform</a> end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>AcceptCEIP</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Have you read and accept the VMware CEIP policy?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you have read and accepted the <a href="https://www.vmware.com/solutions/trustvmware/ceip.html">VMware customer experience improvement program (CEIP) policy</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetUsername</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Username</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network username. To create an account, sign up at <a href="https://account.run.pivotal.io/z/uaa/sign-up" class="bare">https://account.run.pivotal.io/z/uaa/sign-up</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetPassword</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Password</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network password.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuApiToken</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">API Token</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to <a href="https://network.pivotal.io/docs/api">VMWare Tanzu Network API Documentation</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetRelocateImages</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Relocate TAP images</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> to relocate TAP images from the VMware Tanzu Network registry to your ECR registry from before attempting installation. If you do not relocate images, Tanzu Application Platform will depend directly on the VMware Tanzu Network registry for its continued operation.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all fit-content stretch">
+<caption class="title">Table 10. VMware Tanzu Application Platform configuration</caption>
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Parameter Label</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPVersion</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Version</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.2.0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Version of TAP to deploy. The selected version must also support the       selected Kubernetes version. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3">Kubernetes cluster requirements</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPDomainName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Domain name</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Private DNS domain name to access the TAP user interface and project URLs.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all fit-content stretch">
+<caption class="title">Table 11. Sample app configuration</caption>
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Parameter Label</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SampleAppName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tanzu-java-web-app-workload</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of sample application to deploy into the Amazon EKS cluster.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all fit-content stretch">
+<caption class="title">Table 12. Basic configuration</caption>
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Parameter Label</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>KeyPairName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EC2 key pair name</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html">Amazon EC2 key pairs and Windows instances</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>RemoteAccessCidr</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Remote access CIDR</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IPv4 CIDR block permitted to connect to the Windows and Linux bastion hosts. We recommend that you set this value to a trusted network.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all fit-content stretch">
+<caption class="title">Table 13. VPC network configuration</caption>
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Parameter Label</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>VpcId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VPC ID</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID of your existing VPC (for example, <code>vpc-0343606e</code>).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PrivateSubnet1Id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Private subnet 1 ID</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the private subnet in Availability Zone 1 of your existing VPC (for example, <code>subnet-fe9a8b32</code>).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PrivateSubnet2Id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Private subnet 2 ID</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the private subnet in Availability Zone 2 of your existing VPC (for example, <code>subnet-be8b01ea</code>).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PrivateSubnet3Id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Private subnet 3 ID</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the private subnet in Availability Zone 3 of your existing VPC (for example, <code>subnet-abd39039</code>).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PublicSubnet1Id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Public subnet 1 ID</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the public subnet in Availability Zone 1 of your existing VPC (for example, <code>subnet-a0246dcd</code>)</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all fit-content stretch">
+<caption class="title">Table 14. Amazon EKS configuration</caption>
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Parameter Label</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>EKSClusterName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EKS cluster name</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the EKS cluster where TAP will be deployed.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>KubernetesVersion</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Kubernetes version</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.21</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Version of Kubernetes control plane to deploy. The selected version must be supported the selected version of TAP. For more information, refer to Kubernetes cluster requirements (<a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3" class="bare">https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3</a>).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NodeInstanceType</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>m5.xlarge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EKS cluster node instance type.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NodeVolumeSize</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Volume size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>80</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EBS root volume size for Amazon EKS nodes.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NumberOfNodes</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of nodes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>4</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Minimum number of nodes to create for the TAP EKS cluster.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MaxNumberOfNodes</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of nodes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>6</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of available nodes for the TAP EKS cluster in auto scaling.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all fit-content stretch">
+<caption class="title">Table 15. Linux bastion host/bootstrap instance configuration</caption>
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Parameter Label</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LinuxBastionOS</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Ubuntu-Server-22.04-LTS-HVM</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Operating system for the Linux bastion host/bootstrap instance.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LinuxBastionSshPort</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SSH port</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>22</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TCP port to use for the Linux bastion host listening port.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all fit-content stretch">
+<caption class="title">Table 16. AWS Quick Start S3 bucket configuration</caption>
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Parameter Label</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>QSS3BucketName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>aws-quickstart</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the S3 bucket for your copy of the Quick Start assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Quick Start location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>QSS3BucketRegion</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Region</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>us-east-1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.  Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. For more information, refer to <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>QSS3KeyPrefix</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Key prefix</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html" class="bare">https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html</a> and <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1596,8 +1971,10 @@ See <a href="https://aws-quickstart.github.io/option1.html" class="bare">https:/
 <div class="sect1">
 <h2 id="_postdeployment_steps">Postdeployment steps</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_cloudformation_outputs">CloudFormation outputs</h3>
 <div class="paragraph">
-<p>The following values should be available to use from the <strong>Outputs</strong> tab:</p>
+<p>After deployment, refer to the <strong>Outputs</strong> tab in the AWS CloudFormation console for the following information:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -1605,20 +1982,27 @@ See <a href="https://aws-quickstart.github.io/option1.html" class="bare">https:/
 <p>The Elastic IP addresses associated with the Amazon EC2 Linux and Windows bastion host instances.</p>
 </li>
 <li>
-<p>The Tanzu Application Platform website GUI URL that you can access from the Windows bastion host instance.</p>
+<p>The Tanzu Application Platform website URL. For more information, refer to <a href="#_access_the_vmware_tanzu_application_platform_user_interface">Access the VMware Tanzu Application Platform user interface</a>, later in this guide.</p>
 </li>
 </ol>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_security_configuration_and_management_tasks">Security configuration and management tasks</h3>
 <div class="paragraph">
 <p>After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured — including any required patches — to meet your security and other needs. For more information, see the <a href="https://aws.amazon.com/compliance/shared-responsibility-model/">AWS Shared Responsibility Model</a>.</p>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_access_the_gui">Access the GUI</h3>
+<h3 id="_access_the_vmware_tanzu_application_platform_user_interface">Access the VMware Tanzu Application Platform user interface</h3>
 <div class="paragraph">
-<p>The VMware Tanzu Application Platform website graphical user interface (GUI) can be accessed via the Amazon EC2 Windows bastion host instance that is deployed into one of the public subnets.
-Retrieve the password for the Windows bastion host instance using <a href="https://aws.amazon.com/premiumsupport/knowledge-center/retrieve-windows-admin-password/">this guide</a>, and then connect to it using <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/connecting_to_windows_instance.html">this guide</a>.
-The Windows bastion host is intended for users to access the Tanzu Application Platform URL provided within the Outputs tab of the CloudFormation deployment, once the Tanzu Application Platform installation is complete.
-The VMware Tanzu Application Platform GUI is not available via a public URL, but you can connect a Site to Site VPN or AWS Direct Connect to the VPC to allow for direct access from your enterprise network.</p>
+<p>Access the VMware Tanzu Application Platform user interface using the Amazon EC2 Windows bastion host instance that is deployed into a public subnet.</p>
+</div>
+<div class="paragraph">
+<p>To retrieve the password for the Windows bastion host instance, refer to <a href="https://aws.amazon.com/premiumsupport/knowledge-center/retrieve-windows-admin-password/">How do I retrieve my Windows administrator password after launching an instance?</a>. To connect to the bastion host, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/connecting_to_windows_instance.html">Connect to your Windows instance</a>.</p>
+</div>
+<div class="paragraph">
+<p>The VMware Tanzu Application Platform user interface is not available using a public URL. You can use <a href="https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html">Site to Site VPN</a> or <a href="https://aws.amazon.com/directconnect/">AWS Direct Connect</a> to configure direct access to the VPC from your enterprise network.</p>
 </div>
 </div>
 </div>
@@ -1629,8 +2013,10 @@ The VMware Tanzu Application Platform GUI is not available via a public URL, but
 <div class="paragraph">
 <p>For troubleshooting common Quick Start issues, refer to the <a href="https://fwd.aws/rA69w?" target="_blank" rel="noopener">AWS Quick Start General Information Guide</a> and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html" target="_blank" rel="noopener">Troubleshooting CloudFormation</a>.</p>
 </div>
+<div class="sect2">
+<h3 id="_vmware_tanzu_application_platform_documentation">VMware Tanzu Application Platform documentation</h3>
 <div class="paragraph">
-<p><strong class="big">Troubleshooting VMware Tanzu Application Platform documentation</strong></p>
+<p>Refer to the following resources to troubleshoot VMware Tanzu Application Platform.</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1642,66 +2028,89 @@ The VMware Tanzu Application Platform GUI is not available via a public URL, but
 </li>
 </ul>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_faq">FAQ</h3>
+<hr>
 <div class="paragraph">
-<p><strong class="big">I can&#8217;t access the Tanzu Application Platform GUI</strong></p>
+<p><strong>Q.</strong> I can&#8217;t access the Tanzu Application Platform user interface.</p>
 </div>
 <div class="paragraph">
-<p><strong>Explanation</strong></p>
-</div>
-<div class="paragraph">
-<p>Potential causes include:</p>
+<p><strong>A.</strong> The following issues can cause you to not be able to access the Tanzu Application Platform user interface after deployment.</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
 <p>The deployment failed to complete successfully.</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Verify that the CloudFormation stack deployment completed successfully.</p>
 </li>
 <li>
-<p>Accessing the site from a location that doesn&#8217;t have connectivity to the Tanzu Application Platform GUI.</p>
+<p>If the stack deployed successfully, review the Tanzu Application Platform bootstrap logs.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Sign in to the <a href="https://us-east-1.console.aws.amazon.com/console/home?region=us-east-1#">AWS Management Console</a> and open the CloudWatch console.</p>
+</li>
+<li>
+<p>In the left navigation pane, choose <strong>Log groups</strong>.</p>
+</li>
+<li>
+<p>Choose the <code>/aws/quickstart/tanzu-application-platform/&lt;stack ID&gt;</code> log group.</p>
+</li>
+<li>
+<p>Choose the <code>&lt;instance ID&gt;_/var/log/cloud-init-output.log</code> log stream.</p>
+</li>
+<li>
+<p>On the <strong>Log events</strong> page, verify that the bootstrapping completed successfully. If the bootstrapping completed successfully, then the issue might be the location you are connecting from.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
 </li>
 </ul>
 </div>
-<div class="paragraph">
-<p><strong>Solution</strong></p>
-</div>
-<div class="paragraph">
-<p>First, check that the CloudFormation stack deployment completed successfully.
-If the stack deployed successfully, then review the Tanzu Application Platform bootstrap logs by going to the <a href="https://console.aws.amazon.com/cloudwatch/home">CloudWatch Logs console</a> &gt; Log groups &gt; <code>/aws/quickstart/tanzu-application-platform/&lt;stack ID&gt;</code> log group &gt; <code>&lt;instance ID&gt;_/var/log/cloud-init-output.log</code> log stream, and check whether this completed successfully.
-These logs can also be found in the <code>/var/log/cloud-init-output.log</code> file on the Linux bastion host.</p>
-</div>
-<div class="admonitionblock tip">
+<div class="admonitionblock note">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
+<i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-<code>&lt;stack ID&gt;</code> used in the CloudWatch log group name is the ID of the AWS CloudFormation stack, and <code>&lt;instance ID&gt;</code> used in the CloudWatch log stream name is the ID of the Amazon EC2 Linux bastion host, respectively.
+<div class="ulist">
+<ul>
+<li>
+<p>Logs can also be found in the <code>/var/log/cloud-init-output.log</code> file on the Linux bastion host.</p>
+</li>
+<li>
+<p><code>&lt;stack ID&gt;</code> used in the CloudWatch log group name is the ID of the AWS CloudFormation stack, and <code>&lt;instance ID&gt;</code> used in the CloudWatch log stream name is the ID of the Amazon EC2 Linux bastion host, respectively.</p>
+</li>
+</ul>
+</div>
 </td>
 </tr>
 </table>
 </div>
+<div class="ulist">
+<ul>
+<li>
+<p>You are attempting to accessing the site from a location that doesn&#8217;t have connectivity to the Tanzu Application Platform GUI. The Tanzu Application Platform website GUI URL can only be accessed from endpoints with a route to the private VPC network, such as from the Amazon EC2 Windows bastion host instance.</p>
+</li>
+</ul>
+</div>
+<hr>
 <div class="paragraph">
-<p>If the VMware Tanzu Application Platform bootstrap process completed successfully, then the issue might be the location you are connecting from.
-The Tanzu Application Platform website GUI URL can only be accessed from endpoints with a route to the private VPC network, such as from the Amazon EC2 Windows bastion host instance.</p>
+<p><strong>Q.</strong> Tanzu Application Platform installation failed with a EULA error.</p>
 </div>
 <div class="paragraph">
-<p><strong class="big">Tanzu Application Platform installation failed with a EULA error</strong></p>
+<p><strong>A.</strong> You must accept the relevant End User License Agreements (EULAs) before you can download the Tanzu Application Platform packages from the VMware Tanzu Network. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0">Accept the End User License Agreements</a>.</p>
 </div>
 <div class="paragraph">
-<p><strong>Explanation</strong></p>
-</div>
-<div class="paragraph">
-<p>You must accept the relevant End User License Agreements (EULAs) before you can download the Tanzu Application Platform packages from the VMware Tanzu Network.</p>
-</div>
-<div class="paragraph">
-<p><strong>Solution</strong></p>
-</div>
-<div class="paragraph">
-<p>Follow the steps in <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0">Accept the End User License Agreements</a>.</p>
-</div>
-<div class="paragraph">
-<p>SSH into the Linux bastion host instance, and then run the following commands to find additional details about the <code>.status.usefulErrorMessage</code> error:</p>
+<p>For more details about the <code>.status.usefulErrorMessage</code> error, connect to the Linux bastion host using SSH. Then run the following commands. For <code>&lt;PACKAGE-NAME&gt;</code>, substitute the name of the package to target.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1709,49 +2118,28 @@ The Tanzu Application Platform website GUI URL can only be accessed from endpoin
 tanzu package installed get &lt;PACKAGE-NAME&gt; --namespace tap-install</pre>
 </div>
 </div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-<code>&lt;PACKAGE-NAME&gt;</code> is the name of the package to target.
-</td>
-</tr>
-</table>
-</div>
 <div class="paragraph">
-<p>Run the following commands:</p>
+<p>If you have chosen to relocate Tanzu Application Platform images to Amazon ECR and this did not complete successfully, run the following command. This command takes 30–45 minutes to complete.</p>
 </div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>(Optional) If you have chosen to relocate Tanzu Application Platform images to Amazon ECR and this did not complete successfully, run (takes 30-45 minutes):</p>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
 <pre>/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c relocate</pre>
 </div>
 </div>
-</li>
-<li>
-<p>Run the Tanzu Application Platform install:</p>
-<div class="literalblock">
+<div class="paragraph">
+<p>Run the following command to install Tanzu Application Platform.</p>
+</div>
+<div class="listingblock">
 <div class="content">
 <pre>/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install</pre>
 </div>
 </div>
-</li>
-</ol>
+<hr>
+<div class="paragraph">
+<p><strong>Q.</strong> One or more Tanzu Application Platform packages failed to reconcile.</p>
 </div>
 <div class="paragraph">
-<p><strong class="big">One or more Tanzu Application Platform packages fails to reconcile</strong></p>
-</div>
-<div class="paragraph">
-<p><strong>Explanation</strong></p>
-</div>
-<div class="paragraph">
-<p>Potential causes include:</p>
+<p><strong>A.</strong> Potential causes include:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1764,10 +2152,7 @@ tanzu package installed get &lt;PACKAGE-NAME&gt; --namespace tap-install</pre>
 </ul>
 </div>
 <div class="paragraph">
-<p><strong>Solution</strong></p>
-</div>
-<div class="paragraph">
-<p>SSH into the Linux bastion host instance, and verify the installation status by running:</p>
+<p>Connect to the Linux bastion host using SSH. Then run the following command to verify the installation status.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1776,51 +2161,42 @@ tanzu package installed get &lt;PACKAGE-NAME&gt; --namespace tap-install</pre>
 </div>
 <div class="paragraph">
 <p>If the installation has stopped running, one or more reconciliations have likely failed.
-If so, run the following command</p>
+If so, run the following command.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre>/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install</pre>
 </div>
 </div>
+<hr>
 <div class="paragraph">
-<p><strong class="big">It&#8217;s been more than 4 minutes, but the Windows bastion host administrator password still isn&#8217;t available</strong></p>
+<p><strong>Q.</strong> It&#8217;s been more than four minutes, but the Windows bastion host administrator password still isn&#8217;t available</p>
 </div>
 <div class="paragraph">
-<p><strong>Explanation</strong></p>
+<p><strong>A.</strong> It is likely that during deployment a ED25519 key pair was selected instead of an RSA key pair. If you select a ED25519 key pair for this deployment, the CloudFormation stack will deploy successfully, but you will not be able to retrieve the automatically generated password for the Windows bastion host.</p>
 </div>
 <div class="paragraph">
-<p>An Amazon EC2 Key Pair of type ED25519 was likely selected for the deployment, not RSA.
-As of June 23rd, 2022, Amazon EC2 Windows instances do not yet support ED25519 keys (<a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html">reference</a>).
-If a Key Pair of type ED25519 is selected for this deployment, the CloudFormation stack will still deploy successfully, but you will not be able to retrieve the Windows bastion host&#8217;s automatically generated password.</p>
+<p>As of June 23rd, 2022, Amazon EC2 Windows instances do not support ED25519 key pairs. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html">Amazon EC2 key pairs and Windows instances</a>.</p>
 </div>
 <div class="paragraph">
-<p><strong>Solution</strong></p>
+<p>Verify that an RSA key pair used during deployment. If not, your options to remediate this issue include the following:</p>
 </div>
-<div class="paragraph">
-<p>Verify that the Amazon EC2 Key Pair selected for the deployment is of type RSA, not ED25519.</p>
-</div>
-<div class="paragraph">
-<p>Options to remediate include:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
+<div class="ulist">
+<ul>
 <li>
-<p><a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html">Reset the Windows administrator password using EC2 Launch v2</a></p>
+<p><a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html">Reset the Windows administrator password using EC2Launch v2</a></p>
 </li>
 <li>
-<p><a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html">Update the CloudFormation stack</a> to use a Key Pair with the supported type: RSA.
-Implementing this option requires replacing all Amazon EC2 instances that use this key, which includes both the Windows and Linux bastion hosts, as well as the EKS nodes (<a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname">reference</a>).</p>
+<p><a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html">Update the CloudFormation stack</a> to use an RSA key pair. This requires replacing all Amazon EC2 instances (Windows and Linux) and Amazon EKS nodes that use this key. For more information, refer to <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname">KeyName</a>.</p>
 </li>
 <li>
-<p>Customize the CloudFormation template to use a separate Key Pair for the Windows bastion host and then update the CloudFormation stack.
-Implementing this option will only replace the Windows bastion host instance.
-Instructions for implementing this are beyond the scope of this guide.</p>
+<p>Customize the CloudFormation template to use a separate key pair for the Windows bastion host. Then update the CloudFormation stack. This option only replaces the Windows bastion host instance. Instructions for implementing this are beyond the scope of this guide.</p>
 </li>
 <li>
-<p>Contact <a href="https://aws.amazon.com/contact-us/">AWS Technical support</a></p>
+<p>Contact <a href="https://aws.amazon.com/contact-us/">AWS technical support</a>.</p>
 </li>
-</ol>
+</ul>
+</div>
 </div>
 </div>
 </div>
@@ -1872,7 +2248,7 @@ Instructions for implementing this are beyond the scope of this guide.</p>
 </html>
 <!--
 repo commit:
-c028bef6126a60fdd66286e3d9e1cd679daccecb
+b7c66acda423fdd8860d207d37612a1fdde871a6
 
 submodule config:
  d9cdf2a3d1ee58d992a6a81957fa575507319f01 docs/boilerplate (heads/main)
