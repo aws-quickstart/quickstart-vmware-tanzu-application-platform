@@ -2,102 +2,102 @@
 
 For troubleshooting common Quick Start issues, refer to the https://fwd.aws/rA69w?[AWS Quick Start General Information Guide^] and https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html[Troubleshooting CloudFormation^].
 
-[.big]*Troubleshooting {partner-product-name} documentation*
+=== {partner-product-name} documentation
 
-* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html[Troubleshoot installing {partner-product-short-name}]
-* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-troubleshooting-tap-troubleshoot-using-tap.html[Troubleshoot using {partner-product-short-name}]
+Refer to the following resources to troubleshoot {partner-product-name}.
 
-[.big]*I can't access the {partner-product-short-name} GUI*
+* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html[Troubleshoot installing Tanzu Application Platform]
+* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-troubleshooting-tap-troubleshoot-using-tap.html[Troubleshoot using Tanzu Application Platform]
 
-*Explanation*
+=== FAQ
 
-Potential causes include:
+'''
+*Q.* I can't access the {partner-product-short-name} user interface.
+
+*A.* The following issues can cause you to not be able to access the {partner-product-short-name} user interface after deployment.
 
 * The deployment failed to complete successfully.
-* Accessing the site from a location that doesn't have connectivity to the {partner-product-short-name} GUI.
++
+. Verify that the CloudFormation stack deployment completed successfully.
+. If the stack deployed successfully, review the {partner-product-short-name} bootstrap logs.
+.. Sign in to the https://us-east-1.console.aws.amazon.com/console/home?region=us-east-1#[AWS Management Console] and open the CloudWatch console.
+.. In the left navigation pane, choose *Log groups*.
+.. Choose the `+/aws/quickstart/tanzu-application-platform/<stack ID>+` log group.
+.. Choose the `+<instance ID>_/var/log/cloud-init-output.log+` log stream.
+.. On the **Log events** page, verify that the bootstrapping completed successfully. If the bootstrapping completed successfully, then the issue might be the location you are connecting from.
 
-*Solution*
+[NOTE]
+====
+* Logs can also be found in the `+/var/log/cloud-init-output.log+` file on the Linux bastion host.
+* `+<stack ID>+` used in the CloudWatch log group name is the ID of the AWS CloudFormation stack, and `+<instance ID>+` used in the CloudWatch log stream name is the ID of the Amazon EC2 Linux bastion host, respectively.
+====
 
-First, check that the CloudFormation stack deployment completed successfully.
-If the stack deployed successfully, then review the {partner-product-short-name} bootstrap logs by going to the https://console.aws.amazon.com/cloudwatch/home[CloudWatch Logs console] > Log groups > `+/aws/quickstart/tanzu-application-platform/<stack ID>+` log group > `+<instance ID>_/var/log/cloud-init-output.log+` log stream, and check whether this completed successfully.
-These logs can also be found in the `+/var/log/cloud-init-output.log+` file on the Linux bastion host.
+* You are attempting to accessing the site from a location that doesn't have connectivity to the {partner-product-short-name} GUI. The {partner-product-short-name} website GUI URL can only be accessed from endpoints with a route to the private VPC network, such as from the Amazon EC2 Windows bastion host instance.
 
-TIP: `+<stack ID>+` used in the CloudWatch log group name is the ID of the AWS CloudFormation stack, and `+<instance ID>+` used in the CloudWatch log stream name is the ID of the Amazon EC2 Linux bastion host, respectively.
+'''
 
-If the {partner-product-name} bootstrap process completed successfully, then the issue might be the location you are connecting from.
-The {partner-product-short-name} website GUI URL can only be accessed from endpoints with a route to the private VPC network, such as from the Amazon EC2 Windows bastion host instance.
 
-[.big]*{partner-product-short-name} installation failed with a EULA error*
+*Q.* {partner-product-short-name} installation failed with a EULA error.
 
-*Explanation*
+*A.* You must accept the relevant End User License Agreements (EULAs) before you can download the {partner-product-short-name} packages from the {partner-registry}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements].
 
-You must accept the relevant End User License Agreements (EULAs) before you can download the {partner-product-short-name} packages from the {partner-registry}.
-
-*Solution*
-
-Follow the steps in https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements].
-
-SSH into the Linux bastion host instance, and then run the following commands to find additional details about the `+.status.usefulErrorMessage+` error:
+For more details about the `+.status.usefulErrorMessage+` error, connect to the Linux bastion host using SSH. Then run the following commands. For `<PACKAGE-NAME>`, substitute the name of the package to target.
 
 ----
 tanzu package installed list -A
 tanzu package installed get <PACKAGE-NAME> --namespace tap-install
 ----
 
-TIP: `+<PACKAGE-NAME>+` is the name of the package to target.
+If you have chosen to relocate {partner-product-short-name} images to Amazon ECR and this did not complete successfully, run the following command. This command takes 30–45 minutes to complete.
 
-Run the following commands:
+----
+/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c relocate
+----
 
-. (Optional) If you have chosen to relocate {partner-product-short-name} images to Amazon ECR and this did not complete successfully, run (takes 30-45 minutes):
+Run the following command to install {partner-product-short-name}.
 
-  /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c relocate
+----
+/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install
+----
 
-. Run the {partner-product-short-name} install:
+'''
 
-  /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install
 
-[.big]*One or more {partner-product-short-name} packages fails to reconcile*
+*Q.* One or more {partner-product-short-name} packages failed to reconcile.
 
-*Explanation*
-
-Potential causes include:
+*A.* Potential causes include:
 
 * An infrastructure issue causing the task to take longer to run than the timeout value allows.
 * A race condition between components.
 
-*Solution*
-
-SSH into the Linux bastion host instance, and verify the installation status by running:
+Connect to the Linux bastion host using SSH. Then run the following command to verify the installation status.
 
 ----
 tanzu package installed list -A
 ----
 
 If the installation has stopped running, one or more reconciliations have likely failed.
-If so, run the following command
+If so, run the following command.
 
 ----
 /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install
 ----
 
-[.big]*It's been more than 4 minutes, but the Windows bastion host administrator password still isn't available*
+'''
 
-*Explanation*
 
-An Amazon EC2 Key Pair of type ED25519 was likely selected for the deployment, not RSA.
-As of June 23rd, 2022, Amazon EC2 Windows instances do not yet support ED25519 keys (https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[reference]).
-If a Key Pair of type ED25519 is selected for this deployment, the CloudFormation stack will still deploy successfully, but you will not be able to retrieve the Windows bastion host's automatically generated password.
+*Q.* It's been more than four minutes, but the Windows bastion host administrator password still isn't available
 
-*Solution*
+*A.* It is likely that during deployment a ED25519 key pair was selected instead of an RSA key pair. If you select a ED25519 key pair for this deployment, the CloudFormation stack will deploy successfully, but you will not be able to retrieve the automatically generated password for the Windows bastion host.
 
-Verify that the Amazon EC2 Key Pair selected for the deployment is of type RSA, not ED25519.
+As of June 23rd, 2022, Amazon EC2 Windows instances do not support ED25519 key pairs. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances].
 
-Options to remediate include:
+Verify that an RSA key pair used during deployment. If not, your options to remediate this issue include the following:
 
-. https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html[Reset the Windows administrator password using EC2 Launch v2]
-. https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html[Update the CloudFormation stack] to use a Key Pair with the supported type: RSA.
-  Implementing this option requires replacing all Amazon EC2 instances that use this key, which includes both the Windows and Linux bastion hosts, as well as the EKS nodes (https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname[reference]).
-. Customize the CloudFormation template to use a separate Key Pair for the Windows bastion host and then update the CloudFormation stack.
-  Implementing this option will only replace the Windows bastion host instance.
-  Instructions for implementing this are beyond the scope of this guide.
-. Contact https://aws.amazon.com/contact-us/[AWS Technical support]
+* https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html[Reset the Windows administrator password using EC2Launch v2]
+
+* https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html[Update the CloudFormation stack] to use an RSA key pair. This requires replacing all Amazon EC2 instances (Windows and Linux) and Amazon EKS nodes that use this key. For more information, refer to https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname[KeyName].
+
+* Customize the CloudFormation template to use a separate key pair for the Windows bastion host. Then update the CloudFormation stack. This option only replaces the Windows bastion host instance. Instructions for implementing this are beyond the scope of this guide.
+
+* Contact https://aws.amazon.com/contact-us/[AWS technical support].
