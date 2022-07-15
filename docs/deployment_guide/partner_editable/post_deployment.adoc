@@ -46,13 +46,13 @@
 
 |`TAPVersion`
 |Version
-|
-|
+|`1.2.0`
+|Version of TAP to deploy. The selected version must also support the       selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements].
 
 |`TAPDomainName`
 |Domain name
 |
-|
+|Private DNS domain name that will be used for accessing the TAP graphical user interface (GUI) and project URLs.
 |====
 
 [%autowidth.stretch]
@@ -61,9 +61,9 @@
 |Parameter |Parameter Label |Default Value |Description
 
 |`SampleAppName`
-|
-|
-|
+|Name
+|`tanzu-java-web-app-workload`
+|Name of sample application to deploy into the Amazon EKS cluster.
 |====
 
 [%autowidth.stretch]
@@ -74,22 +74,22 @@
 |`AvailabilityZones`
 |Availability Zones
 |
-|
+|List of Availability Zones to use for the subnets in the VPC. Three Availability Zones are used for this deployment.
 
 |`NumberOfAZs`
 |Number of Availability Zones
-|
-|
+|`3`
+|Number of Availability Zones to use in the VPC. This must match the value entered for the `AvailabilityZones` parameter.
 
 |`KeyPairName`
 |EC2 key pair name
 |
-|
+|The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances].
 
-|`RemoteAccessCidr1`
+|`RemoteAccessCidr`
 |Remote access CIDR
 |
-|
+|IPv4 CIDR block permitted to connect to the Windows and Linux bastion hosts. We recommend that you set this value to a trusted network.
 |====
 
 [%autowidth.stretch]
@@ -98,39 +98,39 @@
 |Parameter |Parameter Label |Default Value |Description
 
 |`VPCCIDR`
-|
-|
-|
+|VPC CIDR
+|`10.0.0.0/16`
+|CIDR block for the VPC.
 
 |`PrivateSubnet1CIDR`
-|
-|
-|
+|Private subnet 1 CIDR
+|`10.0.0.0/19`
+|CIDR block for private subnet 1, located in Availability Zone 1.
 
 |`PrivateSubnet2CIDR`
-|
-|
-|
+|Private subnet 2 CIDR
+|`10.0.32.0/19`
+|CIDR block for private subnet 2, located in Availability Zone 2.
 
 |`PrivateSubnet3CIDR`
-|
-|
-|
+|Private subnet 3 CIDR
+|`10.0.64.0/19`
+|CIDR block for private subnet 3, located in Availability Zone 3.
 
 |`PublicSubnet1CIDR`
-|
-|
-|
+|Public subnet 1 CIDR
+|`10.0.128.0/20`
+|CIDR block for the public subnet 1, located in Availability Zone 1.
 
 |`PublicSubnet2CIDR`
-|
-|
-|
+|Public subnet 2 CIDR
+|`10.0.144.0/20`
+|CIDR block for the public subnet 2, located in Availability Zone 2.
 
 |`PublicSubnet3CIDR`
-|
-|
-|
+|Public subnet 3 CIDR
+|`10.0.160.0/20`
+|CIDR block for the public subnet 3, located in Availability Zone 3.
 |====
 
 [%autowidth.stretch]
@@ -139,32 +139,32 @@
 |Parameter |Parameter Label |Default Value |Description
 
 |`EKSClusterName`
+|EKS cluster name
 |
-|
-|
+|Name of the EKS cluster where TAP will be deployed.
 
 |`KubernetesVersion`
-|
-|
-|
+|Kubernetes version
+|`1.21`
+|Version of Kubernetes control plane to deploy. The selected version must be supported the selected version of TAP. For more information, refer to Kubernetes cluster requirements (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
 
 |`NodeInstanceType`
-|
-|
-|
+|Instance type
+|`m5.xlarge`
+|Amazon EKS cluster node instance type.
 
 |`NodeVolumeSize`
-|
+|Volume size
 |
 |
 
 |`NumberOfNodes`
-|
+|Number of nodes
 |
 |
 
 |`MaxNumberOfNodes`
-|
+|Maximum number of nodes
 |
 |
 |====
@@ -175,12 +175,12 @@
 |Parameter |Parameter Label |Default Value |Description
 
 |`LinuxBastionOS`
-|
+|OS
 |
 |
 
 |`LinuxBastionSshPort`
-|
+|SSH port
 |
 |
 |====
@@ -191,17 +191,17 @@
 |Parameter |Parameter Label |Default Value |Description
 
 |`QSS3BucketName`
-|
+|Name
 |
 |
 
 |`QSS3BucketRegion`
-|
+|Region
 |
 |
 
 |`QSS3KeyPrefix`
-|
+|Key prefix
 |
 |
 |====
