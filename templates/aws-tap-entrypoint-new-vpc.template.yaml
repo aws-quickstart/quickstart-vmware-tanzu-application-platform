@@ -67,7 +67,7 @@ Metadata:
           - NumberOfNodes
           - MaxNumberOfNodes
       - Label:
-          default: Linux bastion host / bootstrap instance configuration
+          default: Linux bastion host/bootstrap instance configuration
         Parameters:
           - LinuxBastionOS
           - LinuxBastionSshPort
@@ -229,7 +229,7 @@ Parameters:
   KeyPairName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: >-
-      The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to Amazon EC2 key pairs and Windows instances (https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
+      The name of the EC2 key pair used for SSH access to the Linux bastion host/bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to Amazon EC2 key pairs and Windows instances (https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
   EKSClusterName:
     Type: String
     Description: >-
@@ -476,7 +476,7 @@ Parameters:
   LinuxBastionOS:
     Type: String
     Description: >-
-      Operating system for the Linux bastion host / bootstrap instance.
+      Operating system for the Linux bastion host/bootstrap instance.
     AllowedValues:
       - Ubuntu-Server-22.04-LTS-HVM
     Default: Ubuntu-Server-22.04-LTS-HVM
@@ -527,12 +527,7 @@ Parameters:
   QSS3BucketName:
     Type: String
     Description: >-
-      Name of the S3 bucket for your copy of the Quick Start assets.
-      Keep the default name unless you are customizing the template.
-      Changing the name updates code references to point to a new Quick
-      Start location. This name can include numbers, lowercase letters,
-      uppercase letters, and hyphens, but do not start or end with a hyphen (-).
-      See https://aws-quickstart.github.io/option1.html.
+      Name of the S3 bucket for your copy of the Quick Start assets. Keep the default name unless you are customizing the template.Changing the name updates code references to point to a new Quick Start location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to https://aws-quickstart.github.io/option1.html.
     MinLength: 3
     MaxLength: 63
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
@@ -544,14 +539,7 @@ Parameters:
   QSS3KeyPrefix:
     Type: String
     Description: >-
-      S3 key prefix that is used to simulate a directory for your copy of the
-      Quick Start assets. Keep the default prefix unless you are customizing
-      the template. Changing this prefix updates code references to point to
-      a new Quick Start location. This prefix can include numbers, lowercase
-      letters, uppercase letters, hyphens (-), and forward slashes (/). End
-      with a forward slash.
-      See https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
-      and https://aws-quickstart.github.io/option1.html.
+      S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html and https://aws-quickstart.github.io/option1.html.
     AllowedPattern: ^([0-9a-zA-Z-.]+/)*$
     ConstraintDescription:
       The Quick Start S3 key prefix can include numbers, lowercase letters,
@@ -560,11 +548,7 @@ Parameters:
   QSS3BucketRegion:
     Type: String
     Description: >-
-      AWS Region where the Quick Start S3 bucket (QSS3BucketName) is
-      hosted. Keep the default Region unless you are customizing the template.
-      Changing this Region updates code references to point to a new
-      Quick Start location. When using your own bucket, specify the Region.
-      See https://aws-quickstart.github.io/option1.html.
+     AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. For more information, refer to https://aws-quickstart.github.io/option1.html.
     Default: us-east-1
 Mappings:
   AwsAmiNameMap:
@@ -637,23 +621,23 @@ Resources:
 Outputs:
   LinuxBastionEIP:
     Description: >-
-      The public IP address of the Linux bastion host / bootstrap instance.
+      The public IP address of the Linux bastion host/bootstrap instance.
     Value: !GetAtt ExistingVpcStack.Outputs.LinuxBastionEIP
   UbuntuBastionAZ:
     Condition: Ubuntu
     Description: >-
-      The Availability Zone that the Ubuntu bastion host / bootstrap instance
+      The Availability Zone that the Linux bastion host/bootstrap instance
       is deployed in.
     Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionAZ
   UbuntuBastionId:
     Condition: Ubuntu
     Description: >-
-      The EC2 instance ID of the Ubuntu bastion host / bootstrap instance.
+      The EC2 instance ID of the Linux bastion host/bootstrap instance.
     Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionId
   UbuntuBastionPublicDnsName:
     Condition: Ubuntu
     Description: >-
-      The public DNS name of the Ubuntu bastion host / bootstrap instance.
+      The public DNS name of the Linux bastion host/bootstrap instance.
     Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionPublicDnsName
   EKSClusterName:
     Description: The Amazon EKS cluster name.
