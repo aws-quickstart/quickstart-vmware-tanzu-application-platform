@@ -170,7 +170,7 @@
 |====
 
 [%autowidth.stretch]
-.Linux bastion host / bootstrap instance configuration
+.Linux bastion host/bootstrap instance configuration
 |====
 |Parameter |Parameter Label |Default Value |Description
 
@@ -298,7 +298,7 @@
 |
 |ID of your existing VPC (for example, `vpc-0343606e`).
 
-|`PrivateSubnet1id`
+|`PrivateSubnet1Id`
 |Private subnet 1 ID
 |
 |ID of the private subnet in Availability Zone 1 of your existing VPC (for example, `subnet-fe9a8b32`).
