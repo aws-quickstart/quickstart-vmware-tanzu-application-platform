@@ -1,7 +1,7 @@
 // Include any postdeployment steps here, such as steps necessary to test that the deployment was successful. If there are no postdeployment steps, leave this file empty.
 === Parameter reference
 
-==== Parameters for deploying a {partner-product-short-name} cluster in a new VPC
+==== Parameters for deploying a {partner-product-short-name} cluster to a new VPC
 
 [%autowidth.stretch]
 .{partner-registry} configuration
@@ -10,167 +10,405 @@
 
 |`AcceptEULAs`
 |Have all applicable VMware Tanzu Network EULAs been accepted?
-|No
-|Choose 'Yes' if you have already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for VMware Tanzu] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[VMWare Tanzu Application Platform] end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
+|`No`
+|Choose `Yes` if you have already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for VMware Tanzu] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[VMWare Tanzu Application Platform] end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
 
 |`AcceptCEIP`
 |Have you read and accept the VMware CEIP policy?
-|No
-|Choose 'Yes' if you have read and accepted the https://www.vmware.com/solutions/trustvmware/ceip.html[VMware customer experience improvement program (CEIP) policy].
+|`No`
+|Choose `Yes` if you have read and accepted the https://www.vmware.com/solutions/trustvmware/ceip.html[VMware customer experience improvement program (CEIP) policy].
 
 |`TanzuNetUsername`
 |Username
 |
 |VMware Tanzu Network username. To create an account, sign up at https://account.run.pivotal.io/z/uaa/sign-up.
 
-|`Tan`
+|`TanzuNetPassword`
+|Password
+|
 |VMware Tanzu Network password.
-|*Requires input*
-|The {partner-registry} password (authentication key).
 
-|{partner-registry} API Token
-|*Requires input*
-|The {partner-registry} refresh token for the defined user.
+|`TanzuApiToken`
+|API Token
+|
+|VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to https://network.pivotal.io/docs/api[VMWare Tanzu Network API Documentation].
 
-|{partner-registry} Relocate Images
-|*Requires input*
-|Yes/No whether to relocate {partner-product-short-name} images to your Amazon ECR private registry from VMware Tanzu Network registry before attempting installation.
+|`TanzuNetRelocateImages`
+|Relocate TAP images
+|`No`
+|Choose `Yes` to relocate TAP images from the VMware Tanzu Network registry to your ECR registry from before attempting installation. If you do not relocate images, Tanzu Application Platform will depend directly on the VMware Tanzu Network registry for its continued operation.
 |====
 
 [%autowidth.stretch]
-.Basic deployment configuration
+.VMware Tanzu Application Platform configuration
 |====
-|Parameter Label |Default Value |Description
+|Parameter |Parameter Label |Default Value |Description
 
+|`TAPVersion`
+|Version
+|`1.2.0`
+|Version of TAP to deploy. The selected version must also support the       selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements].
+
+|`TAPDomainName`
+|Domain name
+|
+|Private DNS domain name that will be used for accessing the TAP graphical user interface (GUI) and project URLs.
+|====
+
+[%autowidth.stretch]
+.Sample app configuration
+|====
+|Parameter |Parameter Label |Default Value |Description
+
+|`SampleAppName`
+|Name
+|`tanzu-java-web-app-workload`
+|Name of sample application to deploy into the Amazon EKS cluster.
+|====
+
+[%autowidth.stretch]
+.Basic configuration
+|====
+|Parameter |Parameter Label |Default Value |Description
+
+|`AvailabilityZones`
 |Availability Zones
-|*Requires input*
-|List of Availability Zones to use for the subnets in the VPC.
-Either two or three Availability Zones are used for this deployment.
+|
+|List of Availability Zones to use for the subnets in the VPC. Three Availability Zones are used for this deployment.
 
+|`NumberOfAZs`
 |Number of Availability Zones
-|3
-|Number of Availability Zones to use in the VPC.
-This must match the value entered for the Availability Zones parameter.
+|`3`
+|Number of Availability Zones to use in the VPC. This must match the value entered for the `AvailabilityZones` parameter.
 
-|Key Pair Name
-|*Requires input*
-|The name of the Amazon EC2 Key Pair that will be used for accessing the Linux and Windows bastion hosts, and the Amazon EKS cluster nodes.
+|`KeyPairName`
+|EC2 key pair name
+|
+|The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances].
 
+|`RemoteAccessCidr`
 |Remote access CIDR
-|*Requires input*
-|IPv4 CIDR block that will be allowed to connect to the Amazon EC2 Linux and Windows bastion host instances once deployed.
+|
+|IPv4 CIDR block permitted to connect to the Windows and Linux bastion hosts. We recommend that you set this value to a trusted network.
 |====
 
 [%autowidth.stretch]
-.VPC network configuration
+.Default VPC configuration
 |====
-|Parameter Label |Default Value |Description
+|Parameter |Parameter Label |Default Value |Description
 
+|`VPCCIDR`
 |VPC CIDR
-|10.0.0.0/16
-|CIDR block for the VPC
+|`10.0.0.0/16`
+|CIDR block for the VPC.
 
-|Private Subnet 1 CIDR
-|10.0.0.0/19
+|`PrivateSubnet1CIDR`
+|Private subnet 1 CIDR
+|`10.0.0.0/19`
 |CIDR block for private subnet 1, located in Availability Zone 1.
 
-|Private Subnet 2 CIDR
-|10.0.32.0/19
+|`PrivateSubnet2CIDR`
+|Private subnet 2 CIDR
+|`10.0.32.0/19`
 |CIDR block for private subnet 2, located in Availability Zone 2.
 
-|Private Subnet 3 CIDR
-|10.0.64.0/19
+|`PrivateSubnet3CIDR`
+|Private subnet 3 CIDR
+|`10.0.64.0/19`
 |CIDR block for private subnet 3, located in Availability Zone 3.
 
-|Public Subnet 1 CIDR
-|10.0.128.0/20
-|CIDR block for the public (DMZ) subnet 1, located in Availability Zone 1.
+|`PublicSubnet1CIDR`
+|Public subnet 1 CIDR
+|`10.0.128.0/20`
+|CIDR block for the public subnet 1, located in Availability Zone 1.
 
-|Public Subnet 2 CIDR
-|10.0.144.0/20
-|CIDR block for the public (DMZ) subnet 2, located in Availability Zone 2.
+|`PublicSubnet2CIDR`
+|Public subnet 2 CIDR
+|`10.0.144.0/20`
+|CIDR block for the public subnet 2, located in Availability Zone 2.
 
-|Public Subnet 3 CIDR
-|10.0.160.0/20
-|CIDR block for the public (DMZ) subnet 3, located in Availability Zone 3.
+|`PublicSubnet3CIDR`
+|Public subnet 3 CIDR
+|`10.0.160.0/20`
+|CIDR block for the public subnet 3, located in Availability Zone 3.
 |====
 
 [%autowidth.stretch]
 .Amazon EKS configuration
 |====
-|Parameter Label |Default Value |Description
+|Parameter |Parameter Label |Default Value |Description
 
+|`EKSClusterName`
 |EKS cluster name
-|*Requires input*
-|The name of the cluster that will be created to contain the {partner-product-short-name} deployment.
+|
+|Name of the EKS cluster where TAP will be deployed.
 
+|`KubernetesVersion`
+|Kubernetes version
+|`1.21`
+|Version of Kubernetes control plane to deploy. The selected version must be supported the selected version of TAP. For more information, refer to Kubernetes cluster requirements (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
+
+|`NodeInstanceType`
+|Instance type
+|`m5.xlarge`
+|Amazon EKS cluster node instance type.
+
+|`NodeVolumeSize`
+|Volume size
+|`80`
+|Amazon EBS root volume size for Amazon EKS nodes.
+
+|`NumberOfNodes`
 |Number of nodes
-|4
-|The number of nodes that will be the minimum and created for the {partner-product-short-name} EKS cluster.
+|`4`
+|Minimum number of nodes to create for the TAP EKS cluster.
 
+|`MaxNumberOfNodes`
 |Maximum number of nodes
-|6
-|The maximum number of nodes that will be available in an auto scaling scenario for the {partner-product-short-name} EKS cluster.
-
-|Instance Type
-|m5.xlarge
-|Amazon EC2 instance type for each of the nodes deployed within the {partner-product-short-name} EKS cluster.
+|`6`
+|Maximum number of available nodes for the TAP EKS cluster in auto scaling.
 |====
 
 [%autowidth.stretch]
-.{partner-product-name} configuration
+.Linux bastion host / bootstrap instance configuration
 |====
-|Parameter Label |Default Value |Description
+|Parameter |Parameter Label |Default Value |Description
 
-|{partner-product-short-name} domain name
-|*Requires input*
-|Domain name that can be used for access to {partner-product-name} and its corresponding project URLs.
-Available within a private DNS Zone.
+|`LinuxBastionOS`
+|OS
+|`Ubuntu-Server-22.04-LTS-HVM`
+|Operating system for the Linux bastion host/bootstrap instance.
+
+|`LinuxBastionSshPort`
+|SSH port
+|`22`
+|TCP port to use for the Linux bastion host listening port.
 |====
 
 [%autowidth.stretch]
 .AWS Quick Start S3 bucket configuration
 |====
-|Parameter Label |Default Value |Description
+|Parameter |Parameter Label |Default Value |Description
 
-|QSS3BucketName
-|aws-quickstart
-|Name of the S3 bucket for your copy of the Quick Start assets.
-Keep the default name unless you are customizing the template.
-Changing the name updates code references to point to a new Quick Start location.
-This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-).
-See https://aws-quickstart.github.io/option1.html.
+|`QSS3BucketName`
+|Name
+|`aws-quickstart`
+|Name of the S3 bucket for your copy of the Quick Start assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Quick Start location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to https://aws-quickstart.github.io/option1.html.
 
-|QSS3KeyPrefix
-|quickstart-vmware-tanzu-application-platform/
-|S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets.
-Keep the default prefix unless you are customizing the template.
-Changing this prefix updates code references to point to a new Quick Start location.
-This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/).
-End with a forward slash.
-See https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html and https://aws-quickstart.github.io/option1.html.
+|`QSS3BucketRegion`
+|Region
+|`us-east-1`
+|AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.  Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. For more information, refer to https://aws-quickstart.github.io/option1.html.
 
-|QSS3BucketRegion
-|{default_deployment_region}
-|AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted.
-Keep the default Region unless you are customizing the template.
-Changing this Region updates code references to point to a new Quick Start location.
-When using your own bucket, specify the Region.
-See https://aws-quickstart.github.io/option1.html.
+|`QSS3KeyPrefix`
+|Key prefix
+|
+|S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html and https://aws-quickstart.github.io/option1.html.
+|====
+
+//Edit after completing new VPC parameters; open template I have locally to the side
+==== Parameters for deploying a {partner-product-short-name} cluster to an existing VPC
+
+[%autowidth.stretch]
+.{partner-registry} configuration
+|====
+|Parameter |Parameter Label |Default Value |Description
+
+|`AcceptEULAs`
+|Have all applicable VMware Tanzu Network EULAs been accepted?
+|`No`
+|Choose `Yes` if you have already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for VMware Tanzu] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[VMWare Tanzu Application Platform] end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
+
+|`AcceptCEIP`
+|Have you read and accept the VMware CEIP policy?
+|`No`
+|Choose `Yes` if you have read and accepted the https://www.vmware.com/solutions/trustvmware/ceip.html[VMware customer experience improvement program (CEIP) policy].
+
+|`TanzuNetUsername`
+|Username
+|
+|VMware Tanzu Network username. To create an account, sign up at https://account.run.pivotal.io/z/uaa/sign-up.
+
+|`TanzuNetPassword`
+|Password
+|
+|VMware Tanzu Network password.
+
+|`TanzuApiToken`
+|API Token
+|
+|VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to https://network.pivotal.io/docs/api[VMWare Tanzu Network API Documentation].
+
+|`TanzuNetRelocateImages`
+|Relocate TAP images
+|`No`
+|Choose `Yes` to relocate TAP images from the VMware Tanzu Network registry to your ECR registry from before attempting installation. If you do not relocate images, Tanzu Application Platform will depend directly on the VMware Tanzu Network registry for its continued operation.
+|====
+
+[%autowidth.stretch]
+.VMware Tanzu Application Platform configuration
+|====
+|Parameter |Parameter Label |Default Value |Description
+
+|`TAPVersion`
+|Version
+|`1.2.0`
+|Version of TAP to deploy. The selected version must also support the       selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements].
+
+|`TAPDomainName`
+|Domain name
+|
+|Private DNS domain name to access the TAP user interface and project URLs.
+|====
+
+[%autowidth.stretch]
+.Sample app configuration
+|====
+|Parameter |Parameter Label |Default Value |Description
+
+|`SampleAppName`
+|Name
+|`tanzu-java-web-app-workload`
+|Name of sample application to deploy into the Amazon EKS cluster.
+|====
+
+[%autowidth.stretch]
+.Basic configuration
+|====
+|Parameter |Parameter Label |Default Value |Description
+
+|`KeyPairName`
+|EC2 key pair name
+|
+|The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances].
+
+|`RemoteAccessCidr`
+|Remote access CIDR
+|
+|IPv4 CIDR block permitted to connect to the Windows and Linux bastion hosts. We recommend that you set this value to a trusted network.
+|====
+
+[%autowidth.stretch]
+.VPC network configuration
+|====
+|Parameter |Parameter Label |Default Value |Description
+
+|`VpcId`
+|VPC ID
+|
+|ID of your existing VPC (for example, `vpc-0343606e`).
+
+|`PrivateSubnet1id`
+|Private subnet 1 ID
+|
+|ID of the private subnet in Availability Zone 1 of your existing VPC (for example, `subnet-fe9a8b32`).
+
+|`PrivateSubnet2Id`
+|Private subnet 2 ID
+|
+|ID of the private subnet in Availability Zone 2 of your existing VPC (for example, `subnet-be8b01ea`).
+
+|`PrivateSubnet3Id`
+|Private subnet 3 ID
+|
+|ID of the private subnet in Availability Zone 3 of your existing VPC (for example, `subnet-abd39039`).
+
+|`PublicSubnet1Id`
+|Public subnet 1 ID
+|
+|ID of the public subnet in Availability Zone 1 of your existing VPC (for example, `subnet-a0246dcd`)
+|====
+
+[%autowidth.stretch]
+.Amazon EKS configuration
+|====
+|Parameter |Parameter Label |Default Value |Description
+
+|`EKSClusterName`
+|EKS cluster name
+|
+|Name of the EKS cluster where TAP will be deployed.
+
+|`KubernetesVersion`
+|Kubernetes version
+|`1.21`
+|Version of Kubernetes control plane to deploy. The selected version must be supported the selected version of TAP. For more information, refer to Kubernetes cluster requirements (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
+
+|`NodeInstanceType`
+|Instance type
+|`m5.xlarge`
+|Amazon EKS cluster node instance type.
+
+|`NodeVolumeSize`
+|Volume size
+|`80`
+|Amazon EBS root volume size for Amazon EKS nodes.
+
+|`NumberOfNodes`
+|Number of nodes
+|`4`
+|Minimum number of nodes to create for the TAP EKS cluster.
+
+|`MaxNumberOfNodes`
+|Maximum number of nodes
+|`6`
+|Maximum number of available nodes for the TAP EKS cluster in auto scaling.
+|====
+
+[%autowidth.stretch]
+.Linux bastion host/bootstrap instance configuration
+|====
+|Parameter |Parameter Label |Default Value |Description
+
+|`LinuxBastionOS`
+|OS
+|`Ubuntu-Server-22.04-LTS-HVM`
+|Operating system for the Linux bastion host/bootstrap instance.
+
+|`LinuxBastionSshPort`
+|SSH port
+|`22`
+|TCP port to use for the Linux bastion host listening port.
+|====
+
+[%autowidth.stretch]
+.AWS Quick Start S3 bucket configuration
+|====
+|Parameter |Parameter Label |Default Value |Description
+
+|`QSS3BucketName`
+|Name
+|`aws-quickstart`
+|Name of the S3 bucket for your copy of the Quick Start assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Quick Start location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to https://aws-quickstart.github.io/option1.html.
+
+|`QSS3BucketRegion`
+|Region
+|`us-east-1`
+|AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.  Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. For more information, refer to https://aws-quickstart.github.io/option1.html.
+
+|`QSS3KeyPrefix`
+|Key prefix
+|
+|S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html and https://aws-quickstart.github.io/option1.html.
 |====
 
 == Postdeployment steps
 
-The following values should be available to use from the *Outputs* tab:
+=== CloudFormation outputs
+
+After deployment, refer to the *Outputs* tab in the AWS CloudFormation console for the following information:
 
 . The Elastic IP addresses associated with the Amazon EC2 Linux and Windows bastion host instances.
-. The {partner-product-short-name} website GUI URL that you can access from the Windows bastion host instance.
+. The {partner-product-short-name} website URL. For more information, refer to <<Access the {partner-product-name} user interface>>, later in this guide.
+
+=== Security configuration and management tasks
 
 After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured — including any required patches — to meet your security and other needs. For more information, see the https://aws.amazon.com/compliance/shared-responsibility-model/[AWS Shared Responsibility Model].
 
-=== Access the GUI
+=== Access the {partner-product-name} user interface
 
-The {partner-product-name} website graphical user interface (GUI) can be accessed via the Amazon EC2 Windows bastion host instance that is deployed into one of the public subnets.
-Retrieve the password for the Windows bastion host instance using https://aws.amazon.com/premiumsupport/knowledge-center/retrieve-windows-admin-password/[this guide], and then connect to it using https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/connecting_to_windows_instance.html[this guide].
-The Windows bastion host is intended for users to access the {partner-product-short-name} URL provided within the Outputs tab of the CloudFormation deployment, once the {partner-product-short-name} installation is complete.
-The {partner-product-name} GUI is not available via a public URL, but you can connect a Site to Site VPN or AWS Direct Connect to the VPC to allow for direct access from your enterprise network.
+Access the {partner-product-name} user interface using the Amazon EC2 Windows bastion host instance that is deployed into a public subnet.
+
+To retrieve the password for the Windows bastion host instance, refer to https://aws.amazon.com/premiumsupport/knowledge-center/retrieve-windows-admin-password/[How do I retrieve my Windows administrator password after launching an instance?]. To connect to the bastion host, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/connecting_to_windows_instance.html[Connect to your Windows instance].
+
+The {partner-product-name} user interface is not available using a public URL. You can use https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html[Site to Site VPN] or https://aws.amazon.com/directconnect/[AWS Direct Connect] to configure direct access to the VPC from your enterprise network.
