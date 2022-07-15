@@ -144,7 +144,7 @@ Parameters:
   AcceptEULAs:
     Type: String
     Description: >-
-      Choose 'Yes' if you have already accepted the Cluster Essentials for VMware Tanzu  (https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/) and VMWare Tanzu Application Platform (https://network.tanzu.vmware.com/products/tanzu-application-platform/) end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
+      Choose Yes if you have already accepted the Cluster Essentials for VMware Tanzu (https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/) and VMWare Tanzu Application Platform (https://network.tanzu.vmware.com/products/tanzu-application-platform/) end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
     AllowedValues:
       - 'Yes'
       - 'No'
@@ -152,8 +152,7 @@ Parameters:
   AcceptCEIP:
     Type: String
     Description: >-
-      Choose 'Yes' if you have read and accepted the VMware customer experience
-      improvement program (CEIP) policy (https://www.vmware.com/solutions/trustvmware/ceip.html).
+      Choose Yes if you have read and accepted the VMware customer experience improvement program (CEIP) policy (https://www.vmware.com/solutions/trustvmware/ceip.html).
     AllowedValues:
       - 'Yes'
       - 'No'
@@ -207,7 +206,7 @@ Parameters:
   PublicSubnet1CIDR:
     Type: String
     Description: >-
-      CIDR block for the public (DMZ) subnet 1, located in Availability Zone 1.
+      CIDR block for the public subnet 1, located in Availability Zone 1.
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
     Default: 10.0.128.0/20
@@ -222,7 +221,7 @@ Parameters:
   PublicSubnet3CIDR:
     Type: String
     Description: >-
-      CIDR block for the public (DMZ) subnet 3, located in Availability Zone 3.
+      CIDR block for the public subnet 3, located in Availability Zone 3.
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
     ConstraintDescription: >-
       CIDR block parameter must be in the form x.x.x.x/16-28.
@@ -230,15 +229,11 @@ Parameters:
   KeyPairName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: >-
-      The name of the EC2 key pair that will be used for SSH access to the Linux
-      bastion host / bootstrap instance and EKS cluster nodes, and for
-      encrypting the Windows bastion host password. As of June 21, 2022, only
-      RSA key types are supported due to Windows instances not supporting
-      ED25519. For more information, refer to Amazon EC2 key pairs and Windows instances (https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
+      The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to Amazon EC2 key pairs and Windows instances (https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
   EKSClusterName:
     Type: String
     Description: >-
-      The name of the EKS cluster where TAP will be deployed.
+      Name of the EKS cluster where TAP will be deployed.
     MinLength: 1
     MaxLength: 100
     AllowedPattern: ^[0-9A-Za-z][A-Za-z0-9\-_]*
@@ -248,8 +243,7 @@ Parameters:
   KubernetesVersion:
     Type: String
     Description: >-
-      The version of Kubernetes control plane version to deploy. The selected
-      version must be supported the selected version of TAP. For more information, refer to Kubernetes cluster requirements (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
+      Version of Kubernetes control plane to deploy. The selected version must be supported the selected TAP version (TAPVersion). For more information, refer to Kubernetes cluster requirements (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
       - 1.21
     Default: 1.21
@@ -263,13 +257,13 @@ Parameters:
   MaxNumberOfNodes:
     Type: Number
     Description: >-
-      Maximum number of available nodes for the TAP EKS cluster in an auto-scaling scenario.
+      Maximum number of available nodes for the TAP EKS cluster in auto scaling.
     MinValue: 4
     MaxValue: 450
     Default: 6
   NodeInstanceType:
     Type: String
-    Description: EKS cluster node instance type.
+    Description: Amazon EKS cluster node instance type.
     AllowedValues:
       - c4.4xlarge
       - c4.8xlarge
@@ -478,9 +472,7 @@ Parameters:
   RemoteAccessCidr:
     Type: String
     Description: >-
-      IPv4 CIDR block permitted to connect to the Windows and
-      Linux bastion hosts. We recommend that you set this value to a trusted
-      network.
+      IPv4 CIDR block permitted to connect to the Windows and Linux bastion hosts. We recommend that you set this value to a trusted network.
   LinuxBastionOS:
     Type: String
     Description: >-
@@ -503,7 +495,7 @@ Parameters:
     NoEcho: true
   TanzuNetPassword:
     Type: String
-    Description: The VMware Tanzu Network password.
+    Description: VMware Tanzu Network password.
     NoEcho: true
   TanzuNetApiToken:
     Type: String
@@ -522,14 +514,13 @@ Parameters:
   TAPVersion:
     Type: String
     Description: >-
-      Version of TAP to deploy. The selected version must also support the
-      selected Kubernetes version. For more information, refer to Kubernetes cluster requirements (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
+      Version of TAP to deploy. The selected version must also support the selected Kubernetes version (KubernetesVersion). For more information, refer to Kubernetes cluster requirements (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
       - 1.2.0
     Default: 1.2.0
   SampleAppName:
     Type: String
-    Description: Sample application to deploy into your Amazon EKS cluster.
+    Description: Name of the sample application to deploy into your Amazon EKS cluster.
     AllowedValues:
       - tanzu-java-web-app-workload
     Default: tanzu-java-web-app-workload
