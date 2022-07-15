@@ -15,6 +15,3 @@
 :deployment_time: 2 hours
 :default_deployment_region: us-east-1
 // :private_repo:
-
-
-
