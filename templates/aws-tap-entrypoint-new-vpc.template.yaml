@@ -160,8 +160,7 @@ Parameters:
   TAPDomainName:
    Type: String
    Description: >-
-     Private DNS domain name that will be used for accessing the TAP graphical
-     user interface (GUI) and project URLs.
+      Private DNS domain name to access the TAP user interface and project URLs.
   NumberOfAZs:
     Type: String
     Description: >-

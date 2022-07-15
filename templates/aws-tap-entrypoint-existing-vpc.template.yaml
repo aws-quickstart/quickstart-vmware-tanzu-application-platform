@@ -63,7 +63,7 @@ Metadata:
           - NumberOfNodes
           - MaxNumberOfNodes
       - Label:
-          default: Linux bastion host / bootstrap instance configuration
+          default: Linux bastion host/bootstrap instance configuration
         Parameters:
           - LinuxBastionOS
           - LinuxBastionSshPort
@@ -132,7 +132,7 @@ Parameters:
   AcceptEULAs:
     Type: String
     Description: >-
-      Choose 'Yes' if you have already accepted the Cluster Essentials for VMware Tanzu(https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/) and VMWare Tanzu Application Platform (https://network.tanzu.vmware.com/products/tanzu-application-platform/) end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
+      Choose Yes if you have already accepted the Cluster Essentials for VMware Tanzu (https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/) and VMWare Tanzu Application Platform (https://network.tanzu.vmware.com/products/tanzu-application-platform/) end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
     AllowedValues:
       - 'Yes'
       - 'No'
@@ -140,8 +140,7 @@ Parameters:
   AcceptCEIP:
     Type: String
     Description: >-
-      Choose 'Yes' if you have read and accepted the VMware customer experience
-      improvement program (CEIP) policy (https://www.vmware.com/solutions/trustvmware/ceip.html).
+      Choose Yes if you have read and accepted the VMware customer experience improvement program (CEIP) policy (https://www.vmware.com/solutions/trustvmware/ceip.html).
     AllowedValues:
       - 'Yes'
       - 'No'
@@ -149,8 +148,7 @@ Parameters:
   TAPDomainName:
    Type: String
    Description: >-
-     Private DNS domain name that will be used for accessing the TAP graphical
-     user interface (GUI) and project URLs.
+      Private DNS domain name to access the TAP user interface and project URLs.
   VpcId:
     Type: AWS::EC2::VPC::Id
     Description: >-
@@ -158,38 +156,30 @@ Parameters:
   PublicSubnet1Id:
     Type: AWS::EC2::Subnet::Id
     Description: >-
-      ID of the public subnet in Availability Zone 1 of your existing VPC
-      (for example, subnet-a0246dcd).
+      ID of the public subnet in Availability Zone 1 of your existing VPC (for example, subnet-a0246dcd).
   PrivateSubnet1Id:
     Type: AWS::EC2::Subnet::Id
     Description: >-
-      ID of the private subnet in Availability Zone 1 of your existing VPC
-      (for example, subnet-fe9a8b32).
+      ID of the private subnet in Availability Zone 1 of your existing VPC (for example, subnet-fe9a8b32).
   PrivateSubnet2Id:
     Type: AWS::EC2::Subnet::Id
     Description: >-
-      ID of the private subnet in Availability Zone 2 of your existing VPC
-      (for example, subnet-be8b01ea).
+      ID of the private subnet in Availability Zone 2 of your existing VPC (for example, subnet-be8b01ea).
   PrivateSubnet3Id:
     Type: String
     Description: >-
-      ID of the private subnet in Availability Zone 3 of your existing VPC
-      (for example, subnet-abd39039).
+      ID of the private subnet in Availability Zone 3 of your existing VPC (for example, subnet-abd39039).
     AllowedPattern: ^(subnet-([0-9a-f]{8}|[0-9a-f]{17})|)$
     ConstraintDescription: Must be a valid VPC subnet ID or blank.
     Default: ''
   KeyPairName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: >-
-      The name of the EC2 key pair that will be used for SSH access to the Linux
-      bastion host / bootstrap instance and EKS cluster nodes, and for
-      encrypting the Windows bastion host password. As of June 21, 2022, only
-      RSA key types are supported due to Windows instances not supporting
-      ED25519. For more information, refer to Amazon EC2 key pairs and Windows instances (https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
+      The name of the EC2 key pair used for SSH access to the Linux bastion host/bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to Amazon EC2 key pairs and Windows instances (https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
   EKSClusterName:
     Type: String
     Description: >-
-      The name of the EKS cluster where TAP will be deployed.
+      Name of the EKS cluster where TAP will be deployed.
     MinLength: 1
     MaxLength: 100
     AllowedPattern: ^[0-9A-Za-z][A-Za-z0-9\-_]*
@@ -199,8 +189,7 @@ Parameters:
   KubernetesVersion:
     Type: String
     Description: >-
-      The version of Kubernetes control plane version to deploy. The selected
-      version must be supported the selected version of TAP. For more information, refer to Kubernetes cluster requirements (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
+      Version of Kubernetes control plane to deploy. The selected version must be supported the selected TAP version (TAPVersion). For more information, refer to Kubernetes cluster requirements (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
       - 1.21
     Default: 1.21
@@ -214,13 +203,13 @@ Parameters:
   MaxNumberOfNodes:
     Type: Number
     Description: >-
-      Maximum number of available nodes for the TAP EKS cluster in an auto-scaling scenario.
+      Maximum number of available nodes for the TAP EKS cluster in auto scaling.
     MinValue: 4
     MaxValue: 450
     Default: 6
   NodeInstanceType:
     Type: String
-    Description: EKS cluster node instance type.
+    Description: Amazon EKS cluster node instance type.
     AllowedValues:
       - c4.4xlarge
       - c4.8xlarge
@@ -429,13 +418,11 @@ Parameters:
   RemoteAccessCidr:
     Type: String
     Description: >-
-      IPv4 CIDR block permitted to connect to the Windows and
-      Linux bastion hosts. We recommend that you set this value to a trusted
-      network.
+      IPv4 CIDR block permitted to connect to the Windows and Linux bastion hosts. We recommend that you set this value to a trusted network.
   LinuxBastionOS:
     Type: String
     Description: >-
-      Operating system for the Linux bastion host / bootstrap instance.
+      Operating system for the Linux bastion host/bootstrap instance.
     AllowedValues:
       - Ubuntu-Server-22.04-LTS-HVM
     Default: Ubuntu-Server-22.04-LTS-HVM
@@ -454,7 +441,7 @@ Parameters:
     NoEcho: true
   TanzuNetPassword:
     Type: String
-    Description: The VMware Tanzu Network password.
+    Description: VMware Tanzu Network password.
     NoEcho: true
   TanzuNetApiToken:
     Type: String
@@ -473,26 +460,20 @@ Parameters:
   TAPVersion:
     Type: String
     Description: >-
-      Version of TAP to deploy. The selected version must also support the
-      selected Kubernetes version. For more information, refer to Kubernetes cluster requirements (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
+      Version of TAP to deploy. The selected version must also support the selected Kubernetes version (KubernetesVersion). For more information, refer to Kubernetes cluster requirements (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
       - 1.2.0
     Default: 1.2.0
   SampleAppName:
     Type: String
-    Description: Sample application to deploy into your Amazon EKS cluster.
+    Description: Name of the sample application to deploy into your Amazon EKS cluster.
     AllowedValues:
       - tanzu-java-web-app-workload
     Default: tanzu-java-web-app-workload
   QSS3BucketName:
     Type: String
     Description: >-
-      Name of the S3 bucket for your copy of the Quick Start assets.
-      Keep the default name unless you are customizing the template.
-      Changing the name updates code references to point to a new Quick
-      Start location. This name can include numbers, lowercase letters,
-      uppercase letters, and hyphens, but do not start or end with a hyphen (-).
-      See https://aws-quickstart.github.io/option1.html.
+      Name of the S3 bucket for your copy of the Quick Start assets. Keep the default name unless you are customizing the template.Changing the name updates code references to point to a new Quick Start location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to https://aws-quickstart.github.io/option1.html.
     MinLength: 3
     MaxLength: 63
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
@@ -504,14 +485,7 @@ Parameters:
   QSS3KeyPrefix:
     Type: String
     Description: >-
-      S3 key prefix that is used to simulate a directory for your copy of the
-      Quick Start assets. Keep the default prefix unless you are customizing
-      the template. Changing this prefix updates code references to point to
-      a new Quick Start location. This prefix can include numbers, lowercase
-      letters, uppercase letters, hyphens (-), and forward slashes (/). End
-      with a forward slash.
-      See https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html
-      and https://aws-quickstart.github.io/option1.html.
+      S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html and https://aws-quickstart.github.io/option1.html.
     AllowedPattern: ^([0-9a-zA-Z-.]+/)*$
     ConstraintDescription:
       The Quick Start S3 key prefix can include numbers, lowercase letters,
@@ -520,11 +494,7 @@ Parameters:
   QSS3BucketRegion:
     Type: String
     Description: >-
-      AWS Region where the Quick Start S3 bucket (QSS3BucketName) is
-      hosted. Keep the default Region unless you are customizing the template.
-      Changing this Region updates code references to point to a new
-      Quick Start location. When using your own bucket, specify the Region.
-      See https://aws-quickstart.github.io/option1.html.
+     AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. For more information, refer to https://aws-quickstart.github.io/option1.html.
     Default: us-east-1
 Mappings:
   AwsAmiRegionMap:
