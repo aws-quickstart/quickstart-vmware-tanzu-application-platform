@@ -78,15 +78,12 @@ This Quick Start requires an API token from the {partner-registry} site to downl
 
 === Accept {partner-company-short-name} EULAs
 
-Before deploying this Quick Start, you must accept the following {partner-company-short-name} End User License Agreements (EULAs) for the {partner-registry} account used for the deployment.
+Before deploying this Quick Start, you must accept the following {partner-company-short-name} End User License Agreements (EULAs) for the {partner-registry} account used for the deployment. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements].
 
 [IMPORTANT]
 ====
 Failure to accept the EULAs before deployment will result in the failure of the {partner-product-short-name} installation.
 ====
-
-* https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for VMware Tanzu]
-* https://network.tanzu.vmware.com/products/tanzu-application-platform/[VMWare Tanzu Application Platform]
 
 === VMWare Customer Experience Improvement Program (CEIP)
 
