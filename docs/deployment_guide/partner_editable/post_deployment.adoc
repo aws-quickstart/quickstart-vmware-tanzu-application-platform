@@ -258,7 +258,7 @@
 |`TAPDomainName`
 |Domain name
 |
-|Private DNS domain name that will be used for accessing the TAP graphical user interface (GUI) and project URLs.
+|Private DNS domain name to access the TAP user interface and project URLs.
 |====
 
 [%autowidth.stretch]
@@ -277,16 +277,6 @@
 |====
 |Parameter |Parameter Label |Default Value |Description
 
-|`AvailabilityZones`
-|Availability Zones
-|
-|List of Availability Zones to use for the subnets in the VPC. Three Availability Zones are used for this deployment.
-
-|`NumberOfAZs`
-|Number of Availability Zones
-|`3`
-|Number of Availability Zones to use in the VPC. This must match the value entered for the `AvailabilityZones` parameter.
-
 |`KeyPairName`
 |EC2 key pair name
 |
@@ -299,44 +289,34 @@
 |====
 
 [%autowidth.stretch]
-.Default VPC configuration
+.VPC network configuration
 |====
 |Parameter |Parameter Label |Default Value |Description
 
-|`VPCCIDR`
-|VPC CIDR
-|`10.0.0.0/16`
-|CIDR block for the VPC.
+|`VpcId`
+|VPC ID
+|
+|ID of your existing VPC (for example, `vpc-0343606e`).
 
-|`PrivateSubnet1CIDR`
-|Private subnet 1 CIDR
-|`10.0.0.0/19`
-|CIDR block for private subnet 1, located in Availability Zone 1.
+|`PrivateSubnet1id`
+|Private subnet 1 ID
+|
+|ID of the private subnet in Availability Zone 1 of your existing VPC (for example, `subnet-fe9a8b32`).
 
-|`PrivateSubnet2CIDR`
-|Private subnet 2 CIDR
-|`10.0.32.0/19`
-|CIDR block for private subnet 2, located in Availability Zone 2.
+|`PrivateSubnet2Id`
+|Private subnet 2 ID
+|
+|ID of the private subnet in Availability Zone 2 of your existing VPC (for example, `subnet-be8b01ea`).
 
-|`PrivateSubnet3CIDR`
-|Private subnet 3 CIDR
-|`10.0.64.0/19`
-|CIDR block for private subnet 3, located in Availability Zone 3.
+|`PrivateSubnet3Id`
+|Private subnet 3 ID
+|
+|ID of the private subnet in Availability Zone 3 of your existing VPC (for example, `subnet-abd39039`).
 
-|`PublicSubnet1CIDR`
-|Public subnet 1 CIDR
-|`10.0.128.0/20`
-|CIDR block for the public subnet 1, located in Availability Zone 1.
-
-|`PublicSubnet2CIDR`
-|Public subnet 2 CIDR
-|`10.0.144.0/20`
-|CIDR block for the public subnet 2, located in Availability Zone 2.
-
-|`PublicSubnet3CIDR`
-|Public subnet 3 CIDR
-|`10.0.160.0/20`
-|CIDR block for the public subnet 3, located in Availability Zone 3.
+|`PublicSubnet1Id`
+|Public subnet 1 ID
+|
+|ID of the public subnet in Availability Zone 1 of your existing VPC (for example, `subnet-a0246dcd`)
 |====
 
 [%autowidth.stretch]
@@ -376,7 +356,7 @@
 |====
 
 [%autowidth.stretch]
-.Linux bastion host / bootstrap instance configuration
+.Linux bastion host/bootstrap instance configuration
 |====
 |Parameter |Parameter Label |Default Value |Description
 
