@@ -32,3 +32,5 @@ As shown in <<architecture1>>, this Quick Start sets up the following:
 ** 2 are used for the installation of the sample workload.
 * AWS Secrets Manager for securely storing the {partner-registry} credentials for the {partner-product-short-name} cluster.
 * Amazon CloudWatch for storing the Linux bastion host's performance metrics and {partner-product-short-name} bootstrap logs sent via the CloudWatch agent.
+
+[.small]#* The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#

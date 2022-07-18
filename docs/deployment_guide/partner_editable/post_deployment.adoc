@@ -47,7 +47,7 @@
 |`TAPVersion`
 |Version
 |`1.2.0`
-|Version of TAP to deploy. The selected version must also support the       selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements].
+|Version of TAP to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements].
 
 |`TAPDomainName`
 |Domain name
