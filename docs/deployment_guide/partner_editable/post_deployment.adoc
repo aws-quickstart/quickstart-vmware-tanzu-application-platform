@@ -11,7 +11,7 @@
 |`AcceptEULAs`
 |Have all applicable VMware Tanzu Network EULAs been accepted?
 |`No`
-|Choose `Yes` if you have already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for VMware Tanzu] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[VMWare Tanzu Application Platform] end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
+|Choose `Yes` if you have already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for VMware Tanzu] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[VMware Tanzu Application Platform] end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
 
 |`AcceptCEIP`
 |Have you read and accept the VMware CEIP policy?
@@ -31,7 +31,7 @@
 |`TanzuApiToken`
 |API Token
 |
-|VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to https://network.pivotal.io/docs/api[VMWare Tanzu Network API Documentation].
+|VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to https://network.pivotal.io/docs/api[VMware Tanzu Network API Documentation].
 
 |`TanzuNetRelocateImages`
 |Relocate TAP images
@@ -217,7 +217,7 @@
 |`AcceptEULAs`
 |Have all applicable VMware Tanzu Network EULAs been accepted?
 |`No`
-|Choose `Yes` if you have already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for VMware Tanzu] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[VMWare Tanzu Application Platform] end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
+|Choose `Yes` if you have already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for VMware Tanzu] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[VMware Tanzu Application Platform] end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
 
 |`AcceptCEIP`
 |Have you read and accept the VMware CEIP policy?
@@ -237,7 +237,7 @@
 |`TanzuApiToken`
 |API Token
 |
-|VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to https://network.pivotal.io/docs/api[VMWare Tanzu Network API Documentation].
+|VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to https://network.pivotal.io/docs/api[VMware Tanzu Network API Documentation].
 
 |`TanzuNetRelocateImages`
 |Relocate TAP images

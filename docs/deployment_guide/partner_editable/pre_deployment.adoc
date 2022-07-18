@@ -65,13 +65,13 @@ Complete the following steps to create a {partner-registry} login.
 . Choose *Sign In*.
 . Choose *Create account*.
 . On the *Create your VMware Account* page, complete the form and choose *Sign Up*.
-. Log in to VMWare using the new user credentials.
+. Log in to VMware using the new user credentials.
 
 ==== Generate a {partner-registry} API token
 
 This Quick Start requires an API token from the {partner-registry} site to download the packages required to install {partner-product-short-name}.
 
-. Log in to https://network.tanzu.vmware.com/[VMWare Tanzu Network].
+. Log in to https://network.tanzu.vmware.com/[VMware Tanzu Network].
 . Choose *Edit Profile* from the dropdown list next to your username.
 . Choose *Request new refresh token*.
 . Copy the refesh token. Enter it for the `API Token` (`TanzuApiToken`) parameter during deployment.
@@ -85,7 +85,7 @@ Before deploying this Quick Start, you must accept the following {partner-compan
 Failure to accept the EULAs before deployment will result in the failure of the {partner-product-short-name} installation.
 ====
 
-=== VMWare Customer Experience Improvement Program (CEIP)
+=== VMware Customer Experience Improvement Program (CEIP)
 
 {partner-product-name} participates in the https://www.vmware.com/solutions/trustvmware/ceip.html[VMware customer experience improvement program (CEIP)]. As part of CEIP, {partner-company-short-name} collects technical information about your organization's use of {partner-company-short-name} products and services in association with your organization's {partner-company-short-name} license keys.
 
