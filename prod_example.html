@@ -863,7 +863,7 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_technical_requirements">Technical Requirements</a></li>
 <li><a href="#_vmware_tanzu_network_account">VMware Tanzu Network account</a></li>
 <li><a href="#_accept_vmware_eulas">Accept VMware EULAs</a></li>
-<li><a href="#_vmware_customer_experience_improvement_program_ceip">VMWare Customer Experience Improvement Program (CEIP)</a></li>
+<li><a href="#_vmware_customer_experience_improvement_program_ceip">VMware Customer Experience Improvement Program (CEIP)</a></li>
 </ul>
 </li>
 <li><a href="#_deployment_steps">Deployment steps</a>
@@ -931,7 +931,7 @@ Refer to the <a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-
 <h2 id="_overview">Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This Quick Start deploys VMware Tanzu Application Platform on the AWS Cloud. This Quick Start is for users who want a repeatable, customizable reference deployment for <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/info">VMWare Tanzu Application Platform</a> on Amazon EKS using AWS CloudFormation. This guide provides instructions for deploying the Tanzu Application Platform to Amazon Elastic Kubernetes Service (Amazon EKS) clusters.</p>
+<p>This Quick Start deploys VMware Tanzu Application Platform on the AWS Cloud. This Quick Start is for users who want a repeatable and customizable reference deployment for <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/info">VMware Tanzu Application Platform</a> on Amazon EKS using AWS CloudFormation. This guide provides instructions for deploying the Tanzu Application Platform to Amazon Elastic Kubernetes Service (Amazon EKS) clusters.</p>
 </div>
 </div>
 </div>
@@ -973,6 +973,9 @@ AWS Cloud.</p>
 <p>A virtual private cloud (VPC) configured with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS.</p>
 </li>
 <li>
+<p>An Amazon Route 53 private hosted zone for the TAP user interface.</p>
+</li>
+<li>
 <p>In the public subnets:</p>
 <div class="ulist">
 <ul>
@@ -984,10 +987,10 @@ AWS Cloud.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>An Amazon Elastic Cloud Compute (Amazon EC2) Linux instance that is used for bootstraping the installation of VMware Tanzu Application Platform in an Amazon Elastic Kubernetes Service (Amazon EKS) cluster, and also serves as a bastion host for administrators.</p>
+<p>An Amazon Elastic Compute Cloud (Amazon EC2) Linux instance to bootstrap the installation of VMware TAP in an Amazon EKS cluster and serve as administrator bastion host.</p>
 </li>
 <li>
-<p>An Amazon EC2 Windows instance that is used as a bastion host for end users to access the Tanzu Application Platform website graphical user interface (GUI).</p>
+<p>An Amazon EC2 Windows bastion host for access to the Tanzu Application Platform user interface.</p>
 </li>
 </ul>
 </div>
@@ -1000,52 +1003,30 @@ AWS Cloud.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>A group of Amazon EKS nodes in an Auto Scaling Group with Contour Envoy ingress controller pods and the Tanzu Application Platform installation.
-For a complete list of the Tanzu Application Platform packages, please see the <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-components.html#verify-the-installed-packages-1">documentation</a>.</p>
+<p>A group of Amazon EKS nodes in an Auto Scaling Group with Contour Envoy ingress controller pods and the TAP installation. For a complete list of the Tanzu Application Platform packages, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-components.html#verify-the-installed-packages-1">Verify the installed packages</a>.</p>
 </li>
 <li>
-<p>A Network Load Balancer (NLB) attached to the private subnets, which direct traffic to the Contour Envoy pod configured as a Kubernetes object.
-The Contour Envoy container provides both ingress and reverse proxy for the Tanzu Application Platform pods for the:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Tanzu Application Platform website GUI.</p>
-</li>
-<li>
-<p>Tanzu Application Platform Supply Chain Security Tools metadata store.</p>
-</li>
-</ul>
-</div>
+<p>A Network Load Balancer (NLB) attached to the private subnets to direct traffic to the Contour Envoy pod. The Contour Envoy container provides ingress and reverse proxy to the TAP pods for the TAP user interface and metadata store.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>Amazon EKS for creating the Kubernetes control plane cluster that runs Tanzu Application Platform, Contour Envoy, and other containerized applications.</p>
+<p>Amazon EKS for the Kubernetes control plane cluster that runs TAP, Contour Envoy, and other containerized applications.</p>
 </li>
 <li>
-<p>An Amazon Route 53 private hosted zone used by the Tanzu Application Platform website GUI.</p>
+<p>Five Amazon Elastic Container Registry (Amazon ECR) private repositories: three for TAP installation and two for sample workload installation.</p>
 </li>
 <li>
-<p>5 Amazon Elastic Container Registry (Amazon ECR) private repositories.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>3 are used for the installation of VMware Tanzu Application Platform.</p>
+<p>AWS Secrets Manager for securely storing VMware Tanzu Network credentials for the TAP cluster.</p>
 </li>
 <li>
-<p>2 are used for the installation of the sample workload.</p>
+<p>Amazon CloudWatch for storing Linux bastion host performance metrics and TAP bootstrap logs.</p>
 </li>
 </ul>
 </div>
-</li>
-<li>
-<p>AWS Secrets Manager for securely storing the VMware Tanzu Network credentials for the Tanzu Application Platform cluster.</p>
-</li>
-<li>
-<p>Amazon CloudWatch for storing the Linux bastion host&#8217;s performance metrics and Tanzu Application Platform bootstrap logs sent via the CloudWatch agent.</p>
-</li>
-</ul>
+<div class="paragraph">
+<p><span class="small">* The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.</span></p>
 </div>
 </div>
 </div>
@@ -1183,7 +1164,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <p>On the <strong>Create your VMware Account</strong> page, complete the form and choose <strong>Sign Up</strong>.</p>
 </li>
 <li>
-<p>Log in to VMWare using the new user credentials.</p>
+<p>Log in to VMware using the new user credentials.</p>
 </li>
 </ol>
 </div>
@@ -1196,7 +1177,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Log in to <a href="https://network.tanzu.vmware.com/">VMWare Tanzu Network</a>.</p>
+<p>Log in to <a href="https://network.tanzu.vmware.com/">VMware Tanzu Network</a>.</p>
 </li>
 <li>
 <p>Choose <strong>Edit Profile</strong> from the dropdown list next to your username.</p>
@@ -1232,7 +1213,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_vmware_customer_experience_improvement_program_ceip">VMWare Customer Experience Improvement Program (CEIP)</h3>
+<h3 id="_vmware_customer_experience_improvement_program_ceip">VMware Customer Experience Improvement Program (CEIP)</h3>
 <div class="paragraph">
 <p>VMware Tanzu Application Platform participates in the <a href="https://www.vmware.com/solutions/trustvmware/ceip.html">VMware customer experience improvement program (CEIP)</a>. As part of CEIP, VMware collects technical information about your organization&#8217;s use of VMware products and services in association with your organization&#8217;s VMware license keys.</p>
 </div>
@@ -1330,7 +1311,7 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>AcceptEULAs</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Have all applicable VMware Tanzu Network EULAs been accepted?</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you have already accepted the <a href="https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/">Cluster Essentials for VMware Tanzu</a> and <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/">VMWare Tanzu Application Platform</a> end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you have already accepted the <a href="https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/">Cluster Essentials for VMware Tanzu</a> and <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/">VMware Tanzu Application Platform</a> end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>AcceptCEIP</code></p></td>
@@ -1354,7 +1335,7 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuApiToken</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">API Token</p></td>
 <td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to <a href="https://network.pivotal.io/docs/api">VMWare Tanzu Network API Documentation</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to <a href="https://network.pivotal.io/docs/api">VMware Tanzu Network API Documentation</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetRelocateImages</code></p></td>
@@ -1385,7 +1366,7 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPVersion</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Version</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.2.0</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Version of TAP to deploy. The selected version must also support the       selected Kubernetes version. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3">Kubernetes cluster requirements</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Version of TAP to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3">Kubernetes cluster requirements</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPDomainName</code></p></td>
@@ -1671,7 +1652,7 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>AcceptEULAs</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Have all applicable VMware Tanzu Network EULAs been accepted?</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you have already accepted the <a href="https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/">Cluster Essentials for VMware Tanzu</a> and <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/">VMWare Tanzu Application Platform</a> end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you have already accepted the <a href="https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/">Cluster Essentials for VMware Tanzu</a> and <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/">VMware Tanzu Application Platform</a> end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>AcceptCEIP</code></p></td>
@@ -1695,7 +1676,7 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuApiToken</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">API Token</p></td>
 <td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to <a href="https://network.pivotal.io/docs/api">VMWare Tanzu Network API Documentation</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to <a href="https://network.pivotal.io/docs/api">VMware Tanzu Network API Documentation</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetRelocateImages</code></p></td>
