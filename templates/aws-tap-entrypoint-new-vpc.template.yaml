@@ -67,7 +67,7 @@ Metadata:
           - NumberOfNodes
           - MaxNumberOfNodes
       - Label:
-          default: Linux bastion host/bootstrap instance configuration
+          default: Linux bastion host / bootstrap instance configuration
         Parameters:
           - LinuxBastionOS
           - LinuxBastionSshPort
@@ -144,7 +144,7 @@ Parameters:
   AcceptEULAs:
     Type: String
     Description: >-
-      Choose Yes if you have already accepted the Cluster Essentials for VMware Tanzu (https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/) and VMWare Tanzu Application Platform (https://network.tanzu.vmware.com/products/tanzu-application-platform/) end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
+      Choose Yes if you have already accepted the Cluster Essentials for VMware Tanzu (https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/) and VMware Tanzu Application Platform (https://network.tanzu.vmware.com/products/tanzu-application-platform/) end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
     AllowedValues:
       - 'Yes'
       - 'No'
@@ -228,7 +228,7 @@ Parameters:
   KeyPairName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: >-
-      The name of the EC2 key pair used for SSH access to the Linux bastion host/bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to Amazon EC2 key pairs and Windows instances (https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
+      The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to Amazon EC2 key pairs and Windows instances (https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
   EKSClusterName:
     Type: String
     Description: >-
@@ -475,7 +475,7 @@ Parameters:
   LinuxBastionOS:
     Type: String
     Description: >-
-      Operating system for the Linux bastion host/bootstrap instance.
+      Operating system for the Linux bastion host / bootstrap instance.
     AllowedValues:
       - Ubuntu-Server-22.04-LTS-HVM
     Default: Ubuntu-Server-22.04-LTS-HVM
@@ -500,7 +500,7 @@ Parameters:
     Type: String
     Description: >-
       VMware Tanzu Network user account and authentication (UAA) API
-      refresh token. For more information, refer to VMWare Tanzu Network API Documentation (https://network.pivotal.io/docs/api).
+      refresh token. For more information, refer to VMware Tanzu Network API Documentation (https://network.pivotal.io/docs/api).
     NoEcho: true
   TanzuNetRelocateImages:
     Type: String
@@ -620,23 +620,23 @@ Resources:
 Outputs:
   LinuxBastionEIP:
     Description: >-
-      The public IP address of the Linux bastion host/bootstrap instance.
+      The public IP address of the Linux bastion host / bootstrap instance.
     Value: !GetAtt ExistingVpcStack.Outputs.LinuxBastionEIP
   UbuntuBastionAZ:
     Condition: Ubuntu
     Description: >-
-      The Availability Zone that the Linux bastion host/bootstrap instance
+      The Availability Zone that the Linux bastion host / bootstrap instance
       is deployed in.
     Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionAZ
   UbuntuBastionId:
     Condition: Ubuntu
     Description: >-
-      The EC2 instance ID of the Linux bastion host/bootstrap instance.
+      The EC2 instance ID of the Linux bastion host / bootstrap instance.
     Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionId
   UbuntuBastionPublicDnsName:
     Condition: Ubuntu
     Description: >-
-      The public DNS name of the Linux bastion host/bootstrap instance.
+      The public DNS name of the Linux bastion host / bootstrap instance.
     Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionPublicDnsName
   EKSClusterName:
     Description: The Amazon EKS cluster name.
