@@ -22,9 +22,9 @@ As shown in <<architecture1>>, this Quick Start sets up the following:
 * In the private subnets:
 ** A group of Amazon EKS nodes in an Auto Scaling Group with Contour Envoy ingress controller pods and the TAP installation. For a complete list of the {partner-product-short-name} packages, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-components.html#verify-the-installed-packages-1[Verify the installed packages].
 ** A Network Load Balancer (NLB) attached to the private subnets to direct traffic to the Contour Envoy pod. The Contour Envoy container provides ingress and reverse proxy to the TAP pods for the TAP user interface and metadata store.
-* Amazon EKS for the Kubernetes control plane cluster that runs TAP, Contour Envoy, and other containerized applications.
-* Five Amazon Elastic Container Registry (Amazon ECR) private repositories: three for TAP installation and two for sample workload installation.
-* AWS Secrets Manager for securely storing VMware Tanzu Network credentials for the TAP cluster.
 * Amazon CloudWatch for storing Linux bastion host performance metrics and TAP bootstrap logs.
+* AWS Secrets Manager for securely storing VMware Tanzu Network credentials for the TAP cluster.
+* Amazon Elastic Container Registry (Amazon ECR) for five private repositories: three for TAP installation and two for sample workload installation.
+* Amazon EKS for the Kubernetes control plane cluster that runs TAP, Contour Envoy, and other containerized applications.
 
 [.small]#* The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#
