@@ -881,7 +881,10 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_troubleshooting">Troubleshooting</a>
 <ul class="sectlevel2">
 <li><a href="#_vmware_tanzu_application_platform_documentation">VMware Tanzu Application Platform documentation</a></li>
-<li><a href="#_faq">FAQ</a></li>
+<li><a href="#_i_cant_access_the_tanzu_application_platform_user_interface">I can&#8217;t access the Tanzu Application Platform user interface</a></li>
+<li><a href="#_tanzu_application_platform_installation_failed_with_a_eula_error">Tanzu Application Platform installation failed with a EULA error</a></li>
+<li><a href="#_one_or_more_tanzu_application_platform_packages_failed_to_reconcile">One or more Tanzu Application Platform packages failed to reconcile</a></li>
+<li><a href="#_its_been_more_than_four_minutes_and_the_windows_bastion_host_administrator_password_still_isnt_available">It&#8217;s been more than four minutes and the Windows bastion host administrator password still isn&#8217;t available</a></li>
 </ul>
 </li>
 <li><a href="#_feedback">Feedback</a></li>
@@ -2011,13 +2014,9 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 </div>
 </div>
 <div class="sect2">
-<h3 id="_faq">FAQ</h3>
-<hr>
+<h3 id="_i_cant_access_the_tanzu_application_platform_user_interface">I can&#8217;t access the Tanzu Application Platform user interface</h3>
 <div class="paragraph">
-<p><strong>Q.</strong> I can&#8217;t access the Tanzu Application Platform user interface.</p>
-</div>
-<div class="paragraph">
-<p><strong>A.</strong> The following issues can cause you to not be able to access the Tanzu Application Platform user interface after deployment.</p>
+<p>The following issues can cause you to not be able to access the Tanzu Application Platform user interface after deployment.</p>
 </div>
 <div class="ulist">
 <ul>
@@ -2083,12 +2082,11 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 </li>
 </ul>
 </div>
-<hr>
-<div class="paragraph">
-<p><strong>Q.</strong> Tanzu Application Platform installation failed with a EULA error.</p>
 </div>
+<div class="sect2">
+<h3 id="_tanzu_application_platform_installation_failed_with_a_eula_error">Tanzu Application Platform installation failed with a EULA error</h3>
 <div class="paragraph">
-<p><strong>A.</strong> You must accept the relevant End User License Agreements (EULAs) before you can download the Tanzu Application Platform packages from the VMware Tanzu Network. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0">Accept the End User License Agreements</a>.</p>
+<p>You must accept the relevant End User License Agreements (EULAs) before you can download the Tanzu Application Platform packages from the VMware Tanzu Network. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0">Accept the End User License Agreements</a>.</p>
 </div>
 <div class="paragraph">
 <p>For more details about the <code>.status.usefulErrorMessage</code> error, connect to the Linux bastion host using SSH. Then run the following commands. For <code>&lt;PACKAGE-NAME&gt;</code>, substitute the name of the package to target.</p>
@@ -2115,12 +2113,11 @@ tanzu package installed get &lt;PACKAGE-NAME&gt; --namespace tap-install</pre>
 <pre>/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install</pre>
 </div>
 </div>
-<hr>
-<div class="paragraph">
-<p><strong>Q.</strong> One or more Tanzu Application Platform packages failed to reconcile.</p>
 </div>
+<div class="sect2">
+<h3 id="_one_or_more_tanzu_application_platform_packages_failed_to_reconcile">One or more Tanzu Application Platform packages failed to reconcile</h3>
 <div class="paragraph">
-<p><strong>A.</strong> Potential causes include:</p>
+<p>Potential causes include:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -2149,18 +2146,17 @@ If so, run the following command.</p>
 <pre>/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install</pre>
 </div>
 </div>
-<hr>
-<div class="paragraph">
-<p><strong>Q.</strong> It&#8217;s been more than four minutes, but the Windows bastion host administrator password still isn&#8217;t available</p>
 </div>
+<div class="sect2">
+<h3 id="_its_been_more_than_four_minutes_and_the_windows_bastion_host_administrator_password_still_isnt_available">It&#8217;s been more than four minutes and the Windows bastion host administrator password still isn&#8217;t available</h3>
 <div class="paragraph">
-<p><strong>A.</strong> It is likely that during deployment a ED25519 key pair was selected instead of an RSA key pair. If you select a ED25519 key pair for this deployment, the CloudFormation stack will deploy successfully, but you will not be able to retrieve the automatically generated password for the Windows bastion host.</p>
+<p>It is likely that during deployment a ED25519 key pair was selected instead of an RSA key pair. If you select a ED25519 key pair for this deployment, the CloudFormation stack will deploy successfully, but you will not be able to retrieve the automatically generated password for the Windows bastion host.</p>
 </div>
 <div class="paragraph">
 <p>As of June 23rd, 2022, Amazon EC2 Windows instances do not support ED25519 key pairs. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html">Amazon EC2 key pairs and Windows instances</a>.</p>
 </div>
 <div class="paragraph">
-<p>Verify that an RSA key pair used during deployment. If not, your options to remediate this issue include the following:</p>
+<p>Verify that an RSA key pair used during deployment. If not, try the following options:</p>
 </div>
 <div class="ulist">
 <ul>
