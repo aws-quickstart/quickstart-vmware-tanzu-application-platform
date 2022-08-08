@@ -80,7 +80,7 @@ It is likely that during deployment a ED25519 key pair was selected instead of a
 
 As of June 23rd, 2022, Amazon EC2 Windows instances do not support ED25519 key pairs. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances].
 
-Verify that an RSA key pair used during deployment. If not, your options to remediate this issue include the following:
+Verify that an RSA key pair used during deployment. If not, try the following options:
 
 * https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html[Reset the Windows administrator password using EC2Launch v2]
 
