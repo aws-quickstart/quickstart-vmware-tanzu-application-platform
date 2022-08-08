@@ -9,12 +9,9 @@ Refer to the following resources to troubleshoot {partner-product-name}.
 * https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html[Troubleshoot installing Tanzu Application Platform]
 * https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-troubleshooting-tap-troubleshoot-using-tap.html[Troubleshoot using Tanzu Application Platform]
 
-=== FAQ
+=== I can't access the {partner-product-short-name} user interface.
 
-'''
-*Q.* I can't access the {partner-product-short-name} user interface.
-
-*A.* The following issues can cause you to not be able to access the {partner-product-short-name} user interface after deployment.
+The following issues can cause you to not be able to access the {partner-product-short-name} user interface after deployment.
 
 * The deployment failed to complete successfully.
 +
@@ -34,12 +31,9 @@ Refer to the following resources to troubleshoot {partner-product-name}.
 
 * You are attempting to accessing the site from a location that doesn't have connectivity to the {partner-product-short-name} GUI. The {partner-product-short-name} website GUI URL can only be accessed from endpoints with a route to the private VPC network, such as from the Amazon EC2 Windows bastion host instance.
 
-'''
+=== {partner-product-short-name} installation failed with a EULA error.
 
-
-*Q.* {partner-product-short-name} installation failed with a EULA error.
-
-*A.* You must accept the relevant End User License Agreements (EULAs) before you can download the {partner-product-short-name} packages from the {partner-registry}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements].
+You must accept the relevant End User License Agreements (EULAs) before you can download the {partner-product-short-name} packages from the {partner-registry}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements].
 
 For more details about the `+.status.usefulErrorMessage+` error, connect to the Linux bastion host using SSH. Then run the following commands. For `<PACKAGE-NAME>`, substitute the name of the package to target.
 
@@ -60,12 +54,9 @@ Run the following command to install {partner-product-short-name}.
 /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install
 ----
 
-'''
+=== One or more {partner-product-short-name} packages failed to reconcile.
 
-
-*Q.* One or more {partner-product-short-name} packages failed to reconcile.
-
-*A.* Potential causes include:
+Potential causes include:
 
 * An infrastructure issue causing the task to take longer to run than the timeout value allows.
 * A race condition between components.
@@ -83,12 +74,9 @@ If so, run the following command.
 /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install
 ----
 
-'''
+=== It's been more than four minutes and the Windows bastion host administrator password still isn't available
 
-
-*Q.* It's been more than four minutes, but the Windows bastion host administrator password still isn't available
-
-*A.* It is likely that during deployment a ED25519 key pair was selected instead of an RSA key pair. If you select a ED25519 key pair for this deployment, the CloudFormation stack will deploy successfully, but you will not be able to retrieve the automatically generated password for the Windows bastion host.
+It is likely that during deployment a ED25519 key pair was selected instead of an RSA key pair. If you select a ED25519 key pair for this deployment, the CloudFormation stack will deploy successfully, but you will not be able to retrieve the automatically generated password for the Windows bastion host.
 
 As of June 23rd, 2022, Amazon EC2 Windows instances do not support ED25519 key pairs. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances].
 
