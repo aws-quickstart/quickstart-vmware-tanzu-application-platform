@@ -9,7 +9,7 @@ Refer to the following resources to troubleshoot {partner-product-name}.
 * https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html[Troubleshoot installing Tanzu Application Platform]
 * https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-troubleshooting-tap-troubleshoot-using-tap.html[Troubleshoot using Tanzu Application Platform]
 
-=== I can't access the {partner-product-short-name} user interface.
+=== I can't access the {partner-product-short-name} user interface
 
 The following issues can cause you to not be able to access the {partner-product-short-name} user interface after deployment.
 
@@ -31,7 +31,7 @@ The following issues can cause you to not be able to access the {partner-product
 
 * You are attempting to accessing the site from a location that doesn't have connectivity to the {partner-product-short-name} GUI. The {partner-product-short-name} website GUI URL can only be accessed from endpoints with a route to the private VPC network, such as from the Amazon EC2 Windows bastion host instance.
 
-=== {partner-product-short-name} installation failed with a EULA error.
+=== {partner-product-short-name} installation failed with a EULA error
 
 You must accept the relevant End User License Agreements (EULAs) before you can download the {partner-product-short-name} packages from the {partner-registry}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements].
 
@@ -54,7 +54,7 @@ Run the following command to install {partner-product-short-name}.
 /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install
 ----
 
-=== One or more {partner-product-short-name} packages failed to reconcile.
+=== One or more {partner-product-short-name} packages failed to reconcile
 
 Potential causes include:
 
