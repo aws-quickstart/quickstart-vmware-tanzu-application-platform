@@ -641,7 +641,7 @@ Mappings:
   KubernetesVersion:
   # https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
     '1.22':
-      AwsKubectlVersion: 1.22.6/2022-03-09
+      AwsKubectlVersion: 1.23.7/2022-06-29
   TAPVersion:
     1.2.0:
       ClusterEssentialsBundleVersion: 1.1.0
