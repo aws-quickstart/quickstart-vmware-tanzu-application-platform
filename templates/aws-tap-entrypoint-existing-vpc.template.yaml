@@ -212,8 +212,8 @@ Parameters:
       refer to Kubernetes cluster requirements
       (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
-      - 1.21
-    Default: 1.21
+      - 1.22
+    Default: 1.22
   NumberOfNodes:
     Type: Number
     Description: Minimum number of nodes to create for the TAP EKS cluster.
@@ -640,8 +640,8 @@ Mappings:
       Name: registry.tanzu.vmware.com
   KubernetesVersion:
   # https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
-    '1.21':
-      AwsKubectlVersion: 1.22.6/2022-03-09
+    '1.22':
+      AwsKubectlVersion: 1.23.7/2022-06-29
   TAPVersion:
     1.2.0:
       ClusterEssentialsBundleVersion: 1.1.0
@@ -1678,7 +1678,7 @@ Rules:
     RuleCondition: !Contains [[1.2.0], !Ref TAPVersion]
     Assertions:
       # The values below require quotes to force string comparison.
-      - Assert: !Contains [['1.21', '1.22', '1.23'], !Ref KubernetesVersion]
+      - Assert: !Contains [['1.22', '1.23', '1.24'], !Ref KubernetesVersion]
         AssertDescription: >-
           The VMware Tanzu Application Platform version selection is
           incompatible with the Kubernetes version selection (reference:
