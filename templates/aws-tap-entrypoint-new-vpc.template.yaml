@@ -509,7 +509,7 @@ Parameters:
     Description: >-
       VMware Tanzu Network username. To create an account, sign up at
       https://account.run.pivotal.io/z/uaa/sign-up.
-    NoEcho: true
+    NoEcho: false
   TanzuNetPassword:
     Type: String
     Description: VMware Tanzu Network password.
