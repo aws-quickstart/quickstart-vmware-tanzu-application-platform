@@ -460,7 +460,7 @@ Parameters:
     Type: String
     Description: >-
       VMware Tanzu Network username. To create an account, sign up at
-      https://account.run.pivotal.io/z/uaa/sign-up.
+      https://network.tanzu.vmware.com.
     NoEcho: false
   TanzuNetPassword:
     Type: String
@@ -847,7 +847,7 @@ Resources:
       VpcId: !Ref VpcId
       Tags:
         - Key: Name
-          Value: TAPLinuxBastionSecurityGroup
+          Value: VMwareLinuxBastionSecurityGroup
         - Key: Description
           Value: >-
             The VMware Tanzu Application Platform Linux bastion host /
@@ -932,12 +932,12 @@ Resources:
       Domain: vpc
       Tags:
         - Key: Name
-          Value: TAPLinuxBastionEIP
+          Value: VMwareLinuxBastionEIP
   LinuxBastionIamRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub
-        - TAPLinuxBastionIamRole-${StackId}
+        - VMwareLinuxBastionIamRole-${StackId}
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Description: Linux bastion host / bootstrap instance IAM Role.
       AssumeRolePolicyDocument:
@@ -1060,7 +1060,7 @@ Resources:
     Type: AWS::IAM::InstanceProfile
     Properties:
       InstanceProfileName: !Sub
-        - TAPLinuxBastionInstanceProfile-${StackId}
+        - VMwareLinuxBastionInstanceProfile-${StackId}
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Roles:
         - !Ref LinuxBastionIamRole
@@ -1285,7 +1285,7 @@ Resources:
             DeleteOnTermination: true
       Tags:
         - Key: Name
-          Value: TAPLinuxBastionInstance
+          Value: VMwareLinuxBastionInstance
         - Key: Description
           Value: >-
             VMware Tanzu Application Platform EKS cluster bootstrap instance.
@@ -1505,7 +1505,7 @@ Resources:
       Domain: vpc
       Tags:
         - Key: Name
-          Value: TAPWindowsBastionEIP
+          Value: VMwareWindowsBastionEIP
   WindowsBastionSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -1513,7 +1513,7 @@ Resources:
       VpcId: !Ref VpcId
       Tags:
         - Key: Name
-          Value: TAPWindowsBastionSecurityGroup
+          Value: VMwareWindowsBastionSecurityGroup
         - Key: Description
           Value: >-
             Windows bastion security group for accessing the
@@ -1540,7 +1540,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub
-        - TAPWindowsBastionIamRole-${StackId}
+        - VMwareWindowsBastionIamRole-${StackId}
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Description: Windows bastion host IAM Role.
       AssumeRolePolicyDocument:
@@ -1558,7 +1558,7 @@ Resources:
     Type: AWS::IAM::InstanceProfile
     Properties:
       InstanceProfileName: !Sub
-        - TAPWindowsBastionInstanceProfile-${StackId}
+        - VMwareWindowsBastionInstanceProfile-${StackId}
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Roles:
         - !Ref WindowsBastionIamRole
@@ -1579,7 +1579,7 @@ Resources:
             VolumeType: gp2
       Tags:
         - Key: Name
-          Value: TAPWindowsBastionInstance
+          Value: VMwareWindowsBastionInstance
         - Key: Description
           Value: >-
             Windows bastion instance for accessing the
