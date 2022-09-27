@@ -12,7 +12,7 @@
 // :other-contributors: Akua Mansa, Trek10
 :aws-contributors: Elvis Pappachen, AWS VMware Partner team
 :aws-ia-contributors: Troy Lindsay, AWS Integration & Automation team
-:deployment_time: 2 hours
+:deployment_time: 1 hours
 :default_deployment_region: us-east-1
 // :private_repo:
 
