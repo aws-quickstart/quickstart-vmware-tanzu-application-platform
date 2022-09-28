@@ -481,6 +481,7 @@ Parameters:
       to your ECR registry from before attempting installation. If you do not
       relocate images, Tanzu Application Platform will depend directly on the
       VMware Tanzu Network registry for its continued operation.
+      Relocating images will add approximately 1 hour to deployment time.
     AllowedValues:
       - 'Yes'
       - 'No'
