@@ -7,7 +7,7 @@
 <meta name="generator" content="Asciidoctor 2.0.17">
 <meta name="description" content="VMware Tanzu Application Platform Deployment Guide on AWS">
 <meta name="keywords" content="Quick Start, AWS, VMware Tanzu Application Platform">
-<title>VMware Tanzu Application Platform on the AWS Cloud</title>
+<title>VMware Tanzu Application Platform on AWS</title>
 <style>
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
 /* Uncomment @import statement to use as custom stylesheet */
@@ -887,6 +887,7 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_its_been_more_than_four_minutes_and_the_windows_bastion_host_administrator_password_still_isnt_available">It&#8217;s been more than four minutes and the Windows bastion host administrator password still isn&#8217;t available</a></li>
 </ul>
 </li>
+<li><a href="#_customer_responsibility">Customer responsibility</a></li>
 <li><a href="#_feedback">Feedback</a></li>
 <li><a href="#_notices">Notices</a></li>
 </ul>
@@ -895,7 +896,7 @@ p.footer-text a{color:#d7d8d8}
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<h2 id="_vmware_tanzu_application_platform_on_the_aws_cloud" class="discrete text-center">VMware Tanzu Application Platform on the AWS Cloud</h2>
+<h2 id="_vmware_tanzu_application_platform_on_aws" class="discrete text-center">VMware Tanzu Application Platform on AWS</h2>
 <h2 id="_quick_start_deployment_guide" class="discrete text-left text-center">Quick Start Deployment Guide</h2>
 <div class="imageblock text-center">
 <div class="content">
@@ -1249,7 +1250,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Sign in to your AWS account, and launch this Quick Start, as described under <a href="#_deployment_options">Deployment options</a>. The AWS CloudFormation console opens with a prepopulated template. Deployment takes about 2 hours to complete.</p>
+<p>Sign in to your AWS account, and launch this Quick Start, as described under <a href="#_deployment_options">Deployment options</a>. The AWS CloudFormation console opens with a prepopulated template.</p>
 </li>
 <li>
 <p>Choose the correct AWS Region, and then choose <strong>Next</strong>.</p>
@@ -1276,10 +1277,10 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <p>On the <strong>Configure stack options</strong> page, you can <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html" target="_blank" rel="noopener">specify tags</a> (key-value pairs) for resources in your stack and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-add-tags.html" target="_blank" rel="noopener">set advanced options</a>. When you finish, choose <strong>Next</strong>.</p>
 </li>
 <li>
-<p>On the <strong>Review</strong> page, review and confirm the template settings. Under <strong>Capabilities</strong>, select the two check boxes to acknowledge that the template creates IAM resources that might require the ability to automatically expand macros.</p>
+<p>On the <strong>Review</strong> page, review and confirm the template settings. Under <strong>Capabilities</strong>, select all of the check boxes to acknowledge that the template creates AWS Identity and Access Management (IAM)  resources that might require the ability to automatically expand macros.</p>
 </li>
 <li>
-<p>Choose <strong>Create stack</strong> to deploy the stack.</p>
+<p>Choose <strong>Create stack</strong>. The stack takes about 1 hour to deploy.</p>
 </li>
 <li>
 <p>Monitor the stack&#8217;s status, and when the status is <strong>CREATE_COMPLETE</strong>, the VMware Tanzu Application Platform deployment is ready.</p>
@@ -2174,6 +2175,14 @@ If so, run the following command.</p>
 </li>
 </ul>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_customer_responsibility">Customer responsibility</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>After you deploy a Quick Start, confirm that your resources and services are updated and configured—including any required patches—to meet your security and other needs. For more information, refer to the <a href="https://aws.amazon.com/compliance/shared-responsibility-model/" target="_blank" rel="noopener">Shared Responsibility Model</a>.</p>
 </div>
 </div>
 </div>
