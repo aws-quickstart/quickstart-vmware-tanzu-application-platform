@@ -609,7 +609,7 @@ Mappings:
       WS2022FullBase: ami-024a4831aa3511f47
     us-east-1:
       US2204HVM: ami-0f65ab0fd913bc7be
-      WS2022FullBase: ami-0e1a729017e59e409
+      WS2022FullBase: ami-0f1ee03d06c4c659c
     us-east-2:
       US2204HVM: ami-079b3f6abda6a6372
       WS2022FullBase: ami-094a92978724fc94c
