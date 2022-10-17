@@ -634,8 +634,8 @@ Mappings:
     # Alternative: Ubuntu Server lookup: https://cloud-images.ubuntu.com/locator/ec2/
       Code: US2204HVM
       OS: Ubuntu
-    Windows-Server-2022-English-Full-Base-2022.06.15:
-    # Official AMI name is 'Windows_Server-2022-English-Full-Base-2022.06.15'
+    Windows-Server-2022-English-Full-Base:
+    # Official AMI name pattern is 'Windows_Server-2022-English-Full-Base-????.??.??'
       Code: WS2022FullBase
       OS: Windows
   TanzuNetRegistryServer:
