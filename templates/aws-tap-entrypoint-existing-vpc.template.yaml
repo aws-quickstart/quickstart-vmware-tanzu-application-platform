@@ -601,6 +601,9 @@ Mappings:
     eu-west-3:
       US2204HVM: ami-007aa010c58301c26
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
+    me-central-1:
+      US2204HVM: ami-07d7a26c8bf20468c
+      WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     me-south-1:
       US2204HVM: ami-0a01bd42e3a93e69d
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
