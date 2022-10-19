@@ -11,17 +11,17 @@
 |`AcceptEULAs`
 |Have all applicable {partner-registry} EULAs been accepted?
 |`No`
-|Choose `Yes` if you have already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for VMware Tanzu] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[VMware Tanzu Application Platform] end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
+|Choose `Yes` if you have already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for {partner-product-family-full}^] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[{partner-product-name}^] end-user license agreements (EULAs). {partner-product-acronym} will fail to install successfully if both EULAs have not been accepted for the specified {partner-registry} user account.
 
 |`AcceptCEIP`
 |Have you read and accept the {partner-company-short-name} CEIP policy?
 |`No`
-|Choose `Yes` if you have read and accepted the https://www.vmware.com/solutions/trustvmware/ceip.html[VMware customer experience improvement program (CEIP) policy].
+|Choose `Yes` if you have read and accepted the https://www.vmware.com/solutions/trustvmware/ceip.html[{partner-company-short-name} customer experience improvement program (CEIP) policy^].
 
 |`TanzuNetUsername`
 |Username
 |
-|VMware Tanzu Network username. To create an account, sign up at https://account.run.pivotal.io/z/uaa/sign-up.
+|{partner-registry} username. To create an account, sign up at https://account.run.pivotal.io/z/uaa/sign-up.
 
 |`TanzuNetPassword`
 |Password
@@ -31,7 +31,7 @@
 |`TanzuApiToken`
 |API Token
 |
-|VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to https://network.tanzu.vmware.com/docs/api[VMware Tanzu Network API Documentation].
+|{partner-registry} user account and authentication (UAA) API refresh token. For more information, refer to https://network.tanzu.vmware.com/docs/api[{partner-registry} API documentation^].
 
 |`TanzuNetRelocateImages`
 |Relocate {partner-product-acronym} images
@@ -47,7 +47,7 @@
 |`TAPVersion`
 |Version
 |`1.3.0`
-|Version of TAP to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements].
+|Version of {partner-product-acronym} to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements^].
 
 |`TAPDomainName`
 |Domain name
@@ -84,7 +84,7 @@
 |`KeyPairName`
 |EC2 key pair name
 |
-|The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances].
+|The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances^].
 
 |`RemoteAccessCidr`
 |Remote access CIDR
@@ -217,22 +217,22 @@
 |`AcceptEULAs`
 |Have all applicable {partner-registry} EULAs been accepted?
 |`No`
-|Choose `Yes` if you have already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for VMware Tanzu] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[VMware Tanzu Application Platform] end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
+|Choose `Yes` if you have already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for {partner-product-family-full}^] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[{partner-product-name}^] end-user license agreements (EULAs). {partner-product-acronym} will fail to install successfully if both EULAs have not been accepted for the specified {partner-registry} user account.
 
 |`AcceptCEIP`
 |Have you read and accept the {partner-company-short-name} CEIP policy?
 |`No`
-|Choose `Yes` if you have read and accepted the https://www.vmware.com/solutions/trustvmware/ceip.html[VMware customer experience improvement program (CEIP) policy].
+|Choose `Yes` if you have read and accepted the https://www.vmware.com/solutions/trustvmware/ceip.html[{partner-company-short-name} customer experience improvement program (CEIP) policy^].
 
 |`TanzuNetUsername`
 |Username
 |
-|VMware Tanzu Network username. To create an account, sign up at https://account.run.pivotal.io/z/uaa/sign-up.
+|{partner-registry} username. To create an account, sign up at https://account.run.pivotal.io/z/uaa/sign-up.
 
 |`TanzuNetPassword`
 |Password
 |
-|VMware Tanzu Network password.
+|{partner-registry} password.
 
 |`TanzuApiToken`
 |API Token
@@ -253,7 +253,7 @@
 |`TAPVersion`
 |Version
 |`1.3.0`
-|Version of TAP to deploy. The selected version must also support the       selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements].
+|Version of {partner-product-acronym} to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements^].
 
 |`TAPDomainName`
 |Domain name
@@ -280,7 +280,7 @@
 |`KeyPairName`
 |EC2 key pair name
 |
-|The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances].
+|The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances^].
 
 |`RemoteAccessCidr`
 |Remote access CIDR
@@ -332,7 +332,7 @@
 |`KubernetesVersion`
 |Kubernetes version
 |`1.22`
-|Version of Kubernetes control plane to deploy. The selected version must be supported the selected version of TAP. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements].
+|Version of Kubernetes control plane to deploy. The selected version must support the selected version of {partner-product-acronym}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements^].
 
 |`NodeInstanceType`
 |Instance type
@@ -403,12 +403,12 @@ After deployment, refer to the *Outputs* tab in the AWS CloudFormation console f
 
 === Security configuration and management tasks
 
-After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured — including any required patches — to meet your security and other needs. For more information, see the https://aws.amazon.com/compliance/shared-responsibility-model/[AWS Shared Responsibility Model].
+After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured — including any required patches — to meet your security and other needs. For more information, see the https://aws.amazon.com/compliance/shared-responsibility-model/[AWS Shared Responsibility Model^].
 
 === Access the {partner-product-name} user interface
 
 Access the {partner-product-name} user interface using the Amazon EC2 Windows bastion host instance that is deployed into a public subnet.
 
-To retrieve the password for the Windows bastion host instance, refer to https://aws.amazon.com/premiumsupport/knowledge-center/retrieve-windows-admin-password/[How do I retrieve my Windows administrator password after launching an instance?]. To connect to the bastion host, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/connecting_to_windows_instance.html[Connect to your Windows instance].
+To retrieve the password for the Windows bastion host instance, refer to https://aws.amazon.com/premiumsupport/knowledge-center/retrieve-windows-admin-password/[How do I retrieve my Windows administrator password after launching an instance?^]. To connect to the bastion host, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/connecting_to_windows_instance.html[Connect to your Windows instance^].
 
-The {partner-product-name} user interface is not available using a public URL. You can use https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html[Site to Site VPN] or https://aws.amazon.com/directconnect/[AWS Direct Connect] to configure direct access to the VPC from your enterprise network.
+The {partner-product-name} user interface is not available using a public URL. You can use https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html[Site to Site VPN^] or https://aws.amazon.com/directconnect/[AWS Direct Connect^] to configure direct access to the VPC from your enterprise network.

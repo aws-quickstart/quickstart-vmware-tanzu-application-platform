@@ -20,7 +20,7 @@ As shown in <<architecture1>>, this Quick Start sets up the following:
 *** An Amazon Elastic Compute Cloud (Amazon EC2) Linux instance to bootstrap the installation of {partner-product-name} in an Amazon EKS cluster and serve as administrator bastion host.
 *** An Amazon EC2 Windows bastion host for access to the {partner-product-short-name} user interface.
 * In the private subnets:
-** A group of Amazon EKS nodes in an Auto Scaling Group with Contour Envoy ingress controller pods and the TAP installation. For a complete list of the {partner-product-short-name} packages, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install-components.html#verify-the-installed-packages-1[Verify the installed packages].
+** A group of Amazon EKS nodes in an Auto Scaling Group with Contour Envoy ingress controller pods and the {partner-product-acronym} installation. For a complete list of the {partner-product-short-name} packages, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install-components.html#verify-the-installed-packages-1[Verify the installed packages^].
 ** A Network Load Balancer (NLB) attached to the private subnets to direct traffic to the Contour Envoy pod. The Contour Envoy container provides ingress and reverse proxy to the {partner-product-acronym} pods for the {partner-product-acronym} user interface and metadata store.
 * Amazon CloudWatch for storing Linux bastion host metrics and {partner-product-acronym} bootstrap logs.
 * AWS Secrets Manager for storing {partner-registry} credentials for the {partner-product-acronym} cluster.
