@@ -79,9 +79,9 @@ Metadata:
           - QSS3KeyPrefix
     ParameterLabels:
       AcceptEULAs:
-        default: Have all applicable VMware Tanzu Network EULAs been accepted?
+        default: Have you read and accepted all applicable VMware Tanzu Network EULAs?
       AcceptCEIP:
-        default: Have you read and accept the VMware CEIP policy?
+        default: Have you already read and accepted the VMware CEIP policy?
       AvailabilityZones:
         default: Availability Zones
       NumberOfAZs:
@@ -254,13 +254,14 @@ Parameters:
     ConstraintDescription: >-
       Minimum length of 1. Maximum length of 100. Must start with a letter or
       number.
+    Default: cluster-eks-tap
   KubernetesVersion:
     Type: String
     Description: >-
       Version of Kubernetes control plane to deploy. The selected version must
       be supported the selected TAP version (TAPVersion). For more information,
       refer to Kubernetes cluster requirements
-      (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
+      (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
       - 1.22
     Default: 1.22
@@ -541,10 +542,10 @@ Parameters:
       Version of TAP to deploy. The selected version must also support the
       selected Kubernetes version (KubernetesVersion). For more information,
       refer to Kubernetes cluster requirements
-      (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
+      (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
-      - 1.3.0-rc.1
-    Default: 1.3.0-rc.1
+      - 1.3.0
+    Default: 1.3.0
   SampleAppName:
     Type: String
     Description: >-
@@ -728,15 +729,15 @@ Rules:
     Assertions:
       - Assert: !Equals [!Ref AcceptCEIP, 'Yes']
         AssertDescription: >-
-          You must acknowledge that you have read and accept the VMware
+          You must acknowledge that you have read and accepted the VMware
           Customer Experience Improvement Program (CEIP) policy before you can
           proceed with the installation.
-  TAP1.2Interop:
-    RuleCondition: !Contains [[1.3.0-rc.1], !Ref TAPVersion]
+  TAPInterop:
+    RuleCondition: !Contains [[1.3.0], !Ref TAPVersion]
     Assertions:
       # The values below require quotes to force string comparison.
       - Assert: !Contains [['1.22', '1.23', '1.24'], !Ref KubernetesVersion]
         AssertDescription: >-
           The VMware Tanzu Application Platform version selection is
           incompatible with the Kubernetes version selection (reference:
-          https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
+          https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
