@@ -6,8 +6,8 @@ For troubleshooting common Quick Start issues, refer to the https://fwd.aws/rA69
 
 Refer to the following resources to troubleshoot {partner-product-name}.
 
-* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html[Troubleshoot installing Tanzu Application Platform]
-* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-troubleshooting-tap-troubleshoot-using-tap.html[Troubleshoot using Tanzu Application Platform]
+* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html[Troubleshoot installing Tanzu Application Platform]
+* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-troubleshooting-tap-troubleshoot-using-tap.html[Troubleshoot using Tanzu Application Platform]
 
 === I can't access the {partner-product-short-name} user interface
 

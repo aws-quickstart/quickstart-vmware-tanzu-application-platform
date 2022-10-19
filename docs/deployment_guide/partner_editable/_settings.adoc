@@ -8,11 +8,11 @@
 :partner-registry: {partner-company-short-name} {partner-product-family} Network
 :doc-month: July
 :doc-year: 2022
-:partner-contributors: Brian C Harrison and Satya Dillikar, {partner-company-name}
+:partner-contributors: Satya Dillikar and Siteng Yu, {partner-company-name}
 // :other-contributors: Akua Mansa, Trek10
 :aws-contributors: Elvis Pappachen, AWS VMware Partner team
 :aws-ia-contributors: Troy Lindsay, AWS Integration & Automation team
-:deployment_time: 2 hours
+:deployment_time: 1 hour
 :default_deployment_region: us-east-1
 // :private_repo:
 
