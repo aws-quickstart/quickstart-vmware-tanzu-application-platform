@@ -237,7 +237,7 @@
 |`TanzuApiToken`
 |API Token
 |
-|VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to https://network.tanzu.vmware.com/docs/api[VMware Tanzu Network API Documentation].
+|{partner-registry} user account and authentication (UAA) API refresh token. For more information, refer to the https://network.tanzu.vmware.com/docs/api[{partner-registry} API documentation^].
 
 |`TanzuNetRelocateImages`
 |Relocate {partner-product-acronym} images
