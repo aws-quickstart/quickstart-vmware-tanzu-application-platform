@@ -548,89 +548,89 @@ Parameters:
 Mappings:
   AwsAmiRegionMap:
     af-south-1:
-      US2204HVM: ami-04f0408f494c0c285
+      US2204HVM: ami-0fc6e121c192bdb03
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-east-1:
-      US2204HVM: ami-006e830ecf3449b97
+      US2204HVM: ami-024f879d2b5124b90
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-northeast-1:
-      US2204HVM: ami-0a054d6fbb2cc67ee
+      US2204HVM: ami-07b0d532075d92a20
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-northeast-2:
-      US2204HVM: ami-0818e9b70ba516e4c
+      US2204HVM: ami-05b9c9c0fe2f5a62c
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-northeast-3:
-      US2204HVM: ami-069f7cc82ef9ffee0
+      US2204HVM: ami-0d1fdff91da68b01c
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-south-1:
-      US2204HVM: ami-0c1d7eb198a14f4b7
+      US2204HVM: ami-0d044385bb8ef5481
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-southeast-1:
-      US2204HVM: ami-07dd115509093305a
+      US2204HVM: ami-054e3ff0063ada900
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-southeast-2:
-      US2204HVM: ami-07cba5a9c6484ecc6
+      US2204HVM: ami-0251cb389d14767a2
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-southeast-3:
-      US2204HVM: ami-0de46ab389596d621
+      US2204HVM: ami-0c1460efd8855de7c
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ca-central-1:
-      US2204HVM: ami-0204f3c59456ea9a1
+      US2204HVM: ami-096b9b73064bc93e5
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     cn-north-1:
-      US2204HVM: ami-0a5b1cd4564f86427
+      US2204HVM: ami-051468c74b28583e6
       WS2022FullBase: ami-0d5c69cd276561585
     cn-northwest-1:
-      US2204HVM: ami-09fcf3b4295bfce3a
+      US2204HVM: ami-0ccdfe9ea19c6b1da
       WS2022FullBase: ami-0482ef6efa5fce019
     eu-central-1:
-      US2204HVM: ami-0d06de6bae4839627
+      US2204HVM: ami-03f87e9ce1bec353f
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     eu-north-1:
-      US2204HVM: ami-086a5679c50b4ff6f
+      US2204HVM: ami-09c7120731676fe78
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     eu-south-1:
-      US2204HVM: ami-00806d185ec911bf1
+      US2204HVM: ami-0be8a0321a0db3412
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     eu-west-1:
-      US2204HVM: ami-0c0aa81a5fab62093
+      US2204HVM: ami-00c90dbdc12232b58
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     eu-west-2:
-      US2204HVM: ami-0510e632102e49c91
+      US2204HVM: ami-0660cbd2af1273a49
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     eu-west-3:
-      US2204HVM: ami-0c29d914e1049d227
+      US2204HVM: ami-007aa010c58301c26
+      WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
+    me-central-1:
+      US2204HVM: ami-07d7a26c8bf20468c
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     me-south-1:
-      US2204HVM: ami-02065623a94764b7c
+      US2204HVM: ami-0a01bd42e3a93e69d
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     sa-east-1:
-      US2204HVM: ami-0c8ba8486b94b44c3
+      US2204HVM: ami-08ae71fd7f1449df1
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     us-east-1:
-      US2204HVM: ami-0f65ab0fd913bc7be
+      US2204HVM: ami-052efd3df9dad4825
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     us-east-2:
-      US2204HVM: ami-079b3f6abda6a6372
+      US2204HVM: ami-0b9c02f271998009f
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     us-gov-east-1:
-      US2204HVM: ami-08fcbec75b43330b7
+      US2204HVM: ami-091deef7dfe077967
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     us-gov-west-1:
       US2204HVM: ami-04e77113f128920b2
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     us-west-1:
-      US2204HVM: ami-08daca4640726cc73
+      US2204HVM: ami-02ea247e531eb3ce6
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     us-west-2:
-      US2204HVM: ami-0c21533018816e490
+      US2204HVM: ami-0a22ed271d3dbf544
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
   AwsAmiNameMap:
     Ubuntu-Server-22.04-LTS-HVM:
-    # Official AMI names are:
-    # Commercial: 'ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20220616'
-    # GovCloud: 'ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20220420'
-    # Greater China Region: 'ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20220604'
+    # Official AMI name pattern is 'ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-????????'
     # Alternative: Ubuntu Server lookup: https://cloud-images.ubuntu.com/locator/ec2/
       Code: US2204HVM
       OS: Ubuntu
