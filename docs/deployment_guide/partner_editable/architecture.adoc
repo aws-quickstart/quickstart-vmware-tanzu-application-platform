@@ -13,18 +13,18 @@ As shown in <<architecture1>>, this Quick Start sets up the following:
 
 * A highly available architecture that spans either two or three Availability Zones.*
 * A virtual private cloud (VPC) configured with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS.*
-* An Amazon Route 53 private hosted zone for the TAP user interface.
+* An Amazon Route 53 private hosted zone for the {partner-product-acronym} user interface.
 * In the public subnets:
 ** Managed network address translation (NAT) gateways to allow outbound internet access for resources in the private subnets.
 ** In one public subnet:
-*** An Amazon Elastic Compute Cloud (Amazon EC2) Linux instance to bootstrap the installation of VMware TAP in an Amazon EKS cluster and serve as administrator bastion host.
-*** An Amazon EC2 Windows bastion host for access to the Tanzu Application Platform user interface.
+*** An Amazon Elastic Compute Cloud (Amazon EC2) Linux instance to bootstrap the installation of {partner-product-name} in an Amazon EKS cluster and serve as administrator bastion host.
+*** An Amazon EC2 Windows bastion host for access to the {partner-product-short-name} user interface.
 * In the private subnets:
 ** A group of Amazon EKS nodes in an Auto Scaling Group with Contour Envoy ingress controller pods and the TAP installation. For a complete list of the {partner-product-short-name} packages, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install-components.html#verify-the-installed-packages-1[Verify the installed packages].
-** A Network Load Balancer (NLB) attached to the private subnets to direct traffic to the Contour Envoy pod. The Contour Envoy container provides ingress and reverse proxy to the TAP pods for the TAP user interface and metadata store.
-* Amazon CloudWatch for storing Linux bastion host performance metrics and TAP bootstrap logs.
+** A Network Load Balancer (NLB) attached to the private subnets to direct traffic to the Contour Envoy pod. The Contour Envoy container provides ingress and reverse proxy to the {partner-product-acronym} pods for the {partner-product-acronym} user interface and metadata store.
+* Amazon CloudWatch for storing Linux bastion host metrics and {partner-product-acronym} bootstrap logs.
 * AWS Secrets Manager for securely storing VMware Tanzu Network credentials for the TAP cluster.
-* Amazon Elastic Container Registry (Amazon ECR) for five private repositories: three for TAP installation and two for sample workload installation.
-* Amazon EKS for the Kubernetes control plane cluster that runs TAP, Contour Envoy, and other containerized applications.
+* Amazon Elastic Container Registry (Amazon ECR) for five private repositories: three for {partner-product-acronym} installation and two for sample workload installation.
+* Amazon EKS for the Kubernetes control plane cluster that runs {partner-product-acronym}, Contour Envoy, and other containerized applications.
 
 [.small]#* The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#

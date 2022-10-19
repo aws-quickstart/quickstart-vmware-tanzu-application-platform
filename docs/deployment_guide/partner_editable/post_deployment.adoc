@@ -9,12 +9,12 @@
 |Parameter |Parameter Label |Default Value |Description
 
 |`AcceptEULAs`
-|Have all applicable VMware Tanzu Network EULAs been accepted?
+|Have all applicable {partner-registry} EULAs been accepted?
 |`No`
 |Choose `Yes` if you have already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for VMware Tanzu] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[VMware Tanzu Application Platform] end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
 
 |`AcceptCEIP`
-|Have you read and accept the VMware CEIP policy?
+|Have you read and accept the {partner-company-short-name} CEIP policy?
 |`No`
 |Choose `Yes` if you have read and accepted the https://www.vmware.com/solutions/trustvmware/ceip.html[VMware customer experience improvement program (CEIP) policy].
 
@@ -26,7 +26,7 @@
 |`TanzuNetPassword`
 |Password
 |
-|VMware Tanzu Network password.
+|{partner-registry} password.
 
 |`TanzuApiToken`
 |API Token
@@ -34,13 +34,13 @@
 |VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to https://network.tanzu.vmware.com/docs/api[VMware Tanzu Network API Documentation].
 
 |`TanzuNetRelocateImages`
-|Relocate TAP images
+|Relocate {partner-product-acronym} images
 |`No`
-|Choose `Yes` to relocate TAP images from the VMware Tanzu Network registry to your ECR registry from before attempting installation. If you do not relocate images, Tanzu Application Platform will depend directly on the VMware Tanzu Network registry for its continued operation.
+|Choose `Yes` to relocate {partner-product-acronym} images from the {partner-registry} registry to your ECR registry from before attempting installation. If you do not relocate images, {partner-product-short-name} will depend directly on the {partner-registry} registry for its continued operation.
 |====
 
 [%autowidth.stretch]
-.VMware Tanzu Application Platform configuration
+.{partner-product-name} configuration
 |====
 |Parameter |Parameter Label |Default Value |Description
 
@@ -52,7 +52,7 @@
 |`TAPDomainName`
 |Domain name
 |
-|Private DNS domain name that will be used for accessing the TAP graphical user interface (GUI) and project URLs.
+|Private DNS domain name that will be used for accessing the {partner-product-acronym} graphical user interface (GUI) and project URLs.
 |====
 
 [%autowidth.stretch]
@@ -141,7 +141,7 @@
 |`EKSClusterName`
 |EKS cluster name
 |
-|Name of the EKS cluster where TAP will be deployed.
+|Name of the EKS cluster where {partner-product-acronym} will be deployed.
 
 |`KubernetesVersion`
 |Kubernetes version
@@ -161,12 +161,12 @@
 |`NumberOfNodes`
 |Number of nodes
 |`4`
-|Minimum number of nodes to create for the TAP EKS cluster.
+|Minimum number of nodes to create for the {partner-product-acronym} EKS cluster.
 
 |`MaxNumberOfNodes`
 |Maximum number of nodes
 |`6`
-|Maximum number of available nodes for the TAP EKS cluster in auto scaling.
+|Maximum number of available nodes for the {partner-product-acronym} EKS cluster in auto scaling.
 |====
 
 [%autowidth.stretch]
@@ -215,12 +215,12 @@
 |Parameter |Parameter Label |Default Value |Description
 
 |`AcceptEULAs`
-|Have all applicable VMware Tanzu Network EULAs been accepted?
+|Have all applicable {partner-registry} EULAs been accepted?
 |`No`
 |Choose `Yes` if you have already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for VMware Tanzu] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[VMware Tanzu Application Platform] end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.
 
 |`AcceptCEIP`
-|Have you read and accept the VMware CEIP policy?
+|Have you read and accept the {partner-company-short-name} CEIP policy?
 |`No`
 |Choose `Yes` if you have read and accepted the https://www.vmware.com/solutions/trustvmware/ceip.html[VMware customer experience improvement program (CEIP) policy].
 
@@ -240,13 +240,13 @@
 |VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to https://network.tanzu.vmware.com/docs/api[VMware Tanzu Network API Documentation].
 
 |`TanzuNetRelocateImages`
-|Relocate TAP images
+|Relocate {partner-product-acronym} images
 |`No`
-|Choose `Yes` to relocate TAP images from the VMware Tanzu Network registry to your ECR registry from before attempting installation. If you do not relocate images, Tanzu Application Platform will depend directly on the VMware Tanzu Network registry for its continued operation.
+|Choose `Yes` to relocate {partner-product-acronym} images from the {partner-registry} registry to your ECR registry from before attempting installation. If you do not relocate images, {partner-product-short-name} will depend directly on the {partner-registry} registry for its continued operation.
 |====
 
 [%autowidth.stretch]
-.VMware Tanzu Application Platform configuration
+.{partner-product-name} configuration
 |====
 |Parameter |Parameter Label |Default Value |Description
 
@@ -258,7 +258,7 @@
 |`TAPDomainName`
 |Domain name
 |
-|Private DNS domain name to access the TAP user interface and project URLs.
+|Private DNS domain name to access the {partner-product-acronym} user interface and project URLs.
 |====
 
 [%autowidth.stretch]
@@ -327,7 +327,7 @@
 |`EKSClusterName`
 |EKS cluster name
 |
-|Name of the EKS cluster where TAP will be deployed.
+|Name of the EKS cluster where {partner-product-acronym} will be deployed.
 
 |`KubernetesVersion`
 |Kubernetes version
@@ -347,12 +347,12 @@
 |`NumberOfNodes`
 |Number of nodes
 |`4`
-|Minimum number of nodes to create for the TAP EKS cluster.
+|Minimum number of nodes to create for the {partner-product-acronym} EKS cluster.
 
 |`MaxNumberOfNodes`
 |Maximum number of nodes
 |`6`
-|Maximum number of available nodes for the TAP EKS cluster in auto scaling.
+|Maximum number of available nodes for the {partner-product-acronym} EKS cluster in auto scaling.
 |====
 
 [%autowidth.stretch]
