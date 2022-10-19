@@ -8,7 +8,7 @@
 :partner-registry: {partner-company-short-name} {partner-product-family} Network
 :doc-month: July
 :doc-year: 2022
-:partner-contributors: Brian C Harrison and Satya Dillikar, {partner-company-name}
+:partner-contributors: Satya Dillikar and Siteng Yu, {partner-company-name}
 // :other-contributors: Akua Mansa, Trek10
 :aws-contributors: Elvis Pappachen, AWS VMware Partner team
 :aws-ia-contributors: Troy Lindsay, AWS Integration & Automation team
