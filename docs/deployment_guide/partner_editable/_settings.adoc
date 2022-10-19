@@ -2,10 +2,12 @@
 :quickstart-github-org: aws-quickstart
 :partner-company-short-name: VMware
 :partner-product-family: Tanzu
-:partner-product-name: {partner-company-short-name} {partner-product-family} Application Platform
+:partner-product-family-full: {partner-company-short-name} {partner-product-family}
 :partner-product-short-name: {partner-product-family} Application Platform
+:partner-product-name: {partner-company-short-name} {partner-product-short-name}
+:partner-product-acronym: TAP
 :partner-company-name: VMware, Inc.
-:partner-registry: {partner-company-short-name} {partner-product-family} Network
+:partner-registry: {partner-product-family-full} Network
 :doc-month: July
 :doc-year: 2022
 :partner-contributors: Satya Dillikar and Siteng Yu, {partner-company-name}
