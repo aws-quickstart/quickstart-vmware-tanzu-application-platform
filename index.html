@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.17">
 <meta name="description" content="VMware Tanzu Application Platform Deployment Guide on AWS">
-<meta name="keywords" content="Quick Start, AWS, VMware Tanzu Application Platform">
+<meta name="keywords" content="Partner Solution, AWS, VMware Tanzu Application Platform">
 <title>VMware Tanzu Application Platform on AWS</title>
 <style>
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -897,21 +897,21 @@ p.footer-text a{color:#d7d8d8}
 <div id="preamble">
 <div class="sectionbody">
 <h2 id="_vmware_tanzu_application_platform_on_aws" class="discrete text-center">VMware Tanzu Application Platform on AWS</h2>
-<h2 id="_quick_start_deployment_guide" class="discrete text-left text-center">Quick Start Deployment Guide</h2>
+<h2 id="_partner_solution_deployment_guide" class="discrete text-left text-center">Partner Solution Deployment Guide</h2>
 <div class="imageblock text-center">
 <div class="content">
 <img src="https://aws-quickstart.s3.amazonaws.com/docs/deployment-guide/aws-quickstart-deployment-graphic.png" alt="QS" width="80" height="80">
 </div>
 </div>
 <div class="paragraph text-center">
-<p><strong>July 2022</strong><br>
-<em>Brian C Harrison and Satya Dillikar, VMware, Inc.</em><br>
+<p><strong>October 2022</strong><br>
+<em>Satya Dillikar and Siteng Yu, VMware, Inc.</em><br>
 <em>Elvis Pappachen, AWS VMware Partner team</em><br>
 <em>Troy Lindsay, AWS Integration &amp; Automation team</em><br></p>
 </div>
 <div class="imageblock text-left image-container">
 <div class="content">
-<img src="https://aws-quickstart.s3.amazonaws.com/quickstart-vmware-tanzu-application-platform/docs/boilerplate/.images/aws-quickstart-graphic.png" alt="">
+<img src="https://aws-quickstart.s3.amazonaws.com/{partner-solution-project-name}/docs/boilerplate/.images/aws-quickstart-graphic.png" alt="">
 </div>
 </div>
 <div class="admonitionblock tip">
@@ -921,13 +921,13 @@ p.footer-text a{color:#d7d8d8}
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-Refer to the <a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform" target="_blank" rel="noopener">GitHub repository</a> to view source files, report bugs, submit feature ideas, and post feedback about this Quick Start. To comment on the documentation, refer to <a href="#_feedback">Feedback</a>.
+Refer to the <a href="https://github.com/{partner-solution-github-org}/{partner-solution-project-name}" target="_blank" rel="noopener">GitHub repository</a> to view source files, report bugs, submit feature ideas, and post feedback about this Partner Solution. To comment on the documentation, refer to <a href="#_feedback">Feedback</a>.
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph text-left">
-<p>This Quick Start was created by VMware, Inc. in collaboration with Amazon Web Services (AWS). <a href="http://aws.amazon.com/quickstart/" target="_blank" rel="noopener">Quick Starts</a> are automated reference deployments that help people deploy popular technologies on AWS according to AWS best practices. If you&#8217;re unfamiliar with AWS Quick Starts, refer to the <a href="https://fwd.aws/rA69w?" target="_blank" rel="noopener">AWS Quick Start General Information Guide</a>.</p>
+<p>This Partner Solution was created by VMware, Inc. in collaboration with Amazon Web Services (AWS). <a href="https://aws.amazon.com/solutions/partners/" target="_blank" rel="noopener">Partner Solutions</a> are automated reference deployments that help people deploy popular technologies on AWS according to AWS best practices. If you&#8217;re unfamiliar with AWS Partner Solutions, refer to the <a href="https://fwd.aws/rA69w?" target="_blank" rel="noopener">AWS Partner Solution General Information Guide</a>.</p>
 </div>
 </div>
 </div>
@@ -935,7 +935,7 @@ Refer to the <a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-
 <h2 id="_overview">Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This Quick Start deploys VMware Tanzu Application Platform on the AWS Cloud. This Quick Start is for users who want a repeatable and customizable reference deployment for <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/info">VMware Tanzu Application Platform</a> on Amazon EKS using AWS CloudFormation. This guide provides instructions for deploying the Tanzu Application Platform to Amazon Elastic Kubernetes Service (Amazon EKS) clusters.</p>
+<p>This Quick Start deploys VMware Tanzu Application Platform (TAP) to the AWS Cloud. This Quick Start is for users who want a repeatable and customizable reference deployment for <a href="https://tanzu.vmware.com/application-platform" target="_blank" rel="noopener">VMware Tanzu Application Platform</a> on Amazon Elastic Kubernetes Service (Amazon EKS) using AWS CloudFormation. This guide provides instructions for deploying the Tanzu Application Platform to Amazon EKS clusters. For more information about Tanzu Application Platform, refer to <a href="https://tanzu.vmware.com/application-platform" target="_blank" rel="noopener">https://tanzu.vmware.com/application-platform</a>.</p>
 </div>
 </div>
 </div>
@@ -947,8 +947,7 @@ Refer to the <a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-
 For more information, refer to the <a href="https://fwd.aws/rA69w?" target="_blank" rel="noopener">AWS Quick Start General Information Guide</a>.</p>
 </div>
 <div class="paragraph">
-<p>If you want to purchase a license for VMware Tanzu Application Platform, please reach out to <a href="https://tanzu.vmware.com/contact">https://tanzu.vmware.com/contact</a>.
-To learn more about Tanzu Application Platform, please visit <a href="https://tanzu.vmware.com/application-platform">https://tanzu.vmware.com/application-platform</a>.</p>
+<p>To purchase a license for VMware Tanzu Application Platform, <a href="https://tanzu.vmware.com/contact" target="_blank" rel="noopener">contact VMware Tanzu</a>.</p>
 </div>
 </div>
 </div>
@@ -991,7 +990,7 @@ AWS Cloud.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>An Amazon Elastic Compute Cloud (Amazon EC2) Linux instance to bootstrap the installation of VMware TAP in an Amazon EKS cluster and serve as administrator bastion host.</p>
+<p>An Amazon Elastic Compute Cloud (Amazon EC2) Linux instance to bootstrap the installation of VMware Tanzu Application Platform in an Amazon EKS cluster and serve as administrator bastion host.</p>
 </li>
 <li>
 <p>An Amazon EC2 Windows bastion host for access to the Tanzu Application Platform user interface.</p>
@@ -1007,7 +1006,7 @@ AWS Cloud.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>A group of Amazon EKS nodes in an Auto Scaling Group with Contour Envoy ingress controller pods and the TAP installation. For a complete list of the Tanzu Application Platform packages, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-components.html#verify-the-installed-packages-1">Verify the installed packages</a>.</p>
+<p>A group of Amazon EKS nodes in an Auto Scaling Group with Contour Envoy ingress controller pods and the TAP installation. For a complete list of the Tanzu Application Platform packages, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install-components.html#verify-the-installed-packages-1" target="_blank" rel="noopener">Verify the installed packages</a>.</p>
 </li>
 <li>
 <p>A Network Load Balancer (NLB) attached to the private subnets to direct traffic to the Contour Envoy pod. The Contour Envoy container provides ingress and reverse proxy to the TAP pods for the TAP user interface and metadata store.</p>
@@ -1016,10 +1015,10 @@ AWS Cloud.</p>
 </div>
 </li>
 <li>
-<p>Amazon CloudWatch for storing Linux bastion host performance metrics and TAP bootstrap logs.</p>
+<p>Amazon CloudWatch for storing Linux bastion host metrics and TAP bootstrap logs.</p>
 </li>
 <li>
-<p>AWS Secrets Manager for securely storing VMware Tanzu Network credentials for the TAP cluster.</p>
+<p>AWS Secrets Manager for storing VMware Tanzu Network credentials for the TAP cluster.</p>
 </li>
 <li>
 <p>Amazon Elastic Container Registry (Amazon ECR) for five private repositories: three for TAP installation and two for sample workload installation.</p>
@@ -1072,7 +1071,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>An <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html">Amazon EC2 Key Pair</a> is required for the deployment of this Quick Start, and the key type must be RSA, not ED25519. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html">Amazon EC2 key pairs and Windows instances</a> and <a href="#_troubleshooting">Troubleshooting</a>, later in this guide.</p>
+<p>An <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html" target="_blank" rel="noopener">Amazon EC2 Key Pair</a> is required for the deployment of this Quick Start, and the key type must be RSA, not ED25519. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html" target="_blank" rel="noopener">Amazon EC2 key pairs and Windows instances</a> and <a href="#_troubleshooting" target="_blank" rel="noopener">Troubleshooting</a>, later in this guide.</p>
 </div>
 </td>
 </tr>
@@ -1081,7 +1080,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <div class="sect3">
 <h4 id="_resource_quotas">Resource quotas</h4>
 <div class="paragraph">
-<p>If necessary, request <a href="https://console.aws.amazon.com/servicequotas/home/">service quota increases</a> for the following resources. You might need to request increases if your existing deployment currently uses these resources and if this Quick Start deployment could result in exceeding the default quotas. The <a href="https://console.aws.amazon.com/servicequotas/home/">Service Quotas console</a> displays your usage and quotas for some aspects of some services. For more information, refer to <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html">What is Service Quotas?</a> and <a href="https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html">AWS service quotas</a>.</p>
+<p>If necessary, request <a href="https://console.aws.amazon.com/servicequotas/home/" target="_blank" rel="noopener">service quota increases</a> for the following resources. You might need to request increases if your existing deployment currently uses these resources and if this Quick Start deployment could result in exceeding the default quotas. The <a href="https://console.aws.amazon.com/servicequotas/home/" target="_blank" rel="noopener">Service Quotas console</a> displays your usage and quotas for some aspects of some services. For more information, refer to <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html" target="_blank" rel="noopener">What is Service Quotas?</a> and <a href="https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html" target="_blank" rel="noopener">AWS service quotas</a>.</p>
 </div>
 <table class="tableblock frame-all grid-all fit-content">
 <colgroup>
@@ -1146,7 +1145,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <div class="sect2">
 <h3 id="_vmware_tanzu_network_account">VMware Tanzu Network account</h3>
 <div class="paragraph">
-<p>This Quick Start requires a VMware Tanzu Network account with a username, password, and generated a <a href="https://network.tanzu.vmware.com/docs/api">user account and authentication (UAA) refresh API token</a>.</p>
+<p>This Quick Start requires a VMware Tanzu Network account with a username, password, and a <a href="https://network.tanzu.vmware.com/docs/api" target="_blank" rel="noopener">user account and authentication (UAA) refresh API token</a>.</p>
 </div>
 <div class="sect3">
 <h4 id="_create_a_new_vmware_tanzu_network_login">Create a new VMware Tanzu Network login</h4>
@@ -1165,7 +1164,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <p>Choose <strong>Create account</strong>.</p>
 </li>
 <li>
-<p>On the <strong>Create your VMware Account</strong> page, complete the form and choose <strong>Sign Up</strong>.</p>
+<p>On the <strong>Create your VMware account</strong> page, complete the form, and choose <strong>Sign Up</strong>.</p>
 </li>
 <li>
 <p>Log in to VMware using the new user credentials.</p>
@@ -1181,7 +1180,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Log in to <a href="https://network.tanzu.vmware.com/">VMware Tanzu Network</a>.</p>
+<p>Log in to <a href="https://network.tanzu.vmware.com/" target="_blank" rel="noopener">VMware Tanzu Network</a>.</p>
 </li>
 <li>
 <p>Choose <strong>Edit Profile</strong> from the dropdown list next to your username.</p>
@@ -1190,7 +1189,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <p>Choose <strong>Request new refresh token</strong>.</p>
 </li>
 <li>
-<p>Copy the refesh token. Enter it for the <code>API Token</code> (<code>TanzuApiToken</code>) parameter during deployment.</p>
+<p>Copy the refresh token. Enter it for the <code>API Token</code> (<code>TanzuApiToken</code>) parameter during deployment.</p>
 </li>
 </ol>
 </div>
@@ -1199,7 +1198,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <div class="sect2">
 <h3 id="_accept_vmware_eulas">Accept VMware EULAs</h3>
 <div class="paragraph">
-<p>Before deploying this Quick Start, you must accept the following VMware End User License Agreements (EULAs) for the VMware Tanzu Network account used for the deployment. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0">Accept the End User License Agreements</a>.</p>
+<p>Before deploying this Quick Start, you must accept the following VMware End User License Agreements (EULAs) for the VMware Tanzu Network account used for the deployment. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0" target="_blank" rel="noopener">Accept the End User License Agreements</a>.</p>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -1219,7 +1218,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <div class="sect2">
 <h3 id="_vmware_customer_experience_improvement_program_ceip">VMware Customer Experience Improvement Program (CEIP)</h3>
 <div class="paragraph">
-<p>VMware Tanzu Application Platform participates in the <a href="https://www.vmware.com/solutions/trustvmware/ceip.html">VMware customer experience improvement program (CEIP)</a>. As part of CEIP, VMware collects technical information about your organization&#8217;s use of VMware products and services in association with your organization&#8217;s VMware license keys.</p>
+<p>VMware Tanzu Application Platform participates in the <a href="https://www.vmware.com/solutions/trustvmware/ceip.html" target="_blank" rel="noopener">VMware CEIP</a>. As part of CEIP, VMware collects technical information about your organization&#8217;s use of VMware products and services in association with your organization&#8217;s VMware license keys.</p>
 </div>
 <div class="paragraph">
 <p>You may join or leave CEIP at any time. The CEIP Standard Participation Level provides VMware with information to improve its products and services, identify and fix problems, and advise you on how to best deploy and use VMware products. For example, this information can enable a proactive product deployment discussion with your VMware account team or VMware support team to help resolve your issues. This information cannot directly identify any individual.</p>
@@ -1239,7 +1238,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 </table>
 </div>
 <div class="paragraph">
-<p>For more information, see <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install.html#install-your-tanzu-application-platform-profile-1">Install your Tanzu Application Platform profile</a>. To opt out of telemetry participation after installation, see <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-opting-out-telemetry.html">Opting out of telemetry collection</a>.</p>
+<p>For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install.html#install-your-tanzu-application-platform-profile-1" target="_blank" rel="noopener">Install your Tanzu Application Platform profile</a>. To opt out of telemetry reporting after installation completes, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-opting-out-telemetry.html" target="_blank" rel="noopener">Opting out of telemetry collection</a>.</p>
 </div>
 </div>
 </div>
@@ -1250,7 +1249,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Sign in to your AWS account, and launch this Quick Start, as described under <a href="#_deployment_options">Deployment options</a>. The AWS CloudFormation console opens with a prepopulated template.</p>
+<p>Sign in to your AWS account, and launch this Partner Solution, as described under <a href="#_deployment_options">Deployment options</a>. The AWS CloudFormation console opens with a prepopulated template.</p>
 </li>
 <li>
 <p>Choose the correct AWS Region, and then choose <strong>Next</strong>.</p>
@@ -1267,7 +1266,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Unless you are customizing the Quick Start templates for your own projects, don&#8217;t change the default settings for the following Amazon Simple Storage Service (Amazon S3) parameters: <strong>Quick Start S3 bucket name</strong>, <strong>Quick Start S3 bucket Region</strong>, and <strong>Quick Start S3 key prefix</strong>. Changing these settings automatically updates code references to point to a new Quick Start location. For more information, refer to the <a href="https://fwd.aws/NwqYA?" target="_blank" rel="noopener">AWS Quick Start Contributor&#8217;s Guide</a>.
+Unless you are customizing the Partner Solution templates for your own projects, don&#8217;t change the default settings for the following Amazon Simple Storage Service (Amazon S3) parameters: <strong>Partner Solution S3 bucket name</strong>, <strong>Partner Solution S3 bucket Region</strong>, and <strong>Partner Solution S3 key prefix</strong>. Changing these settings automatically updates code references to point to a new Partner Solution location. For more information, refer to the <a href="https://fwd.aws/NwqYA?" target="_blank" rel="noopener">AWS Partner Solution Contributor&#8217;s Guide</a>.
 </td>
 </tr>
 </table>
@@ -1315,19 +1314,19 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>AcceptEULAs</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Have all applicable VMware Tanzu Network EULAs been accepted?</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you have already accepted the <a href="https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/">Cluster Essentials for VMware Tanzu</a> and <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/">VMware Tanzu Application Platform</a> end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you already accepted the <a href="https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/" target="_blank" rel="noopener">Cluster Essentials for VMware Tanzu</a> and <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/" target="_blank" rel="noopener">VMware Tanzu Application Platform</a> EULAs. TAP will fail to install if both EULAs are not accepted for the specified VMware Tanzu Network user account.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>AcceptCEIP</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Have you read and accept the VMware CEIP policy?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Have you read and accepted the VMware CEIP policy?</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you have read and accepted the <a href="https://www.vmware.com/solutions/trustvmware/ceip.html">VMware customer experience improvement program (CEIP) policy</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you have read and accepted the <a href="https://www.vmware.com/solutions/trustvmware/ceip.html" target="_blank" rel="noopener">VMware CEIP policy</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetUsername</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Username</p></td>
 <td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network username. To create an account, sign up at <a href="https://account.run.pivotal.io/z/uaa/sign-up" class="bare">https://account.run.pivotal.io/z/uaa/sign-up</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network user name. To create an account, sign up at <a href="https://account.run.pivotal.io/z/uaa/sign-up" class="bare">https://account.run.pivotal.io/z/uaa/sign-up</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetPassword</code></p></td>
@@ -1339,13 +1338,13 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuApiToken</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">API Token</p></td>
 <td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to <a href="https://network.pivotal.io/docs/api">VMware Tanzu Network API Documentation</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network UAA API refresh token. For more information, refer to <a href="https://network.tanzu.vmware.com/docs/api" target="_blank" rel="noopener">VMware Tanzu Network API documentation</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetRelocateImages</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Relocate TAP images</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> to relocate TAP images from the VMware Tanzu Network registry to your ECR registry from before attempting installation. If you do not relocate images, Tanzu Application Platform will depend directly on the VMware Tanzu Network registry for its continued operation.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> to relocate TAP images from the VMware Tanzu Network registry to your ECR registry. If you do not relocate the images, Tanzu Application Platform uses the VMware Tanzu Network registry to operate.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1369,8 +1368,8 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPVersion</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Version</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.2.0</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Version of TAP to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3">Kubernetes cluster requirements</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.3.0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Version of TAP to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3" target="_blank" rel="noopener">Kubernetes cluster requirements</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPDomainName</code></p></td>
@@ -1438,7 +1437,7 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>KeyPairName</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">EC2 key pair name</p></td>
 <td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html">Amazon EC2 key pairs and Windows instances</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the EC2 key pair used for SSH access to the Linux bastion host/bootstrap instance and EKS cluster nodes, as well as for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html" target="_blank" rel="noopener">Amazon EC2 key pairs and Windows instances</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>RemoteAccessCidr</code></p></td>
@@ -1530,13 +1529,13 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>EKSClusterName</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">EKS cluster name</p></td>
 <td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the EKS cluster where TAP will be deployed.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the EKS cluster where TAP deploys.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>KubernetesVersion</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Kubernetes version</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.21</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Version of Kubernetes control plane to deploy. The selected version must be supported the selected version of TAP. For more information, refer to Kubernetes cluster requirements (<a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3" class="bare">https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3</a>).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.22</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Version of Kubernetes control plane to deploy. The selected version must support the selected version of TAP. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3" target="_blank" rel="noopener">Kubernetes cluster requirements</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>NodeInstanceType</code></p></td>
@@ -1656,19 +1655,19 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>AcceptEULAs</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Have all applicable VMware Tanzu Network EULAs been accepted?</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you have already accepted the <a href="https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/">Cluster Essentials for VMware Tanzu</a> and <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/">VMware Tanzu Application Platform</a> end-user license agreements (EULAs). TAP will fail to install successfully if both EULAs have not been accepted for the specified VMware Tanzu Network user account.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you already accepted the <a href="https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/" target="_blank" rel="noopener">Cluster Essentials for VMware Tanzu</a> and <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/" target="_blank" rel="noopener">VMware Tanzu Application Platform</a> EULAs. TAP will fail to install successfully if both EULAs are not accepted for the specified VMware Tanzu Network user account.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>AcceptCEIP</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Have you read and accept the VMware CEIP policy?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Have you read and accepted the VMware CEIP policy?</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you have read and accepted the <a href="https://www.vmware.com/solutions/trustvmware/ceip.html">VMware customer experience improvement program (CEIP) policy</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you have read and accepted the <a href="https://www.vmware.com/solutions/trustvmware/ceip.html" target="_blank" rel="noopener">VMware CEIP policy</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetUsername</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Username</p></td>
 <td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network username. To create an account, sign up at <a href="https://account.run.pivotal.io/z/uaa/sign-up" class="bare">https://account.run.pivotal.io/z/uaa/sign-up</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network user name. To create an account, sign up at <a href="https://account.run.pivotal.io/z/uaa/sign-up" class="bare">https://account.run.pivotal.io/z/uaa/sign-up</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetPassword</code></p></td>
@@ -1680,13 +1679,13 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuApiToken</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">API Token</p></td>
 <td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to <a href="https://network.pivotal.io/docs/api">VMware Tanzu Network API Documentation</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network UAA API refresh token. For more information, refer to the <a href="https://network.tanzu.vmware.com/docs/api" target="_blank" rel="noopener">VMware Tanzu Network API documentation</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetRelocateImages</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Relocate TAP images</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> to relocate TAP images from the VMware Tanzu Network registry to your ECR registry from before attempting installation. If you do not relocate images, Tanzu Application Platform will depend directly on the VMware Tanzu Network registry for its continued operation.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> to relocate TAP images from the VMware Tanzu Network registry to your ECR registry. If you do not relocate the images, Tanzu Application Platform uses the VMware Tanzu Network registry to operate.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1710,8 +1709,8 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPVersion</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Version</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.2.0</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Version of TAP to deploy. The selected version must also support the       selected Kubernetes version. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3">Kubernetes cluster requirements</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.3.0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Version of TAP to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3" target="_blank" rel="noopener">Kubernetes cluster requirements</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPDomainName</code></p></td>
@@ -1767,7 +1766,7 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>KeyPairName</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">EC2 key pair name</p></td>
 <td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html">Amazon EC2 key pairs and Windows instances</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html" target="_blank" rel="noopener">Amazon EC2 key pairs and Windows instances</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>RemoteAccessCidr</code></p></td>
@@ -1852,8 +1851,8 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>KubernetesVersion</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Kubernetes version</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.21</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Version of Kubernetes control plane to deploy. The selected version must be supported the selected version of TAP. For more information, refer to Kubernetes cluster requirements (<a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3" class="bare">https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3</a>).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.22</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Version of Kubernetes control plane to deploy. The selected version must support the selected version of TAP. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3" target="_blank" rel="noopener">Kubernetes cluster requirements</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>NodeInstanceType</code></p></td>
@@ -1975,7 +1974,7 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <div class="sect2">
 <h3 id="_security_configuration_and_management_tasks">Security configuration and management tasks</h3>
 <div class="paragraph">
-<p>After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured — including any required patches — to meet your security and other needs. For more information, see the <a href="https://aws.amazon.com/compliance/shared-responsibility-model/">AWS Shared Responsibility Model</a>.</p>
+<p>After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured (including any required patches) to meet your security and other needs. For more information, refer to the <a href="https://aws.amazon.com/compliance/shared-responsibility-model/" target="_blank" rel="noopener">AWS Shared Responsibility Model</a>.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1984,10 +1983,10 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <p>Access the VMware Tanzu Application Platform user interface using the Amazon EC2 Windows bastion host instance that is deployed into a public subnet.</p>
 </div>
 <div class="paragraph">
-<p>To retrieve the password for the Windows bastion host instance, refer to <a href="https://aws.amazon.com/premiumsupport/knowledge-center/retrieve-windows-admin-password/">How do I retrieve my Windows administrator password after launching an instance?</a>. To connect to the bastion host, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/connecting_to_windows_instance.html">Connect to your Windows instance</a>.</p>
+<p>To retrieve the password for the Windows bastion host instance, refer to <a href="https://aws.amazon.com/premiumsupport/knowledge-center/retrieve-windows-admin-password/" target="_blank" rel="noopener">How do I retrieve my Windows administrator password after launching an instance?</a> To connect to the bastion host, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/connecting_to_windows_instance.html" target="_blank" rel="noopener">Connect to your Windows instance</a>.</p>
 </div>
 <div class="paragraph">
-<p>The VMware Tanzu Application Platform user interface is not available using a public URL. You can use <a href="https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html">Site to Site VPN</a> or <a href="https://aws.amazon.com/directconnect/">AWS Direct Connect</a> to configure direct access to the VPC from your enterprise network.</p>
+<p>The VMware Tanzu Application Platform user interface is not available as a public URL. You can use <a href="https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html" target="_blank" rel="noopener">Site&#8209;to&#8209;Site VPN</a> or <a href="https://aws.amazon.com/directconnect/" target="_blank" rel="noopener">AWS Direct Connect</a> to configure direct access to the VPC from your enterprise network.</p>
 </div>
 </div>
 </div>
@@ -2006,10 +2005,10 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html">Troubleshoot installing Tanzu Application Platform</a></p>
+<p><a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html" target="_blank" rel="noopener">Troubleshoot installing Tanzu Application Platform</a></p>
 </li>
 <li>
-<p><a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-troubleshooting-tap-troubleshoot-using-tap.html">Troubleshoot using Tanzu Application Platform</a></p>
+<p><a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-troubleshooting-tap-troubleshoot-using-tap.html" target="_blank" rel="noopener">Troubleshoot using Tanzu Application Platform</a></p>
 </li>
 </ul>
 </div>
@@ -2033,7 +2032,7 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>Sign in to the <a href="https://us-east-1.console.aws.amazon.com/console/home?region=us-east-1#">AWS Management Console</a> and open the CloudWatch console.</p>
+<p>Sign in to the <a href="https://console.aws.amazon.com/console/home" target="_blank" rel="noopener">AWS Management Console</a>, and open the CloudWatch console.</p>
 </li>
 <li>
 <p>In the left navigation pane, choose <strong>Log groups</strong>.</p>
@@ -2087,7 +2086,7 @@ Unless you are customizing the Quick Start templates for your own projects, don&
 <div class="sect2">
 <h3 id="_tanzu_application_platform_installation_failed_with_a_eula_error">Tanzu Application Platform installation failed with a EULA error</h3>
 <div class="paragraph">
-<p>You must accept the relevant End User License Agreements (EULAs) before you can download the Tanzu Application Platform packages from the VMware Tanzu Network. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0">Accept the End User License Agreements</a>.</p>
+<p>You must accept the relevant EULAs before you can download the Tanzu Application Platform packages from the VMware Tanzu Network. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0" target="_blank" rel="noopener">Accept the End User License Agreements</a>.</p>
 </div>
 <div class="paragraph">
 <p>For more details about the <code>.status.usefulErrorMessage</code> error, connect to the Linux bastion host using SSH. Then run the following commands. For <code>&lt;PACKAGE-NAME&gt;</code>, substitute the name of the package to target.</p>
@@ -2151,10 +2150,10 @@ If so, run the following command.</p>
 <div class="sect2">
 <h3 id="_its_been_more_than_four_minutes_and_the_windows_bastion_host_administrator_password_still_isnt_available">It&#8217;s been more than four minutes and the Windows bastion host administrator password still isn&#8217;t available</h3>
 <div class="paragraph">
-<p>It is likely that during deployment a ED25519 key pair was selected instead of an RSA key pair. If you select a ED25519 key pair for this deployment, the CloudFormation stack will deploy successfully, but you will not be able to retrieve the automatically generated password for the Windows bastion host.</p>
+<p>It is likely that during deployment an ED25519 key pair was used instead of an RSA key pair. If you select an ED25519 key pair for this deployment, the CloudFormation stack deploys successfully, but you will be unable to retrieve the automatically generated password for the Windows bastion host.</p>
 </div>
 <div class="paragraph">
-<p>As of June 23rd, 2022, Amazon EC2 Windows instances do not support ED25519 key pairs. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html">Amazon EC2 key pairs and Windows instances</a>.</p>
+<p>As of June 23rd, 2022, Amazon EC2 Windows instances do not support ED25519 key pairs. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html" target="_blank" rel="noopener">Amazon EC2 key pairs and Windows instances</a>.</p>
 </div>
 <div class="paragraph">
 <p>Verify that an RSA key pair used during deployment. If not, try the following options:</p>
@@ -2162,16 +2161,16 @@ If so, run the following command.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html">Reset the Windows administrator password using EC2Launch v2</a></p>
+<p><a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html" target="_blank" rel="noopener">Reset the Windows administrator password using EC2Launch v2</a></p>
 </li>
 <li>
-<p><a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html">Update the CloudFormation stack</a> to use an RSA key pair. This requires replacing all Amazon EC2 instances (Windows and Linux) and Amazon EKS nodes that use this key. For more information, refer to <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname">KeyName</a>.</p>
+<p><a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html" target="_blank" rel="noopener">Update the CloudFormation stack</a> to use an RSA key pair, which will replace all Amazon EC2 instances (Windows and Linux) and Amazon EKS nodes that use this key. For more information, refer to the <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname" target="_blank" rel="noopener">documentation</a>.</p>
 </li>
 <li>
 <p>Customize the CloudFormation template to use a separate key pair for the Windows bastion host. Then update the CloudFormation stack. This option only replaces the Windows bastion host instance. Instructions for implementing this are beyond the scope of this guide.</p>
 </li>
 <li>
-<p>Contact <a href="https://aws.amazon.com/contact-us/">AWS technical support</a>.</p>
+<p><a href="https://aws.amazon.com/contact-us/" target="_blank" rel="noopener">Contact AWS technical support</a>.</p>
 </li>
 </ul>
 </div>
@@ -2182,7 +2181,7 @@ If so, run the following command.</p>
 <h2 id="_customer_responsibility">Customer responsibility</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>After you deploy a Quick Start, confirm that your resources and services are updated and configured—including any required patches—to meet your security and other needs. For more information, refer to the <a href="https://aws.amazon.com/compliance/shared-responsibility-model/" target="_blank" rel="noopener">Shared Responsibility Model</a>.</p>
+<p>After you deploy a Partner Solution, confirm that your resources and services are updated and configured—including any required patches—to meet your security and other needs. For more information, refer to the <a href="https://aws.amazon.com/compliance/shared-responsibility-model/" target="_blank" rel="noopener">Shared Responsibility Model</a>.</p>
 </div>
 </div>
 </div>
@@ -2190,21 +2189,21 @@ If so, run the following command.</p>
 <h2 id="_feedback">Feedback</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To submit feature ideas and report bugs, use the <strong>Issues</strong> section of the <a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform" target="_blank" rel="noopener">GitHub repository</a> for this Quick Start. To submit code, refer to the <a href="https://fwd.aws/NwqYA?" target="_blank" rel="noopener">Quick Start Contributor&#8217;s Guide</a>. To submit feedback on this deployment guide, use the following GitHub links:</p>
+<p>To submit feature ideas and report bugs, use the <strong>Issues</strong> section of the <a href="https://github.com/{partner-solution-github-org}/{partner-solution-project-name}" target="_blank" rel="noopener">GitHub repository</a> for this Partner Solution. To submit code, refer to the <a href="https://fwd.aws/NwqYA?" target="_blank" rel="noopener">Partner Solution Contributor&#8217;s Guide</a>. To submit feedback on this deployment guide, use the following GitHub links:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform/issues/new?labels=documentation,grammar+or+spelling&amp;title=Deployment+guide+feedback&amp;body=Section+heading:%0ADocumentation+issue+description:%0A" target="_blank" rel="noopener">Grammar or spelling</a></p>
+<p><a href="https://github.com/{partner-solution-github-org}/{partner-solution-project-name}/issues/new?labels=documentation,grammar+or+spelling&amp;title=Deployment+guide+feedback&amp;body=Section+heading:%0ADocumentation+issue+description:%0A" target="_blank" rel="noopener">Grammar or spelling</a></p>
 </li>
 <li>
-<p><a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform/issues/new?labels=documentation,broken+link&amp;title=Deployment+guide+feedback&amp;body=Section+heading:%0ADocumentation+issue+description:%0A" target="_blank" rel="noopener">Broken link</a></p>
+<p><a href="https://github.com/{partner-solution-github-org}/{partner-solution-project-name}/issues/new?labels=documentation,broken+link&amp;title=Deployment+guide+feedback&amp;body=Section+heading:%0ADocumentation+issue+description:%0A" target="_blank" rel="noopener">Broken link</a></p>
 </li>
 <li>
-<p><a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform/issues/new?labels=documentation,inaccurate+content&amp;title=Deployment+guide+feedback&amp;body=Section+heading:%0ADocumentation+issue+description:%0A" target="_blank" rel="noopener">Inaccurate content</a></p>
+<p><a href="https://github.com/{partner-solution-github-org}/{partner-solution-project-name}/issues/new?labels=documentation,inaccurate+content&amp;title=Deployment+guide+feedback&amp;body=Section+heading:%0ADocumentation+issue+description:%0A" target="_blank" rel="noopener">Inaccurate content</a></p>
 </li>
 <li>
-<p><a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform/issues/new?labels=documentation,display+and+design&amp;title=Deployment+guide+feedback&amp;body=Section+heading:%0ADocumentation+issue+description:%0A" target="_blank" rel="noopener">Display or design</a></p>
+<p><a href="https://github.com/{partner-solution-github-org}/{partner-solution-project-name}/issues/new?labels=documentation,display+and+design&amp;title=Deployment+guide+feedback&amp;body=Section+heading:%0ADocumentation+issue+description:%0A" target="_blank" rel="noopener">Display or design</a></p>
 </li>
 </ul>
 </div>
@@ -2217,7 +2216,7 @@ If so, run the following command.</p>
 <p>This document is provided for informational purposes only. It represents current AWS product offerings and practices as of the date of issue of this document, which are subject to change without notice. Customers are responsible for making their own independent assessment of the information in this document and any use of AWS products or services, each of which is provided "as is" without warranty of any kind, whether expressed or implied. This document does not create any warranties, representations, contractual commitments, conditions, or assurances from AWS, its affiliates, suppliers, or licensors. The responsibilities and liabilities of AWS to its customers are controlled by AWS agreements, and this document is not part of, nor does it modify, any agreement between AWS and its customers.</p>
 </div>
 <div class="paragraph">
-<p>The software included with this paper is licensed under the Apache License, version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at <a href="http://aws.amazon.com/apache2.0/" target="_blank" rel="noopener">http://aws.amazon.com/apache2.0/</a> or in the accompanying "license" file. This code is distributed on an "as is" basis, without warranties or conditions of any kind, either expressed or implied. Refer to the License for specific language governing permissions and limitations.</p>
+<p>The software included with this paper is licensed under the Apache License, version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at <a href="https://aws.amazon.com/apache2.0/" target="_blank" rel="noopener">https://aws.amazon.com/apache2.0/</a> or in the accompanying "license" file. This code is distributed on an "as is" basis, without warranties or conditions of any kind, either expressed or implied. Refer to the License for specific language governing permissions and limitations.</p>
 </div>
 </div>
 </div>
@@ -2234,8 +2233,8 @@ If so, run the following command.</p>
 </html>
 <!--
 repo commit:
-e6cc9679b2c68f4dc4fa3e1e4bde812ade603d8b
+4cd624f405516ab0a42e68b9da8871f0683d2434
 
 submodule config:
- aab9861c5ebb31a063dc6f6d66e849d9c84106da docs/boilerplate (heads/main)
+ 48efbd14b4ef976f2afcee3f080dba016ef15950 docs/boilerplate (heads/main)
 -->

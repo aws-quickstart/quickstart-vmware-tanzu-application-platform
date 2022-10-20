@@ -3,5 +3,4 @@
 There is no cost to use this Quick Start, but you will be billed for any AWS services or resources that this Quick Start deploys.
 For more information, refer to the https://fwd.aws/rA69w?[AWS Quick Start General Information Guide^].
 
-If you want to purchase a license for {partner-product-name}, please reach out to https://tanzu.vmware.com/contact[https://tanzu.vmware.com/contact].
-To learn more about {partner-product-short-name}, please visit https://tanzu.vmware.com/application-platform[https://tanzu.vmware.com/application-platform].
+To purchase a license for {partner-product-name}, https://tanzu.vmware.com/contact[contact {partner-product-family-full}^].
