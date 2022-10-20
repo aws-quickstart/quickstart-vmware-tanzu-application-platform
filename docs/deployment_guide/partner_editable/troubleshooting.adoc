@@ -17,7 +17,7 @@ The following issues can cause you to not be able to access the {partner-product
 +
 . Verify that the CloudFormation stack deployment completed successfully.
 . If the stack deployed successfully, review the {partner-product-short-name} bootstrap logs.
-.. Sign in to the https://us-east-1.console.aws.amazon.com/console/home?region=us-east-1#[AWS Management Console^], and open the CloudWatch console.
+.. Sign in to the https://console.aws.amazon.com/console/home[AWS Management Console^], and open the CloudWatch console.
 .. In the left navigation pane, choose *Log groups*.
 .. Choose the `+/aws/quickstart/tanzu-application-platform/<stack ID>+` log group.
 .. Choose the `+<instance ID>_/var/log/cloud-init-output.log+` log stream.
