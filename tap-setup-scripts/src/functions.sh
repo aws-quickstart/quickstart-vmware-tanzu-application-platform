@@ -186,7 +186,6 @@ function readUserInputs {
   TAP_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.tap_packages $INPUTS/user-input-values.yaml)
   ESSENTIALS_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.cluster_essentials $INPUTS/user-input-values.yaml)
   TBS_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.build_service $INPUTS/user-input-values.yaml)
-  TBS_IAM_ROLE_ARN=$(yq -r .build_service.buildservice_arn $INPUTS/user-input-values.yaml)
   DEV_NAMESPACE_ARN=$(yq -r .repositories.workload.arn $INPUTS/user-input-values.yaml)
 
   SAMPLE_APP_NAME=$(yq -r .repositories.workload.name $INPUTS/user-input-values.yaml)
@@ -210,6 +209,13 @@ function parseUserInputs {
 
   cat $INPUTS/user-input-values.yaml > $GENERATED/user-input-values.yaml
 
+  kubectl apply -f $RESOURCES/metadata-store-ready-only.yaml
+  METADATA_STORE_ACCESS_TOKEN=$(kubectl get secret \
+    $(kubectl get sa -n metadata-store metadata-store-read-client -o json \
+    | jq -r '.secrets[0].name') -n metadata-store -o json \
+    | jq -r '.data.token' \
+    | base64 -d)
+
   banner "Generating tap-values.yaml"
 
   ytt -f $INPUTS/tap-values.yaml -f $GENERATED/user-input-values.yaml \
@@ -219,6 +225,7 @@ function parseUserInputs {
     --data-value repositories.workload.ootb_repo_prefix=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f2-3) \
     --data-value tanzunet.username=$TANZUNET_REGISTRY_USERNAME \
     --data-value tanzunet.password=$TANZUNET_REGISTRY_PASSWORD \
+    --data-value metadata_store.access_token="Bearer $METADATA_STORE_ACCESS_TOKEN" \
     --ignore-unknown-comments > $GENERATED/tap-values.yaml
 }
 
@@ -399,7 +406,7 @@ function tapWorkloadInstallFull {
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/developer-namespace.yaml
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/pipeline.yaml
   kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/scan-policy.yaml
-  kubectl -n $DEVELOPER_NAMESPACE annotate serviceaccount default eks.amazonaws.com/role-arn=$DEV_NAMESPACE_ARN
+  kubectl -n $DEVELOPER_NAMESPACE annotate serviceaccount default eks.amazonaws.com/role-arn=$DEV_NAMESPACE_ARN --overwrite
 
   tanzu apps workload apply -f $RESOURCES/workload-aws.yaml -n $DEVELOPER_NAMESPACE --yes
 }
@@ -425,6 +432,7 @@ function tapUninstallFull {
   banner "Uninstalling TAP..."
   tanzu package installed delete $TAP_PACKAGE_NAME -n $TAP_NAMESPACE --yes
   waitForRemoval tanzu package installed get $TAP_PACKAGE_NAME -n $TAP_NAMESPACE -o json
+  kubectl delete -f $RESOURCES/metadata-store-ready-only.yaml
 }
 
 function deleteTapRegistrySecret {

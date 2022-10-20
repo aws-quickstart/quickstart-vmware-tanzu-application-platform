@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: metadata-store
+  labels:
+    name: metadata-store
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: metadata-store-ready-only
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: metadata-store-read-only
+subjects:
+- kind: ServiceAccount
+  name: metadata-store-read-client
+  namespace: metadata-store
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: metadata-store-read-client
+  namespace: metadata-store
+automountServiceAccountToken: false
