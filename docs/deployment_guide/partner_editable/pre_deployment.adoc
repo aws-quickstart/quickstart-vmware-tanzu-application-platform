@@ -74,7 +74,7 @@ This Quick Start requires an API token from the {partner-registry} site to downl
 . Log in to https://network.tanzu.vmware.com/[{partner-registry}^].
 . Choose *Edit Profile* from the dropdown list next to your username.
 . Choose *Request new refresh token*.
-. Copy the refesh token. Enter it for the `API Token` (`TanzuApiToken`) parameter during deployment.
+. Copy the refresh token. Enter it for the `API Token` (`TanzuApiToken`) parameter during deployment.
 
 === Accept {partner-company-short-name} EULAs
 
