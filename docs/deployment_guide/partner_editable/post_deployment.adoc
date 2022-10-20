@@ -11,17 +11,17 @@
 |`AcceptEULAs`
 |Have all applicable {partner-registry} EULAs been accepted?
 |`No`
-|Choose `Yes` if you have already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for {partner-product-family-full}^] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[{partner-product-name}^] end-user license agreements (EULAs). {partner-product-acronym} will fail to install successfully if both EULAs have not been accepted for the specified {partner-registry} user account.
+|Choose `Yes` if you already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for {partner-product-family-full}^] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[{partner-product-name}^] EULAs. {partner-product-acronym} will fail to install if both EULAs are not accepted for the specified {partner-registry} user account.
 
 |`AcceptCEIP`
-|Have you read and accept the {partner-company-short-name} CEIP policy?
+|Have you read and accepted the {partner-company-short-name} CEIP policy?
 |`No`
-|Choose `Yes` if you have read and accepted the https://www.vmware.com/solutions/trustvmware/ceip.html[{partner-company-short-name} customer experience improvement program (CEIP) policy^].
+|Choose `Yes` if you have read and accepted the https://www.vmware.com/solutions/trustvmware/ceip.html[{partner-company-short-name} CEIP policy^].
 
 |`TanzuNetUsername`
 |Username
 |
-|{partner-registry} username. To create an account, sign up at https://account.run.pivotal.io/z/uaa/sign-up.
+|{partner-registry} user name. To create an account, sign up at https://account.run.pivotal.io/z/uaa/sign-up.
 
 |`TanzuNetPassword`
 |Password
@@ -31,12 +31,12 @@
 |`TanzuApiToken`
 |API Token
 |
-|{partner-registry} user account and authentication (UAA) API refresh token. For more information, refer to https://network.tanzu.vmware.com/docs/api[{partner-registry} API documentation^].
+|{partner-registry} UAA API refresh token. For more information, refer to https://network.tanzu.vmware.com/docs/api[{partner-registry} API documentation^].
 
 |`TanzuNetRelocateImages`
 |Relocate {partner-product-acronym} images
 |`No`
-|Choose `Yes` to relocate {partner-product-acronym} images from the {partner-registry} registry to your ECR registry from before attempting installation. If you do not relocate images, {partner-product-short-name} will depend directly on the {partner-registry} registry for its continued operation.
+|Choose `Yes` to relocate {partner-product-acronym} images from the {partner-registry} registry to your ECR registry. If you do not relocate the images, {partner-product-short-name} uses the {partner-registry} registry to operate.
 |====
 
 [%autowidth.stretch]
@@ -84,7 +84,7 @@
 |`KeyPairName`
 |EC2 key pair name
 |
-|The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances^].
+|The name of the EC2 key pair used for SSH access to the Linux bastion host/bootstrap instance and EKS cluster nodes, as well as for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances^].
 
 |`RemoteAccessCidr`
 |Remote access CIDR
@@ -141,7 +141,7 @@
 |`EKSClusterName`
 |EKS cluster name
 |
-|Name of the EKS cluster where {partner-product-acronym} will be deployed.
+|Name of the EKS cluster where {partner-product-acronym} deploys.
 
 |`KubernetesVersion`
 |Kubernetes version
@@ -217,17 +217,17 @@
 |`AcceptEULAs`
 |Have all applicable {partner-registry} EULAs been accepted?
 |`No`
-|Choose `Yes` if you have already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for {partner-product-family-full}^] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[{partner-product-name}^] end-user license agreements (EULAs). {partner-product-acronym} will fail to install successfully if both EULAs have not been accepted for the specified {partner-registry} user account.
+|Choose `Yes` if you already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for {partner-product-family-full}^] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[{partner-product-name}^] EULAs. {partner-product-acronym} will fail to install successfully if both EULAs are not accepted for the specified {partner-registry} user account.
 
 |`AcceptCEIP`
-|Have you read and accept the {partner-company-short-name} CEIP policy?
+|Have you read and accepted the {partner-company-short-name} CEIP policy?
 |`No`
-|Choose `Yes` if you have read and accepted the https://www.vmware.com/solutions/trustvmware/ceip.html[{partner-company-short-name} customer experience improvement program (CEIP) policy^].
+|Choose `Yes` if you have read and accepted the https://www.vmware.com/solutions/trustvmware/ceip.html[{partner-company-short-name} CEIP policy^].
 
 |`TanzuNetUsername`
 |Username
 |
-|{partner-registry} username. To create an account, sign up at https://account.run.pivotal.io/z/uaa/sign-up.
+|{partner-registry} user name. To create an account, sign up at https://account.run.pivotal.io/z/uaa/sign-up.
 
 |`TanzuNetPassword`
 |Password
@@ -237,12 +237,12 @@
 |`TanzuApiToken`
 |API Token
 |
-|{partner-registry} user account and authentication (UAA) API refresh token. For more information, refer to the https://network.tanzu.vmware.com/docs/api[{partner-registry} API documentation^].
+|{partner-registry} UAA API refresh token. For more information, refer to the https://network.tanzu.vmware.com/docs/api[{partner-registry} API documentation^].
 
 |`TanzuNetRelocateImages`
 |Relocate {partner-product-acronym} images
 |`No`
-|Choose `Yes` to relocate {partner-product-acronym} images from the {partner-registry} registry to your ECR registry from before attempting installation. If you do not relocate images, {partner-product-short-name} will depend directly on the {partner-registry} registry for its continued operation.
+|Choose `Yes` to relocate {partner-product-acronym} images from the {partner-registry} registry to your ECR registry. If you do not relocate the images, {partner-product-short-name} uses the {partner-registry} registry to operate.
 |====
 
 [%autowidth.stretch]
@@ -403,12 +403,12 @@ After deployment, refer to the *Outputs* tab in the AWS CloudFormation console f
 
 === Security configuration and management tasks
 
-After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured — including any required patches — to meet your security and other needs. For more information, see the https://aws.amazon.com/compliance/shared-responsibility-model/[AWS Shared Responsibility Model^].
+After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured (including any required patches) to meet your security and other needs. For more information, refer to the https://aws.amazon.com/compliance/shared-responsibility-model/[AWS Shared Responsibility Model^].
 
 === Access the {partner-product-name} user interface
 
 Access the {partner-product-name} user interface using the Amazon EC2 Windows bastion host instance that is deployed into a public subnet.
 
-To retrieve the password for the Windows bastion host instance, refer to https://aws.amazon.com/premiumsupport/knowledge-center/retrieve-windows-admin-password/[How do I retrieve my Windows administrator password after launching an instance?^]. To connect to the bastion host, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/connecting_to_windows_instance.html[Connect to your Windows instance^].
+To retrieve the password for the Windows bastion host instance, refer to https://aws.amazon.com/premiumsupport/knowledge-center/retrieve-windows-admin-password/[How do I retrieve my Windows administrator password after launching an instance?^] To connect to the bastion host, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/connecting_to_windows_instance.html[Connect to your Windows instance^].
 
-The {partner-product-name} user interface is not available using a public URL. You can use https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html[Site to Site VPN^] or https://aws.amazon.com/directconnect/[AWS Direct Connect^] to configure direct access to the VPC from your enterprise network.
+The {partner-product-name} user interface is not available as a public URL. You can use https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html[Site&#8209;to&#8209;Site VPN^] or https://aws.amazon.com/directconnect/[AWS Direct Connect^] to configure direct access to the VPC from your enterprise network.

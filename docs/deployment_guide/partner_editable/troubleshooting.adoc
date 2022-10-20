@@ -17,7 +17,7 @@ The following issues can cause you to not be able to access the {partner-product
 +
 . Verify that the CloudFormation stack deployment completed successfully.
 . If the stack deployed successfully, review the {partner-product-short-name} bootstrap logs.
-.. Sign in to the https://us-east-1.console.aws.amazon.com/console/home?region=us-east-1#[AWS Management Console^] and open the CloudWatch console.
+.. Sign in to the https://us-east-1.console.aws.amazon.com/console/home?region=us-east-1#[AWS Management Console^], and open the CloudWatch console.
 .. In the left navigation pane, choose *Log groups*.
 .. Choose the `+/aws/quickstart/tanzu-application-platform/<stack ID>+` log group.
 .. Choose the `+<instance ID>_/var/log/cloud-init-output.log+` log stream.
@@ -33,7 +33,7 @@ The following issues can cause you to not be able to access the {partner-product
 
 === {partner-product-short-name} installation failed with a EULA error
 
-You must accept the relevant End User License Agreements (EULAs) before you can download the {partner-product-short-name} packages from the {partner-registry}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements^].
+You must accept the relevant EULAs before you can download the {partner-product-short-name} packages from the {partner-registry}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements^].
 
 For more details about the `+.status.usefulErrorMessage+` error, connect to the Linux bastion host using SSH. Then run the following commands. For `<PACKAGE-NAME>`, substitute the name of the package to target.
 
@@ -76,7 +76,7 @@ If so, run the following command.
 
 === It's been more than four minutes and the Windows bastion host administrator password still isn't available
 
-It is likely that during deployment a ED25519 key pair was selected instead of an RSA key pair. If you select a ED25519 key pair for this deployment, the CloudFormation stack will deploy successfully, but you will not be able to retrieve the automatically generated password for the Windows bastion host.
+It is likely that during deployment an ED25519 key pair was used instead of an RSA key pair. If you select an ED25519 key pair for this deployment, the CloudFormation stack deploys successfully, but you will be unable to retrieve the automatically generated password for the Windows bastion host.
 
 As of June 23rd, 2022, Amazon EC2 Windows instances do not support ED25519 key pairs. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances^].
 
@@ -84,8 +84,8 @@ Verify that an RSA key pair used during deployment. If not, try the following op
 
 * https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html[Reset the Windows administrator password using EC2Launch v2^]
 
-* https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html[Update the CloudFormation stack^] to use an RSA key pair. This requires replacing all Amazon EC2 instances (Windows and Linux) and Amazon EKS nodes that use this key. For more information, refer to the https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname[documentation^].
+* https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html[Update the CloudFormation stack^] to use an RSA key pair, which will replace all Amazon EC2 instances (Windows and Linux) and Amazon EKS nodes that use this key. For more information, refer to the https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname[documentation^].
 
 * Customize the CloudFormation template to use a separate key pair for the Windows bastion host. Then update the CloudFormation stack. This option only replaces the Windows bastion host instance. Instructions for implementing this are beyond the scope of this guide.
 
-* Contact https://aws.amazon.com/contact-us/[AWS technical support^].
+* https://aws.amazon.com/contact-us/[Contact AWS technical support^].

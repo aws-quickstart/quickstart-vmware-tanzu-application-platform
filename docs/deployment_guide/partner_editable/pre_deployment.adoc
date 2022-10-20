@@ -55,7 +55,7 @@ If necessary, request https://console.aws.amazon.com/servicequotas/home/[service
 
 === {partner-registry} account
 
-This Quick Start requires a {partner-registry} account with a username, password, and generated a https://network.tanzu.vmware.com/docs/api[user account and authentication (UAA) refresh API token^].
+This Quick Start requires a {partner-registry} account with a username, password, and a https://network.tanzu.vmware.com/docs/api[user account and authentication (UAA) refresh API token^].
 
 ==== Create a new {partner-registry} login
 
@@ -64,7 +64,7 @@ Complete the following steps to create a {partner-registry} login.
 . Navigate to https://network.tanzu.vmware.com/.
 . Choose *Sign In*.
 . Choose *Create account*.
-. On the *Create your {partner-company-short-name} account* page, complete the form and choose *Sign Up*.
+. On the *Create your {partner-company-short-name} account* page, complete the form, and choose *Sign Up*.
 . Log in to {partner-company-short-name} using the new user credentials.
 
 ==== Generate a {partner-registry} API token
@@ -87,7 +87,7 @@ Failure to accept the EULAs before deployment will result in the failure of the 
 
 === {partner-company-short-name} Customer Experience Improvement Program (CEIP)
 
-{partner-product-name} participates in the https://www.vmware.com/solutions/trustvmware/ceip.html[{partner-company-short-name} customer experience improvement program (CEIP)^]. As part of CEIP, {partner-company-short-name} collects technical information about your organization's use of {partner-company-short-name} products and services in association with your organization's {partner-company-short-name} license keys.
+{partner-product-name} participates in the https://www.vmware.com/solutions/trustvmware/ceip.html[{partner-company-short-name} CEIP^]. As part of CEIP, {partner-company-short-name} collects technical information about your organization's use of {partner-company-short-name} products and services in association with your organization's {partner-company-short-name} license keys.
 
 You may join or leave CEIP at any time. The CEIP Standard Participation Level provides {partner-company-short-name} with information to improve its products and services, identify and fix problems, and advise you on how to best deploy and use {partner-company-short-name} products. For example, this information can enable a proactive product deployment discussion with your {partner-company-short-name} account team or {partner-company-short-name} support team to help resolve your issues. This information cannot directly identify any individual.
 
