@@ -1417,12 +1417,18 @@ Resources:
             pushd "$tap_dir/src"
             aws s3 cp --no-progress "${QSS3BucketPath}/src/tap-main.sh" ./tap-main.sh
             chmod +x ./tap-main.sh
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/tap-relocate.sh" ./tap-relocate.sh
+            chmod +x ./tap-relocate.sh
             aws s3 cp --no-progress "${QSS3BucketPath}/src/install-tools.sh" ./install-tools.sh
             chmod +x ./install-tools.sh
             aws s3 cp --no-progress "${QSS3BucketPath}/src/functions.sh" ./functions.sh
             popd
             pushd "$tap_dir/src/inputs"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values.yaml" ./tap-values.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-build.yaml" ./tap-values-build.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-run.yaml" ./tap-values-run.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-iterate.yaml" ./tap-values-iterate.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-view.yaml" ./tap-values-view.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-single.yaml" ./tap-values-single.yaml
             cat <<EOF > ./user-input-values.yaml
             #@data/values
             ---
@@ -1441,9 +1447,11 @@ Resources:
               repository: ${TanzuNetRegistryServer}/${TAPRepo}
               version: ${TAPVersion}
             cluster:
+              arch: ${ClusterArch}
               name: ${EKSQSStack.Outputs.EKSClusterName}
             buildservice:
-              buildservice_arn: ${TAPBuildServiceIamRole.Arn}
+              build_cluster_arn: ${TAPBuildServiceIamRole.Arn}
+              iterate_cluster_arn: ${TAPBuildServiceIamRole.Arn}
             dns:
               domain_name: ${TAPDomainName}
               zone_id: ${PrivateHostedZone}
@@ -1456,15 +1464,18 @@ Resources:
                 namespace: ${SampleAppNamespace}
                 repository: ${TAPWorkloadRepo.RepositoryUri}
                 bundle_repository: ${TAPWorkloadBundleRepo.RepositoryUri}
-                arn: ${TAPWorkloadIamRole.Arn}
+                build_cluster_arn: ${TAPWorkloadIamRole.Arn}
+                iterate_cluster_arn: ${TAPWorkloadIamRole.Arn}
             EOF
             popd
             pushd "$tap_dir/src/resources"
             aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/developer-namespace.yaml" ./developer-namespace.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/git-ssh-basic-auth.yaml" ./git-ssh-basic-auth.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/metadata-store-read-only.yaml" ./metadata-store-read-only.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/metadata-store-exportsecret.yaml" ./metadata-store-exportsecret.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/tap-gui-viewer-service-account-rbac.yaml" ./tap-gui-viewer-service-account-rbac.yaml
             aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/pipeline.yaml" ./pipeline.yaml
             aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/scan-policy.yaml" ./scan-policy.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/metadata-store-ready-only.yaml" ./metadata-store-ready-only.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/store_ca.yaml" ./store_ca.yaml
             cat <<EOF > ./workload-aws.yaml
             ${SampleAppConfig}
             EOF
@@ -1479,10 +1490,33 @@ Resources:
             if [[ "${TanzuNetRelocateImages}" == "Yes" ]]
             then
               echo "Creating local copies of key TAP container repos per VMware best practices..."
-              su - $user -c "$tap_dir/src/tap-main.sh -c relocate"
+              su - $user -c "$tap_dir/src/tap-relocate.sh"
             fi
             echo "Installing Tanzu Application Platform..."
-            su - $user -c "$tap_dir/src/tap-main.sh -c install"
+            echo ClusterArch ${ClusterArch}
+            if [[ "${ClusterArch}" == "multi" ]]
+            then
+              echo "Setup TAP Multiple Clusters..."
+              su - $user -c "$tap_dir/src/tap-main.sh -c install view"
+              su - $user -c "$tap_dir/src/tap-main.sh -c install run"
+              su - $user -c "$tap_dir/src/tap-main.sh -c install build"
+              su - $user -c "$tap_dir/src/tap-main.sh -c install iterate"
+              su - $user -c "$tap_dir/src/tap-main.sh -c prepview view"
+              su - $user -c "$tap_dir/src/tap-main.sh -c installwk iterate"
+              su - $user -c "$tap_dir/src/tap-main.sh -c installwk build"
+              su - $user -c "$tap_dir/src/tap-main.sh -c installwk run"
+              echo "wait till the workload to go through the supply-chain (8mins)"
+              sleep 480
+              su - $user -c "$tap_dir/src/tap-main.sh -c runtests run"
+              su - $user -c "$tap_dir/src/tap-main.sh -c runtests iterate"
+            else
+              echo "Setup TAP Single Cluster..."
+              su - $user -c "$tap_dir/src/tap-main.sh -c install single"
+              su - $user -c "$tap_dir/src/tap-main.sh -c installwk single"
+              echo "wait till the workload to go through the supply-chain (8mins)"
+              sleep 480
+              su - $user -c "$tap_dir/src/tap-main.sh -c runtests single"
+            fi
             echo "Completed successfully!"
           - AwsKubectlVersion: !FindInMap [KubernetesVersion, !Ref KubernetesVersion, AwsKubectlVersion]
             ClusterEssentialsBundleRepo: tanzu-cluster-essentials/cluster-essentials-bundle
@@ -1497,6 +1531,7 @@ Resources:
               - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
             TanzuNetRegistryServer: !FindInMap [TanzuNetRegistryServer, Server, Name]
             TAPRepo: tanzu-application-platform/tap-packages
+            ClusterArch: single
   UbuntuBastionEipAssociation:
     Type: AWS::EC2::EIPAssociation
     UpdateReplacePolicy: Delete

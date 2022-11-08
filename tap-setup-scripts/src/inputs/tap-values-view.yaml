@@ -1,0 +1,68 @@
+#@ load("@ytt:data", "data")
+---
+profile: view
+ceip_policy_disclosed: true # Installation fails if this is set to 'false'
+
+shared:
+  ingress_domain: #@ "view.{}".format(data.values.dns.domain_name)
+  
+learningcenter:
+  ingressDomain: #@ "learning-center.view.{}".format(data.values.dns.domain_name)
+  ingressClass: contour
+
+tap_gui:
+  ingressEnabled: true
+  ingressDomain: #@ "view.{}".format(data.values.dns.domain_name)
+  service_type: ClusterIP # NodePort for distributions that don't support LoadBalancer
+  app_config:
+    proxy:
+      /metadata-store:
+        target: https://metadata-store-app.metadata-store:8443/api/v1
+        changeOrigin: true
+        secure: false
+        headers:
+          Authorization: #@ "{}".format(data.values.metadata_store.access_token)
+          X-Custom-Source: project-star  
+    supplyChain:
+      enablePlugin: true
+    auth:
+      allowGuestAccess: true
+    backend:
+      baseUrl: #@ "http://tap-gui.view.{}".format(data.values.dns.domain_name)
+      cors:
+        origin: #@ "http://tap-gui.view.{}".format(data.values.dns.domain_name)
+    app:
+      baseUrl: #@ "http://tap-gui.view.{}".format(data.values.dns.domain_name)
+    kubernetes:
+      serviceLocatorMethod:
+        type: "multiTenant"
+      clusterLocatorMethods:
+        - type: "config"
+          clusters:
+            - url: #@ data.values.cluster.run.url
+              name: #@ "{}-run".format(data.values.cluster.name)
+              authProvider: serviceAccount
+              skipTLSVerify: true
+              skipMetricsLookup: true
+              serviceAccountToken: #@ data.values.cluster.run.token
+            - url: #@ data.values.cluster.build.url
+              name: #@ "{}-build".format(data.values.cluster.name)
+              authProvider: serviceAccount
+              skipTLSVerify: true
+              skipMetricsLookup: true
+              serviceAccountToken: #@ data.values.cluster.build.token              
+
+metadata_store:
+  app_service_type: LoadBalancer
+  ns_for_export_app_cert: #@ data.values.repositories.workload.namespace
+
+contour:
+  infrastructure_provider: aws
+  envoy:
+    service:
+      aws:
+        LBType: nlb
+
+appliveview:
+  ingressEnabled: true
+  ingressDomain: #@ "appliveview.view.{}".format(data.values.dns.domain_name)

@@ -15,7 +15,11 @@ tap:
   repository: registry.tanzu.vmware.com/tanzu-application-platform/tap-packages
   version: 1.3.0-rc.1
 cluster:
+  arch: multi
   name: example-tap-eks-cluster
+buildservice:
+  build_cluster_arn: arn:aws:iam::188471332253:role/TAPBuildServiceIamRoleBuildCluster-eksctl
+  iterate_cluster_arn: arn:aws:iam::188471332253:role/TAPBuildServiceIamRoleIterateTest-eksctl
 dns:
   domain_name: tap.local
   zone_id: Z0123456789ABCDEFGHIJ
@@ -29,3 +33,5 @@ repositories:
     repository: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tap-supply-chain/tanzu-java-web-app-workload-tap-workload
     bundle_repository: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tap-supply-chain/tanzu-java-web-app-workload-tap-workload-bundle
     arn: arn:aws:iam::012345678901:role/TAPWorkloadIamRole-a10ba9b0-232d-11ed-b3d9-0ebc7567a9a9
+    build_cluster_arn: arn:aws:iam::188471332253:role/TAPWorkloadIamRoleBuildCluster-eksctl
+    iterate_cluster_arn: arn:aws:iam::188471332253:role/TAPBuildServiceIamRoleIterateTestWK-eksctl

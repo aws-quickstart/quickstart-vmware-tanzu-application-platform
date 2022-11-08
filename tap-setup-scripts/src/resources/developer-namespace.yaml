@@ -64,9 +64,7 @@ rules:
 - apiGroups: [scanning.apps.tanzu.vmware.com]
   resources: ['imagescans', 'sourcescans']
   verbs: ['*']
-- apiGroups: [conventions.carto.run]
-  resources: [podintents]
-  verbs: ['*']
+
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -76,6 +74,32 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: default
+subjects:
+  - kind: ServiceAccount
+    name: default
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: default-permit-deliverable
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: deliverable
+subjects:
+  - kind: ServiceAccount
+    name: default
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: default-permit-workload
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: workload
 subjects:
   - kind: ServiceAccount
     name: default
