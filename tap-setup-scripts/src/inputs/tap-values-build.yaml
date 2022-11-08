@@ -18,7 +18,6 @@ ootb_supply_chain_testing_scanning:
 
 grype:
   namespace: #@ data.values.repositories.workload.namespace
-  targetImagePullSecret: registry-credentials
   metadataStore:
     url: #@ "https://metadata-store.view.{}".format(data.values.dns.domain_name)
     caSecret:
