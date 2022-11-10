@@ -93,3 +93,32 @@ echo "Starting Uninstallation..."
 $SCRIPT_DIR/tap-main.sh -c uninstallwk single
 $SCRIPT_DIR/tap-main.sh -c uninstall single
 ```
+
+
+## TODO:
+1. update user-input-values.yaml
+    ```
+    repositories:
+      build_cluster_build_service: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tap-build-service
+      iterate_cluster_build_service: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tap-build-service
+      workload:
+        name: tanzu-java-web-app-workload
+        namespace: tap-workload
+        build_cluster_repository: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tap-supply-chain/tanzu-java-web-app-workload-tap-workload
+        build_cluster_bundle_repository: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tap-supply-chain/tanzu-java-web-app-workload-tap-workload-bundle
+        iterate_cluster_repository: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tap-supply-chain/tanzu-java-web-app-workload-tap-workload
+        iterate_cluster_bundle_repository: 012345678901.dkr.ecr.us-east-1.amazonaws.com/621187b4-c917-46c0-9341-f5067b3afd97/tap-supply-chain/tanzu-java-web-app-workload-tap-workload-bundle
+        build_cluster_arn: arn:aws:iam::188471332253:role/TAPWorkloadIamRoleBuildCluster-eksctl
+        iterate_cluster_arn: arn:aws:iam::188471332253:role/TAPBuildServiceIamRoleIterateTestWK-eksctl
+    ```
+
+2. aws-tap-entrypoint-existing-vpc.mulit-cluster.yaml is a temporary file with all new resources. This needs to be merged with aws-tap-entrypoint-existing-vpc.template.yaml
+
+
+3. Cloudformation Template testing
+
+    aws cloudformation validate-template --template-body file://aws-tap-entrypoint-existing-vpc.mulit-cluster.yaml --region us-east-1
+
+    aws cloudformation deploy --template-file aws-tap-entrypoint-existing-vpc.mulit-cluster.yaml --stack-name cli-4eks-try1   --region us-east-1 --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND --disable-rollback
+
+    aws cloudformation delete-stack --stack-name cli-4eks-try1 --region us-east-1
