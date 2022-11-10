@@ -1,0 +1,16 @@
+#@ load("@ytt:data", "data")
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: metadata-store-secrets
+  labels:
+    name: metadata-store-secrets
+---
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: store-ca-cert
+  namespace: metadata-store-secrets
+data:
+  ca.crt: #@ data.values.view_cluster.ca_cert

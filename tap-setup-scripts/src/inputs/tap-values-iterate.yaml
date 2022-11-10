@@ -1,0 +1,36 @@
+#@ load("@ytt:data", "data")
+---
+profile: iterate
+ceip_policy_disclosed: true # Installation fails if this is set to 'false'
+buildservice:
+  kp_default_repository: #@ data.values.repositories.build_service
+  kp_default_repository_aws_iam_role_arn: #@ data.values.buildservice.iterate_cluster_arn
+  enable_automatic_dependency_updates: false
+
+supply_chain: testing
+
+ootb_supply_chain_testing:
+  registry:
+    server: #@ data.values.repositories.workload.server
+    repository: #@ data.values.repositories.workload.ootb_repo_prefix
+  gitops:
+    ssh_secret: ""
+
+image_policy_webhook:
+  allow_unmatched_tags: true
+
+contour:
+  infrastructure_provider: aws
+  envoy:
+    service:
+      aws:
+        LBType: nlb
+
+cnrs:
+  domain_name:  #@ "iterate.{}".format(data.values.dns.domain_name)
+
+ootb_templates:
+  iaas_auth: true
+
+excluded_packages:
+  - policy.apps.tanzu.vmware.com

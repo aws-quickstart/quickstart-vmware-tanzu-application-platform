@@ -4,27 +4,13 @@ profile: full
 ceip_policy_disclosed: true # Installation fails if this is set to 'false'
 buildservice:
   kp_default_repository: #@ data.values.repositories.build_service
-  kp_default_repository_aws_iam_role_arn: #@ data.values.buildservice.buildservice_arn
+  kp_default_repository_aws_iam_role_arn: #@ data.values.buildservice.build_cluster_arn
   enable_automatic_dependency_updates: false
 
 supply_chain: testing_scanning
 
 ootb_templates:
   iaas_auth: true
-
-ootb_supply_chain_basic:
-  registry:
-    server: #@ data.values.repositories.workload.server
-    repository: #@ data.values.repositories.workload.ootb_repo_prefix
-  gitops:
-    ssh_secret: ""
-
-ootb_supply_chain_testing:
-  registry:
-    server: #@ data.values.repositories.workload.server
-    repository: #@ data.values.repositories.workload.ootb_repo_prefix
-  gitops:
-    ssh_secret: ""
 
 ootb_supply_chain_testing_scanning:
   registry:
@@ -82,3 +68,9 @@ grype:
 scanning:
   metadataStore:
     url: "" # Disable embedded integration since it's deprecated
+
+image_policy_webhook:
+  allow_unmatched_tags: true
+
+excluded_packages:
+  - policy.apps.tanzu.vmware.com

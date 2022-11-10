@@ -1,0 +1,27 @@
+#@ load("@ytt:data", "data")
+---
+profile: run
+ceip_policy_disclosed: true # Installation fails if this is set to 'false'
+
+supply_chain: testing_scanning
+
+contour:
+  infrastructure_provider: aws
+  envoy:
+    service:
+      aws:
+        LBType: nlb
+
+image_policy_webhook:
+  allow_unmatched_tags: true
+
+cnrs:
+  domain_name:  #@ "run.{}".format(data.values.dns.domain_name)
+
+appliveview_connector:
+  backend:
+    sslDisabled: "true"
+    host:  #@ "appliveview_connector.run.{}".format(data.values.dns.domain_name)
+    
+excluded_packages:
+  - policy.apps.tanzu.vmware.com
