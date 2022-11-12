@@ -3,6 +3,10 @@ project:
   owner: quickstart-eng@amazon.com
   s3_regional_buckets: true
   template: templates/aws-tap-entrypoint-new-vpc.template.yaml
+  package_lambda: true
+  lambda_source_path: functions/source
+  lambda_zip_path: functions/packages
+  build_submodules: true
   parameters:
     AcceptEULAs: --override--
     AcceptCEIP: --override--
