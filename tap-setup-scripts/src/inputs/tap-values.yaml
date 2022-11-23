@@ -82,3 +82,6 @@ grype:
 scanning:
   metadataStore:
     url: "" # Disable embedded integration since it's deprecated
+
+excluded_packages:
+  - policy.apps.tanzu.vmware.com
