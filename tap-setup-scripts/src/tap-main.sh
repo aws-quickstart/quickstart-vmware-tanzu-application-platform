@@ -121,7 +121,7 @@ function tapInstallWorkloadMain {
 
       kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/pipeline.yaml
       banner "Installing Sample Workload on Build Cluster"
-      tanzu apps workload apply -f $RESOURCES/workload-aws.yaml -n $DEVELOPER_NAMESPACE --yes
+      tanzu apps workload apply -f $RESOURCES/workload-aws.yaml -n $DEVELOPER_NAMESPACE --yes --app tanzu-java-web-app-workload-$CLUSTER_NAME_SUFFIX
       # let the supply-chain to complete before generating deliverable
       sleep 60
       tapWorkloadGenerateDeliverable
@@ -132,6 +132,7 @@ function tapInstallWorkloadMain {
     iterate)
       DEV_NAMESPACE_ARN=$(yq -r .repositories.workload.iterate_cluster_arn $INPUTS/user-input-values.yaml)
       echo DEV_NAMESPACE_ARN $DEV_NAMESPACE_ARN
+      kubectl -n $DEVELOPER_NAMESPACE annotate serviceaccount default eks.amazonaws.com/role-arn=$DEV_NAMESPACE_ARN --overwrite
 
       #note: scan-policy cannot work in iterate-cluster
       kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/pipeline.yaml
