@@ -714,7 +714,7 @@ Outputs:
     Description: >-
       The Availability Zone that the Ubuntu bastion host / bootstrap instance
       is deployed in.
-    Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionMulti.AvailabilityZone
+    Value: !GetAtt ExistingVpcStack.Outputs.UbuntuMultiBastionAZ
     Condition: UbuntuMultiCluster
   UbuntuMultiBastionId:
     Description: >-
@@ -724,7 +724,7 @@ Outputs:
   UbuntuMultiBastionPublicDnsName:
     Description: >-
       The public DNS name of the Ubuntu bastion host / bootstrap instance.
-    Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionMulti.PublicDnsName
+    Value: !GetAtt ExistingVpcStack.Outputs.UbuntuMultiBastionPublicDnsName
     Condition: UbuntuMultiCluster
   EKSClusterName:
     Description: The Amazon EKS cluster name.
