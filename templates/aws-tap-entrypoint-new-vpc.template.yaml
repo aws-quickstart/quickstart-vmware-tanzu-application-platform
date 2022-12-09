@@ -616,6 +616,14 @@ Conditions:
   3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
   Ubuntu: !Equals [!FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, OS], Ubuntu]
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
+  CreateMultiCluster: !Equals [!Ref TAPClusterArch, 'multi']
+  CreateSingleCluster: !Equals [!Ref TAPClusterArch, 'single']
+  UbuntuMultiCluster: !And
+    - !Condition Ubuntu
+    - !Equals [!Ref TAPClusterArch, 'multi']
+  UbuntuSingleCluster: !And
+    - !Condition Ubuntu
+    - !Equals [!Ref TAPClusterArch, 'single']
 Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
@@ -686,24 +694,58 @@ Outputs:
       The public IP address of the Linux bastion host / bootstrap instance.
     Value: !GetAtt ExistingVpcStack.Outputs.LinuxBastionEIP
   UbuntuBastionAZ:
-    Condition: Ubuntu
+    Condition: UbuntuSingleCluster
     Description: >-
       The Availability Zone that the Linux bastion host / bootstrap instance
       is deployed in.
     Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionAZ
   UbuntuBastionId:
-    Condition: Ubuntu
+    Condition: UbuntuSingleCluster
     Description: >-
       The EC2 instance ID of the Linux bastion host / bootstrap instance.
     Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionId
   UbuntuBastionPublicDnsName:
-    Condition: Ubuntu
+    Condition: UbuntuSingleCluster
     Description: >-
       The public DNS name of the Linux bastion host / bootstrap instance.
     Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionPublicDnsName
+# multi ubuntu bastion outputs
+  UbuntuMultiBastionAZ:
+    Description: >-
+      The Availability Zone that the Ubuntu bastion host / bootstrap instance
+      is deployed in.
+    Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionMulti.AvailabilityZone
+    Condition: UbuntuMultiCluster
+  UbuntuMultiBastionId:
+    Description: >-
+      The EC2 instance ID of the Ubuntu bastion host / bootstrap instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.UbuntuMultiBastionId
+    Condition: UbuntuMultiCluster
+  UbuntuMultiBastionPublicDnsName:
+    Description: >-
+      The public DNS name of the Ubuntu bastion host / bootstrap instance.
+    Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionMulti.PublicDnsName
+    Condition: UbuntuMultiCluster
   EKSClusterName:
     Description: The Amazon EKS cluster name.
     Value: !GetAtt ExistingVpcStack.Outputs.EKSClusterName
+    Condition: CreateSingleCluster
+  ViewEKSClusterName:
+    Description: The Amazon EKS cluster name.
+    Value: !GetAtt ExistingVpcStack.Outputs.ViewEKSClusterName
+    Condition: CreateMultiCluster
+  RunEKSClusterName:
+    Description: The Amazon EKS cluster name.
+    Value: !GetAtt ExistingVpcStack.Outputs.RunEKSClusterName
+    Condition: CreateMultiCluster
+  BuildEKSClusterName:
+    Description: The Amazon EKS cluster name.
+    Value: !GetAtt ExistingVpcStack.Outputs.BuildEKSClusterName
+    Condition: CreateMultiCluster
+  IterateEKSClusterName:
+    Description: The Amazon EKS cluster name.
+    Value: !GetAtt ExistingVpcStack.Outputs.IterateEKSClusterName
+    Condition: CreateMultiCluster
   TAPGuiUrl:
     Description: >-
       The URL of the VMware Tanzu Application Platform GUI that is accessible
