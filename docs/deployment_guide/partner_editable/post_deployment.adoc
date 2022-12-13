@@ -186,24 +186,24 @@
 |====
 
 [%autowidth.stretch]
-.AWS Quick Start S3 bucket configuration
+.AWS Partner Solution S3 bucket configuration
 |====
 |Parameter |Parameter Label |Default Value |Description
 
 |`QSS3BucketName`
 |Name
 |`aws-quickstart`
-|Name of the S3 bucket for your copy of the Quick Start assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Quick Start location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to https://aws-quickstart.github.io/option1.html.
+|Name of the S3 bucket for your copy of the Partner Solution assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Partner Solution location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to https://aws-quickstart.github.io/option1.html.
 
 |`QSS3BucketRegion`
 |Region
 |`us-east-1`
-|AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.  Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. For more information, refer to https://aws-quickstart.github.io/option1.html.
+|AWS Region where the Partner Solution S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.  Changing this Region updates code references to point to a new Partner Solution location. When using your own bucket, specify the Region. For more information, refer to https://aws-quickstart.github.io/option1.html.
 
 |`QSS3KeyPrefix`
 |Key prefix
 |
-|S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html and https://aws-quickstart.github.io/option1.html.
+|S3 key prefix that is used to simulate a directory for your copy of the Partner Solution assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Partner Solution location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html and https://aws-quickstart.github.io/option1.html.
 |====
 
 //Edit after completing new VPC parameters; open template I have locally to the side
@@ -372,24 +372,24 @@
 |====
 
 [%autowidth.stretch]
-.AWS Quick Start S3 bucket configuration
+.AWS Partner Solution S3 bucket configuration
 |====
 |Parameter |Parameter Label |Default Value |Description
 
 |`QSS3BucketName`
 |Name
 |`aws-quickstart`
-|Name of the S3 bucket for your copy of the Quick Start assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Quick Start location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to https://aws-quickstart.github.io/option1.html.
+|Name of the S3 bucket for your copy of the Partner Solution assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Partner Solution location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to https://aws-quickstart.github.io/option1.html.
 
 |`QSS3BucketRegion`
 |Region
 |`us-east-1`
-|AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.  Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. For more information, refer to https://aws-quickstart.github.io/option1.html.
+|AWS Region where the Partner Solution S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.  Changing this Region updates code references to point to a new Partner Solution location. When using your own bucket, specify the Region. For more information, refer to https://aws-quickstart.github.io/option1.html.
 
 |`QSS3KeyPrefix`
 |Key prefix
 |
-|S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html and https://aws-quickstart.github.io/option1.html.
+|S3 key prefix that is used to simulate a directory for your copy of the Partner Solution assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Partner Solution location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html and https://aws-quickstart.github.io/option1.html.
 |====
 
 == Postdeployment steps
@@ -403,7 +403,7 @@ After deployment, refer to the *Outputs* tab in the AWS CloudFormation console f
 
 === Security configuration and management tasks
 
-After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured (including any required patches) to meet your security and other needs. For more information, refer to the https://aws.amazon.com/compliance/shared-responsibility-model/[AWS Shared Responsibility Model^].
+After you successfully deploy this Partner Solution, confirm that your resources and services are updated and configured (including any required patches) to meet your security and other needs. For more information, refer to the https://aws.amazon.com/compliance/shared-responsibility-model/[AWS Shared Responsibility Model^].
 
 === Access the {partner-product-name} user interface
 

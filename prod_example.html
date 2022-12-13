@@ -911,7 +911,7 @@ p.footer-text a{color:#d7d8d8}
 </div>
 <div class="imageblock text-left image-container">
 <div class="content">
-<img src="https://aws-quickstart.s3.amazonaws.com/{partner-solution-project-name}/docs/boilerplate/.images/aws-quickstart-graphic.png" alt="">
+<img src="https://aws-quickstart.s3.amazonaws.com/quickstart-vmware-tanzu-application-platform/docs/boilerplate/.images/aws-quickstart-graphic.png" alt="">
 </div>
 </div>
 <div class="admonitionblock tip">
@@ -921,7 +921,7 @@ p.footer-text a{color:#d7d8d8}
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-Refer to the <a href="https://github.com/{partner-solution-github-org}/{partner-solution-project-name}" target="_blank" rel="noopener">GitHub repository</a> to view source files, report bugs, submit feature ideas, and post feedback about this Partner Solution. To comment on the documentation, refer to <a href="#_feedback">Feedback</a>.
+Refer to the <a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform" target="_blank" rel="noopener">GitHub repository</a> to view source files, report bugs, submit feature ideas, and post feedback about this Partner Solution. To comment on the documentation, refer to <a href="#_feedback">Feedback</a>.
 </td>
 </tr>
 </table>
@@ -935,7 +935,7 @@ Refer to the <a href="https://github.com/{partner-solution-github-org}/{partner-
 <h2 id="_overview">Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This Quick Start deploys VMware Tanzu Application Platform (TAP) to the AWS Cloud. This Quick Start is for users who want a repeatable and customizable reference deployment for <a href="https://tanzu.vmware.com/application-platform" target="_blank" rel="noopener">VMware Tanzu Application Platform</a> on Amazon Elastic Kubernetes Service (Amazon EKS) using AWS CloudFormation. This guide provides instructions for deploying the Tanzu Application Platform to Amazon EKS clusters. For more information about Tanzu Application Platform, refer to <a href="https://tanzu.vmware.com/application-platform" target="_blank" rel="noopener">https://tanzu.vmware.com/application-platform</a>.</p>
+<p>This Partner Solution deploys VMware Tanzu Application Platform (TAP) to the AWS Cloud. This Partner Solution is for users who want a repeatable and customizable reference deployment for <a href="https://tanzu.vmware.com/application-platform" target="_blank" rel="noopener">VMware Tanzu Application Platform</a> on Amazon Elastic Kubernetes Service (Amazon EKS) using AWS CloudFormation. This guide provides instructions for deploying the Tanzu Application Platform to Amazon EKS clusters. For more information about Tanzu Application Platform, refer to <a href="https://tanzu.vmware.com/application-platform" target="_blank" rel="noopener">https://tanzu.vmware.com/application-platform</a>.</p>
 </div>
 </div>
 </div>
@@ -943,8 +943,8 @@ Refer to the <a href="https://github.com/{partner-solution-github-org}/{partner-
 <h2 id="_costs_and_licenses">Costs and licenses</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>There is no cost to use this Quick Start, but you will be billed for any AWS services or resources that this Quick Start deploys.
-For more information, refer to the <a href="https://fwd.aws/rA69w?" target="_blank" rel="noopener">AWS Quick Start General Information Guide</a>.</p>
+<p>There is no cost to use this Partner Solution, but you will be billed for any AWS services or resources that this Partner Solution deploys.
+For more information, refer to the <a href="https://fwd.aws/rA69w?" target="_blank" rel="noopener">AWS Partner Solution General Information Guide</a>.</p>
 </div>
 <div class="paragraph">
 <p>To purchase a license for VMware Tanzu Application Platform, <a href="https://tanzu.vmware.com/contact" target="_blank" rel="noopener">contact VMware Tanzu</a>.</p>
@@ -955,17 +955,17 @@ For more information, refer to the <a href="https://fwd.aws/rA69w?" target="_bla
 <h2 id="_architecture">Architecture</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Deploying this Quick Start with default parameters builds the following Tanzu Application Platform environment in the
+<p>Deploying this Partner Solution with default parameters builds the following Tanzu Application Platform environment in the
 AWS Cloud.</p>
 </div>
 <div id="architecture1" class="imageblock">
 <div class="content">
 <img src="docs/deployment_guide/images/architecture_diagram.png" alt="Architecture">
 </div>
-<div class="title">Figure 1. Quick Start architecture for Tanzu Application Platform on AWS</div>
+<div class="title">Figure 1. Partner Solution architecture for Tanzu Application Platform on AWS</div>
 </div>
 <div class="paragraph">
-<p>As shown in <a href="#architecture1">Figure 1</a>, this Quick Start sets up the following:</p>
+<p>As shown in <a href="#architecture1">Figure 1</a>, this Partner Solution sets up the following:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1029,7 +1029,7 @@ AWS Cloud.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p><span class="small">* The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.</span></p>
+<p><span class="small">* The template that deploys the Partner Solution into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.</span></p>
 </div>
 </div>
 </div>
@@ -1037,7 +1037,7 @@ AWS Cloud.</p>
 <h2 id="_deployment_options">Deployment options</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This Quick Start provides the following deployment options:</p>
+<p>This Partner Solution provides the following deployment options:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1051,7 +1051,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>This Quick Start provides separate templates for these options. It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instance types, and Tanzu Application Platform settings.</p>
+<p>This Partner Solution provides separate templates for these options. It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instance types, and Tanzu Application Platform settings.</p>
 </div>
 </div>
 </div>
@@ -1061,7 +1061,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <div class="sect2">
 <h3 id="_technical_requirements">Technical Requirements</h3>
 <div class="paragraph">
-<p>Before you launch the Quick Start, review the following information and ensure that your account is properly configured. Otherwise, the deployment might fail.</p>
+<p>Before you launch the Partner Solution, review the following information and ensure that your account is properly configured. Otherwise, the deployment might fail.</p>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -1071,7 +1071,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>An <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html" target="_blank" rel="noopener">Amazon EC2 Key Pair</a> is required for the deployment of this Quick Start, and the key type must be RSA, not ED25519. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html" target="_blank" rel="noopener">Amazon EC2 key pairs and Windows instances</a> and <a href="#_troubleshooting" target="_blank" rel="noopener">Troubleshooting</a>, later in this guide.</p>
+<p>An <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html" target="_blank" rel="noopener">Amazon EC2 Key Pair</a> is required for the deployment of this Partner Solution, and the key type must be RSA, not ED25519. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html" target="_blank" rel="noopener">Amazon EC2 key pairs and Windows instances</a> and <a href="#_troubleshooting" target="_blank" rel="noopener">Troubleshooting</a>, later in this guide.</p>
 </div>
 </td>
 </tr>
@@ -1080,7 +1080,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <div class="sect3">
 <h4 id="_resource_quotas">Resource quotas</h4>
 <div class="paragraph">
-<p>If necessary, request <a href="https://console.aws.amazon.com/servicequotas/home/" target="_blank" rel="noopener">service quota increases</a> for the following resources. You might need to request increases if your existing deployment currently uses these resources and if this Quick Start deployment could result in exceeding the default quotas. The <a href="https://console.aws.amazon.com/servicequotas/home/" target="_blank" rel="noopener">Service Quotas console</a> displays your usage and quotas for some aspects of some services. For more information, refer to <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html" target="_blank" rel="noopener">What is Service Quotas?</a> and <a href="https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html" target="_blank" rel="noopener">AWS service quotas</a>.</p>
+<p>If necessary, request <a href="https://console.aws.amazon.com/servicequotas/home/" target="_blank" rel="noopener">service quota increases</a> for the following resources. You might need to request increases if your existing deployment currently uses these resources and if this Partner Solution deployment could result in exceeding the default quotas. The <a href="https://console.aws.amazon.com/servicequotas/home/" target="_blank" rel="noopener">Service Quotas console</a> displays your usage and quotas for some aspects of some services. For more information, refer to <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html" target="_blank" rel="noopener">What is Service Quotas?</a> and <a href="https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html" target="_blank" rel="noopener">AWS service quotas</a>.</p>
 </div>
 <table class="tableblock frame-all grid-all fit-content">
 <colgroup>
@@ -1145,7 +1145,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <div class="sect2">
 <h3 id="_vmware_tanzu_network_account">VMware Tanzu Network account</h3>
 <div class="paragraph">
-<p>This Quick Start requires a VMware Tanzu Network account with a username, password, and a <a href="https://network.tanzu.vmware.com/docs/api" target="_blank" rel="noopener">user account and authentication (UAA) refresh API token</a>.</p>
+<p>This Partner Solution requires a VMware Tanzu Network account with a username, password, and a <a href="https://network.tanzu.vmware.com/docs/api" target="_blank" rel="noopener">user account and authentication (UAA) refresh API token</a>.</p>
 </div>
 <div class="sect3">
 <h4 id="_create_a_new_vmware_tanzu_network_login">Create a new VMware Tanzu Network login</h4>
@@ -1175,7 +1175,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <div class="sect3">
 <h4 id="_generate_a_vmware_tanzu_network_api_token">Generate a VMware Tanzu Network API token</h4>
 <div class="paragraph">
-<p>This Quick Start requires an API token from the VMware Tanzu Network site to download the packages required to install Tanzu Application Platform.</p>
+<p>This Partner Solution requires an API token from the VMware Tanzu Network site to download the packages required to install Tanzu Application Platform.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -1198,7 +1198,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <div class="sect2">
 <h3 id="_accept_vmware_eulas">Accept VMware EULAs</h3>
 <div class="paragraph">
-<p>Before deploying this Quick Start, you must accept the following VMware End User License Agreements (EULAs) for the VMware Tanzu Network account used for the deployment. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0" target="_blank" rel="noopener">Accept the End User License Agreements</a>.</p>
+<p>Before deploying this Partner Solution, you must accept the following VMware End User License Agreements (EULAs) for the VMware Tanzu Network account used for the deployment. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0" target="_blank" rel="noopener">Accept the End User License Agreements</a>.</p>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -1266,7 +1266,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Unless you are customizing the Partner Solution templates for your own projects, don&#8217;t change the default settings for the following Amazon Simple Storage Service (Amazon S3) parameters: <strong>Partner Solution S3 bucket name</strong>, <strong>Partner Solution S3 bucket Region</strong>, and <strong>Partner Solution S3 key prefix</strong>. Changing these settings automatically updates code references to point to a new Partner Solution location. For more information, refer to the <a href="https://fwd.aws/NwqYA?" target="_blank" rel="noopener">AWS Partner Solution Contributor&#8217;s Guide</a>.
+Unless you&#8217;re customizing the Partner Solution templates or are instructed otherwise in this guide&#8217;s <strong>Predeployment</strong> section, don&#8217;t change the default settings for the following parameters: <code>QSS3BucketName</code>, <code>QSS3BucketRegion</code>, and <code>QSS3KeyPrefix</code>. Changing the values of these parameters will modify code references that point to the Amazon Simple Storage Service (Amazon S3) bucket name and key prefix. For more information, refer to the <a href="https://fwd.aws/NwqYA?" target="_blank" rel="noopener">AWS Partner Solutions Contributor&#8217;s Guide</a>.
 </td>
 </tr>
 </table>
@@ -1595,7 +1595,7 @@ Unless you are customizing the Partner Solution templates for your own projects,
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 8. AWS Quick Start S3 bucket configuration</caption>
+<caption class="title">Table 8. AWS Partner Solution S3 bucket configuration</caption>
 <colgroup>
 <col>
 <col>
@@ -1615,19 +1615,19 @@ Unless you are customizing the Partner Solution templates for your own projects,
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>QSS3BucketName</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>aws-quickstart</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the S3 bucket for your copy of the Quick Start assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Quick Start location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the S3 bucket for your copy of the Partner Solution assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Partner Solution location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>QSS3BucketRegion</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Region</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>us-east-1</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.  Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. For more information, refer to <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AWS Region where the Partner Solution S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.  Changing this Region updates code references to point to a new Partner Solution location. When using your own bucket, specify the Region. For more information, refer to <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>QSS3KeyPrefix</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Key prefix</p></td>
 <td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html" class="bare">https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html</a> and <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix that is used to simulate a directory for your copy of the Partner Solution assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Partner Solution location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html" class="bare">https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html</a> and <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1912,7 +1912,7 @@ Unless you are customizing the Partner Solution templates for your own projects,
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 16. AWS Quick Start S3 bucket configuration</caption>
+<caption class="title">Table 16. AWS Partner Solution S3 bucket configuration</caption>
 <colgroup>
 <col>
 <col>
@@ -1932,19 +1932,19 @@ Unless you are customizing the Partner Solution templates for your own projects,
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>QSS3BucketName</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>aws-quickstart</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the S3 bucket for your copy of the Quick Start assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Quick Start location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the S3 bucket for your copy of the Partner Solution assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Partner Solution location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>QSS3BucketRegion</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Region</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>us-east-1</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.  Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. For more information, refer to <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AWS Region where the Partner Solution S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.  Changing this Region updates code references to point to a new Partner Solution location. When using your own bucket, specify the Region. For more information, refer to <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>QSS3KeyPrefix</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Key prefix</p></td>
 <td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html" class="bare">https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html</a> and <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix that is used to simulate a directory for your copy of the Partner Solution assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Partner Solution location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html" class="bare">https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html</a> and <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1974,7 +1974,7 @@ Unless you are customizing the Partner Solution templates for your own projects,
 <div class="sect2">
 <h3 id="_security_configuration_and_management_tasks">Security configuration and management tasks</h3>
 <div class="paragraph">
-<p>After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured (including any required patches) to meet your security and other needs. For more information, refer to the <a href="https://aws.amazon.com/compliance/shared-responsibility-model/" target="_blank" rel="noopener">AWS Shared Responsibility Model</a>.</p>
+<p>After you successfully deploy this Partner Solution, confirm that your resources and services are updated and configured (including any required patches) to meet your security and other needs. For more information, refer to the <a href="https://aws.amazon.com/compliance/shared-responsibility-model/" target="_blank" rel="noopener">AWS Shared Responsibility Model</a>.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1995,7 +1995,7 @@ Unless you are customizing the Partner Solution templates for your own projects,
 <h2 id="_troubleshooting">Troubleshooting</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>For troubleshooting common Quick Start issues, refer to the <a href="https://fwd.aws/rA69w?" target="_blank" rel="noopener">AWS Quick Start General Information Guide</a> and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html" target="_blank" rel="noopener">Troubleshooting CloudFormation</a>.</p>
+<p>For troubleshooting common Partner Solution issues, refer to the <a href="https://fwd.aws/rA69w?" target="_blank" rel="noopener">AWS Partner Solution General Information Guide</a> and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html" target="_blank" rel="noopener">Troubleshooting CloudFormation</a>.</p>
 </div>
 <div class="sect2">
 <h3 id="_vmware_tanzu_application_platform_documentation">VMware Tanzu Application Platform documentation</h3>
@@ -2189,21 +2189,21 @@ If so, run the following command.</p>
 <h2 id="_feedback">Feedback</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To submit feature ideas and report bugs, use the <strong>Issues</strong> section of the <a href="https://github.com/{partner-solution-github-org}/{partner-solution-project-name}" target="_blank" rel="noopener">GitHub repository</a> for this Partner Solution. To submit code, refer to the <a href="https://fwd.aws/NwqYA?" target="_blank" rel="noopener">Partner Solution Contributor&#8217;s Guide</a>. To submit feedback on this deployment guide, use the following GitHub links:</p>
+<p>To submit feature ideas and report bugs, use the <strong>Issues</strong> section of the <a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform" target="_blank" rel="noopener">GitHub repository</a> for this Partner Solution. To submit code, refer to the <a href="https://fwd.aws/NwqYA?" target="_blank" rel="noopener">Partner Solution Contributor&#8217;s Guide</a>. To submit feedback on this deployment guide, use the following GitHub links:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://github.com/{partner-solution-github-org}/{partner-solution-project-name}/issues/new?labels=documentation,grammar+or+spelling&amp;title=Deployment+guide+feedback&amp;body=Section+heading:%0ADocumentation+issue+description:%0A" target="_blank" rel="noopener">Grammar or spelling</a></p>
+<p><a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform/issues/new?labels=documentation,grammar+or+spelling&amp;title=Deployment+guide+feedback&amp;body=Section+heading:%0ADocumentation+issue+description:%0A" target="_blank" rel="noopener">Grammar or spelling</a></p>
 </li>
 <li>
-<p><a href="https://github.com/{partner-solution-github-org}/{partner-solution-project-name}/issues/new?labels=documentation,broken+link&amp;title=Deployment+guide+feedback&amp;body=Section+heading:%0ADocumentation+issue+description:%0A" target="_blank" rel="noopener">Broken link</a></p>
+<p><a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform/issues/new?labels=documentation,broken+link&amp;title=Deployment+guide+feedback&amp;body=Section+heading:%0ADocumentation+issue+description:%0A" target="_blank" rel="noopener">Broken link</a></p>
 </li>
 <li>
-<p><a href="https://github.com/{partner-solution-github-org}/{partner-solution-project-name}/issues/new?labels=documentation,inaccurate+content&amp;title=Deployment+guide+feedback&amp;body=Section+heading:%0ADocumentation+issue+description:%0A" target="_blank" rel="noopener">Inaccurate content</a></p>
+<p><a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform/issues/new?labels=documentation,inaccurate+content&amp;title=Deployment+guide+feedback&amp;body=Section+heading:%0ADocumentation+issue+description:%0A" target="_blank" rel="noopener">Inaccurate content</a></p>
 </li>
 <li>
-<p><a href="https://github.com/{partner-solution-github-org}/{partner-solution-project-name}/issues/new?labels=documentation,display+and+design&amp;title=Deployment+guide+feedback&amp;body=Section+heading:%0ADocumentation+issue+description:%0A" target="_blank" rel="noopener">Display or design</a></p>
+<p><a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-application-platform/issues/new?labels=documentation,display+and+design&amp;title=Deployment+guide+feedback&amp;body=Section+heading:%0ADocumentation+issue+description:%0A" target="_blank" rel="noopener">Display or design</a></p>
 </li>
 </ul>
 </div>

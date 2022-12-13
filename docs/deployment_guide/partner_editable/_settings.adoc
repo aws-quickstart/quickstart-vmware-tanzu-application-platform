@@ -1,5 +1,5 @@
-:quickstart-project-name: quickstart-vmware-tanzu-application-platform
-:quickstart-github-org: aws-quickstart
+:partner-solution-project-name: quickstart-vmware-tanzu-application-platform
+:partner-solution-github-org: aws-quickstart
 :partner-company-short-name: VMware
 :partner-product-family: Tanzu
 :partner-product-family-full: {partner-company-short-name} {partner-product-family}
