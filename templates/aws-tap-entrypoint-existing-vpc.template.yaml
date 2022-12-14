@@ -1461,13 +1461,7 @@ Resources:
             EOF
             popd
             pushd "$tap_dir/src/resources"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/developer-namespace.yaml" ./developer-namespace.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/metadata-store-read-only.yaml" ./metadata-store-read-only.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/metadata-store-exportsecret.yaml" ./metadata-store-exportsecret.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/tap-gui-viewer-service-account-rbac.yaml" ./tap-gui-viewer-service-account-rbac.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/pipeline.yaml" ./pipeline.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/scan-policy.yaml" ./scan-policy.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/store_ca.yaml" ./store_ca.yaml
+            aws s3 cp --no-progress --recursive --exclude '*' --include '*.yaml' "${QSS3BucketPath}/src/resources/" .
             cat <<EOF > ./workload-aws.yaml
             ${SampleAppConfig}
             EOF
