@@ -822,19 +822,8 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Ref EKSClusterName
         ClusterAutoScaler: Enabled
-        ProvisionBastionHost: Disabled
-        SnykIntegration: Disabled
-        NewRelicIntegration: Disabled
-        CalicoIntegration: Disabled
-        RafaySysIntegration: Disabled
-        GrafanaIntegration: Disabled
-        PrometheusIntegration: Disabled
-        VaultIntegration: Disabled
-        ConsulIntegration: Disabled
-        RancherIntegration: Disabled
         MonitoringStack: None
         ALBIngressController: Enabled
-        EfsStorageClass: Disabled
   TAPLogGroup:
     Type: AWS::Logs::LogGroup
     UpdateReplacePolicy: Retain

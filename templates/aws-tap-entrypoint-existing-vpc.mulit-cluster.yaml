@@ -179,7 +179,7 @@ Resources:
     # Properties:
     #   RoleName: !Sub
     #     - VMwareLinuxBastionIamRole-${StackId}
-    # REPLACE 
+    # REPLACE
     # Resource: !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}
     # WITH
     # Resource: !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/*
@@ -224,19 +224,8 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Join ['', [!Ref EKSClusterName, "-run" ]]
         ClusterAutoScaler: Enabled
-        ProvisionBastionHost: Disabled
-        SnykIntegration: Disabled
-        NewRelicIntegration: Disabled
-        CalicoIntegration: Disabled
-        RafaySysIntegration: Disabled
-        GrafanaIntegration: Disabled
-        PrometheusIntegration: Disabled
-        VaultIntegration: Disabled
-        ConsulIntegration: Disabled
-        RancherIntegration: Disabled
         MonitoringStack: None
         ALBIngressController: Enabled
-        EfsStorageClass: Disabled
   VIEWEKSQSStack:
     Type: AWS::CloudFormation::Stack
     DependsOn:
