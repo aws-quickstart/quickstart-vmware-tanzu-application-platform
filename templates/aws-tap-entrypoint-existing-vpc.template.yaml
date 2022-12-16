@@ -1834,7 +1834,14 @@ Resources:
                   - ecr:UploadLayerPart
                   - ecr:DeleteRepositoryPolicy
                   - ecr:SetRepositoryPolicy
-                Resource: '*'
+                Resource:
+                  - !GetAtt TAPWorkloadRepo.Arn
+                  - !GetAtt TAPWorkloadBundleRepo.Arn
+                  - !Sub
+                    # Allows TAP to deploy & manage new workloads from other
+                    # repos with the stack ID prefix post-deployment.
+                      - arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${StackId}/*
+                      - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
   ITERATEBuildServiceIamRole:
     Type: AWS::IAM::Role
     # Condition: UseEcr
@@ -2024,7 +2031,14 @@ Resources:
                   - ecr:UploadLayerPart
                   - ecr:DeleteRepositoryPolicy
                   - ecr:SetRepositoryPolicy
-                Resource: '*'
+                Resource:
+                  - !GetAtt TAPWorkloadRepo.Arn
+                  - !GetAtt TAPWorkloadBundleRepo.Arn
+                  - !Sub
+                    # Allows TAP to deploy & manage new workloads from other
+                    # repos with the stack ID prefix post-deployment.
+                      - arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${StackId}/*
+                      - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
 # roles multi cluster end
   UbuntuBastion:
   # TODO: Implement CloudFormation helper scripts once Ubuntu 22.04 is
