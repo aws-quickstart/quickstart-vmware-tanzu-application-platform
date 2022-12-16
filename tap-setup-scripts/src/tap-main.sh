@@ -121,7 +121,7 @@ function tapInstallWorkloadMain {
 
       kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/pipeline.yaml
       banner "Installing Sample Workload on Build Cluster"
-      tanzu apps workload apply -f $RESOURCES/workload-aws.yaml -n $DEVELOPER_NAMESPACE --yes --app tanzu-java-web-app-workload-$CLUSTER_NAME_SUFFIX
+      tanzu apps workload apply -f $RESOURCES/workload-aws.yaml -n $DEVELOPER_NAMESPACE --yes
       # let the supply-chain to complete before generating deliverable
       sleep 60
       tapWorkloadGenerateDeliverable
