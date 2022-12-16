@@ -620,12 +620,6 @@ Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
   CreateMultiCluster: !Equals [!Ref TAPClusterArch, 'multi']
   CreateSingleCluster: !Equals [!Ref TAPClusterArch, 'single']
-  UbuntuMultiCluster: !And
-    - !Condition Ubuntu
-    - !Equals [!Ref TAPClusterArch, 'multi']
-  UbuntuSingleCluster: !And
-    - !Condition Ubuntu
-    - !Equals [!Ref TAPClusterArch, 'single']
 Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
@@ -696,38 +690,18 @@ Outputs:
       The public IP address of the Linux bastion host / bootstrap instance.
     Value: !GetAtt ExistingVpcStack.Outputs.LinuxBastionEIP
   UbuntuBastionAZ:
-    Condition: UbuntuSingleCluster
     Description: >-
       The Availability Zone that the Linux bastion host / bootstrap instance
       is deployed in.
     Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionAZ
   UbuntuBastionId:
-    Condition: UbuntuSingleCluster
     Description: >-
       The EC2 instance ID of the Linux bastion host / bootstrap instance.
     Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionId
   UbuntuBastionPublicDnsName:
-    Condition: UbuntuSingleCluster
     Description: >-
       The public DNS name of the Linux bastion host / bootstrap instance.
     Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionPublicDnsName
-# multi ubuntu bastion outputs
-  UbuntuMultiBastionAZ:
-    Description: >-
-      The Availability Zone that the Ubuntu bastion host / bootstrap instance
-      is deployed in.
-    Value: !GetAtt ExistingVpcStack.Outputs.UbuntuMultiBastionAZ
-    Condition: UbuntuMultiCluster
-  UbuntuMultiBastionId:
-    Description: >-
-      The EC2 instance ID of the Ubuntu bastion host / bootstrap instance.
-    Value: !GetAtt ExistingVpcStack.Outputs.UbuntuMultiBastionId
-    Condition: UbuntuMultiCluster
-  UbuntuMultiBastionPublicDnsName:
-    Description: >-
-      The public DNS name of the Ubuntu bastion host / bootstrap instance.
-    Value: !GetAtt ExistingVpcStack.Outputs.UbuntuMultiBastionPublicDnsName
-    Condition: UbuntuMultiCluster
   EKSClusterName:
     Description: The Amazon EKS cluster name.
     Value: !GetAtt ExistingVpcStack.Outputs.EKSClusterName
