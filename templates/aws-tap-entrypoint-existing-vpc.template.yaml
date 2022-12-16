@@ -1346,7 +1346,12 @@ Resources:
                   - eks:DescribeAddonVersions
                   - eks:DescribeCluster
                   - eks:DescribeNodegroup
-                Resource: !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/*
+                Resource:
+                  - !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}
+                  - !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}-run
+                  - !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}-build
+                  - !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}-iterate
+                  - !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}-view
               - Sid: DescribeEksAddons
                 Effect: Allow
                 Action:
@@ -2395,6 +2400,7 @@ Resources:
             chmod 755 ./kubectl
             mv ./kubectl /usr/local/bin/
             kubectl completion bash > /etc/bash_completion.d/kubectl
+
             su - $user -c "aws eks update-kubeconfig --name ${BUILDEKSQSStack.Outputs.EKSClusterName}"
             su - $user -c "aws eks update-kubeconfig --name ${VIEWEKSQSStack.Outputs.EKSClusterName}"
             su - $user -c "aws eks update-kubeconfig --name ${RUNEKSQSStack.Outputs.EKSClusterName}"
