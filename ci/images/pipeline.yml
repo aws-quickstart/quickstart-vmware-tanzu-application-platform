@@ -1,0 +1,38 @@
+resources:
+- name: ci-repo
+  type: git
+  source:
+    uri: ((repo.uri))
+    branch: ((repo.branch))
+    private_key: ((repo.ro-key))
+    paths:
+    - ci/
+- name: docker-image
+  type: registry-image
+  icon: docker
+  source:
+    repository: ((tappc-registry.url))/ci/docker-image
+    username: ((tappc-registry.username))
+    password: ((tappc-registry.password))
+    tag: latest
+
+jobs:
+- name: build-docker-image
+  plan:
+  - get: ci-repo
+    params:
+      submodules: none
+  - task: build
+    file: ci-repo/ci/tasks/build-image/task.yml
+    vars:
+      repo: ((docker-in-nimbus.repo))
+      tag: ((docker-in-nimbus.tag))
+    input_mapping:
+      input: ci-repo
+    params:
+      NIMBUS_USER: ((ci/nimbus.user))
+      BUILD_ARG_BASE: ((docker-in-nimbus.repo)):((docker-in-nimbus.tag))
+      CONTEXT: input/ci/images/docker-image
+  - put: docker-image
+    params:
+      image: image/image.tar

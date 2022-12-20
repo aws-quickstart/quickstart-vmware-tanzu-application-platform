@@ -1,0 +1,17 @@
+repo:
+  uri: git@github.com:hoegaarden/quickstart-vmware-tanzu-application-platform
+  branch: TAPPC-131_ci-build-images
+  ro-key: ((ci/repo-keys/github/hoegaarden/quickstart-vmware-tanzu-application-platform.ro))
+
+dockerhub-proxy: harbor-repo.vmware.com/dockerhub-proxy-cache
+
+#! new versions can be found at:
+#! https://artifactory.eng.vmware.com/ui/repos/tree/General/devtools-docker/vmware/runway/resourcetypes/docker-in-nimbus-task
+docker-in-nimbus:
+  repo: devtools-docker.artifactory.eng.vmware.com/vmware/runway/resourcetypes/docker-in-nimbus-task
+  tag: 0.13.1
+
+tappc-registry:
+  url: tappc-docker-local.artifactory.eng.vmware.com
+  username: ((ci/registry/tappc.username))
+  password: ((ci/registry/tappc.password))
