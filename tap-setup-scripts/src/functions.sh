@@ -401,6 +401,43 @@ function createTapRegistrySecret {
     --export-to-all-namespaces --namespace $TAP_NAMESPACE --yes
 }
 
+function ensurePackageOverlays() {
+  local -
+  set -e
+  set -u
+  set -o pipefail
+
+  local tapVersion="${1?needs to be the TAP version}"
+  local tapNamespace="${2?needs to be the namespace where TAPs pkgis get deployed into}"
+  local resourcesDir="${3?needs to be the directory with additional resource files}"
+  local tapValuesFile="${4?needs to be the path to the TAP data values file}"
+
+  local olSecrets="${resourcesDir}/package_overlay_secrets.yaml"
+  local olApply="${resourcesDir}/package_overlay_apply.yaml"
+
+  local f
+  for f in "$olSecrets" "$olApply" ; do
+    [ -e "$f" ] || {
+      echo >&2 "$f does not exist, skipping applying package overlays"
+      return 0
+    }
+  done
+
+  banner 'Adding package overlays'
+
+  # create the overlay secrets in the tap-install namespace
+  ytt \
+    -f "$olSecrets" \
+    -v tapVersion="$tapVersion" \
+    -v tapNamespace="$tapNamespace" \
+    | kubectl apply -f -
+
+  # patch the tap data values with the package overlays
+  local newTapValues
+  newTapValues="$( ytt -f "$tapValuesFile" -f "$olApply" )"
+  echo "$newTapValues" > "$tapValuesFile"
+}
+
 function tapInstallFull {
   requireValue TAP_PACKAGE_NAME TAP_VERSION TAP_NAMESPACE
 
@@ -408,6 +445,8 @@ function tapInstallFull {
   banner "Installing TAP values from $GENERATED/$TAP_VALUES_FILE for TAP_VERSION $TAP_VERSION ..."
 
   first_time=$(tanzu package installed get $TAP_PACKAGE_NAME -n $TAP_NAMESPACE -o json 2>/dev/null)
+
+  ensurePackageOverlays "$TAP_VERSION" "$TAP_NAMESPACE" "$RESOURCES" "${GENERATED}/${TAP_VALUES_FILE}"
 
   if [[ -z $first_time ]]
   then

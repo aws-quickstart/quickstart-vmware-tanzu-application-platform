@@ -549,34 +549,34 @@ Parameters:
 Mappings:
   AwsAmiRegionMap:
     af-south-1:
-      US2204HVM: ami-0fc6e121c192bdb03
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-east-1:
-      US2204HVM: ami-024f879d2b5124b90
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-northeast-1:
-      US2204HVM: ami-07b0d532075d92a20
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-northeast-2:
-      US2204HVM: ami-05b9c9c0fe2f5a62c
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-northeast-3:
-      US2204HVM: ami-0d1fdff91da68b01c
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-south-1:
-      US2204HVM: ami-0d044385bb8ef5481
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-southeast-1:
-      US2204HVM: ami-054e3ff0063ada900
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-southeast-2:
-      US2204HVM: ami-0251cb389d14767a2
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-southeast-3:
       US2204HVM: ami-0c1460efd8855de7c
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ca-central-1:
-      US2204HVM: ami-096b9b73064bc93e5
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     cn-north-1:
       US2204HVM: ami-051468c74b28583e6
@@ -588,46 +588,46 @@ Mappings:
       US2204HVM: ami-03f87e9ce1bec353f
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     eu-north-1:
-      US2204HVM: ami-09c7120731676fe78
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     eu-south-1:
-      US2204HVM: ami-0be8a0321a0db3412
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     eu-west-1:
-      US2204HVM: ami-00c90dbdc12232b58
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     eu-west-2:
-      US2204HVM: ami-0660cbd2af1273a49
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     eu-west-3:
-      US2204HVM: ami-007aa010c58301c26
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     me-central-1:
-      US2204HVM: ami-07d7a26c8bf20468c
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     me-south-1:
-      US2204HVM: ami-0a01bd42e3a93e69d
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     sa-east-1:
-      US2204HVM: ami-08ae71fd7f1449df1
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     us-east-1:
-      US2204HVM: ami-052efd3df9dad4825
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     us-east-2:
-      US2204HVM: ami-0b9c02f271998009f
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     us-gov-east-1:
-      US2204HVM: ami-091deef7dfe077967
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     us-gov-west-1:
-      US2204HVM: ami-04e77113f128920b2
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     us-west-1:
       US2204HVM: ami-02ea247e531eb3ce6
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     us-west-2:
-      US2204HVM: ami-0a22ed271d3dbf544
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
   AwsAmiNameMap:
     Ubuntu-Server-22.04-LTS-HVM:
@@ -802,6 +802,9 @@ Resources:
         - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
           S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
       Parameters:
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3BucketRegion: !Ref QSS3BucketRegion
+        QSS3KeyPrefix: !Sub ${QSS3KeyPrefix}submodules/quickstart-amazon-eks/
         ConfigSetName: !Ref AWS::StackName
         VPCID: !Ref VpcId
         PrivateSubnet1ID: !Ref PrivateSubnet1Id
@@ -822,19 +825,8 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Ref EKSClusterName
         ClusterAutoScaler: Enabled
-        ProvisionBastionHost: Disabled
-        SnykIntegration: Disabled
-        NewRelicIntegration: Disabled
-        CalicoIntegration: Disabled
-        RafaySysIntegration: Disabled
-        GrafanaIntegration: Disabled
-        PrometheusIntegration: Disabled
-        VaultIntegration: Disabled
-        ConsulIntegration: Disabled
-        RancherIntegration: Disabled
         MonitoringStack: None
         ALBIngressController: Enabled
-        EfsStorageClass: Disabled
   TAPLogGroup:
     Type: AWS::Logs::LogGroup
     UpdateReplacePolicy: Retain
@@ -1469,13 +1461,7 @@ Resources:
             EOF
             popd
             pushd "$tap_dir/src/resources"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/developer-namespace.yaml" ./developer-namespace.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/metadata-store-read-only.yaml" ./metadata-store-read-only.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/metadata-store-exportsecret.yaml" ./metadata-store-exportsecret.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/tap-gui-viewer-service-account-rbac.yaml" ./tap-gui-viewer-service-account-rbac.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/pipeline.yaml" ./pipeline.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/scan-policy.yaml" ./scan-policy.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/store_ca.yaml" ./store_ca.yaml
+            aws s3 cp --no-progress --recursive --exclude '*' --include '*.yaml' "${QSS3BucketPath}/src/resources/" .
             cat <<EOF > ./workload-aws.yaml
             ${SampleAppConfig}
             EOF
