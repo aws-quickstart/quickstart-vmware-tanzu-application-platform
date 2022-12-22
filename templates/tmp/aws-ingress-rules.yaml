@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  AWS CloudFormation template
+Parameters:
+  VIEWEKSQSStackOutputsControlPlaneSecurityGroup:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: >-
+      VIEWEKSQSStackOutputsControlPlaneSecurityGroup
+    Default: sg-0b7600143225762b3
+  BUILDEKSQSStackOutputsControlPlaneSecurityGroup:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: >-
+      BUILDEKSQSStackOutputsControlPlaneSecurityGroup
+    Default: sg-0f49a82fb76fc56ce
+  RUNEKSQSStackOutputsControlPlaneSecurityGroup:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: >-
+      RUNEKSQSStackOutputsControlPlaneSecurityGroup
+    Default: sg-06f81c96948078a39
+  TAPClusterArch:
+    Type: String
+    Description: >-
+      TAP Cluster Architecture
+    AllowedValues:
+      - 'Multi'
+      - 'Single'
+    Default: 'Single'
+Conditions:
+  CreateMultiCluster: !Equals [!Ref TAPClusterArch, 'Multi']
+  CreateSingleCluster: !Equals [!Ref TAPClusterArch, 'Single']
+Resources:
+  RunEKSViewClusterApiIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Condition: CreateMultiCluster
+    Properties:
+      Description: >-
+        Allow the View Cluster to connect to the EKS
+        control plane for Kubernetes API traffic.
+      GroupId: !Ref RUNEKSQSStackOutputsControlPlaneSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+      FromPort: 443
+      SourceSecurityGroupId: !Ref VIEWEKSQSStackOutputsControlPlaneSecurityGroup
+  BuildEKSViewClusterApiIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Condition: CreateMultiCluster
+    Properties:
+      Description: >-
+        Allow the View Cluster to connect to the EKS
+        control plane for Kubernetes API traffic.
+      GroupId: !Ref BUILDEKSQSStackOutputsControlPlaneSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+      FromPort: 443
+      SourceSecurityGroupId: !Ref VIEWEKSQSStackOutputsControlPlaneSecurityGroup

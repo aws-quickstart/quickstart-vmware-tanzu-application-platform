@@ -20,17 +20,20 @@ Parameters:
    Description: >-
       Private DNS domain name for accessing the TAP graphical user interface
       (GUI) and project URLs.
-   Default: ui-tanzu-east-1.com
+  #  Default: ui-tanzu-east-1.com
+   Default: dec13uiwest2.com
   VpcId:
     Type: AWS::EC2::VPC::Id
     Description: >-
       ID of your existing VPC (example: vpc-0343606e).
-    Default: vpc-01d766924c375f941
+    # Default: vpc-01d766924c375f941
+    Default: vpc-0f3f57c47d4d49497
   LinuxBastionSecurityGroup:
     Type: AWS::EC2::SecurityGroup::Id
     Description: >-
       LinuxBastionSecurityGroup
-    Default: sg-04f896fcedaed6c77
+    # Default: sg-04f896fcedaed6c77
+    Default: sg-06cfef08e91bcebe0
   TAPClusterArch:
     Type: String
     Description: >-
@@ -44,19 +47,22 @@ Parameters:
     Description: >-
       ID of the public subnet in Availability Zone 1 of your existing VPC
       (example: subnet-a0246dcd).
-    Default: subnet-035494469cc076aab
+    # Default: subnet-035494469cc076aab
+    Default: subnet-044a446ded7d8a655
   PrivateSubnet1Id:
     Type: AWS::EC2::Subnet::Id
     Description: >-
       ID of the private subnet in Availability Zone 1 of your existing VPC
       (example: subnet-fe9a8b32).
-    Default: subnet-00cc7a8de362c6c72
+    # Default: subnet-00cc7a8de362c6c72
+    Default: subnet-0a6e2164dc7d680e4
   PrivateSubnet2Id:
     Type: AWS::EC2::Subnet::Id
     Description: >-
       ID of the private subnet in Availability Zone 2 of your existing VPC
       (example: subnet-be8b01ea).
-    Default: subnet-0e3ee5ff3be98993f
+    # Default: subnet-0e3ee5ff3be98993f
+    Default: subnet-0c1463263cdf99d9c
   PrivateSubnet3Id:
     Type: String
     Description: >-
@@ -64,7 +70,8 @@ Parameters:
       (example: subnet-abd39039).
     AllowedPattern: ^(subnet-([0-9a-f]{8}|[0-9a-f]{17})|)$
     ConstraintDescription: Must be a valid VPC subnet ID or blank.
-    Default: subnet-05dadbf75aa8ac48f
+    # Default: subnet-05dadbf75aa8ac48f
+    Default: subnet-090a03d278e2387c4
   KeyPairName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: >-
@@ -74,7 +81,8 @@ Parameters:
       are supported due to Windows instances not supporting ED25519. For more
       information, refer to Amazon EC2 key pairs and Windows instances
       (https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
-    Default: satyakeypair-us-east1
+    # Default: satyakeypair-us-east1
+    Default: satya-keypair-us-west-2
   EKSClusterName:
     Type: String
     Description: Name of the EKS cluster where TAP will be deployed.
@@ -204,6 +212,9 @@ Resources:
         - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
           S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
       Parameters:
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3BucketRegion: !Ref QSS3BucketRegion
+        QSS3KeyPrefix: !Sub ${QSS3KeyPrefix}submodules/quickstart-amazon-eks/
         ConfigSetName: !Ref AWS::StackName
         VPCID: !Ref VpcId
         PrivateSubnet1ID: !Ref PrivateSubnet1Id
@@ -214,7 +225,7 @@ Resources:
           - !Ref AWS::NoValue
         RemoteAccessCIDR: !Ref RemoteAccessCidr
         EKSPublicAccessEndpoint: Disabled
-        AdditionalEKSAdminRoleArn: arn:aws:iam::188471332253:role/VMwareLinuxBastionIamRole-73181b90-5efd-11ed-a166-126e4ccc5485
+        AdditionalEKSAdminRoleArn: arn:aws:iam::188471332253:role/VMwareLinuxBastionIamRole-d86eff60-7b70-11ed-b501-062e4bbd9f03
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
@@ -224,19 +235,19 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Join ['', [!Ref EKSClusterName, "-run" ]]
         ClusterAutoScaler: Enabled
-        ProvisionBastionHost: Disabled
-        SnykIntegration: Disabled
-        NewRelicIntegration: Disabled
-        CalicoIntegration: Disabled
-        RafaySysIntegration: Disabled
-        GrafanaIntegration: Disabled
-        PrometheusIntegration: Disabled
-        VaultIntegration: Disabled
-        ConsulIntegration: Disabled
-        RancherIntegration: Disabled
+        # ProvisionBastionHost: Disabled
+        # SnykIntegration: Disabled
+        # NewRelicIntegration: Disabled
+        # CalicoIntegration: Disabled
+        # RafaySysIntegration: Disabled
+        # GrafanaIntegration: Disabled
+        # PrometheusIntegration: Disabled
+        # VaultIntegration: Disabled
+        # ConsulIntegration: Disabled
+        # RancherIntegration: Disabled
+        # EfsStorageClass: Disabled
         MonitoringStack: None
         ALBIngressController: Enabled
-        EfsStorageClass: Disabled
   VIEWEKSQSStack:
     Type: AWS::CloudFormation::Stack
     DependsOn:
@@ -247,6 +258,9 @@ Resources:
         - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
           S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
       Parameters:
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3BucketRegion: !Ref QSS3BucketRegion
+        QSS3KeyPrefix: !Sub ${QSS3KeyPrefix}submodules/quickstart-amazon-eks/
         ConfigSetName: !Ref AWS::StackName
         VPCID: !Ref VpcId
         PrivateSubnet1ID: !Ref PrivateSubnet1Id
@@ -257,7 +271,7 @@ Resources:
           - !Ref AWS::NoValue
         RemoteAccessCIDR: !Ref RemoteAccessCidr
         EKSPublicAccessEndpoint: Disabled
-        AdditionalEKSAdminRoleArn: arn:aws:iam::188471332253:role/VMwareLinuxBastionIamRole-73181b90-5efd-11ed-a166-126e4ccc5485
+        AdditionalEKSAdminRoleArn: arn:aws:iam::188471332253:role/VMwareLinuxBastionIamRole-d86eff60-7b70-11ed-b501-062e4bbd9f03
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
@@ -267,19 +281,19 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Join ['', [!Ref EKSClusterName, "-view" ]]
         ClusterAutoScaler: Enabled
-        ProvisionBastionHost: Disabled
-        SnykIntegration: Disabled
-        NewRelicIntegration: Disabled
-        CalicoIntegration: Disabled
-        RafaySysIntegration: Disabled
-        GrafanaIntegration: Disabled
-        PrometheusIntegration: Disabled
-        VaultIntegration: Disabled
-        ConsulIntegration: Disabled
-        RancherIntegration: Disabled
+        # ProvisionBastionHost: Disabled
+        # SnykIntegration: Disabled
+        # NewRelicIntegration: Disabled
+        # CalicoIntegration: Disabled
+        # RafaySysIntegration: Disabled
+        # GrafanaIntegration: Disabled
+        # PrometheusIntegration: Disabled
+        # VaultIntegration: Disabled
+        # ConsulIntegration: Disabled
+        # RancherIntegration: Disabled
+        # EfsStorageClass: Disabled
         MonitoringStack: None
         ALBIngressController: Enabled
-        EfsStorageClass: Disabled
   BUILDEKSQSStack:
     Type: AWS::CloudFormation::Stack
     DependsOn:
@@ -290,6 +304,9 @@ Resources:
         - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
           S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
       Parameters:
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3BucketRegion: !Ref QSS3BucketRegion
+        QSS3KeyPrefix: !Sub ${QSS3KeyPrefix}submodules/quickstart-amazon-eks/
         ConfigSetName: !Ref AWS::StackName
         VPCID: !Ref VpcId
         PrivateSubnet1ID: !Ref PrivateSubnet1Id
@@ -300,7 +317,7 @@ Resources:
           - !Ref AWS::NoValue
         RemoteAccessCIDR: !Ref RemoteAccessCidr
         EKSPublicAccessEndpoint: Disabled
-        AdditionalEKSAdminRoleArn: arn:aws:iam::188471332253:role/VMwareLinuxBastionIamRole-73181b90-5efd-11ed-a166-126e4ccc5485
+        AdditionalEKSAdminRoleArn: arn:aws:iam::188471332253:role/VMwareLinuxBastionIamRole-d86eff60-7b70-11ed-b501-062e4bbd9f03
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
@@ -310,19 +327,19 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Join ['', [!Ref EKSClusterName, "-build" ]]
         ClusterAutoScaler: Enabled
-        ProvisionBastionHost: Disabled
-        SnykIntegration: Disabled
-        NewRelicIntegration: Disabled
-        CalicoIntegration: Disabled
-        RafaySysIntegration: Disabled
-        GrafanaIntegration: Disabled
-        PrometheusIntegration: Disabled
-        VaultIntegration: Disabled
-        ConsulIntegration: Disabled
-        RancherIntegration: Disabled
+        # ProvisionBastionHost: Disabled
+        # SnykIntegration: Disabled
+        # NewRelicIntegration: Disabled
+        # CalicoIntegration: Disabled
+        # RafaySysIntegration: Disabled
+        # GrafanaIntegration: Disabled
+        # PrometheusIntegration: Disabled
+        # VaultIntegration: Disabled
+        # ConsulIntegration: Disabled
+        # RancherIntegration: Disabled
+        # EfsStorageClass: Disabled
         MonitoringStack: None
         ALBIngressController: Enabled
-        EfsStorageClass: Disabled
   ITERATEEKSQSStack:
     Type: AWS::CloudFormation::Stack
     DependsOn:
@@ -333,6 +350,9 @@ Resources:
         - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
           S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
       Parameters:
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3BucketRegion: !Ref QSS3BucketRegion
+        QSS3KeyPrefix: !Sub ${QSS3KeyPrefix}submodules/quickstart-amazon-eks/
         ConfigSetName: !Ref AWS::StackName
         VPCID: !Ref VpcId
         PrivateSubnet1ID: !Ref PrivateSubnet1Id
@@ -343,7 +363,7 @@ Resources:
           - !Ref AWS::NoValue
         RemoteAccessCIDR: !Ref RemoteAccessCidr
         EKSPublicAccessEndpoint: Disabled
-        AdditionalEKSAdminRoleArn: arn:aws:iam::188471332253:role/VMwareLinuxBastionIamRole-73181b90-5efd-11ed-a166-126e4ccc5485
+        AdditionalEKSAdminRoleArn: arn:aws:iam::188471332253:role/VMwareLinuxBastionIamRole-d86eff60-7b70-11ed-b501-062e4bbd9f03
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
@@ -353,19 +373,19 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Join ['', [!Ref EKSClusterName, "-iterate" ]]
         ClusterAutoScaler: Enabled
-        ProvisionBastionHost: Disabled
-        SnykIntegration: Disabled
-        NewRelicIntegration: Disabled
-        CalicoIntegration: Disabled
-        RafaySysIntegration: Disabled
-        GrafanaIntegration: Disabled
-        PrometheusIntegration: Disabled
-        VaultIntegration: Disabled
-        ConsulIntegration: Disabled
-        RancherIntegration: Disabled
+        # ProvisionBastionHost: Disabled
+        # SnykIntegration: Disabled
+        # NewRelicIntegration: Disabled
+        # CalicoIntegration: Disabled
+        # RafaySysIntegration: Disabled
+        # GrafanaIntegration: Disabled
+        # PrometheusIntegration: Disabled
+        # VaultIntegration: Disabled
+        # ConsulIntegration: Disabled
+        # RancherIntegration: Disabled
+        # EfsStorageClass: Disabled
         MonitoringStack: None
         ALBIngressController: Enabled
-        EfsStorageClass: Disabled
   BUILDBuildServiceIamRole:
     Type: AWS::IAM::Role
     # Condition: UseEcr

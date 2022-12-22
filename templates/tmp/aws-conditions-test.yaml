@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  AWS CloudFormation template
+Parameters:
+  EKSClusterName:
+    Description: Name of the EKS cluster where TAP will be deployed.
+    Type: String
+    Default: eks-cluster-tap
+  TAPClusterArch:
+    Type: String
+    Description: >-
+      TAP Cluster Architecture
+    AllowedValues:
+      - 'Multi'
+      - 'Single'
+    Default: 'Single'
+Conditions:
+  CreateMultiCluster: !Equals [!Ref TAPClusterArch, 'Multi']
+  CreateSingleCluster: !Equals [!Ref TAPClusterArch, 'Single']
+Resources:
+  MultiNullResource:
+    Type: AWS::CloudFormation::WaitConditionHandle
+    Condition: CreateMultiCluster
+  SingleNullResource:
+    Type: AWS::CloudFormation::WaitConditionHandle
+    Condition: CreateSingleCluster
+  # VIEWClusterName:
+  #   Type: Custom::TestString
+  #   Properties:
+  #     ServiceToken: 'arn:aws:sns:us-west-2:188471332253:CRTest1'
+  #     ClusterName: !Join ['', [!Ref EKSClusterName, "-view" ]]
+  # SINGLEClusterName:
+  #   Type: Custom::TestString
+  #   Properties:
+  #     ServiceToken: 'arn:aws:sns:us-west-2:188471332253:CRTest2'
+  #     ClusterName: !Ref EKSClusterName
+Outputs:
+  VIEWClusterName:
+    Description: Name of the VIEW EKS cluster.
+    Value: !Join ['', [!Ref EKSClusterName, "-view" ]]
+    Condition: CreateMultiCluster
+  SINGLEClusterName:
+    Description: Name of the Single EKS cluster.
+    Value: !Ref EKSClusterName
+    Condition: CreateSingleCluster
