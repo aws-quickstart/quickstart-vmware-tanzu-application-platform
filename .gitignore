@@ -14,3 +14,8 @@ prod_example.html
 
 # IDE workspace settings
 .vscode/
+
+# direnv config
+.envrc
+
+.cache

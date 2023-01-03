@@ -817,6 +817,9 @@ Resources:
         - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
           S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
       Parameters:
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3BucketRegion: !Ref QSS3BucketRegion
+        QSS3KeyPrefix: !Sub ${QSS3KeyPrefix}submodules/quickstart-amazon-eks/
         ConfigSetName: !Ref AWS::StackName
         VPCID: !Ref VpcId
         PrivateSubnet1ID: !Ref PrivateSubnet1Id
@@ -839,12 +842,19 @@ Resources:
         ClusterAutoScaler: Enabled
         MonitoringStack: None
         ALBIngressController: Enabled
+<<<<<<< HEAD
 #eks stacks multi cluster start
   RUNEKSQSStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateMultiCluster
     DependsOn:
       - EKSAdvancedConfigStack
+=======
+  TAPLogGroup:
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+>>>>>>> 9ebbd70040436493cf77a486f8e7291f8d045099
     Properties:
       TemplateURL: !Sub
         - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
@@ -2262,13 +2272,7 @@ Resources:
             EOF
             popd
             pushd "$tap_dir/src/resources"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/developer-namespace.yaml" ./developer-namespace.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/metadata-store-read-only.yaml" ./metadata-store-read-only.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/metadata-store-exportsecret.yaml" ./metadata-store-exportsecret.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/tap-gui-viewer-service-account-rbac.yaml" ./tap-gui-viewer-service-account-rbac.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/pipeline.yaml" ./pipeline.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/scan-policy.yaml" ./scan-policy.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/store_ca.yaml" ./store_ca.yaml
+            aws s3 cp --no-progress --recursive --exclude '*' --include '*.yaml' "${QSS3BucketPath}/src/resources/" .
             cat <<EOF > ./workload-aws.yaml
             ${SampleAppConfig}
             EOF
