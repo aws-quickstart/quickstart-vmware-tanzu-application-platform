@@ -842,19 +842,12 @@ Resources:
         ClusterAutoScaler: Enabled
         MonitoringStack: None
         ALBIngressController: Enabled
-<<<<<<< HEAD
 #eks stacks multi cluster start
   RUNEKSQSStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateMultiCluster
     DependsOn:
       - EKSAdvancedConfigStack
-=======
-  TAPLogGroup:
-    Type: AWS::Logs::LogGroup
-    UpdateReplacePolicy: Retain
-    DeletionPolicy: Retain
->>>>>>> 9ebbd70040436493cf77a486f8e7291f8d045099
     Properties:
       TemplateURL: !Sub
         - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
