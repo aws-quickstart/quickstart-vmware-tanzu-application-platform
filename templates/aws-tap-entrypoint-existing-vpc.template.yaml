@@ -2206,6 +2206,7 @@ Resources:
               WORKLOAD_ARN="arn:aws:iam::${AWS::AccountId}:role/BUILDWorkloadIamRole-${AWS::StackId}"
               ITERATE_BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/ITERATEBuildServiceIamRole-${AWS::StackId}"
               ITERATE_WK_ARN="arn:aws:iam::${AWS::AccountId}:role/ITERATEWorkloadIamRole-${AWS::StackId}"
+
             else
               echo "Set IAM role arns for single cluster..."
               BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/TAPBuildServiceIamRole-${AWS::StackId}"
@@ -2213,6 +2214,10 @@ Resources:
               ITERATE_BUILD_ARN=""
               ITERATE_WK_ARN=""
             fi
+            echo $BUILD_ARN
+            echo $WORKLOAD_ARN
+            echo $ITERATE_BUILD_ARN
+            echo $ITERATE_WK_ARN
             cat <<EOF > ./user-input-values.yaml
             #@data/values
             ---
