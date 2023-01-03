@@ -2198,6 +2198,21 @@ Resources:
             aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-iterate.yaml" ./tap-values-iterate.yaml
             aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-view.yaml" ./tap-values-view.yaml
             aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-single.yaml" ./tap-values-single.yaml
+            echo ClusterArch ${ClusterArch}
+            if [[ "${ClusterArch}" == "multi" ]]
+            then
+              echo "Set IAM role arns for multi cluster..."
+              BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/BUILDBuildServiceIamRole-${AWS::StackId}"
+              WORKLOAD_ARN="arn:aws:iam::${AWS::AccountId}:role/BUILDWorkloadIamRole-${AWS::StackId}"
+              ITERATE_BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/ITERATEBuildServiceIamRole-${AWS::StackId}"
+              ITERATE_WK_ARN="arn:aws:iam::${AWS::AccountId}:role/ITERATEWorkloadIamRole-${AWS::StackId}"
+            else
+              echo "Set IAM role arns for single cluster..."
+              BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/TAPBuildServiceIamRole-${AWS::StackId}"
+              WORKLOAD_ARN="arn:aws:iam::${AWS::AccountId}:role/TAPWorkloadIamRole-${AWS::StackId}"
+              ITERATE_BUILD_ARN=""
+              ITERATE_WK_ARN=""
+            fi
             cat <<EOF > ./user-input-values.yaml
             #@data/values
             ---
@@ -2219,8 +2234,8 @@ Resources:
               arch: ${ClusterArch}
               name: ${EKSClusterName}
             buildservice:
-              build_cluster_arn: ${TAPBuildServiceIamRole.Arn}
-              iterate_cluster_arn: ${TAPBuildServiceIamRole.Arn}
+              build_cluster_arn: $BUILD_ARN
+              iterate_cluster_arn: $ITERATE_BUILD_ARN
             dns:
               domain_name: ${TAPDomainName}
               zone_id: ${PrivateHostedZone}
@@ -2233,8 +2248,8 @@ Resources:
                 namespace: ${SampleAppNamespace}
                 repository: ${TAPWorkloadRepo.RepositoryUri}
                 bundle_repository: ${TAPWorkloadBundleRepo.RepositoryUri}
-                build_cluster_arn: ${TAPWorkloadIamRole.Arn}
-                iterate_cluster_arn: ${TAPWorkloadIamRole.Arn}
+                build_cluster_arn: $WORKLOAD_ARN
+                iterate_cluster_arn: $ITERATE_WK_ARN
             EOF
             popd
             pushd "$tap_dir/src/resources"
