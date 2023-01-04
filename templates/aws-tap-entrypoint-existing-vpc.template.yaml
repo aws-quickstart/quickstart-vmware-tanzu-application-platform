@@ -2201,23 +2201,19 @@ Resources:
             aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-iterate.yaml" ./tap-values-iterate.yaml
             aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-view.yaml" ./tap-values-view.yaml
             aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-single.yaml" ./tap-values-single.yaml
-            stack_string="${AWS::StackId}"
-            IFS='/'
-            read -ra STACKARR <<< "$stack_string"
-            stack_id=${STACKARR[2]}
             echo ClusterArch ${ClusterArch}
             if [[ "${ClusterArch}" == "multi" ]]
             then
               echo "Set IAM role arns for multi cluster..."
-              BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/BUILDBuildServiceIamRole-$stack_id"
-              WORKLOAD_ARN="arn:aws:iam::${AWS::AccountId}:role/BUILDWorkloadIamRole-$stack_id"
-              ITERATE_BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/ITERATEBuildServiceIamRole-$stack_id"
-              ITERATE_WK_ARN="arn:aws:iam::${AWS::AccountId}:role/ITERATEWorkloadIamRole-$stack_id"
+              BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/BUILDBuildServiceIamRole-${StackId}"
+              WORKLOAD_ARN="arn:aws:iam::${AWS::AccountId}:role/BUILDWorkloadIamRole-${StackId}
+              ITERATE_BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/ITERATEBuildServiceIamRole-${StackId}"
+              ITERATE_WK_ARN="arn:aws:iam::${AWS::AccountId}:role/ITERATEWorkloadIamRole-${StackId}"
 
             else
               echo "Set IAM role arns for single cluster..."
-              BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/TAPBuildServiceIamRole-$stack_id"
-              WORKLOAD_ARN="arn:aws:iam::${AWS::AccountId}:role/TAPWorkloadIamRole-$stack_id"
+              BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/TAPBuildServiceIamRole-${StackId}"
+              WORKLOAD_ARN="arn:aws:iam::${AWS::AccountId}:role/TAPWorkloadIamRole-${StackId}"
               ITERATE_BUILD_ARN=""
               ITERATE_WK_ARN=""
             fi
@@ -2322,6 +2318,7 @@ Resources:
             TanzuNetRegistryServer: !FindInMap [TanzuNetRegistryServer, Server, Name]
             TAPRepo: tanzu-application-platform/tap-packages
             ClusterArch: !Ref TAPClusterArch
+            StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
   UbuntuBastionEipAssociation:
     Type: AWS::EC2::EIPAssociation
     UpdateReplacePolicy: Delete
