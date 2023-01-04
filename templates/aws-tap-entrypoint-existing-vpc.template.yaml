@@ -2206,10 +2206,9 @@ Resources:
             then
               echo "Set IAM role arns for multi cluster..."
               BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/BUILDBuildServiceIamRole-${StackId}"
-              WORKLOAD_ARN="arn:aws:iam::${AWS::AccountId}:role/BUILDWorkloadIamRole-${StackId}
+              WORKLOAD_ARN="arn:aws:iam::${AWS::AccountId}:role/BUILDWorkloadIamRole-${StackId}"
               ITERATE_BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/ITERATEBuildServiceIamRole-${StackId}"
               ITERATE_WK_ARN="arn:aws:iam::${AWS::AccountId}:role/ITERATEWorkloadIamRole-${StackId}"
-
             else
               echo "Set IAM role arns for single cluster..."
               BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/TAPBuildServiceIamRole-${StackId}"
