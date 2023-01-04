@@ -274,8 +274,8 @@ Parameters:
       refer to Kubernetes cluster requirements
       (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
-      - 1.22
-    Default: 1.22
+      - 1.23
+    Default: 1.23
   NumberOfNodes:
     Type: Number
     Description: Minimum number of nodes to create for the TAP EKS cluster.
@@ -609,14 +609,8 @@ Parameters:
      location. When using your own bucket, specify the Region. For more
      information, refer to https://aws-quickstart.github.io/option1.html.
     Default: us-east-1
-Mappings:
-  AwsAmiNameMap:
-    Ubuntu-Server-22.04-LTS-HVM:
-      Code: US2204HVM
-      OS: Ubuntu
 Conditions:
   3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
-  Ubuntu: !Equals [!FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, OS], Ubuntu]
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
   CreateMultiCluster: !Equals [!Ref TAPClusterArch, 'multi']
   CreateSingleCluster: !Equals [!Ref TAPClusterArch, 'single']
