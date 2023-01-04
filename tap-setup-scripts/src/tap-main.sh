@@ -132,6 +132,7 @@ function tapInstallWorkloadMain {
     iterate)
       DEV_NAMESPACE_ARN=$(yq -r .repositories.workload.iterate_cluster_arn $INPUTS/user-input-values.yaml)
       echo DEV_NAMESPACE_ARN $DEV_NAMESPACE_ARN
+      kubectl -n $DEVELOPER_NAMESPACE annotate serviceaccount default eks.amazonaws.com/role-arn=$DEV_NAMESPACE_ARN --overwrite
 
       #note: scan-policy cannot work in iterate-cluster
       kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/pipeline.yaml
