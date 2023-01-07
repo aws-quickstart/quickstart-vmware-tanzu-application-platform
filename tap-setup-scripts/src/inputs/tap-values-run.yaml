@@ -22,6 +22,6 @@ appliveview_connector:
   backend:
     sslDisabled: "true"
     host:  #@ "appliveview_connector.run.{}".format(data.values.dns.domain_name)
-    
+
 excluded_packages:
   - policy.apps.tanzu.vmware.com

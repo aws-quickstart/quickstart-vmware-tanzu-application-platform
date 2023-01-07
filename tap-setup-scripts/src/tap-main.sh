@@ -52,6 +52,12 @@ function tapInstallMain {
       kubectl apply -f $GENERATED/metadata-store-exportsecret.yaml
       ;;
     iterate)
+      kubectl create -f $RESOURCES/tap-gui-viewer-service-account-rbac.yaml || true
+      ytt -f $RESOURCES/metadata-store-exportsecret.yaml  \
+        --data-value workload.namespace=$DEVELOPER_NAMESPACE \
+        --ignore-unknown-comments > $GENERATED/metadata-store-exportsecret.yaml
+
+      kubectl apply -f $GENERATED/metadata-store-exportsecret.yaml
       ;;
     view)
       kubectl apply -f $RESOURCES/metadata-store-read-only.yaml
@@ -84,6 +90,9 @@ function tapUninstallMain {
       kubectl delete secret generic store-auth-token -n metadata-store-secrets || true
       ;;
     iterate)
+      kubectl delete -f $RESOURCES/tap-gui-viewer-service-account-rbac.yaml || true
+      kubectl delete -f $GENERATED/store_ca.yaml || true
+      kubectl delete secret generic store-auth-token -n metadata-store-secrets || true
       ;;
     view)
       kubectl delete -f $RESOURCES/metadata-store-read-only.yaml || true
@@ -317,6 +326,7 @@ case $cmd in
 "prepview")
   readUserInputs
   tapPrepViewClusterToken
+  tapPrepIterateClusterToken
   tapPrepBuildClusterToken
   tapPrepRunClusterToken
   parseUserInputsViewCluster

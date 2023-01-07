@@ -100,7 +100,6 @@ function installTanzuCLI {
 
     pivnet login --api-token="$PIVNET_TOKEN"
 
-    TANZUCLI_FILE_NAME="tanzu-framework-linux-$(dpkg --print-architecture).tar"
     TANZUCLI_FILE_ID=$(pivnet product-files \
       -p tanzu-application-platform \
       -r $TAP_VERSION \
@@ -112,7 +111,9 @@ function installTanzuCLI {
       --release-version=$TAP_VERSION \
       --product-file-id=$TANZUCLI_FILE_ID
 
-    tar xvf $DOWNLOADS/$TANZUCLI_FILE_NAME -C $TANZU_DIR
+    TANZUCLI_FILE_NAME=`ls $DOWNLOADS/tanzu-framework-linux-*`
+    # echo TANZUCLI_FILE_NAME $TANZUCLI_FILE_NAME
+    tar xvf $TANZUCLI_FILE_NAME -C $TANZU_DIR
     export TANZU_CLI_NO_INIT=true
     MOST_RECENT_CLI=$(find $TANZU_DIR/cli/core/ -name tanzu-core-linux_$(dpkg --print-architecture) | xargs ls -t | head -n 1)
     echo "Installing Tanzu CLI"
@@ -244,13 +245,17 @@ function parseUserInputsMC {
   METADATA_STORE_ACCESS_TOKEN=""
   RUN_CLUSTER_URL=""
   BUILD_CLUSTER_URL=""
+  ITERATE_CLUSTER_URL=""
   RUN_CLUSTER_TOKEN=""
   BUILD_CLUSTER_TOKEN=""
+  ITERATE_CLUSTER_TOKEN=""
   ytt -f $INPUTS/tap-values-view.yaml -f $GENERATED/user-input-values.yaml \
     --data-value cluster.run.url=$RUN_CLUSTER_URL \
     --data-value cluster.run.token=$RUN_CLUSTER_TOKEN \
     --data-value cluster.build.url=$BUILD_CLUSTER_URL \
     --data-value cluster.build.token=$BUILD_CLUSTER_TOKEN \
+    --data-value cluster.iterate.url=$ITERATE_CLUSTER_URL \
+    --data-value cluster.iterate.token=$ITERATE_CLUSTER_TOKEN \
     --data-value metadata_store.access_token="Bearer $METADATA_STORE_ACCESS_TOKEN" \
     --data-value repositories.workload.server=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f1) \
     --data-value repositories.workload.ootb_repo_prefix=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f2-3) \
@@ -272,12 +277,16 @@ function parseUserInputsViewCluster {
 
   banner "Generating tap-values.yaml for View cluster"
 
+  ITERATE_CLUSTER_URL=`cat $GENERATED/iterate-cluster-url.txt`
+  ITERATE_CLUSTER_TOKEN=`cat $GENERATED/iterate-cluster-token.txt`
   BUILD_CLUSTER_URL=`cat $GENERATED/build-cluster-url.txt`
   BUILD_CLUSTER_TOKEN=`cat $GENERATED/build-cluster-token.txt`
   RUN_CLUSTER_URL=`cat $GENERATED/run-cluster-url.txt`
   RUN_CLUSTER_TOKEN=`cat $GENERATED/run-cluster-token.txt`
   METADATA_STORE_ACCESS_TOKEN=`cat $GENERATED/view-cluster-metadata-token.txt`
 
+  # echo ITERATE_CLUSTER_URL: $ITERATE_CLUSTER_URL
+  # echo ITERATE_CLUSTER_TOKEN: $ITERATE_CLUSTER_TOKEN
   # echo BUILD_CLUSTER_URL: $BUILD_CLUSTER_URL
   # echo BUILD_CLUSTER_TOKEN: $BUILD_CLUSTER_TOKEN
   # echo RUN_CLUSTER_URL: $RUN_CLUSTER_URL
@@ -289,6 +298,8 @@ function parseUserInputsViewCluster {
     --data-value cluster.run.token=$RUN_CLUSTER_TOKEN \
     --data-value cluster.build.url=$BUILD_CLUSTER_URL \
     --data-value cluster.build.token=$BUILD_CLUSTER_TOKEN \
+    --data-value cluster.iterate.url=$ITERATE_CLUSTER_URL \
+    --data-value cluster.iterate.token=$ITERATE_CLUSTER_TOKEN \
     --data-value metadata_store.access_token="Bearer $METADATA_STORE_ACCESS_TOKEN" \
     --data-value repositories.workload.server=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f1) \
     --data-value repositories.workload.ootb_repo_prefix=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f2-3) \
@@ -682,6 +693,30 @@ function runTestCasesTAPWK {
 }
 
 
+function tapPrepIterateClusterToken {
+  MY_CLUSTER_NAME="$CLUSTER_NAME_PREFIX-iterate"
+  aws eks update-kubeconfig --name ${MY_CLUSTER_NAME}
+
+  ITERATE_CLUSTER_URL=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+  ITERATE_CLUSTER_SECRET=$(kubectl -n tap-gui get sa tap-gui-viewer -o=json  | jq -r '.secrets[0].name')
+  ITERATE_CLUSTER_TOKEN=$(kubectl -n tap-gui get secret ${ITERATE_CLUSTER_SECRET} -o=json \
+   | jq -r '.data["token"]' \
+   | base64 --decode)
+
+  echo $ITERATE_CLUSTER_URL > $GENERATED/iterate-cluster-url.txt
+  echo $ITERATE_CLUSTER_TOKEN > $GENERATED/iterate-cluster-token.txt
+
+  # cat $GENERATED/iterate-cluster-token.txt
+  # cat $GENERATED/iterate-cluster-url.txt
+
+  #store_ca.yaml and view-cluster-metadata-token.txt are generated in function tapPrepViewClusterToken
+  kubectl apply -f $GENERATED/store_ca.yaml
+  METADATA_STORE_ACCESS_TOKEN=`cat $GENERATED/view-cluster-metadata-token.txt`
+  kubectl delete secret store-auth-token -n metadata-store-secrets || true
+  kubectl create secret generic store-auth-token --from-literal=auth_token=$METADATA_STORE_ACCESS_TOKEN -n metadata-store-secrets
+
+}
+
 function tapPrepBuildClusterToken {
   MY_CLUSTER_NAME="$CLUSTER_NAME_PREFIX-build"
   aws eks update-kubeconfig --name ${MY_CLUSTER_NAME}
@@ -768,14 +803,13 @@ function tapPrepWorkloadUninstall {
   banner "Removing $DEVELOPER_NAMESPACE namespace"
   kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/developer-namespace.yaml || true
 }
+
 function tapWorkloadGenerateDeliverable {
   requireValue  DEVELOPER_NAMESPACE SAMPLE_APP_NAME GENERATED
 
   echo "Generating ${GENERATED}/${SAMPLE_APP_NAME}-delivery.yaml "
 
-  kubectl get deliverables "${SAMPLE_APP_NAME}"  -n $DEVELOPER_NAMESPACE  -o yaml |  \
-    yq 'del(.status)'  | yq 'del(.metadata.ownerReferences)' |  \
-    yq 'del(.metadata.resourceVersion)' | yq 'del(.metadata.uid)' >  "${GENERATED}/${SAMPLE_APP_NAME}-delivery.yaml"
+  kubectl get configmap "${SAMPLE_APP_NAME}-deliverable"  -n $DEVELOPER_NAMESPACE  -o go-template='{{.data.deliverable}}' > "${GENERATED}/${SAMPLE_APP_NAME}-delivery.yaml"
 
   cat ${GENERATED}/${SAMPLE_APP_NAME}-delivery.yaml
 
@@ -798,5 +832,8 @@ function tapWorkloadApplyDeliverable {
 
   echo "get app URL and copy into browser to test the app"
   kubectl get ksvc -n $DEVELOPER_NAMESPACE
+
+  # workaround to see target-cluster in tap-gui
+  kubectl patch deliverable ${SAMPLE_APP_NAME} -n ${DEVELOPER_NAMESPACE} --type merge --patch "{\"metadata\":{\"labels\":{\"carto.run/workload-name\":\"${SAMPLE_APP_NAME}\",\"carto.run/workload-namespace\":\"${DEVELOPER_NAMESPACE}\"}}}"
 
 }
