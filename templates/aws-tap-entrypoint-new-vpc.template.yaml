@@ -556,10 +556,8 @@ Parameters:
       refer to Kubernetes cluster requirements
       (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
-      - 1.3.0
-    Default: 1.3.0
-    #   - 1.3.2
-    # Default: 1.3.2
+      - 1.4.0-rc.18
+    Default: 1.4.0-rc.18
   SampleAppName:
     Type: String
     Description: >-
@@ -762,7 +760,7 @@ Rules:
           Customer Experience Improvement Program (CEIP) policy before you can
           proceed with the installation.
   TAPInterop:
-    RuleCondition: !Contains [[1.3.0], !Ref TAPVersion]
+    RuleCondition: !Contains [[1.4.0-rc.18], !Ref TAPVersion]
     Assertions:
       # The values below require quotes to force string comparison.
       - Assert: !Contains [['1.22', '1.23', '1.24'], !Ref KubernetesVersion]

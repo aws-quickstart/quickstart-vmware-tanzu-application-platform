@@ -505,10 +505,8 @@ Parameters:
       refer to Kubernetes cluster requirements
       (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
-      - 1.3.0
-    Default: 1.3.0
-    #   - 1.3.2
-    # Default: 1.3.2
+      - 1.4.0-rc.18
+    Default: 1.4.0-rc.18
   SampleAppName:
     Type: String
     Description: >-
@@ -659,7 +657,7 @@ Mappings:
     '1.23':
       AwsKubectlVersion: 1.23.7/2022-06-29
   TAPVersion:
-    1.3.0:
+    1.4.0-rc.18:
       ClusterEssentialsBundleVersion: 1.3.0
   ClusterEssentialsBundle:
     1.1.0:
@@ -1506,6 +1504,20 @@ Resources:
       ToPort: 443
       FromPort: 443
       SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+  IterateEKSViewClusterApiIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Condition: CreateMultiCluster
+    Properties:
+      Description: >-
+        Allow the View Cluster to connect to the Iterate Cluster EKS
+        control plane for Kubernetes API traffic.
+      GroupId: !GetAtt ITERATEEKSQSStack.Outputs.ControlPlaneSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+      FromPort: 443
+      SourceSecurityGroupId: !GetAtt VIEWEKSQSStack.Outputs.NodeGroupSecurityGroup
   RunEKSViewClusterApiIngressRule:
     Type: AWS::EC2::SecurityGroupIngress
     UpdateReplacePolicy: Delete
@@ -1513,13 +1525,13 @@ Resources:
     Condition: CreateMultiCluster
     Properties:
       Description: >-
-        Allow the View Cluster to connect to the EKS
+        Allow the View Cluster to connect to the Run Cluster EKS
         control plane for Kubernetes API traffic.
       GroupId: !GetAtt RUNEKSQSStack.Outputs.ControlPlaneSecurityGroup
       IpProtocol: tcp
       ToPort: 443
       FromPort: 443
-      SourceSecurityGroupId: !GetAtt VIEWEKSQSStack.Outputs.ControlPlaneSecurityGroup
+      SourceSecurityGroupId: !GetAtt VIEWEKSQSStack.Outputs.NodeGroupSecurityGroup
   BuildEKSViewClusterApiIngressRule:
     Type: AWS::EC2::SecurityGroupIngress
     UpdateReplacePolicy: Delete
@@ -1527,13 +1539,13 @@ Resources:
     Condition: CreateMultiCluster
     Properties:
       Description: >-
-        Allow the View Cluster to connect to the EKS
+        Allow the View Cluster to connect to the Build Cluster EKS
         control plane for Kubernetes API traffic.
       GroupId: !GetAtt BUILDEKSQSStack.Outputs.ControlPlaneSecurityGroup
       IpProtocol: tcp
       ToPort: 443
       FromPort: 443
-      SourceSecurityGroupId: !GetAtt VIEWEKSQSStack.Outputs.ControlPlaneSecurityGroup
+      SourceSecurityGroupId: !GetAtt VIEWEKSQSStack.Outputs.NodeGroupSecurityGroup
   LinuxBastionEIP:
     Type: AWS::EC2::EIP
     Properties:
@@ -2502,8 +2514,9 @@ Resources:
             echo "Installing pivnet CLI..."
             wget -O "$tap_dir/downloads/pivnet" "https://github.com/pivotal-cf/pivnet-cli/releases/download/v${PivNetVersion}/pivnet-linux-$(dpkg --print-architecture)-${PivNetVersion}"
             install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
-            echo "Installing tanzu CLI and staging tanzu-cluster-essentials..."
+            echo "Installing Tanzu CLI and Staging Tanzu-cluster-essentials..."
             su - $user -c "$tap_dir/src/install-tools.sh"
+            sleep 120
             echo TanzuNetRelocateImages ${TanzuNetRelocateImages}
             if [[ "${TanzuNetRelocateImages}" == "Yes" ]]
             then
@@ -2803,7 +2816,7 @@ Rules:
           Customer Experience Improvement Program (CEIP) policy before you can
           proceed with the installation.
   TAPInterop:
-    RuleCondition: !Contains [[1.3.0], !Ref TAPVersion]
+    RuleCondition: !Contains [[1.4.0-rc.18], !Ref TAPVersion]
     Assertions:
       # The values below require quotes to force string comparison.
       - Assert: !Contains [['1.22', '1.23', '1.24'], !Ref KubernetesVersion]
