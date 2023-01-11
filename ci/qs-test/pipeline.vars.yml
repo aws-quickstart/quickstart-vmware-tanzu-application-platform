@@ -1,0 +1,10 @@
+repo:
+  url: https://github.com/hoegaarden/quickstart-vmware-tanzu-application-platform
+  branch: TAPPC-131_ci-build-images
+
+dockerhub-proxy: harbor-repo.vmware.com/dockerhub-proxy-cache
+
+tappc-registry:
+  url: tappc-docker-local.artifactory.eng.vmware.com
+  username: ((ci/registry/tappc.username))
+  password: ((ci/registry/tappc.password))

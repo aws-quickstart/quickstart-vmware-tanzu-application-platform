@@ -1,0 +1,7 @@
+platform: linux
+outputs:
+- name: creds
+inputs:
+- name: ci-repo
+run:
+  path: ci-repo/ci/tasks/get-cloudgate-creds/task.sh

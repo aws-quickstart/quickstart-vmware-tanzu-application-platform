@@ -1,0 +1,71 @@
+resources:
+# - name: repo
+#   type: git
+#   check_every: 1m
+#   icon: github
+#   source:
+#     uri: ((repo.url))
+#     branch: ((repo.branch))
+#     ignore_paths:
+#     - ci/
+- name: ci-repo
+  type: git
+  check_every: 1m
+  icon: github
+  source:
+    uri: ((repo.url))
+    branch: ((repo.branch))
+    paths:
+    - ci/
+- name: docker-image
+  type: registry-image
+  icon: docker
+  source:
+    repository: ((tappc-registry.url))/ci/docker-image
+    username: ((tappc-registry.username))
+    password: ((tappc-registry.password))
+    tag: latest
+
+jobs:
+# - name: set-pipeline
+#   plan:
+#   - get: ci-repo
+#     params:
+#       submodules: none
+#     trigger: true
+#   - set_pipeline: self
+#     file: ci-repo/ci/images/pipeline.yml
+#     var_files:
+#     - ci-repo/ci/images/pipeline.vars.yml
+
+- name: test
+  plan:
+  - in_parallel:
+    - get: docker-image
+    - get: ci-repo
+  - task: get-cloudgate-creds
+    image: docker-image
+    file: ci-repo/ci/tasks/get-cloudgate-creds/task.yml
+    params:
+      CLOUDGATE_BASE_URL: https://api.console.cloudgate.vmware.com
+      CLOUDGATE_CLIENT_ID: ((ci/cloudgate.clientId))
+      CLOUDGATE_CLIENT_SECRET: ((ci/cloudgate.clientSecret))
+      CLOUDGATE_MASTER_ACCOUNT_ID: ((ci/cloudgate.masterAccountId))
+      CLOUDGATE_ORG_ACCOUNT_ID: ((ci/cloudgate.orgAccountId))
+      CLOUDGATE_OU_ID: ((ci/cloudgate.ouId))
+      CLOUDGATE_TTL: 1800
+  - task: use-creds
+    image: docker-image
+    config:
+      platform: linux
+      inputs:
+      - name: creds
+      run:
+        path: bash
+        args:
+        - -c
+        - |
+          source creds/env.inc.sh
+
+          aws sts get-caller-identity
+          aws s3api list-buckets
