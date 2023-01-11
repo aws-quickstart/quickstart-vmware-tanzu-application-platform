@@ -17,6 +17,17 @@ resources:
     tag: latest
 
 jobs:
+- name: set-pipeline
+  plan:
+  - get: ci-repo
+    params:
+      submodules: none
+    trigger: true
+  - set_pipeline: self
+    file: ci-repo/ci/images/pipeline.yml
+    var_files:
+    - ci-repo/ci/images/pipeline.vars.yml
+
 - name: build-docker-image
   plan:
   - get: ci-repo
