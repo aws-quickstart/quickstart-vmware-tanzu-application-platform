@@ -1,13 +1,13 @@
 resources:
-# - name: repo
-#   type: git
-#   check_every: 1m
-#   icon: github
-#   source:
-#     uri: ((repo.url))
-#     branch: ((repo.branch))
-#     ignore_paths:
-#     - ci/
+- name: repo
+  type: git
+  check_every: 1m
+  icon: github
+  source:
+    uri: ((repo.url))
+    branch: ((repo.branch))
+    ignore_paths:
+    - ci/
 - name: ci-repo
   type: git
   check_every: 1m
@@ -43,6 +43,9 @@ jobs:
   - in_parallel:
     - get: docker-image
     - get: ci-repo
+      params:
+        submodules: none
+    - get: repo
   - task: get-cloudgate-creds
     image: docker-image
     file: ci-repo/ci/tasks/get-cloudgate-creds/task.yml
@@ -53,19 +56,34 @@ jobs:
       CLOUDGATE_MASTER_ACCOUNT_ID: ((ci/cloudgate.masterAccountId))
       CLOUDGATE_ORG_ACCOUNT_ID: ((ci/cloudgate.orgAccountId))
       CLOUDGATE_OU_ID: ((ci/cloudgate.ouId))
-      CLOUDGATE_TTL: 1800
-  - task: use-creds
+      CLOUDGATE_TTL: 43200
+  - task: taskcat-test
     image: docker-image
+    params:
+      NIMBUS_USER: ((ci/nimbus.user))
+      NIMBUS_DEPLOY_OPTS: '--cpus=4 --memory=4096'
+      DOCKER_USER: ((ci/registry/dockerhub/horlh.username))
+      DOCKER_PASS: ((ci/registry/dockerhub/horlh.password))
+      DOCKER_URL: ((ci/registry/dockerhub/horlh.url))
     config:
       platform: linux
       inputs:
       - name: creds
+      - name: repo
       run:
-        path: bash
+        path: execute
         args:
+        - bash
         - -c
         - |
+          set -e
+          set -u
+          set -o pipefail
+
           source creds/env.inc.sh
 
-          aws sts get-caller-identity
-          aws s3api list-buckets
+          # TODO: remove
+          docker login "${DOCKER_URL}" -u "${DOCKER_USER}" --password-stdin <<< "${DOCKER_PASS}"
+
+          cd repo
+          taskcat test run
