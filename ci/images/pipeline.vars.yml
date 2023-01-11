@@ -1,7 +1,6 @@
 repo:
-  uri: git@github.com:hoegaarden/quickstart-vmware-tanzu-application-platform
+  url: https://github.com/hoegaarden/quickstart-vmware-tanzu-application-platform
   branch: TAPPC-131_ci-build-images
-  ro-key: ((ci/repo-keys/github/hoegaarden/quickstart-vmware-tanzu-application-platform.ro))
 
 dockerhub-proxy: harbor-repo.vmware.com/dockerhub-proxy-cache
 

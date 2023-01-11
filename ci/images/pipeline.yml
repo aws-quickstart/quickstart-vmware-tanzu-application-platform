@@ -4,9 +4,8 @@ resources:
   check_every: 1m
   icon: github
   source:
-    uri: ((repo.uri))
+    uri: ((repo.url))
     branch: ((repo.branch))
-    private_key: ((repo.ro-key))
     paths:
     - ci/
 - name: docker-image
