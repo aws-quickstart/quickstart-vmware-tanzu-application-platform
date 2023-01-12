@@ -33,6 +33,3 @@ scanning:
 
 ootb_templates:
   iaas_auth: true
-
-excluded_packages:
-  - policy.apps.tanzu.vmware.com
