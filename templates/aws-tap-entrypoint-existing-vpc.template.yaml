@@ -1041,7 +1041,7 @@ Resources:
         NodeInstanceFamily: Standard
         NodeGroupType: Managed
         NodeGroupOS: Amazon Linux 2
-        EKSClusterName: !Join ['', [!Ref EKSClusterName, "-single" ]]
+        EKSClusterName: !Ref EKSClusterName
         ClusterAutoScaler: Enabled
         MonitoringStack: None
         ALBIngressController: Enabled
