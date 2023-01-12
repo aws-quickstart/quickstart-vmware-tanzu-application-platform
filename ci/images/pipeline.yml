@@ -1,0 +1,53 @@
+resources:
+- name: ci-repo
+  type: git
+  check_every: 1m
+  icon: github
+  source:
+    uri: ((repo.url))
+    branch: ((repo.branch))
+    paths:
+    - ci/
+- name: docker-image
+  type: registry-image
+  icon: docker
+  source:
+    repository: ((tappc-registry.url))/ci/docker-image
+    username: ((tappc-registry.username))
+    password: ((tappc-registry.password))
+    tag: latest
+
+jobs:
+- name: set-pipeline
+  plan:
+  - get: ci-repo
+    params:
+      submodules: none
+    trigger: true
+  - set_pipeline: self
+    file: ci-repo/ci/images/pipeline.yml
+    var_files:
+    - ci-repo/ci/images/pipeline.vars.yml
+
+- name: build-docker-image
+  plan:
+  - get: ci-repo
+    params:
+      submodules: none
+    passed:
+    - set-pipeline
+    trigger: true
+  - task: build
+    file: ci-repo/ci/tasks/build-image/task.yml
+    vars:
+      repo: ((docker-in-nimbus.repo))
+      tag: ((docker-in-nimbus.tag))
+    input_mapping:
+      input: ci-repo
+    params:
+      NIMBUS_USER: ((ci/nimbus.user))
+      BUILD_ARG_BASE: ((docker-in-nimbus.repo)):((docker-in-nimbus.tag))
+      CONTEXT: input/ci/images/docker-image
+  - put: docker-image
+    params:
+      image: image/image.tar

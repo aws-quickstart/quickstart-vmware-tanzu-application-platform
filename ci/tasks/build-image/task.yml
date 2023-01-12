@@ -1,0 +1,17 @@
+#! https://gitlab.eng.vmware.com/devtools/runway/concourse/resourcetypes/official/docker-in-nimbus-task/
+---
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: ((repo)) #! e.g. devtools-docker.artifactory.eng.vmware.com/vmware/runway/resourcetypes/docker-in-nimbus-task
+    tag: ((tag)) #! e.g. 0.13.0
+
+inputs:
+- name: input
+
+outputs:
+- name: image
+
+run:
+  path: build
