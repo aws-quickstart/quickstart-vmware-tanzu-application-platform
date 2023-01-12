@@ -2446,25 +2446,16 @@ Resources:
             aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-iterate.yaml" ./tap-values-iterate.yaml
             aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-view.yaml" ./tap-values-view.yaml
             aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-single.yaml" ./tap-values-single.yaml
+            echo "Logging script input parameters"
             echo ClusterArch ${ClusterArch}
-            if [[ "${ClusterArch}" == "multi" ]]
-            then
-              echo "Set IAM role arns for multi cluster..."
-              BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/BUILDBuildServiceIamRole-${StackId}"
-              WORKLOAD_ARN="arn:aws:iam::${AWS::AccountId}:role/BUILDWorkloadIamRole-${StackId}"
-              ITERATE_BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/ITERATEBuildServiceIamRole-${StackId}"
-              ITERATE_WK_ARN="arn:aws:iam::${AWS::AccountId}:role/ITERATEWorkloadIamRole-${StackId}"
-            else
-              echo "Set IAM role arns for single cluster..."
-              BUILD_ARN="arn:aws:iam::${AWS::AccountId}:role/TAPBuildServiceIamRole-${StackId}"
-              WORKLOAD_ARN="arn:aws:iam::${AWS::AccountId}:role/TAPWorkloadIamRole-${StackId}"
-              ITERATE_BUILD_ARN=""
-              ITERATE_WK_ARN=""
-            fi
-            echo $BUILD_ARN
-            echo $WORKLOAD_ARN
-            echo $ITERATE_BUILD_ARN
-            echo $ITERATE_WK_ARN
+            echo BuildClusterBuildServiceArn ${BuildClusterBuildServiceArn}
+            echo BuildClusterWorkloadArn ${BuildClusterWorkloadArn}
+            echo IterateClusterBuildServiceArn ${IterateClusterBuildServiceArn}
+            echo IterateClusterWorkloadArn ${IterateClusterWorkloadArn}
+            echo BuildClusterName ${BuildClusterName}
+            echo RunClusterName ${RunClusterName}
+            echo ViewClusterName ${ViewClusterName}
+            echo IterateClusterName ${IterateClusterName}
             cat <<EOF > ./user-input-values.yaml
             #@data/values
             ---
@@ -2486,8 +2477,8 @@ Resources:
               arch: ${ClusterArch}
               name: ${EKSClusterName}
             buildservice:
-              build_cluster_arn: $BUILD_ARN
-              iterate_cluster_arn: $ITERATE_BUILD_ARN
+              build_cluster_arn: ${BuildClusterBuildServiceArn}
+              iterate_cluster_arn: ${IterateClusterBuildServiceArn}
             dns:
               domain_name: ${TAPDomainName}
               zone_id: ${PrivateHostedZone}
@@ -2500,8 +2491,8 @@ Resources:
                 namespace: ${SampleAppNamespace}
                 repository: ${TAPWorkloadRepo.RepositoryUri}
                 bundle_repository: ${TAPWorkloadBundleRepo.RepositoryUri}
-                build_cluster_arn: $WORKLOAD_ARN
-                iterate_cluster_arn: $ITERATE_WK_ARN
+                build_cluster_arn: ${BuildClusterWorkloadArn}
+                iterate_cluster_arn: ${IterateClusterWorkloadArn}
             EOF
             popd
             pushd "$tap_dir/src/resources"
@@ -2516,7 +2507,6 @@ Resources:
             install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
             echo "Installing Tanzu CLI and Staging Tanzu-cluster-essentials..."
             su - $user -c "$tap_dir/src/install-tools.sh"
-            sleep 120
             echo TanzuNetRelocateImages ${TanzuNetRelocateImages}
             if [[ "${TanzuNetRelocateImages}" == "Yes" ]]
             then
@@ -2563,7 +2553,14 @@ Resources:
             TanzuNetRegistryServer: !FindInMap [TanzuNetRegistryServer, Server, Name]
             TAPRepo: tanzu-application-platform/tap-packages
             ClusterArch: !Ref TAPClusterArch
-            StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+            BuildClusterName: !If [CreateMultiCluster, !GetAtt BUILDEKSQSStack.Outputs.EKSClusterName, !GetAtt EKSQSStack.Outputs.EKSClusterName]
+            BuildClusterBuildServiceArn: !If [CreateMultiCluster, !GetAtt BUILDBuildServiceIamRole.Arn, !GetAtt TAPBuildServiceIamRole.Arn]
+            BuildClusterWorkloadArn: !If [CreateMultiCluster, !GetAtt BUILDWorkloadIamRole.Arn, !GetAtt TAPWorkloadIamRole.Arn]
+            IterateClusterName: !If [CreateMultiCluster, !GetAtt ITERATEEKSQSStack.Outputs.EKSClusterName, ""]
+            IterateClusterBuildServiceArn: !If [CreateMultiCluster, !GetAtt ITERATEBuildServiceIamRole.Arn, ""]
+            IterateClusterWorkloadArn: !If [CreateMultiCluster, !GetAtt ITERATEWorkloadIamRole.Arn, ""]
+            RunClusterName: !If [CreateMultiCluster, !GetAtt RUNEKSQSStack.Outputs.EKSClusterName, ""]
+            ViewClusterName: !If [CreateMultiCluster, !GetAtt VIEWEKSQSStack.Outputs.EKSClusterName, ""]
   UbuntuBastionEipAssociation:
     Type: AWS::EC2::EIPAssociation
     UpdateReplacePolicy: Delete

@@ -71,6 +71,3 @@ scanning:
 
 image_policy_webhook:
   allow_unmatched_tags: true
-
-excluded_packages:
-  - policy.apps.tanzu.vmware.com
