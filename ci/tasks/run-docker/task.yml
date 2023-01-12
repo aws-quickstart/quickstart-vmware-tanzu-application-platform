@@ -1,0 +1,16 @@
+---
+platform: linux
+inputs:
+- name: ci-repo
+- name: creds
+- name: repo
+caches:
+- path: image-cache
+params:
+  NIMBUS_USER:
+  NIMBUS_DEPLOY_OPTS:
+  DOCKER_HUB_PROXY:
+run:
+  path: execute
+  args:
+  - ci-repo/ci/tasks/run-docker/task.sh
