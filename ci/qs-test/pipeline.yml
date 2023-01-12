@@ -62,5 +62,5 @@ jobs:
     file: ci-repo/ci/tasks/run-docker/task.yml
     params:
       NIMBUS_USER: ((ci/nimbus.user))
-      NIMBUS_DEPLOY_OPTS: '--cpus=4 --memory=4096'
+      NIMBUS_DEPLOY_OPTS: '--cpus=6 --memory=4096'
       DOCKER_HUB_PROXY: ((dockerhub-proxy))
