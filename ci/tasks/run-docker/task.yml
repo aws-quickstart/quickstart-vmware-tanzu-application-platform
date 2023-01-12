@@ -10,7 +10,12 @@ params:
   NIMBUS_USER:
   NIMBUS_DEPLOY_OPTS:
   DOCKER_HUB_PROXY:
+  RUN: 'echo >&2 "RUN not defined. Exiting."; exit 1;'
 run:
   path: execute
   args:
-  - ci-repo/ci/tasks/run-docker/task.sh
+  - "bash"
+  - "-euo"
+  - "pipefail"
+  - "-c"
+  - "$RUN"
