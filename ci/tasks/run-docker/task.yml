@@ -4,6 +4,8 @@ inputs:
 - name: ci-repo
 - name: creds
 - name: repo
+outputs:
+- name: output
 caches:
 - path: image-cache
 params:

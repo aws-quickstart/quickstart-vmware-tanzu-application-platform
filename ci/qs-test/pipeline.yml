@@ -65,3 +65,15 @@ jobs:
       NIMBUS_USER: ((ci/nimbus.user))
       NIMBUS_DEPLOY_OPTS: '--cpus=6 --memory=4096'
       DOCKER_HUB_PROXY: ((dockerhub-proxy))
+
+  - task: taskcat-test
+    image: docker-image
+    config:
+      platform: linux
+      inputs:
+      - name: output
+      run:
+        path: bash
+        args:
+        - -c
+        - 'exit 1'

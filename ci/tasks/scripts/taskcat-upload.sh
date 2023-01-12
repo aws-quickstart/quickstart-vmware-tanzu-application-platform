@@ -6,19 +6,36 @@ set -o pipefail
 
 # TODO move to image
 apt-get -y update
-apt-get -y install pigz
+apt-get -y install pigz jq
+pip3 install yq
 
 source creds/env.inc.sh
 source ci-repo/ci/tasks/lib/docker.lib.sh
 source ci-repo/ci/tasks/lib/misc.lib.sh
 
 readonly IMAGE_CACHE_FILE="${PWD}/image-cache/images.tar.gz"
+readonly TASKCAT_CONFIG_OUTPUT="${PWD}/output/taskcat.yml"
 
 main() {
   cd repo
 
-  # Runs `taskcat package -s functions/source -z functions/packages` internally
+  local gitSha="$( git rev-parse HEAD )"
+
+  # To upload into a different subdirectory inside the bucket, we need to
+  # change the taskcat name and pass that bucket subdirectory into our stack as
+  # a paramater. Thus we patch taskcat's config here and later use that for the
+  # output of our task.
+  local patchedTaskcatConfig="$(
+    yq -y --arg gitSha "$gitSha" \
+      '.project.name = $gitSha | .project.parameters.QSS3KeyPrefix = $gitSha + "/"' \
+      .taskcat.yml
+  )"
+  echo "$patchedTaskcatConfig" > .taskcat.yml
+
   taskcat upload
+
+  # produce the output, so other tasks can pick it up
+  cp .taskcat.yml "${TASKCAT_CONFIG_OUTPUT}"
 }
 
 run::logged 'load images from cache' \
