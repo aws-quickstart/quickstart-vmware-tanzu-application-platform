@@ -4,11 +4,6 @@ set -e
 set -u
 set -o pipefail
 
-# TODO move to image
-apt-get -y update
-apt-get -y install pigz jq
-pip3 install yq
-
 source creds/env.inc.sh
 source ci-repo/ci/tasks/lib/docker.lib.sh
 source ci-repo/ci/tasks/lib/misc.lib.sh

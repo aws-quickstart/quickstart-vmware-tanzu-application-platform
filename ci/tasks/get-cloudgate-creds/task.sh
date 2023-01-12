@@ -4,10 +4,6 @@ set -e
 set -u
 set -o pipefail
 
-# put that into the container image
-apt-get -y update
-apt-get -y install jq
-
 main() {
   local token="$(
     curl --silent --fail --location --request POST "${CLOUDGATE_BASE_URL}/authn/token" \

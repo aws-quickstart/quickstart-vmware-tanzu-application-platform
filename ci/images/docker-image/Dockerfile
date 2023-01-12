@@ -7,7 +7,9 @@ RUN apt-get -qy update \
         && apt-get -qy install -o APT::Install-Suggests=0 -o APT::Install-Recommends=0 \
             curl \
             git \
+            jq \
             less \
+            pigz \
             python3-pip \
         && pip3 --no-cache-dir install --upgrade \
             pip \
@@ -15,4 +17,5 @@ RUN apt-get -qy update \
         && python3 -m pip --no-cache-dir install \
             awscli \
             taskcat \
+            yq \
         && rm -rf /var/lib/apt/lists/*
