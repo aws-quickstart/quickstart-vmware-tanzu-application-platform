@@ -17,14 +17,6 @@ resources:
     branch: ((repo.branch))
     paths:
     - ci/
-- name: docker-image
-  type: registry-image
-  icon: docker
-  source:
-    repository: ((tappc-registry.url))/ci/docker-image
-    username: ((tappc-registry.username))
-    password: ((tappc-registry.password))
-    tag: latest
 
 jobs:
 # - name: set-pipeline
@@ -48,7 +40,6 @@ jobs:
     - get: repo
   - in_parallel:
     - task: get-cloudgate-creds
-      image: docker-image
       file: ci-repo/ci/tasks/get-cloudgate-creds/task.yml
       params:
         CLOUDGATE_BASE_URL: https://api.console.cloudgate.vmware.com
@@ -63,6 +54,11 @@ jobs:
       image: docker-image
       config:
         platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: tappc-docker-local.artifactory.eng.vmware.com/ci/docker-image
+            tag: latest
         inputs:
         - name: ci-repo
         - name: repo
@@ -93,10 +89,8 @@ jobs:
         VAR_domain: thingamaji.ga
 
   - task: taskcat-upload
-    image: docker-image
-    file: ci-repo/ci/tasks/run-docker/task.yml
+    file: ci-repo/ci/tasks/taskcat-build-upload/task.yml
     params:
-      RUN: ci-repo/ci/tasks/scripts/taskcat-upload.sh
       NIMBUS_USER: ((ci/nimbus.user))
       NIMBUS_DEPLOY_OPTS: '--cpus=6 --memory=4096'
       DOCKER_HUB_PROXY: ((dockerhub-proxy))
@@ -105,6 +99,11 @@ jobs:
     image: docker-image
     config:
       platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: tappc-docker-local.artifactory.eng.vmware.com/ci/docker-image
+          tag: latest
       inputs:
       - name: output
       run:

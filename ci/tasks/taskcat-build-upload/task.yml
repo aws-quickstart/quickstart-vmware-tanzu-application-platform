@@ -1,5 +1,12 @@
 ---
 platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: tappc-docker-local.artifactory.eng.vmware.com/ci/docker-image
+    tag: latest
+
 inputs:
 - name: ci-repo
 - name: creds
@@ -13,12 +20,8 @@ params:
   NIMBUS_USER:
   NIMBUS_DEPLOY_OPTS:
   DOCKER_HUB_PROXY:
-  RUN: 'echo >&2 "RUN not defined. Exiting."; exit 1;'
+
 run:
   path: execute
   args:
-  - "bash"
-  - "-euo"
-  - "pipefail"
-  - "-c"
-  - "$RUN"
+  - ci-repo/ci/tasks/taskcat-build-upload/task.sh
