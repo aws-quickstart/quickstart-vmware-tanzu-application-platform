@@ -46,17 +46,52 @@ jobs:
       params:
         submodules: none
     - get: repo
-  - task: get-cloudgate-creds
-    image: docker-image
-    file: ci-repo/ci/tasks/get-cloudgate-creds/task.yml
-    params:
-      CLOUDGATE_BASE_URL: https://api.console.cloudgate.vmware.com
-      CLOUDGATE_CLIENT_ID: ((ci/cloudgate.clientId))
-      CLOUDGATE_CLIENT_SECRET: ((ci/cloudgate.clientSecret))
-      CLOUDGATE_MASTER_ACCOUNT_ID: ((ci/cloudgate.masterAccountId))
-      CLOUDGATE_ORG_ACCOUNT_ID: ((ci/cloudgate.orgAccountId))
-      CLOUDGATE_OU_ID: ((ci/cloudgate.ouId))
-      CLOUDGATE_TTL: 43200
+  - in_parallel:
+    - task: get-cloudgate-creds
+      image: docker-image
+      file: ci-repo/ci/tasks/get-cloudgate-creds/task.yml
+      params:
+        CLOUDGATE_BASE_URL: https://api.console.cloudgate.vmware.com
+        CLOUDGATE_CLIENT_ID: ((ci/cloudgate.clientId))
+        CLOUDGATE_CLIENT_SECRET: ((ci/cloudgate.clientSecret))
+        CLOUDGATE_MASTER_ACCOUNT_ID: ((ci/cloudgate.masterAccountId))
+        CLOUDGATE_ORG_ACCOUNT_ID: ((ci/cloudgate.orgAccountId))
+        CLOUDGATE_OU_ID: ((ci/cloudgate.ouId))
+        CLOUDGATE_TTL: 43200
+
+    - task: generate-taskcat-config
+      image: docker-image
+      config:
+        platform: linux
+        inputs:
+        - name: ci-repo
+        - name: repo
+        outputs:
+        - name: taskcat-config
+        run:
+          path: bash
+          args:
+          - -c
+          - |
+            set -e
+            set -u
+            set -o pipefail
+
+            gitSha="$( cd repo && git rev-parse HEAD )"
+
+            ytt \
+              --file ci-repo/ci/qs-test/taskcat.yml \
+              --data-values-env VAR \
+              --data-value gitSha="$gitSha" \
+              > taskcat-config/taskcat.yml
+      params:
+        VAR_tanzunet_username: ((ci/tanzunet.username))
+        VAR_tanzunet_password: ((ci/tanzunet.password))
+        VAR_tanzunet_refreshToken: ((ci/tanzunet.refreshToken))
+        VAR_keypairName: ((ci/qs-test/keypair.name))
+        VAR_bucket: tcat-9d0156f41d3b503b8360120b8214b6f1
+        VAR_domain: thingamaji.ga
+
   - task: taskcat-upload
     image: docker-image
     file: ci-repo/ci/tasks/run-docker/task.yml

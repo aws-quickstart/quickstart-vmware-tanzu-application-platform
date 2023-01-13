@@ -9,28 +9,12 @@ source ci-repo/ci/tasks/lib/docker.lib.sh
 source ci-repo/ci/tasks/lib/misc.lib.sh
 
 readonly IMAGE_CACHE_FILE="${PWD}/image-cache/images.tar.gz"
-readonly TASKCAT_CONFIG_OUTPUT="${PWD}/output/taskcat.yml"
+readonly TASKCAT_CONFIG_FILE="${PWD}/taskcat-config/taskcat.yml"
 
 main() {
   cd repo
 
-  local gitSha="$( git rev-parse HEAD )"
-
-  # To upload into a different subdirectory inside the bucket, we need to
-  # change the taskcat name and pass that bucket subdirectory into our stack as
-  # a paramater. Thus we patch taskcat's config here and later use that for the
-  # output of our task.
-  local patchedTaskcatConfig="$(
-    yq -y --arg gitSha "$gitSha" \
-      '.project.name = $gitSha | .project.parameters.QSS3KeyPrefix = $gitSha + "/"' \
-      .taskcat.yml
-  )"
-  echo "$patchedTaskcatConfig" > .taskcat.yml
-
-  taskcat upload
-
-  # produce the output, so other tasks can pick it up
-  cp .taskcat.yml "${TASKCAT_CONFIG_OUTPUT}"
+  taskcat upload --config-file "$TASKCAT_CONFIG_FILE"
 }
 
 run::logged 'load images from cache' \

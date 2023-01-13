@@ -4,6 +4,7 @@ inputs:
 - name: ci-repo
 - name: creds
 - name: repo
+- name: taskcat-config
 outputs:
 - name: output
 caches:
