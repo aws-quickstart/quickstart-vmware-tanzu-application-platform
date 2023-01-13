@@ -33,7 +33,6 @@ jobs:
 - name: test
   plan:
   - in_parallel:
-    - get: docker-image
     - get: ci-repo
       params:
         submodules: none
@@ -49,37 +48,8 @@ jobs:
         CLOUDGATE_ORG_ACCOUNT_ID: ((ci/cloudgate.orgAccountId))
         CLOUDGATE_OU_ID: ((ci/cloudgate.ouId))
         CLOUDGATE_TTL: 43200
-
     - task: generate-taskcat-config
-      image: docker-image
-      config:
-        platform: linux
-        image_resource:
-          type: registry-image
-          source:
-            repository: tappc-docker-local.artifactory.eng.vmware.com/ci/docker-image
-            tag: latest
-        inputs:
-        - name: ci-repo
-        - name: repo
-        outputs:
-        - name: taskcat-config
-        run:
-          path: bash
-          args:
-          - -c
-          - |
-            set -e
-            set -u
-            set -o pipefail
-
-            gitSha="$( cd repo && git rev-parse HEAD )"
-
-            ytt \
-              --file ci-repo/ci/qs-test/taskcat.yml \
-              --data-values-env VAR \
-              --data-value gitSha="$gitSha" \
-              > taskcat-config/taskcat.yml
+      file: ci-repo/ci/tasks/taskcat-generate-config/task.yml
       params:
         VAR_tanzunet_username: ((ci/tanzunet.username))
         VAR_tanzunet_password: ((ci/tanzunet.password))
@@ -96,7 +66,6 @@ jobs:
       DOCKER_HUB_PROXY: ((dockerhub-proxy))
 
   - task: taskcat-test
-    image: docker-image
     config:
       platform: linux
       image_resource:

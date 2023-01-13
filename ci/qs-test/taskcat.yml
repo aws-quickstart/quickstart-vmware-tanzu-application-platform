@@ -5,6 +5,7 @@
 
 #@ domain = data.values.domain
 #@ gitSha = data.values.gitSha
+#@ gitRemote = data.values.gitRemote
 #@ bucket = data.values.bucket
 #@ tanzunet_username = data.values.tanzunet_username
 #@ tanzunet_password = data.values.tanzunet_password
@@ -17,6 +18,7 @@ project:
   owner: quickstart-eng@amazon.com
   s3_bucket: #@ bucket
   s3_regional_buckets: true
+  shorten_stack_name: true
   template: templates/aws-tap-entrypoint-new-vpc.template.yaml
   package_lambda: true
   lambda_source_path: functions/source
@@ -42,14 +44,21 @@ project:
     QSS3Prefix: #@ gitSha + "/"
   regions:
     - #@ region
+  tags:
+    gitSha: #@ gitSha
+    gitRemote: #@ gitRemote
 tests:
   single:
     regions:
       - #@ region
     parameters:
       TAPClusterArch: single
+    tags:
+      test: single
   multi:
     regions:
       - #@ region
     parameters:
       TAPClusterArch: multi
+    tags:
+      test: multi
