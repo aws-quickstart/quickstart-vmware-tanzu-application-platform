@@ -22,6 +22,4 @@ params:
   DOCKER_HUB_PROXY:
 
 run:
-  path: execute
-  args:
-  - ci-repo/ci/tasks/taskcat-build-upload/task.sh
+  path: ci-repo/ci/tasks/taskcat-build-upload/task.sh

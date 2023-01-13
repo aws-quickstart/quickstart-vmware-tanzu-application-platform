@@ -58,7 +58,7 @@ jobs:
         VAR_bucket: tcat-9d0156f41d3b503b8360120b8214b6f1
         VAR_domain: thingamaji.ga
 
-  - task: taskcat-upload
+  - task: taskcat-prepare-bucket
     file: ci-repo/ci/tasks/taskcat-build-upload/task.yml
     params:
       NIMBUS_USER: ((ci/nimbus.user))
@@ -89,9 +89,9 @@ jobs:
           source creds/env.inc.sh
 
           cd repo
-          taskcat --debug \
-            test run \
-              --skip-upload \
-              --input-file ../taskcat-config/taskcat.yml \
-              --test-names single \
-              --minimal-output
+          taskcat test run \
+            --skip-upload \
+            --input-file ../taskcat-config/taskcat.yml \
+            --test-names single \
+            --minimal-output \
+            --no-delete

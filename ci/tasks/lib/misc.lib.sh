@@ -4,7 +4,12 @@ run::logged() {
 
   echo >&2 "## ---- ${msg}"
   "$@" || rc=$?
-  echo >&2 "## ----"
+
+  if [[ $rc == 0 ]] ; then
+    echo >&2 "## ---- ${msg} done."
+  else
+    echo >&2 "## ---- ${msg} failed! (rc: $rc)"
+  fi
   echo >&2
 
   return $rc
