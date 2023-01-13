@@ -74,9 +74,24 @@ jobs:
           repository: tappc-docker-local.artifactory.eng.vmware.com/ci/docker-image
           tag: latest
       inputs:
-      - name: output
+      - name: taskcat-config
+      - name: repo
+      - name: creds
       run:
         path: bash
         args:
         - -c
-        - 'exit 1'
+        - |
+          set -e
+          set -u
+          set -o pipefail
+
+          source creds/env.inc.sh
+
+          cd repo
+          taskcat --debug \
+            test run \
+              --skip-upload \
+              --input-file ../taskcat-config/taskcat.yml \
+              --test-names single \
+              --minimal-output
