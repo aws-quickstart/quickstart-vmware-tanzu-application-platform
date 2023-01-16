@@ -41,7 +41,7 @@ project:
     TAPDomainName: #@ "{}.{}".format("$[taskcat_random-string]", domain)
     QSS3BucketName: #@ bucket + "-" + region
     QSS3BucketRegion: #@ region
-    QSS3Prefix: #@ gitSha + "/"
+    QSS3KeyPrefix: #@ gitSha + "/"
   regions:
     - #@ region
   tags:
