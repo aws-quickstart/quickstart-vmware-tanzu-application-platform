@@ -53,12 +53,8 @@ tests:
       - #@ region
     parameters:
       TAPClusterArch: single
-    tags:
-      test: single
   multi:
     regions:
       - #@ region
     parameters:
       TAPClusterArch: multi
-    tags:
-      test: multi
