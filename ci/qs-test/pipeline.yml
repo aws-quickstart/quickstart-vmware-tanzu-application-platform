@@ -39,7 +39,8 @@ jobs:
     - get: repo
   - &setup
     in_parallel:
-    - task: get-cloudgate-creds
+    - &getCloudGateCreds
+      task: get-cloudgate-creds
       file: ci-repo/ci/tasks/get-cloudgate-creds/task.yml
       params:
         CLOUDGATE_BASE_URL: https://api.console.cloudgate.vmware.com
@@ -84,6 +85,12 @@ jobs:
     file: ci-repo/ci/tasks/taskcat-run-test/task.yml
     params:
       TEST_NAME: single
+    ensure: &postTest
+      in_parallel:
+      - task: print-logs
+        file: ci-repo/ci/tasks/taskcat-print-logs/task.yml
+      - task: cleanup-stack
+        file: ci-repo/ci/tasks/aws-delete-stack/task.yml
 
 - name: test-multi
   plan:
@@ -103,3 +110,4 @@ jobs:
     file: ci-repo/ci/tasks/taskcat-run-test/task.yml
     params:
       TEST_NAME: multi
+    ensure: *postTest
