@@ -40,6 +40,7 @@ jobs:
     - ci-repo/ci/qs-test/pipeline.vars.yml
 
 - name: prepare-bucket
+  serial: true
   plan:
   - in_parallel:
     - get: ci-repo
@@ -80,6 +81,7 @@ jobs:
       DOCKER_HUB_PROXY: ((dockerhub-proxy))
 
 - name: test-single
+  serial: true
   plan:
   - in_parallel:
     - get: ci-repo
@@ -105,6 +107,7 @@ jobs:
         file: ci-repo/ci/tasks/aws-delete-stack/task.yml
 
 - name: test-multi
+  serial: true
   plan:
   - in_parallel:
     - get: ci-repo
