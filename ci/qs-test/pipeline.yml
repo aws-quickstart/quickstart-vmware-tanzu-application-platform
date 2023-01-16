@@ -124,7 +124,7 @@ jobs:
       TEST_NAME: multi
     ensure: *postTest
 
-- name: failed-stacks
+- name: housekeeping
   plan:
   - in_parallel:
     - get: houekeeping-time
@@ -134,75 +134,4 @@ jobs:
         submodules: none
   - *getCloudGateCreds
   - task: print-failed-stacks
-    config:
-      platform: linux
-      image_resource:
-        type: registry-image
-        source:
-          repository: tappc-docker-local.artifactory.eng.vmware.com/ci/docker-image
-          tag: latest
-      inputs:
-      - name: creds
-      - name: ci-repo
-      params:
-        REGIONS: us-east-1
-      run:
-        path: bash
-        args:
-        - -c
-        - |
-          set -e
-          set -u
-          set -o pipefail
-
-          . creds/env.inc.sh
-
-          # TODO: auto-cleanup failed stacks; for now, just report
-          main() {
-            local rc=0
-
-            echo >&2 -e 'failed stacks:'
-            failedStacks || rc=$(( rc | $? ))
-
-            echo >&2 -e 'old stacks:'
-            oldStacks || rc=$(( rc | $? ))
-
-            return $rc
-          }
-
-          cleanStackList() {
-            jq 'map(del(.TemplateDescription, .DriftInformation))'
-          }
-
-          oldStacks() {
-            # TODO: get a list of stacks which are older than x days
-            echo >&2 'not implemented yet.'
-            return 0
-          }
-
-          failedStacks() {
-            local res='[]'
-
-            for r in $REGIONS ; do
-              regionData="$(
-                aws cloudformation list-stacks \
-                  --region "$r" \
-                  --stack-status-filter CREATE_FAILED DELETE_FAILED ROLLBACK_FAILED UPDATE_FAILED \
-                  --query 'StackSummaries[]' \
-                  --output json \
-                  | jq --arg region "$r" '.[].Region = $region'
-              )"
-
-              [[ "$regionData" == '[]' ]] && continue
-
-              res="$( jq --argjson new "$regionData" '. + $new' <<< "$res" )"
-            done
-
-            cleanStackList <<< "$res"
-
-            [[ "$res" != '[]' ]] && {
-              return 1
-            }
-          }
-
-          main "$@"
+    file: ci-repo/ci/tasks/aws-housekeeping/stacks.yml
