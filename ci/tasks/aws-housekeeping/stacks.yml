@@ -10,5 +10,6 @@ inputs:
 - name: ci-repo
 params:
   REGIONS: us-east-1
+  OLD_AFTER: 3 days
 run:
   path: ci-repo/ci/tasks/aws-housekeeping/stacks.sh
