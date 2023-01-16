@@ -30,14 +30,15 @@ jobs:
 #     var_files:
 #     - ci-repo/ci/images/pipeline.vars.yml
 
-- name: test
+- name: prepare-bucket
   plan:
   - in_parallel:
     - get: ci-repo
       params:
         submodules: none
     - get: repo
-  - in_parallel:
+  - &setup
+    in_parallel:
     - task: get-cloudgate-creds
       file: ci-repo/ci/tasks/get-cloudgate-creds/task.yml
       params:
@@ -65,33 +66,40 @@ jobs:
       NIMBUS_DEPLOY_OPTS: '--cpus=6 --memory=4096'
       DOCKER_HUB_PROXY: ((dockerhub-proxy))
 
+- name: test-single
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ prepare-bucket ]
+    - get: repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ prepare-bucket ]
+  - *setup
   - task: taskcat-test
-    config:
-      platform: linux
-      image_resource:
-        type: registry-image
-        source:
-          repository: tappc-docker-local.artifactory.eng.vmware.com/ci/docker-image
-          tag: latest
-      inputs:
-      - name: taskcat-config
-      - name: repo
-      - name: creds
-      run:
-        path: bash
-        args:
-        - -c
-        - |
-          set -e
-          set -u
-          set -o pipefail
+    file: ci-repo/ci/tasks/taskcat-run-test/task.yml
+    params:
+      TEST_NAME: single
 
-          source creds/env.inc.sh
-
-          cd repo
-          taskcat test run \
-            --skip-upload \
-            --input-file ../taskcat-config/taskcat.yml \
-            --test-names single \
-            --minimal-output \
-            --no-delete
+- name: test-multi
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ prepare-bucket ]
+    - get: repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ prepare-bucket ]
+  - *setup
+  - task: taskcat-test
+    file: ci-repo/ci/tasks/taskcat-run-test/task.yml
+    params:
+      TEST_NAME: multi
