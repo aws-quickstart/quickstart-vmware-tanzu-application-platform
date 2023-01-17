@@ -1,3 +1,9 @@
+resource_types:
+- name: slack-alert
+  type: registry-image
+  source:
+    repository: ((dockerhub-proxy))/arbourd/concourse-slack-alert-resource
+
 resources:
 - name: ci-repo
   type: git
@@ -16,9 +22,24 @@ resources:
     username: ((tappc-registry.username))
     password: ((tappc-registry.password))
     tag: latest
+- name: notify
+  icon: slack
+  type: slack-alert
+  source:
+    url: ((ci/slack.webhook))
+
+alerting:
+  onJobs: &alertingOnJobs
+    on_failure:
+      put: notify
+      params: { alert_type: failed }
+    on_error:
+      put: notify
+      params: { alert_type: errored }
 
 jobs:
 - name: set-pipeline
+  << : *alertingOnJobs
   plan:
   - get: ci-repo
     params:
@@ -30,6 +51,7 @@ jobs:
     - ci-repo/ci/images/pipeline.vars.yml
 
 - name: build-docker-image
+  << : *alertingOnJobs
   plan:
   - get: ci-repo
     params:
@@ -51,3 +73,8 @@ jobs:
   - put: docker-image
     params:
       image: image/image.tar
+    on_success:
+      put: notify
+      params:
+        alert_type: success
+        text: new `docker-image` pushed

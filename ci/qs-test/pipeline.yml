@@ -1,3 +1,9 @@
+resource_types:
+- name: slack-alert
+  type: registry-image
+  source:
+    repository: ((dockerhub-proxy))/arbourd/concourse-slack-alert-resource
+
 resources:
 - name: repo
   type: git
@@ -19,6 +25,7 @@ resources:
     - ci/qs-test/
     - ci/tasks/
 - name: houekeeping-time
+  icon: wrench-clock
   type: time
   source:
     location: UTC
@@ -26,9 +33,24 @@ resources:
     stop: 09:00 AM
     days: [ Monday, Tuesday, Wednesday, Thursday, Friday ]
     initial_version: true
+- name: notify
+  icon: slack
+  type: slack-alert
+  source:
+    url: ((ci/slack.webhook))
+
+alerting:
+  onJobs: &alertingOnJobs
+    on_failure:
+      put: notify
+      params: { alert_type: failed }
+    on_error:
+      put: notify
+      params: { alert_type: errored }
 
 jobs:
 - name: set-pipeline
+  << : *alertingOnJobs
   plan:
   - get: ci-repo
     params:
@@ -40,6 +62,7 @@ jobs:
     - ci-repo/ci/qs-test/pipeline.vars.yml
 
 - name: prepare-bucket
+  << : *alertingOnJobs
   serial: true
   plan:
   - in_parallel:
@@ -81,6 +104,7 @@ jobs:
       DOCKER_HUB_PROXY: ((dockerhub-proxy))
 
 - name: test-single
+  << : *alertingOnJobs
   serial: true
   plan:
   - in_parallel:
@@ -107,6 +131,7 @@ jobs:
         file: ci-repo/ci/tasks/aws-delete-stack/task.yml
 
 - name: test-multi
+  << : *alertingOnJobs
   serial: true
   plan:
   - in_parallel:
@@ -128,6 +153,7 @@ jobs:
     ensure: *postTest
 
 - name: housekeeping
+  << : *alertingOnJobs
   plan:
   - in_parallel:
     - get: houekeeping-time
