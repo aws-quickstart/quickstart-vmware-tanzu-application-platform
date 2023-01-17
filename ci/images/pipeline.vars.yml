@@ -8,7 +8,7 @@ dockerhub-proxy: harbor-repo.vmware.com/dockerhub-proxy-cache
 #! https://artifactory.eng.vmware.com/ui/repos/tree/General/devtools-docker/vmware/runway/resourcetypes/docker-in-nimbus-task
 docker-in-nimbus:
   repo: devtools-docker.artifactory.eng.vmware.com/vmware/runway/resourcetypes/docker-in-nimbus-task
-  tag: 0.13.1
+  tag: 0.13.3
 
 tappc-registry:
   url: tappc-docker-local.artifactory.eng.vmware.com
