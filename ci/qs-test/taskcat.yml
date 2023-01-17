@@ -1,11 +1,12 @@
 #@ load("@ytt:data", "data")
+#@ load("@ytt:regexp", "regexp")
 
 #@ region = "us-east-1"
 #@ accessCIDR = "0.0.0.0/0"
 
 #@ domain = data.values.domain
 #@ gitSha = data.values.gitSha
-#@ gitRemote = data.values.gitRemote
+#@ gitRemote = regexp.replace("(https?://)[^@]+(@)", data.values.gitRemote, "$1--redacted--$2")
 #@ bucket = data.values.bucket
 #@ tanzunet_username = data.values.tanzunet_username
 #@ tanzunet_password = data.values.tanzunet_password
