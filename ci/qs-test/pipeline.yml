@@ -162,5 +162,5 @@ jobs:
         submodules: none
       passed: [ set-pipeline ]
   - *getCloudGateCreds
-  - task: print-failed-stacks
+  - task: stacks-housekeeping
     file: ci-repo/ci/tasks/aws-housekeeping/stacks.yml

@@ -11,5 +11,6 @@ inputs:
 params:
   REGIONS: us-east-1
   OLD_AFTER: 3 days
+  IGNORE_OLD_STACKS_RE: '(eks-quickstart-AccountSharedResources|eks-quickstart-RegionalSharedResources)'
 run:
   path: ci-repo/ci/tasks/aws-housekeeping/stacks.sh
