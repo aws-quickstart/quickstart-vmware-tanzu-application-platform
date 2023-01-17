@@ -1,0 +1,11 @@
+repo:
+  host: github.com
+  slug: vmware-tap-on-public-cloud/quickstart-vmware-tanzu-application-platform
+  branch: TAPPC-132_qs-test-main
+
+dockerhub-proxy: harbor-repo.vmware.com/dockerhub-proxy-cache
+
+tappc-registry:
+  url: tappc-docker-local.artifactory.eng.vmware.com
+  username: ((ci/registry/tappc.username))
+  password: ((ci/registry/tappc.password))

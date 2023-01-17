@@ -1,0 +1,25 @@
+---
+platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: tappc-docker-local.artifactory.eng.vmware.com/ci/docker-image
+    tag: latest
+
+inputs:
+- name: ci-repo
+- name: creds
+- name: repo
+- name: taskcat-config
+outputs:
+- name: output
+caches:
+- path: image-cache
+params:
+  NIMBUS_USER:
+  NIMBUS_DEPLOY_OPTS:
+  DOCKER_HUB_PROXY:
+
+run:
+  path: ci-repo/ci/tasks/taskcat-build-upload/task.sh
