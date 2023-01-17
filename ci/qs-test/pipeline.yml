@@ -3,6 +3,10 @@ resource_types:
   type: registry-image
   source:
     repository: ((dockerhub-proxy))/arbourd/concourse-slack-alert-resource
+- name: pull-request
+  type: registry-image
+  source:
+    repository: ((dockerhub-proxy))/teliaoss/github-pr-resource
 
 resources:
 - name: repo
@@ -10,7 +14,7 @@ resources:
   check_every: 1m
   icon: github
   source:
-    uri: ((repo.url))
+    uri: https://((repo.host))/((repo.slug))
     branch: ((repo.branch))
     ignore_paths:
     - ci/
@@ -19,7 +23,7 @@ resources:
   check_every: 1m
   icon: github
   source:
-    uri: ((repo.url))
+    uri: https://((repo.host))/((repo.slug))
     branch: ((repo.branch))
     paths:
     - ci/qs-test/
@@ -38,6 +42,14 @@ resources:
   type: slack-alert
   source:
     url: ((ci/slack.webhook))
+- name: pull-request
+  icon: pull-request
+  type: pull-request
+  source:
+    repository: ((repo.slug))
+    #! TODO: get a proper PAT
+    access_token: ((ci/repo-keys/github/hoegaarden/quickstart-vmware-tanzu-application-platform.pat))
+    disable_forks: false
 
 alerting:
   onJobs: &alertingOnJobs
@@ -47,6 +59,16 @@ alerting:
     on_error:
       put: notify
       params: { alert_type: errored }
+
+groups:
+- name: main
+  jobs: [ prepare-bucket, test-single, test-multi, set-pipeline ]
+- name: pr
+  jobs: [ "pr-*", set-pipeline ]
+- name: housekeeping
+  jobs: [ "housekeep*", set-pipeline ]
+- name: all
+  jobs: [ "*", set-pipeline ]
 
 jobs:
 - name: set-pipeline
@@ -61,6 +83,7 @@ jobs:
     var_files:
     - ci-repo/ci/qs-test/pipeline.vars.yml
 
+#! ---> main ----
 - name: prepare-bucket
   << : *alertingOnJobs
   serial: true
@@ -150,6 +173,74 @@ jobs:
     params:
       TEST_NAME: multi
     ensure: *postTest
+#! ---< main ----
+
+#! ---> PR stuff ----
+- name: pr-prepare-bucket
+  << : *alertingOnJobs
+  serial: true
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      passed: [ set-pipeline ]
+    - get: repo
+      resource: pull-request
+      trigger: true
+  - in_parallel:
+    - task: handle-submodules
+      file: ci-repo/ci/tasks/git-force-submodules/task.yml
+    - *setup
+  - task: taskcat-prepare-bucket
+    file: ci-repo/ci/tasks/taskcat-build-upload/task.yml
+    params:
+      NIMBUS_USER: ((ci/nimbus.user))
+      NIMBUS_DEPLOY_OPTS: '--cpus=6 --memory=4096'
+      DOCKER_HUB_PROXY: ((dockerhub-proxy))
+
+- name: pr-test-single
+  << : *alertingOnJobs
+  serial: true
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ pr-prepare-bucket ]
+    - get: repo
+      resource: pull-request
+      trigger: true
+      passed: [ pr-prepare-bucket ]
+  - *setup
+  - task: taskcat-test
+    file: ci-repo/ci/tasks/taskcat-run-test/task.yml
+    params:
+      TEST_NAME: single
+    ensure: *postTest
+
+- name: pr-test-multi
+  << : *alertingOnJobs
+  serial: true
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ pr-prepare-bucket ]
+    - get: repo
+      resource: pull-request
+      trigger: true
+      passed: [ pr-prepare-bucket ]
+  - *setup
+  - task: taskcat-test
+    file: ci-repo/ci/tasks/taskcat-run-test/task.yml
+    params:
+      TEST_NAME: multi
+    ensure: *postTest
+#! ---< PR stuff ----
 
 - name: housekeeping
   << : *alertingOnJobs
