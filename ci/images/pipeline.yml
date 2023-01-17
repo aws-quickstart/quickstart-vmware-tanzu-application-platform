@@ -5,15 +5,22 @@ resource_types:
     repository: ((dockerhub-proxy))/arbourd/concourse-slack-alert-resource
 
 resources:
-- name: ci-repo
+- &ciRepo
+  name: ci-repo
   type: git
   check_every: 1m
   icon: github
-  source:
+  source: &ciRepoSource
     uri: ((repo.url))
     branch: ((repo.branch))
     paths:
     - ci/
+- << : *ciRepo
+  name: docker-image-files
+  source:
+    << : *ciRepoSource
+    paths:
+    - ci/images/docker-image/
 - name: docker-image
   type: registry-image
   icon: docker
@@ -53,19 +60,23 @@ jobs:
 - name: build-docker-image
   << : *alertingOnJobs
   plan:
-  - get: ci-repo
-    params:
-      submodules: none
-    passed:
-    - set-pipeline
-    trigger: true
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      passed:
+      - set-pipeline
+    - get: docker-image-files
+      params:
+        submodules: none
+      trigger: true
   - task: build
     file: ci-repo/ci/tasks/build-image/task.yml
     vars:
       repo: ((docker-in-nimbus.repo))
       tag: ((docker-in-nimbus.tag))
     input_mapping:
-      input: ci-repo
+      input: docker-image-files
     params:
       NIMBUS_USER: ((ci/nimbus.user))
       BUILD_ARG_BASE: ((docker-in-nimbus.repo)):((docker-in-nimbus.tag))

@@ -69,7 +69,6 @@ jobs:
     - get: ci-repo
       params:
         submodules: none
-      trigger: true
       passed: [ set-pipeline ]
     - get: repo
       trigger: true
@@ -161,6 +160,7 @@ jobs:
     - get: ci-repo
       params:
         submodules: none
+      passed: [ set-pipeline ]
   - *getCloudGateCreds
   - task: print-failed-stacks
     file: ci-repo/ci/tasks/aws-housekeeping/stacks.yml
