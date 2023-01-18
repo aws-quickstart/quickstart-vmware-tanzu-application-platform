@@ -43,11 +43,11 @@ tap_gui:
     auth:
       allowGuestAccess: true
     backend:
-      baseUrl: #@ "http://tap-gui.{}".format(data.values.dns.domain_name)
+      baseUrl: #@ "https://tap-gui.{}".format(data.values.dns.domain_name)
       cors:
-        origin: #@ "http://tap-gui.{}".format(data.values.dns.domain_name)
+        origin: #@ "https://tap-gui.{}".format(data.values.dns.domain_name)
     app:
-      baseUrl: #@ "http://tap-gui.{}".format(data.values.dns.domain_name)
+      baseUrl: #@ "https://tap-gui.{}".format(data.values.dns.domain_name)
 
 metadata_store:
   ns_for_export_app_cert: #@ data.values.repositories.workload.namespace
