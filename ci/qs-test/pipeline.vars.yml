@@ -7,4 +7,14 @@ ci-repo:
   << : *repo
   #! e.g. branch: ci
 
-dockerhub-proxy: harbor-repo.vmware.com/dockerhub-proxy-cache
+tappc-registry:
+  url: tappc-docker-local.artifactory.eng.vmware.com
+  username: ((ci/registry/tappc.username))
+  password: ((ci/registry/tappc.password))
+
+publish-bucket:
+  name: tcat-9d0156f41d3b503b8360120b8214b6f1-us-east-1
+  prefix: public/main/
+
+ci-bucket:
+  name-without-region: tcat-9d0156f41d3b503b8360120b8214b6f1
