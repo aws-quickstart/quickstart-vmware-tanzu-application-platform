@@ -11,8 +11,8 @@ resources:
   check_every: 1m
   icon: github
   source: &ciRepoSource
-    uri: https://((repo.host))/((repo.slug))
-    branch: ((repo.branch))
+    uri: https://((ci-repo.host))/((ci-repo.slug))
+    branch: ((ci-repo.branch))
     paths:
     - ci/
 - << : *ciRepo
