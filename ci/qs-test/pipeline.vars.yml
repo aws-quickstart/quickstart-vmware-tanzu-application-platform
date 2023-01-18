@@ -1,7 +1,7 @@
 repo:
   host: github.com
   slug: vmware-tap-on-public-cloud/quickstart-vmware-tanzu-application-platform
-  branch: TAPPC-132_qs-test-main
+  branch: main
 
 dockerhub-proxy: harbor-repo.vmware.com/dockerhub-proxy-cache
 
