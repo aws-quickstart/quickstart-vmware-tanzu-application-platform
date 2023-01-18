@@ -115,7 +115,7 @@ jobs:
         VAR_tanzunet_password: ((ci/tanzunet.password))
         VAR_tanzunet_refreshToken: ((ci/tanzunet.refreshToken))
         VAR_keypairName: ((ci/qs-test/keypair.name))
-        VAR_bucket: tcat-9d0156f41d3b503b8360120b8214b6f1
+        VAR_bucket: ((ci-bucket.name-without-region))
         VAR_domain: thingamaji.ga
 
   - task: taskcat-prepare-bucket
@@ -192,7 +192,7 @@ jobs:
   - task: publish-bucket
     files: ci-repo/ci/tasks/taskcat-bucket-sync/task.yml
     params:
-      DESTINATION_BUCKET: tcat-9d0156f41d3b503b8360120b8214b6f1-us-east-1/public/main/
+      DESTINATION_BUCKET: ((publish-bucket.name))/((publish-bucket.prefix))
 #! ---< main ----
 
 #! ---> PR stuff ----
