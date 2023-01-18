@@ -1,9 +1,11 @@
-repo:
+repo: &repo
   host: github.com
   slug: vmware-tap-on-public-cloud/quickstart-vmware-tanzu-application-platform
-  branch: TAPPC-132_qs-test-main
+  branch: main
 
-dockerhub-proxy: harbor-repo.vmware.com/dockerhub-proxy-cache
+ci-repo:
+  << : *repo
+  #! e.g. branch: ci
 
 tappc-registry:
   url: tappc-docker-local.artifactory.eng.vmware.com

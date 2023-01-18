@@ -1,5 +1,6 @@
-repo:
-  url: https://github.com/vmware-tap-on-public-cloud/quickstart-vmware-tanzu-application-platform
+ci-repo:
+  host: github.com
+  slug: vmware-tap-on-public-cloud/quickstart-vmware-tanzu-application-platform
   branch: main
 
 dockerhub-proxy: harbor-repo.vmware.com/dockerhub-proxy-cache
