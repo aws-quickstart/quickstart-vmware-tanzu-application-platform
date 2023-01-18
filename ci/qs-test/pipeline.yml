@@ -50,6 +50,13 @@ resources:
     #! TODO: get a proper PAT
     access_token: ((ci/repo-keys/github/hoegaarden/quickstart-vmware-tanzu-application-platform.pat))
     disable_forks: false
+- name: daily-run
+  type: time
+  source:
+    location: UTC
+    start: 05:00 AM
+    stop: 06:00 AM
+    days: [ Monday, Tuesday, Wednesday, Thursday, Friday ]
 
 alerting:
   onJobs: &alertingOnJobs
@@ -89,6 +96,8 @@ jobs:
   serial: true
   plan:
   - in_parallel:
+    - get: dialy-run
+      trigger: true
     - get: ci-repo
       params:
         submodules: none
