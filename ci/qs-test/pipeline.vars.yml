@@ -8,8 +8,3 @@ ci-repo:
   #! e.g. branch: ci
 
 dockerhub-proxy: harbor-repo.vmware.com/dockerhub-proxy-cache
-
-tappc-registry:
-  url: tappc-docker-local.artifactory.eng.vmware.com
-  username: ((ci/registry/tappc.username))
-  password: ((ci/registry/tappc.password))
