@@ -1,0 +1,15 @@
+---
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: tappc-docker-local.artifactory.eng.vmware.com/ci/docker-image
+    tag: latest
+inputs:
+- name: taskcat-config
+- name: creds
+- name: ci-repo
+run:
+  path: ci-repo/ci/tasks/taskcat-bucket-sync/task.sh
+params:
+  DESTINATION_BUCKET: someBucket/someDir

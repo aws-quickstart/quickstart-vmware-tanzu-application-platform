@@ -173,6 +173,26 @@ jobs:
     params:
       TEST_NAME: multi
     ensure: *postTest
+
+- name: publish-bucket
+  << : *alertingOnJobs
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ test-single, test-multi ]
+    - get: repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ test-single, test-multi ]
+  - *setup
+  - task: publish-bucket
+    files: ci-repo/ci/tasks/taskcat-bucket-sync/task.yml
+    params:
+      DESTINATION_BUCKET: tcat-9d0156f41d3b503b8360120b8214b6f1-us-east-1/public/main/
 #! ---< main ----
 
 #! ---> PR stuff ----
