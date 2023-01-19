@@ -47,8 +47,7 @@ resources:
   type: pull-request
   source:
     repository: ((repo.slug))
-    #! TODO: get a proper PAT
-    access_token: ((ci/repo-keys/github/hoegaarden/quickstart-vmware-tanzu-application-platform.pat))
+    access_token: ((ci/pr-resource.token))
     disable_forks: false
 - name: daily-run
   type: time
