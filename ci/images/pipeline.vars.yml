@@ -13,5 +13,5 @@ docker-in-nimbus:
 
 tappc-registry:
   url: tappc-docker-local.artifactory.eng.vmware.com
-  username: ((ci/registry/tappc.username))
-  password: ((ci/registry/tappc.password))
+  username: ((ci/serviceaccount/tappc-ci.username))
+  password: ((ci/serviceaccount/tappc-ci.password))

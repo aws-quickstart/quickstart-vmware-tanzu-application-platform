@@ -9,8 +9,8 @@ ci-repo:
 
 tappc-registry:
   url: tappc-docker-local.artifactory.eng.vmware.com
-  username: ((ci/registry/tappc.username))
-  password: ((ci/registry/tappc.password))
+  username: ((ci/serviceaccount/tappc-ci.username))
+  password: ((ci/serviceaccount/tappc-ci.password))
 
 publish-bucket:
   name: tcat-9d0156f41d3b503b8360120b8214b6f1-us-east-1
