@@ -69,7 +69,7 @@ alerting:
 
 groups:
 - name: main
-  jobs: [ prepare-bucket, test-single, test-multi, set-pipeline ]
+  jobs: [ prepare-bucket, test-single, test-multi, publish-bucket, set-pipeline ]
 - name: pr
   jobs: [ "pr-*", set-pipeline ]
 - name: housekeeping
@@ -96,7 +96,7 @@ jobs:
   serial: true
   plan:
   - in_parallel:
-    - get: dialy-run
+    - get: daily-run
       trigger: true
     - get: ci-repo
       params:
@@ -199,7 +199,7 @@ jobs:
       passed: [ test-single, test-multi ]
   - *setup
   - task: publish-bucket
-    files: ci-repo/ci/tasks/taskcat-bucket-sync/task.yml
+    file: ci-repo/ci/tasks/taskcat-bucket-sync/task.yml
     params:
       DESTINATION_BUCKET: ((publish-bucket.name))/((publish-bucket.prefix))
 #! ---< main ----
