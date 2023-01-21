@@ -228,9 +228,9 @@ Parameters:
   NumberOfNodes:
     Type: Number
     Description: Minimum number of nodes to create for the TAP EKS cluster.
-    MinValue: 4
+    MinValue: 3
     MaxValue: 450
-    Default: 4
+    Default: 3
   MaxNumberOfNodes:
     Type: Number
     Description: >-
@@ -444,9 +444,9 @@ Parameters:
   NodeVolumeSize:
     Type: Number
     Description: Amazon EBS root volume size for Amazon EKS nodes.
-    MinValue: 80
+    MinValue: 100
     MaxValue: 16384
-    Default: 80
+    Default: 100
   RemoteAccessCidr:
     Type: String
     Description: >-

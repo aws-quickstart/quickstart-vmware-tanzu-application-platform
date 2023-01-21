@@ -651,7 +651,7 @@ function runTestCasesTAPGUI {
   echo TAP_GUI_URL $TAP_GUI_URL
 
   #test-1:
-  rx_str=`curl -LI $TAP_GUI_URL  -o /dev/null -w '%{http_code}\n' -s` || true
+  rx_str=`curl -LIk $TAP_GUI_URL  -o /dev/null -w '%{http_code}\n' -s` || true
   expected_str="200"
 
   echo "Test1: Access TAP GUI"
@@ -668,7 +668,7 @@ function runTestCasesTAPWK {
   echo WORKLOAD_URL $WORKLOAD_URL
 
   #test-2:
-  rx_str=`curl -LI  $WORKLOAD_URL -o /dev/null -w '%{http_code}\n' -s` || true
+  rx_str=`curl -LI $WORKLOAD_URL -o /dev/null -w '%{http_code}\n' -s` || true
   expected_str="200"
 
   echo "Test2: Access Sample Workload GUI"
