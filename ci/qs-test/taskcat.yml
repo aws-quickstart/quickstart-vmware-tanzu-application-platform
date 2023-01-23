@@ -33,8 +33,6 @@ project:
     KeyPairName: #@ keypairName
     RemoteAccessCidr: #@ accessCIDR
     EKSClusterName: $[taskcat_random-string]
-    NumberOfNodes: 4
-    MaxNumberOfNodes: 4
     TanzuNetUsername: #@ tanzunet_username
     TanzuNetPassword: #@ tanzunet_password
     TanzuNetApiToken: #@ tanzunet_refreshToken
