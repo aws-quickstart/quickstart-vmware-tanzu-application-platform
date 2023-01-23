@@ -225,14 +225,14 @@ function tapRunTestsMain {
     build)
       ;;
     run)
-      TAP_GUI_URL="http://tap-gui.view.${DOMAIN_NAME}"
+      TAP_GUI_URL="https://tap-gui.view.${DOMAIN_NAME}"
       WORKLOAD_URL="http://${SAMPLE_APP_NAME}.${DEVELOPER_NAMESPACE}.run.${DOMAIN_NAME}"
       echo "Running Tests on Run Cluster"
       runTestCasesTAPGUI $TAP_GUI_URL
       runTestCasesTAPWK $WORKLOAD_URL
       ;;
     iterate)
-      TAP_GUI_URL="http://tap-gui.iterate.${DOMAIN_NAME}"
+      TAP_GUI_URL="https://tap-gui.iterate.${DOMAIN_NAME}"
       WORKLOAD_URL="http://${SAMPLE_APP_NAME}.${DEVELOPER_NAMESPACE}.iterate.${DOMAIN_NAME}"
       echo "Running Tests on Iterate Cluster"
       runTestCasesTAPWK  $WORKLOAD_URL
@@ -240,7 +240,7 @@ function tapRunTestsMain {
     view)
       ;;
     single)
-      TAP_GUI_URL="http://tap-gui.${DOMAIN_NAME}"
+      TAP_GUI_URL="https://tap-gui.${DOMAIN_NAME}"
       WORKLOAD_URL="http://${SAMPLE_APP_NAME}.${DEVELOPER_NAMESPACE}.${DOMAIN_NAME}"
       echo "Running Tests on Single Cluster"
       runTestCasesTAPGUI $TAP_GUI_URL
