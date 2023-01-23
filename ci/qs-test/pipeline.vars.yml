@@ -15,7 +15,7 @@ tappc-registry:
   password: ((ci/serviceaccount/tappc-ci.password))
 
 publish-bucket:
-  name: tcat-9d0156f41d3b503b8360120b8214b6f1-us-east-1
+  name: tap-quickstart
   prefix: public/main/
 
 ci-bucket:
