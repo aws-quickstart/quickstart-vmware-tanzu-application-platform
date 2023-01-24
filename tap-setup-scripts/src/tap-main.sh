@@ -226,7 +226,7 @@ function tapRunTestsMain {
       ;;
     run)
       TAP_GUI_URL="https://tap-gui.view.${DOMAIN_NAME}"
-      WORKLOAD_URL="http://${SAMPLE_APP_NAME}.${DEVELOPER_NAMESPACE}.run.${DOMAIN_NAME}"
+      WORKLOAD_URL="https://${SAMPLE_APP_NAME}.${DEVELOPER_NAMESPACE}.run.${DOMAIN_NAME}"
       echo "Running Tests on Run Cluster"
       runTestCasesTAPGUI $TAP_GUI_URL
       runTestCasesTAPWK $WORKLOAD_URL
