@@ -169,6 +169,7 @@ Parameters:
     AllowedValues:
       - 'multi'
       - 'single'
+    Default: 'single'
   VpcId:
     Type: AWS::EC2::VPC::Id
     Description: >-
