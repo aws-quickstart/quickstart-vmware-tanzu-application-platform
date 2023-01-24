@@ -28,7 +28,8 @@ resources:
     paths:
     - ci/qs-test/
     - ci/tasks/
-- name: houekeeping-time
+- name: housekeeping-daily
+  old_name: houekeeping-time
   icon: wrench-clock
   type: time
   source:
@@ -36,6 +37,14 @@ resources:
     start: 07:00 AM
     stop: 09:00 AM
     days: [ Monday, Tuesday, Wednesday, Thursday, Friday ]
+    initial_version: true
+- name: housekeeping-interval
+  icon: wrench-clock
+  type: time
+  source:
+    location: UTC
+    days: [ Monday, Tuesday, Wednesday, Thursday, Friday ]
+    interval: 1h
     initial_version: true
 - name: notify
   icon: slack
@@ -72,9 +81,9 @@ groups:
 - name: pr
   jobs: [ "pr-*", set-pipeline ]
 - name: housekeeping
-  jobs: [ "housekeep*", set-pipeline ]
+  jobs: [ "housekeeping-*", set-pipeline ]
 - name: all
-  jobs: [ "*", set-pipeline ]
+  jobs: [ "*" ]
 
 jobs:
 - name: set-pipeline
@@ -270,24 +279,51 @@ jobs:
     ensure: *postTest
 #! ---< PR stuff ----
 
-- name: housekeeping
+#! ---> housekeeping ----
+- name: housekeeping-log-failed-stacks
   << : *alertingOnJobs
   plan:
   - in_parallel:
-    - get: houekeeping-time
+    - get: housekeeping-daily
       trigger: true
     - get: ci-repo
       params:
         submodules: none
       passed: [ set-pipeline ]
+  - *getCloudGateCreds
+  - task: stacks-housekeeping
+    file: ci-repo/ci/tasks/aws-housekeeping/stacks.yml
+
+- name: housekeeping-check-pr-resource-token
+  << : *alertingOnJobs
+  plan:
   - in_parallel:
-    - do:
-      - *getCloudGateCreds
-      - task: stacks-housekeeping
-        file: ci-repo/ci/tasks/aws-housekeeping/stacks.yml
-    - task: check-pr-resource-token
-      file: ci-repo/ci/tasks/github-token-expiry/task.yml
+    - get: housekeeping-daily
+      trigger: true
+    - get: ci-repo
       params:
-        SECRET_PATH: ci/pr-resource
-        EXPIRATION_DATE: ((ci/pr-resource.expiration))
-        MIN_DAYS_LEFT: 30
+        submodules: none
+      passed: [ set-pipeline ]
+  - task: check-pr-resource-token
+    file: ci-repo/ci/tasks/github-token-expiry/task.yml
+    params:
+      SECRET_PATH: ci/pr-resource
+      EXPIRATION_DATE: ((ci/pr-resource.expiration))
+      MIN_DAYS_LEFT: 30
+
+- name: housekeeping-cleanup-failed-stacks
+  << : *alertingOnJobs
+  plan:
+  - in_parallel:
+    - get: housekeeping-interval
+      trigger: true
+    - get: ci-repo
+      params:
+        submodules: none
+      passed: [ set-pipeline ]
+  - *getCloudGateCreds
+  - task: cleanup-failed-stacks
+    file: ci-repo/ci/tasks/aws-housekeeping/cleanup-stacks.yml
+    params:
+      REALLY_DELETE: "1"
+#! ---< housekeeping ----
