@@ -205,7 +205,6 @@ jobs:
 
 #! ---> PR stuff ----
 - name: pr-prepare-bucket
-  << : *alertingOnJobs
   serial: true
   plan:
   - in_parallel:
@@ -228,7 +227,6 @@ jobs:
       DOCKER_HUB_PROXY: ((dockerhub-proxy))
 
 - name: pr-test-single
-  << : *alertingOnJobs
   serial: true
   plan:
   - in_parallel:
@@ -249,7 +247,6 @@ jobs:
     ensure: *postTest
 
 - name: pr-test-multi
-  << : *alertingOnJobs
   serial: true
   plan:
   - in_parallel:
