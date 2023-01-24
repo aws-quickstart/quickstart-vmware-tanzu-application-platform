@@ -1,0 +1,12 @@
+---
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: tappc-docker-local.artifactory.eng.vmware.com/ci/docker-image
+    tag: latest
+inputs:
+- name: test-result
+- name: ci-repo
+run:
+  path: ci-repo/ci/tasks/taskcat-print-durations/task.sh
