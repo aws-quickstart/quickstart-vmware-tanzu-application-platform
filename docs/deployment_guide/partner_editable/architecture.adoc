@@ -28,7 +28,6 @@ As shown in <<architecture1>>, this Partner Solution sets up the following:
 
 [.small]#* The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#
 
-//TO-DO REPLACE WITH MULTI-CLUSTER DIAGRAM! SINGLE CLUSTER DIAGRAM USED AS PLACEHOLDER
 [#architecture2]
 .Partner Solution multicluster architecture for {partner-product-short-name} on AWS
 image::../docs/deployment_guide/images/architecture_diagram.png[Architecture]
