@@ -181,7 +181,7 @@ Parameters:
     AllowedValues:
       - 'multi'
       - 'single'
-    Default: 'multi'
+    Default: 'single'
   NumberOfAZs:
     Type: String
     Description: >-

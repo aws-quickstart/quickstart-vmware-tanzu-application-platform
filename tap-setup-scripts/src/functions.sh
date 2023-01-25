@@ -668,7 +668,7 @@ function runTestCasesTAPWK {
   echo WORKLOAD_URL $WORKLOAD_URL
 
   #test-2:
-  rx_str=`curl -LI $WORKLOAD_URL -o /dev/null -w '%{http_code}\n' -s` || true
+  rx_str=`curl -LIk $WORKLOAD_URL -o /dev/null -w '%{http_code}\n' -s` || true
   expected_str="200"
 
   echo "Test2: Access Sample Workload GUI"
@@ -680,7 +680,7 @@ function runTestCasesTAPWK {
   fi
 
   #test-3: workload output
-  rx_str=`curl -s $WORKLOAD_URL` || true
+  rx_str=`curl -sk $WORKLOAD_URL` || true
   expected_str="Greetings from Spring Boot + Tanzu!"
 
   echo "Test3: Verify Sample Workload Output"
