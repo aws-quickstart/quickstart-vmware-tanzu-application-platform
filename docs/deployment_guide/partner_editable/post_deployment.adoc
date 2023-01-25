@@ -31,12 +31,12 @@
 |`TanzuApiToken`
 |API Token
 |
-|VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to https://network.tanzu.vmware.com/docs/api[VMware Tanzu Network API Documentation].
+|{partner-registry} UAA API refresh token. For more information, refer to the https://network.tanzu.vmware.com/docs/api[{partner-registry} API documentation^].
 
 |`TanzuNetRelocateImages`
 |Relocate {partner-product-acronym} images
 |`No`
-|Choose `Yes` to relocate TAP images from the VMware Tanzu Network registry to your ECR registry from before attempting installation. If you do not relocate images, Tanzu Application Platform will depend directly on the VMware Tanzu Network registry for its continued operation.
+|Choose `Yes` to relocate {partner-product-acronym} images from the {partner-registry} registry to your ECR registry. If you do not relocate the images, {partner-product-short-name} uses the {partner-registry} registry to operate.
 
 |`TAPClusterArch`
 |EKS single or multi-cluster / TAP Cluster Architecture
@@ -52,7 +52,7 @@
 |`TAPVersion`
 |Version
 |`1.4.0`
-|Version of TAP to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements].
+|Version of {partner-product-acronym} to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements].
 
 |`TAPDomainName`
 |Domain name
@@ -151,7 +151,7 @@
 |`KubernetesVersion`
 |Kubernetes version
 |`1.23`
-|Version of Kubernetes control plane to deploy. The selected version must be supported the selected version of TAP. For more information, refer to  https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements].
+|Version of Kubernetes control plane to deploy. The selected version must support the selected version of {partner-product-acronym}. For more information, refer to  https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements].
 
 |`NodeInstanceType`
 |Instance type
@@ -166,12 +166,12 @@
 |`NumberOfNodes`
 |Number of nodes
 |`3`
-|Minimum number of nodes to create for each TAP EKS cluster.
+|Minimum number of nodes to create for each {partner-product-acronym} EKS cluster.
 
 |`MaxNumberOfNodes`
 |Maximum number of nodes
 |`6`
-|Maximum number of available nodes for each TAP EKS cluster in auto scaling.
+|Maximum number of available nodes for each {partner-product-acronym} EKS cluster in auto scaling.
 |====
 
 [%autowidth.stretch]
@@ -242,17 +242,17 @@
 |`TanzuApiToken`
 |API Token
 |
-|VMware Tanzu Network user account and authentication (UAA) API refresh token. For more information, refer to https://network.tanzu.vmware.com/docs/api[VMware Tanzu Network API Documentation].
+|{partner-registry} UAA API refresh token. For more information, refer to the https://network.tanzu.vmware.com/docs/api[{partner-registry} API documentation^].
 
 |`TanzuNetRelocateImages`
 |Relocate {partner-product-acronym} images
 |`No`
-|Choose `Yes` to relocate TAP images from the VMware Tanzu Network registry to your ECR registry from before attempting installation. If you do not relocate images, Tanzu Application Platform will depend directly on the VMware Tanzu Network registry for its continued operation.
+|Choose `Yes` to relocate {partner-product-acronym} images from the {partner-registry} registry to your ECR registry. If you do not relocate the images, {partner-product-short-name} uses the {partner-registry} registry to operate.
 
 |`TAPClusterArch`
 |EKS single or multi-cluster / TAP Cluster Architecture
 |`single`
-|Choose `multi` to deploy Tanzu Application Platform with multicluster.
+|Choose `multi` to deploy {partner-product-acronym} with multicluster.
 |====
 
 [%autowidth.stretch]
@@ -263,7 +263,7 @@
 |`TAPVersion`
 |Version
 |`1.4.0`
-|Version of TAP to deploy. The selected version must also support the       selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements].
+|Version of {partner-product-acronym} to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.1/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements].
 
 |`TAPDomainName`
 |Domain name
@@ -342,7 +342,7 @@
 |`KubernetesVersion`
 |Kubernetes version
 |`1.23`
-|Version of Kubernetes control plane to deploy. The selected version must be supported the selected version of TAP. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements].
+|Version of Kubernetes control plane to deploy. The selected version must be supported the selected version of {partner-product-acronym}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements].
 
 
 |`NodeInstanceType`
@@ -358,12 +358,12 @@
 |`NumberOfNodes`
 |Number of nodes
 |`3` 
-|Minimum number of nodes to create for each TAP EKS cluster.
+|Minimum number of nodes to create for each {partner-product-acronym} EKS cluster.
 
 |`MaxNumberOfNodes`
 |Maximum number of nodes
 |`6`
-|Maximum number of available nodes for each TAP EKS cluster in auto scaling.
+|Maximum number of available nodes for each {partner-product-acronym} EKS cluster in auto scaling.
 |====
 
 [%autowidth.stretch]
