@@ -31,7 +31,7 @@
 |`TanzuApiToken`
 |API Token
 |
-|{partner-registry} UAA API refresh token. For more information, refer to the https://network.tanzu.vmware.com/docs/api[{partner-registry} API documentation^].
+|{partner-registry} UAA API refresh token. For more information, refer to https://network.tanzu.vmware.com/docs/api[{partner-registry} API documentation^].
 
 |`TanzuNetRelocateImages`
 |Relocate {partner-product-acronym} images
