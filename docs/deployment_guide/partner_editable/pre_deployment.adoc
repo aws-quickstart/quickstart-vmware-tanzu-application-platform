@@ -41,7 +41,7 @@ If necessary, request https://console.aws.amazon.com/servicequotas/home/[service
 |1, 4 (multicluster)
 
 |EKS nodes (min/desired/max)
-|single cluster:4/4/6 multicluster:16/16/24
+|single cluster:3/3/6 multicluster:12/12/24
 
 |Secrets Manager secrets
 |1
