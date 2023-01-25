@@ -41,7 +41,7 @@
 |`TAPClusterArch`
 |EKS single or multi-cluster / TAP Cluster Architecture
 |`single`
-|Choose `multi` to deploy Tanzu Application Platform with multicluster.
+|Choose `multi` to deploy {partner-product-acronym} with multicluster.
 |====
 
 [%autowidth.stretch]
