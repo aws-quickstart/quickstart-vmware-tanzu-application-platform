@@ -58,6 +58,7 @@ resources:
     repository: ((repo.slug))
     access_token: ((ci/pr-resource.token))
     disable_forks: false
+    base_bracnch: main
     ignore_paths:
     - ci/
 - name: daily-run
