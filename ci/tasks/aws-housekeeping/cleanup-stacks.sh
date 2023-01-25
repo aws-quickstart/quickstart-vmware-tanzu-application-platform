@@ -31,6 +31,7 @@ set -e
 set -u
 set -o pipefail
 
+# shellcheck disable=SC1091
 . creds/env.inc.sh
 
 ##------------------------------------------------------------
@@ -90,7 +91,7 @@ cleaner::VpcWithLeftoverResources() {
         "$allStacksFile"
     )"
 
-    (( $allRelatedStackCount != 2 )) && {
+    (( allRelatedStackCount != 2 )) && {
       echo >&2 "Expected to find 2 stacks (root & vpc) for '$rootStackName', found $allRelatedStackCount; thus not touching '$rootStackName'"
       continue
     }
@@ -103,13 +104,14 @@ cleaner::VpcWithLeftoverResources() {
         "$allStacksFile"
     )
 
-    (( $vpcStackCount != 1 )) && {
+    (( vpcStackCount != 1 )) && {
       echo >&2 "Expected to find one stack for root stack '$rootStackName', but found $vpcStackCount; thus not touching '$rootStackName'"
       continue
     }
 
     # Let's ensure we find the expected error event and extract the VPC ID from there
     vpcId="$(
+      # shellcheck disable=SC2016
       aws cloudformation describe-stack-events \
         --stack-name "$vpcStackName" \
         --region "$region" \
@@ -126,6 +128,7 @@ cleaner::VpcWithLeftoverResources() {
 
     # Collect the seciruty groups
     mapfile -td $'\t' secGroupIds < <(
+      # shellcheck disable=SC2016
       aws ec2 describe-security-groups \
         --region "$region" \
         --query 'SecurityGroups[?VpcId==`'"$vpcId"'` && GroupId!=`default` && Description==`EKS created security group applied to ENI that is attached to EKS Control Plane master nodes, as well as any managed workloads.`].GroupId' \
@@ -162,6 +165,7 @@ getDeleteFailedStacks() {
 
   for r in ${REGION:-us-east-1}; do
     regionalStacks="$(
+      # shellcheck disable=SC2016
       aws cloudformation describe-stacks \
         --query 'Stacks[?StackStatus == `DELETE_FAILED`]' \
         --region "$r" \
