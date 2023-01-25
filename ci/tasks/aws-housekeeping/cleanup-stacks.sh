@@ -91,7 +91,7 @@ cleaner::VpcWithLeftoverResources() {
     )"
 
     (( $allRelatedStackCount != 2 )) && {
-      echo >&2 "Expected to find 2 stacks (root & vpc) for '$rootStackName', found $allStacksFile; thus not touching '$rootStackName'"
+      echo >&2 "Expected to find 2 stacks (root & vpc) for '$rootStackName', found $allRelatedStackCount; thus not touching '$rootStackName'"
       continue
     }
 
