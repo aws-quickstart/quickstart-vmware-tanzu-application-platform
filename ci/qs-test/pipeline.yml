@@ -77,6 +77,21 @@ alerting:
     on_error:
       put: notify
       params: { alert_type: errored }
+  onPrJobs: &alertginOnPrJobs
+    on_failure:
+      put: pull-request
+      params:
+        path: repo
+        status: failure
+        comment: |
+          Your PR sadly failed, please check [here](${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME})
+    on_error:
+      put: pull-request
+      params:
+        path: repo
+        status: error
+        comment: |
+          Your PR sadly errored, please check [here](${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME})
 
 groups:
 - name: main
@@ -217,6 +232,7 @@ jobs:
 
 #! ---> PR stuff ----
 - name: pr-prepare-bucket
+  << : *alertginOnPrJobs
   serial: true
   plan:
   - in_parallel:
@@ -228,6 +244,10 @@ jobs:
       resource: pull-request
       trigger: true
   - in_parallel:
+    - put: pull-request
+      params:
+        path: repo
+        status: pending
     - task: handle-submodules
       file: ci-repo/ci/tasks/git-force-submodules/task.yml
     - *setup
@@ -239,6 +259,7 @@ jobs:
       DOCKER_HUB_PROXY: ((dockerhub-proxy))
 
 - name: pr-test-single
+  << : *alertginOnPrJobs
   serial: true
   plan:
   - in_parallel:
@@ -259,6 +280,7 @@ jobs:
     ensure: *postTest
 
 - name: pr-test-multi
+  << : *alertginOnPrJobs
   serial: true
   plan:
   - in_parallel:
@@ -277,6 +299,19 @@ jobs:
     params:
       TEST_NAME: multi
     ensure: *postTest
+
+- name: pr-set-success
+  plan:
+  - get: repo
+    resource: pull-request
+    trigger: true
+    passed: [ pr-test-single, pr-test-multi ]
+  - put: pull-request
+    params:
+      path: repo
+      status: success
+      comment: |
+        Congratulations, your PR made it through the pipeline! :tada:
 #! ---< PR stuff ----
 
 #! ---> housekeeping ----
