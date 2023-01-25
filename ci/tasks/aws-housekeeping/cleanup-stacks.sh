@@ -56,23 +56,16 @@ main() {
           [ .[] | select(has("RootId") | not) | .StackName ]
             | map(select(. | test($ignoreRootStacks) | not))
             | @tsv
-        ' \
-        "$failedStacksFile"
+        ' "$failedStacksFile"
     )
 
     # run the cleaner
     rc=0
-    "$cleaner" "$failedStacksFile" "${failedRootStackNames[@]}" 2>&1 \
-      | sed "s/^/${cleaner}: /g" \
-      || rc=$?
-
-    echo >&2
-    if (( $rc != 0 )) ; then
-      echo >&2 "$cleaner failed, will continue with the next cleaner"
-    else
-      echo >&2 "$cleaner succeeded."
-    fi
-    echo >&2
+    {
+      echo "## ---- $cleaner start ----"
+      "$cleaner" "$failedStacksFile" "${failedRootStackNames[@]}" || rc=$?
+      echo "## ---- $cleaner done (rc: $rc) ----"
+    } >&2
   done
 }
 
@@ -86,9 +79,7 @@ cleaner::VpcWithLeftoverResources() {
   local vpcId secGroupIds secGroupId
 
   for rootStackName in "$@" ; do
-    echo
-    echo "running for root stack '$rootStackName'"
-    echo
+    echo >&2 -e "\nrunning for root stack '$rootStackName'\n"
 
     # We expect 2 stacks to have failed, the root stack and the vpc stack.
     # Let's check on that and bail out if that's not the case.
@@ -108,7 +99,7 @@ cleaner::VpcWithLeftoverResources() {
     read -r vpcStackCount vpcStackName region < <(
       jq -r \
         --arg rootStackName "$rootStackName" \
-        '[ .[] | select(.StackName | test("^\($rootStackName)-VPCStack-.{12}$")) ] | [ length, .[0].StackName, .[0].Region ] | @tsv' \
+        '[ .[] | select(.StackName | test("^\($rootStackName)-VPCStack-[^-]+$")) ] | [ length, .[0].StackName, .[0].Region ] | @tsv' \
         "$allStacksFile"
     )
 
