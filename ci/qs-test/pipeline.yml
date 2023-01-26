@@ -83,8 +83,8 @@ alerting:
       params:
         path: repo
         status: failure
-        comment: |
-          Your PR sadly failed, please check [here](${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME})
+        # comment: |
+        #   Your PR sadly failed, please check [here](${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME})
       get_params:
         skip_download: true
     on_error:
@@ -92,8 +92,8 @@ alerting:
       params:
         path: repo
         status: error
-        comment: |
-          Your PR sadly errored, please check [here](${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME})
+        # comment: |
+        #   Your PR sadly errored, please check [here](${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME})
       get_params:
         skip_download: true
     on_abort:
@@ -101,8 +101,8 @@ alerting:
       params:
         path: repo
         status: pending
-        comment: |
-          Your PR has been aborted, please check [here](${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME})
+        # comment: |
+        #   Your PR has been aborted, please check [here](${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME})
       get_params:
         skip_download: true
 
@@ -333,8 +333,8 @@ jobs:
     params:
       path: repo
       status: success
-      comment: |
-        Congratulations, your PR made it through the pipeline! :tada:
+      # comment: |
+      #   Congratulations, your PR made it through the pipeline! :tada:
     get_params:
       skip_download: true
 #! ---< PR stuff ----
