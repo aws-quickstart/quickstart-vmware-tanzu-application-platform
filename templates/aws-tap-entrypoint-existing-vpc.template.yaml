@@ -164,12 +164,11 @@ Parameters:
       (GUI) and project URLs.
   TAPClusterArch:
     Type: String
-    Description: >-
-      TAP Cluster Architecture
+Description: TAP cluster architecture.
     AllowedValues:
-      - 'multi'
-      - 'single'
-    Default: 'single'
+      - multi
+      - single
+    Default: single
   VpcId:
     Type: AWS::EC2::VPC::Id
     Description: >-
@@ -694,8 +693,8 @@ Mappings:
               ref:
                 branch: main
 Conditions:
-  CreateMultiCluster: !Equals [!Ref TAPClusterArch, 'multi']
-  CreateSingleCluster: !Equals [!Ref TAPClusterArch, 'single']
+  CreateMultiCluster: !Equals [!Ref TAPClusterArch, multi]
+  CreateSingleCluster: !Equals [!Ref TAPClusterArch, single]
   3AZDeployment: !Not [!Equals [!Ref PrivateSubnet3Id, '']]
   Ubuntu: !Equals [!FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, OS], Ubuntu]
   # TODO: Finish building logic to only deploy ECR-related resources if when
@@ -873,7 +872,7 @@ Resources:
     Condition: CreateMultiCluster
     Properties:
       AddonName: aws-ebs-csi-driver
-      ClusterName: !Join ['', [!Ref EKSClusterName, "-build" ]]
+      ClusterName: !Sub ${EKSClusterName}-build
       ResolveConflicts: NONE
       ServiceAccountRoleArn: !GetAtt BUILDEKSEBSCSIDriverRole.Arn
   RUNEBSSCIAddon:
@@ -881,7 +880,7 @@ Resources:
     Condition: CreateMultiCluster
     Properties:
       AddonName: aws-ebs-csi-driver
-      ClusterName: !Join ['', [!Ref EKSClusterName, "-run" ]]
+      ClusterName: !Sub ${EKSClusterName}-run
       ResolveConflicts: NONE
       ServiceAccountRoleArn: !GetAtt RUNEKSEBSCSIDriverRole.Arn
   VIEWEBSSCIAddon:
@@ -889,7 +888,7 @@ Resources:
     Condition: CreateMultiCluster
     Properties:
       AddonName: aws-ebs-csi-driver
-      ClusterName: !Join ['', [!Ref EKSClusterName, "-view" ]]
+      ClusterName: !Sub ${EKSClusterName}-view
       ResolveConflicts: NONE
       ServiceAccountRoleArn: !GetAtt VIEWEKSEBSCSIDriverRole.Arn
   ITERATEEBSSCIAddon:
@@ -897,7 +896,7 @@ Resources:
     Condition: CreateMultiCluster
     Properties:
       AddonName: aws-ebs-csi-driver
-      ClusterName: !Join ['', [!Ref EKSClusterName, "-iterate" ]]
+      ClusterName: !Sub ${EKSClusterName}-iterate
       ResolveConflicts: NONE
       ServiceAccountRoleArn: !GetAtt ITERATEEKSEBSCSIDriverRole.Arn
   SINGLEEBSSCIAddon:
@@ -1079,7 +1078,7 @@ Resources:
         NodeInstanceFamily: Standard
         NodeGroupType: Managed
         NodeGroupOS: Amazon Linux 2
-        EKSClusterName: !Join ['', [!Ref EKSClusterName, "-run" ]]
+        EKSClusterName: !Sub ${EKSClusterName}-run
         ClusterAutoScaler: Enabled
         MonitoringStack: None
         ALBIngressController: Enabled
@@ -1115,7 +1114,7 @@ Resources:
         NodeInstanceFamily: Standard
         NodeGroupType: Managed
         NodeGroupOS: Amazon Linux 2
-        EKSClusterName: !Join ['', [!Ref EKSClusterName, "-view" ]]
+        EKSClusterName: !Sub ${EKSClusterName}-view
         ClusterAutoScaler: Enabled
         MonitoringStack: None
         ALBIngressController: Enabled
@@ -1151,7 +1150,7 @@ Resources:
         NodeInstanceFamily: Standard
         NodeGroupType: Managed
         NodeGroupOS: Amazon Linux 2
-        EKSClusterName: !Join ['', [!Ref EKSClusterName, "-build" ]]
+        EKSClusterName: !Sub ${EKSClusterName}-build
         ClusterAutoScaler: Enabled
         MonitoringStack: None
         ALBIngressController: Enabled
@@ -1187,7 +1186,7 @@ Resources:
         NodeInstanceFamily: Standard
         NodeGroupType: Managed
         NodeGroupOS: Amazon Linux 2
-        EKSClusterName: !Join ['', [!Ref EKSClusterName, "-iterate" ]]
+        EKSClusterName: !Sub ${EKSClusterName}-iterate
         ClusterAutoScaler: Enabled
         MonitoringStack: None
         ALBIngressController: Enabled
@@ -2744,19 +2743,19 @@ Outputs:
     Value: https://fwd.aws/gDY8k?
 #start multi cluster outputs
   ViewEKSClusterName:
-    Description: The Amazon EKS cluster name.
+    Description: The TAP View cluster name.
     Value: !GetAtt VIEWEKSQSStack.Outputs.EKSClusterName
     Condition: CreateMultiCluster
   RunEKSClusterName:
-    Description: The Amazon EKS cluster name.
+    Description: The TAP Run cluster name.
     Value: !GetAtt RUNEKSQSStack.Outputs.EKSClusterName
     Condition: CreateMultiCluster
   BuildEKSClusterName:
-    Description: The Amazon EKS cluster name.
+    Description: The TAP Build cluster name.
     Value: !GetAtt BUILDEKSQSStack.Outputs.EKSClusterName
     Condition: CreateMultiCluster
   IterateEKSClusterName:
-    Description: The Amazon EKS cluster name.
+    Description: The TAP Iterate cluster name.
     Value: !GetAtt ITERATEEKSQSStack.Outputs.EKSClusterName
     Condition: CreateMultiCluster
   BUILDWorkloadIamRole:
@@ -2776,7 +2775,7 @@ Outputs:
     Value: !GetAtt ITERATEBuildServiceIamRole.Arn
     Condition: CreateMultiCluster
   TAPClusterArch:
-    Description: TAP ClusterArch
+    Description: TAP cluster architecture.
     Value: !Ref TAPClusterArch
   IterateLinuxBastionSshToNodesEgressRule:
     Description: IterateLinuxBastionSshToNodesEgressRule
