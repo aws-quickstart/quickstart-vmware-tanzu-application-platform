@@ -342,6 +342,7 @@ jobs:
 #! ---> housekeeping ----
 - name: housekeeping-log-failed-stacks
   << : *alertingOnJobs
+  serial_groups: [ 'stack-cleanup' ]
   plan:
   - in_parallel:
     - get: housekeeping-daily
@@ -373,6 +374,7 @@ jobs:
 
 - name: housekeeping-cleanup-failed-stacks
   << : *alertingOnJobs
+  serial_groups: [ 'stack-cleanup' ]
   plan:
   - in_parallel:
     - get: housekeeping-interval
