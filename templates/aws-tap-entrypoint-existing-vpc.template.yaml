@@ -164,7 +164,7 @@ Parameters:
       (GUI) and project URLs.
   TAPClusterArch:
     Type: String
-Description: TAP cluster architecture.
+    Description: TAP cluster architecture.
     AllowedValues:
       - multi
       - single

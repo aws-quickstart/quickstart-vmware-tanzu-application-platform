@@ -673,7 +673,7 @@ Resources:
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
 Outputs:
   ClusterArch:
-Description: TAP cluster architecture.
+    Description: TAP cluster architecture.
     Value: !Ref TAPClusterArch
   LinuxBastionEIP:
     Description: >-
