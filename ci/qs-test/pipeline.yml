@@ -96,6 +96,15 @@ alerting:
           Your PR sadly errored, please check [here](${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME})
       get_params:
         skip_download: true
+    on_abort:
+      put: pull-request
+      params:
+        path: repo
+        status: pending
+        comment: |
+          Your PR has been aborted, please check [here](${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME})
+      get_params:
+        skip_download: true
 
 groups:
 - name: main
