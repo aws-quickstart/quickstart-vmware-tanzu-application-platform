@@ -231,6 +231,17 @@ jobs:
 #! ---< main ----
 
 #! ---> PR stuff ----
+- name: pr-set-pending
+  << : *alertginOnPrJobs
+  plan:
+  - get: repo
+    resource: pull-request
+    trigger: true
+  - put: pull-request
+    params:
+      path: repo
+      status: pending
+
 - name: pr-prepare-bucket
   << : *alertginOnPrJobs
   serial: true
@@ -241,13 +252,10 @@ jobs:
         submodules: none
       passed: [ set-pipeline ]
     - get: repo
+      passed: [ pr-set-pending ]
       resource: pull-request
       trigger: true
   - in_parallel:
-    - put: pull-request
-      params:
-        path: repo
-        status: pending
     - task: handle-submodules
       file: ci-repo/ci/tasks/git-force-submodules/task.yml
     - *setup
