@@ -584,7 +584,7 @@ Mappings:
       US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ap-southeast-3:
-      US2204HVM: ami-0c1460efd8855de7c
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     ca-central-1:
       US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
@@ -596,7 +596,7 @@ Mappings:
       US2204HVM: ami-0ccdfe9ea19c6b1da
       WS2022FullBase: ami-0482ef6efa5fce019
     eu-central-1:
-      US2204HVM: ami-03f87e9ce1bec353f
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     eu-north-1:
       US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
@@ -635,7 +635,7 @@ Mappings:
       US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     us-west-1:
-      US2204HVM: ami-02ea247e531eb3ce6
+      US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
     us-west-2:
       US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
@@ -735,7 +735,7 @@ Resources:
         - IamOidcProviderArn: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider
           OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt BUILDEKSQSStack.Outputs.OIDCIssuerURL]]
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
   RUNEKSEBSCSIDriverRole:
     Type: AWS::IAM::Role
     Condition: CreateMultiCluster
@@ -768,7 +768,7 @@ Resources:
         - IamOidcProviderArn: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider
           OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt RUNEKSQSStack.Outputs.OIDCIssuerURL]]
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
   VIEWEKSEBSCSIDriverRole:
     Type: AWS::IAM::Role
     Condition: CreateMultiCluster
@@ -801,7 +801,7 @@ Resources:
         - IamOidcProviderArn: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider
           OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt VIEWEKSQSStack.Outputs.OIDCIssuerURL]]
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
   ITERATEEKSEBSCSIDriverRole:
     Type: AWS::IAM::Role
     Condition: CreateMultiCluster
@@ -834,7 +834,7 @@ Resources:
         - IamOidcProviderArn: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider
           OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt ITERATEEKSQSStack.Outputs.OIDCIssuerURL]]
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
   SINGLEEKSEBSCSIDriverRole:
     Type: AWS::IAM::Role
     Condition: CreateSingleCluster
@@ -867,7 +867,7 @@ Resources:
         - IamOidcProviderArn: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider
           OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
   BUILDEBSSCIAddon:
     Type: AWS::EKS::Addon
     Condition: CreateMultiCluster
