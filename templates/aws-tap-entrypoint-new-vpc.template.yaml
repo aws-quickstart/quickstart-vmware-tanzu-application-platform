@@ -176,12 +176,11 @@ Parameters:
       (GUI) and project URLs.
   TAPClusterArch:
     Type: String
-    Description: >-
-      TAP Cluster Architecture
+    Description: TAP cluster architecture.
     AllowedValues:
-      - 'multi'
-      - 'single'
-    Default: 'single'
+      - multi
+      - single
+    Default: single
   NumberOfAZs:
     Type: String
     Description: >-
@@ -610,8 +609,8 @@ Parameters:
 Conditions:
   3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
-  CreateMultiCluster: !Equals [!Ref TAPClusterArch, 'multi']
-  CreateSingleCluster: !Equals [!Ref TAPClusterArch, 'single']
+  CreateMultiCluster: !Equals [!Ref TAPClusterArch, multi]
+  CreateSingleCluster: !Equals [!Ref TAPClusterArch, single]
 Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
@@ -674,8 +673,7 @@ Resources:
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
 Outputs:
   ClusterArch:
-    Description: >-
-      TAP cluster architecture
+Description: TAP cluster architecture.
     Value: !Ref TAPClusterArch
   LinuxBastionEIP:
     Description: >-
@@ -699,19 +697,19 @@ Outputs:
     Value: !GetAtt ExistingVpcStack.Outputs.EKSClusterName
     Condition: CreateSingleCluster
   ViewEKSClusterName:
-    Description: The Amazon EKS cluster name.
+    Description: The TAP View cluster name.
     Value: !GetAtt ExistingVpcStack.Outputs.ViewEKSClusterName
     Condition: CreateMultiCluster
   RunEKSClusterName:
-    Description: The Amazon EKS cluster name.
+    Description: The TAP Run cluster name.
     Value: !GetAtt ExistingVpcStack.Outputs.RunEKSClusterName
     Condition: CreateMultiCluster
   BuildEKSClusterName:
-    Description: The Amazon EKS cluster name.
+    Description: The TAP Build cluster name.
     Value: !GetAtt ExistingVpcStack.Outputs.BuildEKSClusterName
     Condition: CreateMultiCluster
   IterateEKSClusterName:
-    Description: The Amazon EKS cluster name.
+    Description: The TAP Iterate cluster name.
     Value: !GetAtt ExistingVpcStack.Outputs.IterateEKSClusterName
     Condition: CreateMultiCluster
   TAPGuiUrl:
