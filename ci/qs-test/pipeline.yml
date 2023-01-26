@@ -58,7 +58,7 @@ resources:
     repository: ((repo.slug))
     access_token: ((ci/pr-resource.token))
     disable_forks: false
-    base_bracnch: main
+    base_branch: main
     ignore_paths:
     - ci/
 - name: daily-run
@@ -83,15 +83,28 @@ alerting:
       params:
         path: repo
         status: failure
-        comment: |
-          Your PR sadly failed, please check [here](${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME})
+        # comment: |
+        #   Your PR sadly failed, please check [here](${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME})
+      get_params:
+        skip_download: true
     on_error:
       put: pull-request
       params:
         path: repo
         status: error
-        comment: |
-          Your PR sadly errored, please check [here](${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME})
+        # comment: |
+        #   Your PR sadly errored, please check [here](${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME})
+      get_params:
+        skip_download: true
+    on_abort:
+      put: pull-request
+      params:
+        path: repo
+        status: pending
+        # comment: |
+        #   Your PR has been aborted, please check [here](${ATC_EXTERNAL_URL}/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME})
+      get_params:
+        skip_download: true
 
 groups:
 - name: main
@@ -231,6 +244,19 @@ jobs:
 #! ---< main ----
 
 #! ---> PR stuff ----
+- name: pr-set-pending
+  << : *alertginOnPrJobs
+  plan:
+  - get: repo
+    resource: pull-request
+    trigger: true
+  - put: pull-request
+    params:
+      path: repo
+      status: pending
+    get_params:
+      skip_download: true
+
 - name: pr-prepare-bucket
   << : *alertginOnPrJobs
   serial: true
@@ -241,13 +267,10 @@ jobs:
         submodules: none
       passed: [ set-pipeline ]
     - get: repo
+      passed: [ pr-set-pending ]
       resource: pull-request
       trigger: true
   - in_parallel:
-    - put: pull-request
-      params:
-        path: repo
-        status: pending
     - task: handle-submodules
       file: ci-repo/ci/tasks/git-force-submodules/task.yml
     - *setup
@@ -310,8 +333,10 @@ jobs:
     params:
       path: repo
       status: success
-      comment: |
-        Congratulations, your PR made it through the pipeline! :tada:
+      # comment: |
+      #   Congratulations, your PR made it through the pipeline! :tada:
+    get_params:
+      skip_download: true
 #! ---< PR stuff ----
 
 #! ---> housekeeping ----
