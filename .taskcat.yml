@@ -27,6 +27,13 @@ project:
   regions:
     - us-east-1
 tests:
-  default:
+  single-cluster:
+    parameters:
+      TAPClusterArch: single
     regions:
       - us-east-1
+  multi-cluster:
+    parameters:
+      TAPClusterArch: multi
+    regions:
+      - us-west-2
