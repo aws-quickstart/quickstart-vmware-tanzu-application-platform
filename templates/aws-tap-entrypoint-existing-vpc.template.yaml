@@ -505,8 +505,8 @@ Parameters:
       refer to Kubernetes cluster requirements
       (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
-      - '1.4.0'
-    Default: '1.4.0'
+      - 1.4.0
+    Default: 1.4.0
   SampleAppName:
     Type: String
     Description: >-
@@ -657,7 +657,7 @@ Mappings:
     '1.23':
       AwsKubectlVersion: 1.23.7/2022-06-29
   TAPVersion:
-    '1.4.0':
+    1.4.0:
       ClusterEssentialsBundleVersion: 1.3.0
   ClusterEssentialsBundle:
     1.1.0:
@@ -2720,7 +2720,7 @@ Outputs:
       accessible from within the VPC, such as the Windows bastion instance.
     Value: !Sub
       - http://${SampleAppName}.${Namespace}${ClusterName}.${TAPDomainName}
-      - ClusterName: !If [CreateMultiCluster, '.run', '']
+      - ClusterName: !If [CreateMultiCluster, .run, '']
         Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
   WindowsBastionAZ:
     Description: >-
@@ -2760,57 +2760,9 @@ Outputs:
     Description: The TAP Iterate cluster name.
     Value: !GetAtt ITERATEEKSQSStack.Outputs.EKSClusterName
     Condition: CreateMultiCluster
-  BUILDWorkloadIamRole:
-    Description: BUILDWorkloadIamRole.
-    Value: !GetAtt BUILDWorkloadIamRole.Arn
-    Condition: CreateMultiCluster
-  BUILDBuildServiceIamRole:
-    Description: BUILDBuildServiceIamRole.
-    Value: !GetAtt BUILDBuildServiceIamRole.Arn
-    Condition: CreateMultiCluster
-  ITERATEWorkloadIamRole:
-    Description: ITERATEWorkloadIamRole.
-    Value: !GetAtt ITERATEWorkloadIamRole.Arn
-    Condition: CreateMultiCluster
-  ITERATEBuildServiceIamRole:
-    Description: ITERATEBuildServiceIamRole.
-    Value: !GetAtt ITERATEBuildServiceIamRole.Arn
-    Condition: CreateMultiCluster
   TAPClusterArch:
     Description: TAP cluster architecture.
     Value: !Ref TAPClusterArch
-  IterateLinuxBastionSshToNodesEgressRule:
-    Description: IterateLinuxBastionSshToNodesEgressRule
-    Value: !Ref IterateLinuxBastionSshToNodesEgressRule
-    Condition: CreateMultiCluster
-  IterateNodesSshIngressRule:
-    Description: IterateNodesSshIngressRule
-    Value: !Ref IterateNodesSshIngressRule
-    Condition: CreateMultiCluster
-  BuildLinuxBastionSshToNodesEgressRule:
-    Description: BuildLinuxBastionSshToNodesEgressRule
-    Value: !Ref BuildLinuxBastionSshToNodesEgressRule
-    Condition: CreateMultiCluster
-  BuildNodesSshIngressRule:
-    Description: BuildNodesSshIngressRule
-    Value: !Ref BuildNodesSshIngressRule
-    Condition: CreateMultiCluster
-  RunLinuxBastionSshToNodesEgressRule:
-    Description: RunLinuxBastionSshToNodesEgressRule
-    Value: !Ref RunLinuxBastionSshToNodesEgressRule
-    Condition: CreateMultiCluster
-  RunNodesSshIngressRule:
-    Description: RunNodesSshIngressRule
-    Value: !Ref RunNodesSshIngressRule
-    Condition: CreateMultiCluster
-  ViewLinuxBastionSshToNodesEgressRule:
-    Description: ViewLinuxBastionSshToNodesEgressRule
-    Value: !Ref ViewLinuxBastionSshToNodesEgressRule
-    Condition: CreateMultiCluster
-  ViewNodesSshIngressRule:
-    Description: ViewNodesSshIngressRule
-    Value: !Ref ViewNodesSshIngressRule
-    Condition: CreateMultiCluster
 #end multi cluster outputs
 Rules:
   AcceptEULAs:
@@ -2827,7 +2779,7 @@ Rules:
           Customer Experience Improvement Program (CEIP) policy before you can
           proceed with the installation.
   TAPInterop:
-    RuleCondition: !Contains [['1.4.0'], !Ref TAPVersion]
+    RuleCondition: !Contains [[1.4.0], !Ref TAPVersion]
     Assertions:
       # The values below require quotes to force string comparison.
       - Assert: !Contains [['1.22', '1.23', '1.24'], !Ref KubernetesVersion]
