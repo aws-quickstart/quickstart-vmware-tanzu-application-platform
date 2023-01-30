@@ -7,4 +7,5 @@ This Partner Solution provides the following deployment options:
   It then deploys {partner-product-short-name} into this new VPC.
 * https://fwd.aws/DdRVe?[Deploy {partner-product-short-name} into an existing VPC^]. This option provisions {partner-product-short-name} in your existing AWS infrastructure.
 
-This Partner Solution provides separate templates for these options. It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instance types, and {partner-product-short-name} settings.
+This Partner Solution provides separate templates for these options. It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instance types, and {partner-product-short-name} settings. Two different deployment cluster architectures are also provided in each deployment options: single cluster architecture or multicluster architecture.
+
