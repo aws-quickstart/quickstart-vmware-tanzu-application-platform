@@ -1,4 +1,4 @@
-ARG BASE=devtools-docker.artifactory.eng.vmware.com/vmware/runway/resourcetypes/docker-in-nimbus-task:0.13.1
+ARG BASE=devtools-docker.artifactory.eng.vmware.com/vmware/runway/resourcetypes/docker-in-nimbus-task:0.13.4
 
 FROM ghcr.io/vmware-tanzu/carvel-docker-image AS carvel
 
