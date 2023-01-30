@@ -30,7 +30,7 @@ As shown in <<architecture1>>, this Partner Solution sets up the following:
 
 [#architecture2]
 .Partner Solution multicluster architecture for {partner-product-short-name} on AWS
-image::../docs/deployment_guide/images/architecture_diagram.png[Architecture]
+image::../docs/deployment_guide/images/architecture_diagram2.png[Architecture]
 
 As shown in <<architecture2>>, below are additional resources set up in the multi-cluster deployment options:
 
