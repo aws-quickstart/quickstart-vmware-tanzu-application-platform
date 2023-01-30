@@ -12,6 +12,7 @@ RUN apt-get -qy update \
             git \
             jq \
             less \
+            locales \
             pigz \
             python3-pip \
         && pip3 --no-cache-dir install --upgrade \
@@ -22,5 +23,15 @@ RUN apt-get -qy update \
             taskcat \
             yq \
         && rm -rf /var/lib/apt/lists/*
+
+ARG DEFAULT_LOCALE='en_US.UTF-8'
+
+# Needs to look something like `en_US.UTF-8 UTF-8`
+RUN echo "${DEFAULT_LOCALE} ${DEFAULT_LOCALE##*.}" > /etc/locale.gen \
+        && locale-gen
+
+ENV LC_ALL="${DEFAULT_LOCALE}"
+ENV LANG="${DEFAULT_LOCALE}"
+ENV LANGUAGE="${DEFAULT_LOCALE}"
 
 COPY --from=carvel /usr/local/bin/ytt /usr/local/bin/ytt
