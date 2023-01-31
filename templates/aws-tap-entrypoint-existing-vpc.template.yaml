@@ -2451,23 +2451,18 @@ Resources:
 
               local rc="${!1:-42}"
               local handleURL="${!2:-${CloudInitHandle}}"
-              local args=(
-                --region "${!AWS_REGION}"
-                --exit-code "$rc"
-              )
+              local reason='installation succeeded'
+              local ctxLines=10
 
-              if (( rc == 0 )) ; then
-                args+=(
-                  --reason "tap-install: succeeded"
-                )
-              else
-                args+=(
-                  --reason "tap-install: failed"
-                  --data "[...] $( tail -n 6 /var/log/cloud-init-output.log )"
-                )
-              fi
+              (( rc != 0 )) && {
+                local nl=$'\n'
+                # We don't care about the last 3 lines of the log, because
+                # that's logging the cfnSignal itself.
+                reason="${!nl}$( tail -n $(( ctxLines + 3 )) /var/log/cloud-init-output.log | head -n -3 )${!nl}"
+              }
 
-              cfn-signal "${!args[@]}" "$handleURL" || echo >&2 'could not run cfn-signal'
+              cfn-signal --region "${!AWS_REGION}" --exit-code "$rc" --reason "$reason" "$handleURL" \
+                || echo >&2 'could not run cfn-signal'
             }
             export -f cfnSignal
             trap 'cfnSignal $?' ERR
