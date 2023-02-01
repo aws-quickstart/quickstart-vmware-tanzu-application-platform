@@ -188,6 +188,9 @@ jobs:
         submodules: none
       trigger: true
       passed: [ prepare-bucket ]
+    - get: daily-run
+      trigger: true
+      passed: [ prepare-bucket ]
   - *setup
   - task: taskcat-test
     file: ci-repo/ci/tasks/taskcat-run-test/task.yml
@@ -213,6 +216,9 @@ jobs:
     - get: repo
       params:
         submodules: none
+      trigger: true
+      passed: [ prepare-bucket ]
+    - get: daily-run
       trigger: true
       passed: [ prepare-bucket ]
   - *setup
