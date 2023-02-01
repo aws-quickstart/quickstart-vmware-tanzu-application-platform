@@ -223,8 +223,9 @@ Parameters:
       refer to Kubernetes cluster requirements
       (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
-      - 1.23
-    Default: 1.23
+      - '1.23'
+      - '1.24'
+    Default: '1.24'
   NumberOfNodes:
     Type: Number
     Description: Minimum number of nodes to create for the TAP EKS cluster.
@@ -655,7 +656,9 @@ Mappings:
   KubernetesVersion:
   # https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
     '1.23':
-      AwsKubectlVersion: 1.23.7/2022-06-29
+      AwsKubectlVersion: 1.23.15/2023-01-11
+    '1.24':
+      AwsKubectlVersion: 1.24.9/2023-01-11
   TAPVersion:
     1.4.0:
       ClusterEssentialsBundleVersion: 1.3.0
@@ -702,211 +705,6 @@ Conditions:
   # UseEcr: !Equals [!Ref TanzuNetRelocateImages, 'Yes']
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
 Resources:
-  BUILDEKSEBSCSIDriverRole:
-    Type: AWS::IAM::Role
-    Condition: CreateMultiCluster
-    Properties:
-      RoleName: !Sub
-        - BUILDEKSEBSCSIDriverRole-${StackId}
-        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: >-
-        VMware Tanzu Application Platform role for EBSSCI Driver.
-      AssumeRolePolicyDocument: !Sub
-        - |
-          {
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Effect": "Allow",
-                "Principal": {
-                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
-                },
-                "Action": "sts:AssumeRoleWithWebIdentity",
-                "Condition": {
-                  "StringEquals": {
-                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
-                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
-                  }
-                }
-              }
-            ]
-          }
-        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
-          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt BUILDEKSQSStack.Outputs.OIDCIssuerURL]]
-      ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
-  RUNEKSEBSCSIDriverRole:
-    Type: AWS::IAM::Role
-    Condition: CreateMultiCluster
-    Properties:
-      RoleName: !Sub
-        - RUNEKSEBSCSIDriverRole-${StackId}
-        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: >-
-        VMware Tanzu Application Platform role for EBSSCI Driver.
-      AssumeRolePolicyDocument: !Sub
-        - |
-          {
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Effect": "Allow",
-                "Principal": {
-                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
-                },
-                "Action": "sts:AssumeRoleWithWebIdentity",
-                "Condition": {
-                  "StringEquals": {
-                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
-                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
-                  }
-                }
-              }
-            ]
-          }
-        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
-          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt RUNEKSQSStack.Outputs.OIDCIssuerURL]]
-      ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
-  VIEWEKSEBSCSIDriverRole:
-    Type: AWS::IAM::Role
-    Condition: CreateMultiCluster
-    Properties:
-      RoleName: !Sub
-        - VIEWEKSEBSCSIDriverRole-${StackId}
-        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: >-
-        VMware Tanzu Application Platform role for EBSSCI Driver.
-      AssumeRolePolicyDocument: !Sub
-        - |
-          {
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Effect": "Allow",
-                "Principal": {
-                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
-                },
-                "Action": "sts:AssumeRoleWithWebIdentity",
-                "Condition": {
-                  "StringEquals": {
-                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
-                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
-                  }
-                }
-              }
-            ]
-          }
-        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
-          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt VIEWEKSQSStack.Outputs.OIDCIssuerURL]]
-      ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
-  ITERATEEKSEBSCSIDriverRole:
-    Type: AWS::IAM::Role
-    Condition: CreateMultiCluster
-    Properties:
-      RoleName: !Sub
-        - ITERATEEKSEBSCSIDriverRole-${StackId}
-        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: >-
-        VMware Tanzu Application Platform role for EBSSCI Driver.
-      AssumeRolePolicyDocument: !Sub
-        - |
-          {
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Effect": "Allow",
-                "Principal": {
-                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
-                },
-                "Action": "sts:AssumeRoleWithWebIdentity",
-                "Condition": {
-                  "StringEquals": {
-                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
-                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
-                  }
-                }
-              }
-            ]
-          }
-        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
-          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt ITERATEEKSQSStack.Outputs.OIDCIssuerURL]]
-      ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
-  SINGLEEKSEBSCSIDriverRole:
-    Type: AWS::IAM::Role
-    Condition: CreateSingleCluster
-    Properties:
-      RoleName: !Sub
-        - SINGLEEKSEBSCSIDriverRole-${StackId}
-        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: >-
-        VMware Tanzu Application Platform role for EBSSCI Driver.
-      AssumeRolePolicyDocument: !Sub
-        - |
-          {
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Effect": "Allow",
-                "Principal": {
-                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
-                },
-                "Action": "sts:AssumeRoleWithWebIdentity",
-                "Condition": {
-                  "StringEquals": {
-                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
-                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
-                  }
-                }
-              }
-            ]
-          }
-        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
-          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
-      ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
-  BUILDEBSSCIAddon:
-    Type: AWS::EKS::Addon
-    Condition: CreateMultiCluster
-    Properties:
-      AddonName: aws-ebs-csi-driver
-      ClusterName: !Sub ${EKSClusterName}-build
-      ResolveConflicts: NONE
-      ServiceAccountRoleArn: !GetAtt BUILDEKSEBSCSIDriverRole.Arn
-  RUNEBSSCIAddon:
-    Type: AWS::EKS::Addon
-    Condition: CreateMultiCluster
-    Properties:
-      AddonName: aws-ebs-csi-driver
-      ClusterName: !Sub ${EKSClusterName}-run
-      ResolveConflicts: NONE
-      ServiceAccountRoleArn: !GetAtt RUNEKSEBSCSIDriverRole.Arn
-  VIEWEBSSCIAddon:
-    Type: AWS::EKS::Addon
-    Condition: CreateMultiCluster
-    Properties:
-      AddonName: aws-ebs-csi-driver
-      ClusterName: !Sub ${EKSClusterName}-view
-      ResolveConflicts: NONE
-      ServiceAccountRoleArn: !GetAtt VIEWEKSEBSCSIDriverRole.Arn
-  ITERATEEBSSCIAddon:
-    Type: AWS::EKS::Addon
-    Condition: CreateMultiCluster
-    Properties:
-      AddonName: aws-ebs-csi-driver
-      ClusterName: !Sub ${EKSClusterName}-iterate
-      ResolveConflicts: NONE
-      ServiceAccountRoleArn: !GetAtt ITERATEEKSEBSCSIDriverRole.Arn
-  SINGLEEBSSCIAddon:
-    Type: AWS::EKS::Addon
-    Condition: CreateSingleCluster
-    Properties:
-      AddonName: aws-ebs-csi-driver
-      ClusterName: !Ref EKSClusterName
-      ResolveConflicts: NONE
-      ServiceAccountRoleArn: !GetAtt SINGLEEKSEBSCSIDriverRole.Arn
   TanzuNetSecretCredentials:
     Type: AWS::SecretsManager::Secret
     Properties:
