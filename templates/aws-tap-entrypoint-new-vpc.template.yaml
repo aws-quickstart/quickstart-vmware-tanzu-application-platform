@@ -62,7 +62,6 @@ Metadata:
           default: Amazon EKS configuration
         Parameters:
           - EKSClusterName
-          - KubernetesVersion
           - NodeInstanceType
           - NodeVolumeSize
           - NumberOfNodes
@@ -115,8 +114,6 @@ Metadata:
         default: EKS single or multi cluster
       EKSClusterName:
         default: EKS cluster name
-      KubernetesVersion:
-        default: Kubernetes version
       NodeInstanceType:
         default: Instance type
       NodeVolumeSize:
@@ -265,17 +262,6 @@ Parameters:
       Minimum length of 1. Maximum length of 100. Must start with a letter or
       number.
     Default: cluster-eks-tap
-  KubernetesVersion:
-    Type: String
-    Description: >-
-      Version of Kubernetes control plane to deploy. The selected version must
-      be supported the selected TAP version (TAPVersion). For more information,
-      refer to Kubernetes cluster requirements
-      (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3).
-    AllowedValues:
-      - '1.23'
-      - '1.24'
-    Default: '1.24'
   NumberOfNodes:
     Type: Number
     Description: Minimum number of nodes to create for the TAP EKS cluster.
@@ -551,8 +537,7 @@ Parameters:
   TAPVersion:
     Type: String
     Description: >-
-      Version of TAP to deploy. The selected version must also support the
-      selected Kubernetes version (KubernetesVersion). For more information,
+      Version of TAP to deploy. For more information,
       refer to Kubernetes cluster requirements
       (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
@@ -660,7 +645,6 @@ Resources:
         NodeInstanceType: !Ref NodeInstanceType
         NodeVolumeSize: !Ref NodeVolumeSize
         EKSClusterName: !Ref EKSClusterName
-        KubernetesVersion: !Ref KubernetesVersion
         TAPDomainName: !Ref TAPDomainName
         TAPClusterArch: !Ref TAPClusterArch
         TanzuNetUsername: !Ref TanzuNetUsername
@@ -758,12 +742,3 @@ Rules:
           You must acknowledge that you have read and accepted the VMware
           Customer Experience Improvement Program (CEIP) policy before you can
           proceed with the installation.
-  TAPInterop:
-    RuleCondition: !Contains [[1.4.0], !Ref TAPVersion]
-    Assertions:
-      # The values below require quotes to force string comparison.
-      - Assert: !Contains [['1.22', '1.23', '1.24'], !Ref KubernetesVersion]
-        AssertDescription: >-
-          The VMware Tanzu Application Platform version selection is
-          incompatible with the Kubernetes version selection (reference:
-          https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3).

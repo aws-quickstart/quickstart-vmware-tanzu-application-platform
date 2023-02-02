@@ -58,7 +58,6 @@ Metadata:
           default: Amazon EKS configuration
         Parameters:
           - EKSClusterName
-          - KubernetesVersion
           - NodeInstanceType
           - NodeVolumeSize
           - NumberOfNodes
@@ -103,8 +102,6 @@ Metadata:
         default: EKS single or multi cluster
       EKSClusterName:
         default: EKS cluster name
-      KubernetesVersion:
-        default: Kubernetes version
       NodeInstanceType:
         default: Instance type
       NodeVolumeSize:
@@ -217,13 +214,8 @@ Parameters:
     Default: cluster-eks-tap
   KubernetesVersion:
     Type: String
-    Description: >-
-      Version of Kubernetes control plane to deploy. The selected version must
-      be supported the selected TAP version (TAPVersion). For more information,
-      refer to Kubernetes cluster requirements
-      (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3).
+    Description: The EKS/kubernetes version to run TAP on
     AllowedValues:
-      - '1.23'
       - '1.24'
     Default: '1.24'
   NumberOfNodes:
@@ -501,9 +493,8 @@ Parameters:
   TAPVersion:
     Type: String
     Description: >-
-      Version of TAP to deploy. The selected version must also support the
-      selected Kubernetes version (KubernetesVersion). For more information,
-      refer to Kubernetes cluster requirements
+      Version of TAP to deploy. For more information, refer to Kubernetes
+      cluster requirements
       (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
       - 1.4.0
@@ -655,8 +646,6 @@ Mappings:
       Name: registry.tanzu.vmware.com
   KubernetesVersion:
   # https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
-    '1.23':
-      AwsKubectlVersion: 1.23.15/2023-01-11
     '1.24':
       AwsKubectlVersion: 1.24.9/2023-01-11
   TAPVersion:
