@@ -10,12 +10,19 @@ set -e
 set -u
 set -o pipefail
 
-DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd )"
-readonly DIR
+REPO_DIR="${REPO_DIR:-$( cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../../../ && pwd )}"
+readonly REPO_DIR
 
 # shellcheck disable=SC2034
-readonly TEMPLATE_NEW_VPC="${DIR}/../../../templates/aws-tap-entrypoint-new-vpc.template.yaml"
-readonly TEMPLATE_EXISTING_VPC="${DIR}/../../../templates/aws-tap-entrypoint-existing-vpc.template.yaml"
+readonly TEMPLATE_NEW_VPC="${REPO_DIR}/templates/aws-tap-entrypoint-new-vpc.template.yaml"
+readonly TEMPLATE_EXISTING_VPC="${REPO_DIR}/templates/aws-tap-entrypoint-existing-vpc.template.yaml"
+
+##--------------------------------------------------------------------
+Test::CloudformationLint() {
+  cd "$REPO_DIR"
+  find templates/ -type f -iregex '.*\.ya?ml' -print0 \
+    | xargs -0 -r cfn-lint
+}
 
 ##--------------------------------------------------------------------
 # Test if all substacks we create get configured with the correct bucket
