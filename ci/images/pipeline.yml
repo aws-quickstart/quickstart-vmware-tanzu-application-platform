@@ -43,6 +43,20 @@ resources:
     username: ((tappc-registry.username))
     password: ((tappc-registry.password))
     tag: latest
+- << : *ciRepo
+  name: shellcheck-image-files
+  source:
+    << : *ciRepoSource
+    paths:
+    - ci/images/shellcheck-image/
+- name: shellcheck-image
+  type: registry-image
+  icon: docker
+  source:
+    repository: ((tappc-registry.url))/ci/shellcheck-image
+    username: ((tappc-registry.username))
+    password: ((tappc-registry.password))
+    tag: latest
 - name: notify
   icon: slack
   type: slack-alert
@@ -137,3 +151,37 @@ jobs:
       params:
         alert_type: success
         text: new `inclusive-lang-image` pushed
+
+- name: build-shellcheck-image
+  << : *alertingOnJobs
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      passed:
+      - set-pipeline
+    - get: shellcheck-image-files
+      params:
+        submodules: none
+      trigger: true
+  - task: build
+    file: ci-repo/ci/tasks/build-image/task.yml
+    vars:
+      repo: ((docker-in-nimbus.repo))
+      tag: ((docker-in-nimbus.tag))
+    input_mapping:
+      input: shellcheck-image-files
+    params:
+      NIMBUS_USER: ((ci/nimbus.user))
+      BUILD_ARG_BASE: ((dockerhub-proxy))/dockerhub-proxy-cache/paketobuildpacks/run-jammy-base:latest
+      BUILD_ARG_SHELLCHECK: ((dockerhub-proxy))/koalaman/shellcheck:stable
+      CONTEXT: input/ci/images/shellcheck-image
+  - put: shellcheck-image
+    params:
+      image: image/image.tar
+    on_success:
+      put: notify
+      params:
+        alert_type: success
+        text: new `shellcheck-image` pushed
