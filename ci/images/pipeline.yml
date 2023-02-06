@@ -29,6 +29,20 @@ resources:
     username: ((tappc-registry.username))
     password: ((tappc-registry.password))
     tag: latest
+- << : *ciRepo
+  name: inclusive-lang-image-files
+  source:
+    << : *ciRepoSource
+    paths:
+    - ci/images/inclusive-lang-image/
+- name: inclusive-lang-image
+  type: registry-image
+  icon: docker
+  source:
+    repository: ((tappc-registry.url))/ci/inclusive-lang-image
+    username: ((tappc-registry.username))
+    password: ((tappc-registry.password))
+    tag: latest
 - name: notify
   icon: slack
   type: slack-alert
@@ -89,3 +103,37 @@ jobs:
       params:
         alert_type: success
         text: new `docker-image` pushed
+
+- name: build-inclusive-lang-image
+  << : *alertingOnJobs
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      passed:
+      - set-pipeline
+    - get: inclusive-lang-image-files
+      params:
+        submodules: none
+      trigger: true
+  - task: build
+    file: ci-repo/ci/tasks/build-image/task.yml
+    vars:
+      repo: ((docker-in-nimbus.repo))
+      tag: ((docker-in-nimbus.tag))
+    input_mapping:
+      input: inclusive-lang-image-files
+    params:
+      NIMBUS_USER: ((ci/nimbus.user))
+      BUILD_ARG_BASE: ((dockerhub-proxy))/dockerhub-proxy-cache/paketobuildpacks/run-jammy-tiny:latest
+      BUILD_ARG_WOKE: ((dockerhub-proxy))/getwoke/woke:latest
+      CONTEXT: input/ci/images/inclusive-lang-image
+  - put: inclusive-lang-image
+    params:
+      image: image/image.tar
+    on_success:
+      put: notify
+      params:
+        alert_type: success
+        text: new `inclusive-lang-image` pushed
