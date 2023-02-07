@@ -34,7 +34,6 @@ Metadata:
       - Label:
           default: VMware Tanzu Application Platform configuration
         Parameters:
-          - TAPVersion
           - TAPDomainName
           - TAPClusterArch
       - Label:
@@ -118,8 +117,6 @@ Metadata:
         default: API token
       TanzuNetRelocateImages:
         default: Relocate TAP images
-      TAPVersion:
-        default: Version
       SampleAppName:
         default: Name
       QSS3BucketName:
@@ -493,9 +490,7 @@ Parameters:
   TAPVersion:
     Type: String
     Description: >-
-      Version of TAP to deploy. For more information, refer to Kubernetes
-      cluster requirements
-      (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3).
+      Version of TAP to deploy.
     AllowedValues:
       - 1.4.0
     Default: 1.4.0
