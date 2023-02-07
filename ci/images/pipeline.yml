@@ -140,7 +140,9 @@ jobs:
       input: inclusive-lang-image-files
     params:
       NIMBUS_USER: ((ci/nimbus.user))
-      BUILD_ARG_BASE: ((dockerhub-proxy))/dockerhub-proxy-cache/paketobuildpacks/run-jammy-tiny:latest
+      #! for woke we don't need a shell, because we just need to run the
+      #! binary, thus the `tiny` variant should suffice
+      BUILD_ARG_BASE: ((dockerhub-proxy))/paketobuildpacks/run-jammy-tiny:latest
       BUILD_ARG_WOKE: ((dockerhub-proxy))/getwoke/woke:latest
       CONTEXT: input/ci/images/inclusive-lang-image
   - put: inclusive-lang-image
@@ -174,7 +176,9 @@ jobs:
       input: shellcheck-image-files
     params:
       NIMBUS_USER: ((ci/nimbus.user))
-      BUILD_ARG_BASE: ((dockerhub-proxy))/dockerhub-proxy-cache/paketobuildpacks/run-jammy-base:latest
+      #! for shellcheck we need a shell (to `find` all files we want it to run
+      #! against), thus we use the `base` variant here
+      BUILD_ARG_BASE: ((dockerhub-proxy))/paketobuildpacks/run-jammy-base:latest
       BUILD_ARG_SHELLCHECK: ((dockerhub-proxy))/koalaman/shellcheck:stable
       CONTEXT: input/ci/images/shellcheck-image
   - put: shellcheck-image
