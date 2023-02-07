@@ -108,7 +108,7 @@ alerting:
 
 groups:
 - name: main
-  jobs: [ prepare-bucket, test-single, test-multi, publish-bucket, set-pipeline ]
+  jobs: [ prepare-bucket, test-static, test-single, test-multi, publish-bucket, set-pipeline ]
 - name: pr
   jobs: [ "pr-*", set-pipeline ]
 - name: housekeeping
@@ -130,9 +130,8 @@ jobs:
     - ci-repo/ci/qs-test/pipeline.vars.yml
 
 #! ---> main ----
-- name: prepare-bucket
+- name: test-static
   << : *alertingOnJobs
-  serial: true
   plan:
   - in_parallel:
     - get: daily-run
@@ -143,6 +142,24 @@ jobs:
       passed: [ set-pipeline ]
     - get: repo
       trigger: true
+  - task: test-static
+    file: ci-repo/ci/tasks/test-static.yml
+- name: prepare-bucket
+  << : *alertingOnJobs
+  serial: true
+  plan:
+  - in_parallel:
+    - get: daily-run
+      trigger: true
+      passed: [ test-static ]
+    - get: ci-repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ test-static ]
+    - get: repo
+      trigger: true
+      passed: [ test-static ]
   - &setup
     in_parallel:
     - &getCloudGateCreds
@@ -257,9 +274,8 @@ jobs:
     get_params:
       skip_download: true
 
-- name: pr-prepare-bucket
+- name: pr-test-static
   << : *alertginOnPrJobs
-  serial: true
   plan:
   - in_parallel:
     - get: ci-repo
@@ -268,6 +284,23 @@ jobs:
       passed: [ set-pipeline ]
     - get: repo
       passed: [ pr-set-pending ]
+      resource: pull-request
+      trigger: true
+  - task: test-static
+    file: ci-repo/ci/tasks/test-static.yml
+
+- name: pr-prepare-bucket
+  << : *alertginOnPrJobs
+  serial: true
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ pr-test-static ]
+    - get: repo
+      passed: [ pr-test-static ]
       resource: pull-request
       trigger: true
   - in_parallel:
