@@ -13,7 +13,6 @@ set -o pipefail
 REPO_DIR="${REPO_DIR:-$( cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../../../ && pwd )}"
 readonly REPO_DIR
 
-# shellcheck disable=SC2034
 readonly TEMPLATE_NEW_VPC="${REPO_DIR}/templates/aws-tap-entrypoint-new-vpc.template.yaml"
 readonly TEMPLATE_EXISTING_VPC="${REPO_DIR}/templates/aws-tap-entrypoint-existing-vpc.template.yaml"
 
@@ -27,7 +26,13 @@ Test::CloudformationLint() {
 ##--------------------------------------------------------------------
 # Test if all substacks we create get configured with the correct bucket
 # parameters
-Test::SubstacksGetBucketConfig() {
+Test::SubstacksGetBucketConfig::New() {
+  SubstacksGetBucketConfig "$TEMPLATE_NEW_VPC"
+}
+Test::SubstacksGetBucketConfig::Existing() {
+  SubstacksGetBucketConfig "$TEMPLATE_EXISTING_VPC"
+}
+SubstacksGetBucketConfig() {
   # shellcheck disable=SC2016
   yq '
     def checkParams($params; $name):
@@ -40,9 +45,14 @@ Test::SubstacksGetBucketConfig() {
 
     .Resources | to_entries | map(
       # check all resources of type stack
-      # explicitly exclude "EKSAdvancedConfigStack", which does not take the bucket params
-      select(.value.Type == "AWS::CloudFormation::Stack" and .key != "EKSAdvancedConfigStack")
-        | checkParams(.value.Properties.Parameters; .key)
+      # explicitly exclude "EKSAdvancedConfigStack" & "VPCStack", which do not
+      # take the bucket params
+      select(
+        .value.Type == "AWS::CloudFormation::Stack"
+        and .key != "EKSAdvancedConfigStack"
+        and .key != "VPCStack"
+      )
+      | checkParams(.value.Properties.Parameters; .key)
     )
     | flatten
     | if (. | length) >=1 then
@@ -50,7 +60,7 @@ Test::SubstacksGetBucketConfig() {
       else
         empty
       end
-  ' "$TEMPLATE_EXISTING_VPC"
+  ' "$1"
 }
 
 ##--------------------------------------------------------------------
