@@ -21,12 +21,18 @@ project:
     TanzuNetApiToken: --override--
     TanzuNetRelocateImages: --override--
     TAPDomainName: --override--
-    TAPClusterArch: --override--
     QSS3BucketName: $[taskcat_autobucket]
     QSS3BucketRegion: $[taskcat_current_region]
   regions:
     - us-east-1
 tests:
-  default:
+  single-cluster:
+    parameters:
+      TAPClusterArch: single
     regions:
       - us-east-1
+  multi-cluster:
+    parameters:
+      TAPClusterArch: multi
+    regions:
+      - us-west-2
