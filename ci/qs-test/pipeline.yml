@@ -143,7 +143,7 @@ jobs:
     - get: repo
       trigger: true
   - task: test-static
-    file: ci-repo/ci/tasks/test-static.yml
+    file: ci-repo/ci/tasks/test-static/task.yml
 - name: prepare-bucket
   << : *alertingOnJobs
   serial: true
@@ -293,7 +293,7 @@ jobs:
       resource: pull-request
       trigger: true
   - task: test-static
-    file: ci-repo/ci/tasks/test-static.yml
+    file: ci-repo/ci/tasks/test-static/task.yml
 
 - name: pr-prepare-bucket
   << : *alertginOnPrJobs
