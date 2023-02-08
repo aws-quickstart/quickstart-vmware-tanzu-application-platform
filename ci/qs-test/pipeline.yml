@@ -217,6 +217,8 @@ jobs:
       in_parallel:
       - task: print-logs
         file: ci-repo/ci/tasks/taskcat-print-logs/task.yml
+      - task: print-durations
+        file: ci-repo/ci/tasks/taskcat-print-durations/task.yml
       - task: cleanup-stack
         file: ci-repo/ci/tasks/aws-delete-stack/task.yml
 
