@@ -10,35 +10,57 @@ set -e
 set -u
 set -o pipefail
 
-DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd )"
-readonly DIR
+REPO_DIR="${REPO_DIR:-$( cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../../../ && pwd )}"
+readonly REPO_DIR
 
-# shellcheck disable=SC2034
-readonly TEMPLATE_NEW_VPC="${DIR}/../../../templates/aws-tap-entrypoint-new-vpc.template.yaml"
-readonly TEMPLATE_EXISTING_VPC="${DIR}/../../../templates/aws-tap-entrypoint-existing-vpc.template.yaml"
+readonly TEMPLATE_NEW_VPC="${REPO_DIR}/templates/aws-tap-entrypoint-new-vpc.template.yaml"
+readonly TEMPLATE_EXISTING_VPC="${REPO_DIR}/templates/aws-tap-entrypoint-existing-vpc.template.yaml"
+
+##--------------------------------------------------------------------
+Test::CloudformationLint() {
+  cd "$REPO_DIR"
+  find templates/ -type f -iregex '.*\.ya?ml' -print0 \
+    | xargs -0 -r cfn-lint
+}
 
 ##--------------------------------------------------------------------
 # Test if all substacks we create get configured with the correct bucket
 # parameters
-Test::SubstacksGetBucketConfig() {
+Test::SubstacksGetBucketConfig::New() {
+  SubstacksGetBucketConfig "$TEMPLATE_NEW_VPC"
+}
+Test::SubstacksGetBucketConfig::Existing() {
+  SubstacksGetBucketConfig "$TEMPLATE_EXISTING_VPC"
+}
+SubstacksGetBucketConfig() {
   # shellcheck disable=SC2016
-  yq -e '
-    def paramMissing($param; $name):
-      "`\($name)` is missing parameter `\($param)`" | halt_error(1)
-    ;
+  yq '
     def checkParams($params; $name):
-        if $params | has("QSS3BucketName")   then . else paramMissing("QSS3BucketName"; $name)   end
-      | if $params | has("QSS3BucketRegion") then . else paramMissing("QSS3BucketRegion"; $name) end
-      | if $params | has("QSS3KeyPrefix")    then . else paramMissing("QSS3KeyPrefix"; $name)    end
+      [
+        ( if $params | has("QSS3BucketName")   then empty else "`\($name)` is missing `QSS3BucketName`"   end ) ,
+        ( if $params | has("QSS3BucketRegion") then empty else "`\($name)` is missing `QSS3BucketRegion`" end ) ,
+        ( if $params | has("QSS3KeyPrefix")    then empty else "`\($name)` is missing `QSS3KeyPrefix`"    end )
+      ]
     ;
 
     .Resources | to_entries | map(
       # check all resources of type stack
-      # explicitly exclude "EKSAdvancedConfigStack", which does not take the bucket params
-      select(.value.Type == "AWS::CloudFormation::Stack" and .key != "EKSAdvancedConfigStack")
-        | checkParams(.value.Properties.Parameters; .key)
+      # explicitly exclude "EKSAdvancedConfigStack" & "VPCStack", which do not
+      # take the bucket params
+      select(
+        .value.Type == "AWS::CloudFormation::Stack"
+        and .key != "EKSAdvancedConfigStack"
+        and .key != "VPCStack"
+      )
+      | checkParams(.value.Properties.Parameters; .key)
     )
-  ' "$TEMPLATE_EXISTING_VPC" >/dev/null
+    | flatten
+    | if (. | length) >=1 then
+        error( (["  "]+.) | join("\n  ") )
+      else
+        empty
+      end
+  ' "$1"
 }
 
 ##--------------------------------------------------------------------

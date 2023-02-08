@@ -6,7 +6,9 @@ set -o pipefail
 
 readonly BUILD_DIR="$PWD"
 
+# shellcheck disable=SC1091
 source "${BUILD_DIR}/creds/env.inc.sh"
+# shellcheck disable=SC1091
 source "${BUILD_DIR}/ci-repo/ci/tasks/lib/misc.lib.sh"
 
 readonly IMAGE_CACHE_FILE="${BUILD_DIR}/image-cache/images.tar.gz"
@@ -19,6 +21,11 @@ main() {
 
   run::logged 'running taskcat upload' \
     taskcat upload --config-file "$TASKCAT_CONFIG_FILE" --disable-lambda-packaging
+
+  local bucketCoords
+  mapfile -t -d $'\t' bucketCoords < <( bucket::getCoords "$TASKCAT_CONFIG_FILE" )
+  run::logged 'quick create' \
+    bucket::printDetails "${bucketCoords[0]}" "${bucketCoords[1]}" "${bucketCoords[2]}"
 }
 
 # `ensurePackageZips` makes sure we have the correct package zips in the project repo.
@@ -34,11 +41,13 @@ main() {
 # to package those up too, similar as we do right now for the eks packages.
 ensurePackageZips() {
   local submodulePath='submodules/quickstart-amazon-eks'
-  local name="$(basename "$submodulePath")"
+  local name rev bucket
 
-  local rev="$( cd "$submodulePath" && git rev-parse HEAD )"
+  name="$(basename "$submodulePath")"
+  rev="$( cd "$submodulePath" && git rev-parse HEAD )"
+  bucket="$( yq -r .project.parameters.QSS3BucketName "$TASKCAT_CONFIG_FILE" )"
+
   local tarball="${name}-${rev}.tar.gz"
-  local bucket="$( yq -r .project.parameters.QSS3BucketName "$TASKCAT_CONFIG_FILE" )"
   local s3Path="s3://${bucket}/ci/cached-packages/${tarball}"
 
   local scratchDir="${SCRATCH_DIR:-/scratch}"

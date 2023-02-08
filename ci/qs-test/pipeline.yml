@@ -65,7 +65,7 @@ resources:
   type: time
   source:
     location: UTC
-    start: 05:00 AM
+    start: 04:00 AM
     stop: 06:00 AM
     days: [ Monday, Tuesday, Wednesday, Thursday, Friday ]
 
@@ -108,7 +108,7 @@ alerting:
 
 groups:
 - name: main
-  jobs: [ prepare-bucket, test-single, test-multi, publish-bucket, set-pipeline ]
+  jobs: [ prepare-bucket, test-static, test-single, test-multi, publish-bucket, set-pipeline ]
 - name: pr
   jobs: [ "pr-*", set-pipeline ]
 - name: housekeeping
@@ -130,9 +130,8 @@ jobs:
     - ci-repo/ci/qs-test/pipeline.vars.yml
 
 #! ---> main ----
-- name: prepare-bucket
+- name: test-static
   << : *alertingOnJobs
-  serial: true
   plan:
   - in_parallel:
     - get: daily-run
@@ -143,6 +142,24 @@ jobs:
       passed: [ set-pipeline ]
     - get: repo
       trigger: true
+  - task: test-static
+    file: ci-repo/ci/tasks/test-static/task.yml
+- name: prepare-bucket
+  << : *alertingOnJobs
+  serial: true
+  plan:
+  - in_parallel:
+    - get: daily-run
+      trigger: true
+      passed: [ test-static ]
+    - get: ci-repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ test-static ]
+    - get: repo
+      trigger: true
+      passed: [ test-static ]
   - &setup
     in_parallel:
     - &getCloudGateCreds
@@ -188,6 +205,9 @@ jobs:
         submodules: none
       trigger: true
       passed: [ prepare-bucket ]
+    - get: daily-run
+      trigger: true
+      passed: [ prepare-bucket ]
   - *setup
   - task: taskcat-test
     file: ci-repo/ci/tasks/taskcat-run-test/task.yml
@@ -213,6 +233,9 @@ jobs:
     - get: repo
       params:
         submodules: none
+      trigger: true
+      passed: [ prepare-bucket ]
+    - get: daily-run
       trigger: true
       passed: [ prepare-bucket ]
   - *setup
@@ -257,9 +280,8 @@ jobs:
     get_params:
       skip_download: true
 
-- name: pr-prepare-bucket
+- name: pr-test-static
   << : *alertginOnPrJobs
-  serial: true
   plan:
   - in_parallel:
     - get: ci-repo
@@ -268,6 +290,23 @@ jobs:
       passed: [ set-pipeline ]
     - get: repo
       passed: [ pr-set-pending ]
+      resource: pull-request
+      trigger: true
+  - task: test-static
+    file: ci-repo/ci/tasks/test-static/task.yml
+
+- name: pr-prepare-bucket
+  << : *alertginOnPrJobs
+  serial: true
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ pr-test-static ]
+    - get: repo
+      passed: [ pr-test-static ]
       resource: pull-request
       trigger: true
   - in_parallel:
