@@ -29,14 +29,13 @@ Test::CloudformationLint() {
 # parameters
 Test::SubstacksGetBucketConfig() {
   # shellcheck disable=SC2016
-  yq -e '
-    def paramMissing($param; $name):
-      "`\($name)` is missing parameter `\($param)`" | halt_error(1)
-    ;
+  yq '
     def checkParams($params; $name):
-        if $params | has("QSS3BucketName")   then . else paramMissing("QSS3BucketName"; $name)   end
-      | if $params | has("QSS3BucketRegion") then . else paramMissing("QSS3BucketRegion"; $name) end
-      | if $params | has("QSS3KeyPrefix")    then . else paramMissing("QSS3KeyPrefix"; $name)    end
+      [
+        ( if $params | has("QSS3BucketName")   then empty else "`\($name)` is missing `QSS3BucketName`"   end ) ,
+        ( if $params | has("QSS3BucketRegion") then empty else "`\($name)` is missing `QSS3BucketRegion`" end ) ,
+        ( if $params | has("QSS3KeyPrefix")    then empty else "`\($name)` is missing `QSS3KeyPrefix`"    end )
+      ]
     ;
 
     .Resources | to_entries | map(
@@ -45,7 +44,13 @@ Test::SubstacksGetBucketConfig() {
       select(.value.Type == "AWS::CloudFormation::Stack" and .key != "EKSAdvancedConfigStack")
         | checkParams(.value.Properties.Parameters; .key)
     )
-  ' "$TEMPLATE_EXISTING_VPC" >/dev/null
+    | flatten
+    | if (. | length) >=1 then
+        error( (["  "]+.) | join("\n  ") )
+      else
+        empty
+      end
+  ' "$TEMPLATE_EXISTING_VPC"
 }
 
 ##--------------------------------------------------------------------
