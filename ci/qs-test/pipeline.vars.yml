@@ -1,0 +1,22 @@
+repo: &repo
+  host: github.com
+  slug: vmware-tap-on-public-cloud/quickstart-vmware-tanzu-application-platform
+  branch: main
+
+ci-repo:
+  << : *repo
+  #! e.g. branch: ci
+
+dockerhub-proxy: harbor-repo.vmware.com/dockerhub-proxy-cache
+
+tappc-registry:
+  url: tappc-docker-local.artifactory.eng.vmware.com
+  username: ((ci/serviceaccount/tappc-ci.username))
+  password: ((ci/serviceaccount/tappc-ci.password))
+
+publish-bucket:
+  name: tap-quickstart
+  prefix: public/main/
+
+ci-bucket:
+  name-without-region: tcat-9d0156f41d3b503b8360120b8214b6f1

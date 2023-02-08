@@ -1,0 +1,16 @@
+---
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: tappc-docker-local.artifactory.eng.vmware.com/ci/docker-image
+    tag: latest
+inputs:
+- name: ci-repo
+run:
+  path: ci-repo/ci/tasks/github-token-expiry/task.py
+params:
+  PYTHONIOENCODING: utf-8
+  SECRET_PATH: some/path/in/vault
+  EXPIRATION_DATE: ((some/path/in/vault.expiration))
+  MIN_DAYS_LEFT: 12

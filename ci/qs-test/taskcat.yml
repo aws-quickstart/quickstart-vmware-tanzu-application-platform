@@ -1,0 +1,59 @@
+#@ load("@ytt:data", "data")
+#@ load("@ytt:regexp", "regexp")
+
+#@ region = "us-east-1"
+#@ accessCIDR = "0.0.0.0/0"
+
+#@ domain = data.values.domain
+#@ gitSha = data.values.gitSha
+#@ gitRemote = regexp.replace("(https?://)[^@]+(@)", data.values.gitRemote, "$1--redacted--$2")
+#@ bucket = data.values.bucket
+#@ tanzunet_username = data.values.tanzunet_username
+#@ tanzunet_password = data.values.tanzunet_password
+#@ tanzunet_refreshToken = data.values.tanzunet_refreshToken
+#@ keypairName = data.values.keypairName
+
+---
+project:
+  name: #@ gitSha
+  owner: quickstart-eng@amazon.com
+  s3_bucket: #@ bucket
+  s3_regional_buckets: true
+  shorten_stack_name: true
+  template: templates/aws-tap-entrypoint-new-vpc.template.yaml
+  package_lambda: true
+  lambda_source_path: functions/source
+  lambda_zip_path: functions/packages
+  build_submodules: true
+  parameters:
+    AcceptEULAs: "Yes"
+    AcceptCEIP: "Yes"
+    AvailabilityZones: $[taskcat_genaz_3]
+    NumberOfAZs: 3
+    KeyPairName: #@ keypairName
+    RemoteAccessCidr: #@ accessCIDR
+    EKSClusterName: $[taskcat_random-string]
+    TanzuNetUsername: #@ tanzunet_username
+    TanzuNetPassword: #@ tanzunet_password
+    TanzuNetApiToken: #@ tanzunet_refreshToken
+    TanzuNetRelocateImages: "No"
+    TAPDomainName: #@ "{}.{}".format("$[taskcat_random-string]", domain)
+    QSS3BucketName: #@ bucket + "-" + region
+    QSS3BucketRegion: #@ region
+    QSS3KeyPrefix: #@ gitSha + "/"
+  regions:
+    - #@ region
+  tags:
+    gitSha: #@ gitSha
+    gitRemote: #@ gitRemote
+tests:
+  single:
+    regions:
+      - #@ region
+    parameters:
+      TAPClusterArch: single
+  multi:
+    regions:
+      - #@ region
+    parameters:
+      TAPClusterArch: multi

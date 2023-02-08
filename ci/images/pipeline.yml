@@ -1,0 +1,91 @@
+resource_types:
+- name: slack-alert
+  type: registry-image
+  source:
+    repository: ((dockerhub-proxy))/arbourd/concourse-slack-alert-resource
+
+resources:
+- &ciRepo
+  name: ci-repo
+  type: git
+  check_every: 1m
+  icon: github
+  source: &ciRepoSource
+    uri: https://((ci-repo.host))/((ci-repo.slug))
+    branch: ((ci-repo.branch))
+    paths:
+    - ci/
+- << : *ciRepo
+  name: docker-image-files
+  source:
+    << : *ciRepoSource
+    paths:
+    - ci/images/docker-image/
+- name: docker-image
+  type: registry-image
+  icon: docker
+  source:
+    repository: ((tappc-registry.url))/ci/docker-image
+    username: ((tappc-registry.username))
+    password: ((tappc-registry.password))
+    tag: latest
+- name: notify
+  icon: slack
+  type: slack-alert
+  source:
+    url: ((ci/slack.webhook))
+
+alerting:
+  onJobs: &alertingOnJobs
+    on_failure:
+      put: notify
+      params: { alert_type: failed }
+    on_error:
+      put: notify
+      params: { alert_type: errored }
+
+jobs:
+- name: set-pipeline
+  << : *alertingOnJobs
+  plan:
+  - get: ci-repo
+    params:
+      submodules: none
+    trigger: true
+  - set_pipeline: self
+    file: ci-repo/ci/images/pipeline.yml
+    var_files:
+    - ci-repo/ci/images/pipeline.vars.yml
+
+- name: build-docker-image
+  << : *alertingOnJobs
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      passed:
+      - set-pipeline
+    - get: docker-image-files
+      params:
+        submodules: none
+      trigger: true
+  - task: build
+    file: ci-repo/ci/tasks/build-image/task.yml
+    vars:
+      repo: ((docker-in-nimbus.repo))
+      tag: ((docker-in-nimbus.tag))
+    input_mapping:
+      input: docker-image-files
+    params:
+      NIMBUS_USER: ((ci/nimbus.user))
+      BUILD_ARG_BASE: ((docker-in-nimbus.repo)):((docker-in-nimbus.tag))
+      CONTEXT: input/ci/images/docker-image
+  - put: docker-image
+    params:
+      image: image/image.tar
+    on_success:
+      put: notify
+      params:
+        alert_type: success
+        text: new `docker-image` pushed
