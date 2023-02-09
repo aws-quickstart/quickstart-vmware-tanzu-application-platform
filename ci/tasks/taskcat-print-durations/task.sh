@@ -20,7 +20,7 @@ readonly -A PHASES=(
 main() {
   local logicalId outputName
   local -a phaseTimes
-  local start end
+  local start end duration
   local durations='{}'
 
   local logFile="test-result/${STACK_NAME}-${REGION}-cfnlogs.txt"
@@ -33,9 +33,9 @@ main() {
     # log lines look something like that:
     # ```
     #   [...]
-    # 2023-01-30 12:39:41.514000+00:00  CREATE_COMPLETE     AWS::CloudFormation::WaitCondition        WaitForTAPTests
-    # 2023-01-30 12:39:41.033000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::WaitCondition        WaitForTAPTests                                   Resource creation Initiated
-    # 2023-01-30 12:39:40.786000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::WaitCondition        WaitForTAPTests
+    # 2023-01-30 12:39:41.514000+00:00  CREATE_COMPLETE     AWS::CloudFormation::WaitCondition        PhaseTAPTests
+    # 2023-01-30 12:39:41.033000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::WaitCondition        PhaseTAPTests                                   Resource creation Initiated
+    # 2023-01-30 12:39:40.786000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::WaitCondition        PhaseTAPTests
     #   [...]
     # ```
     mapfile -t phaseTimes < <(
@@ -53,13 +53,15 @@ main() {
       continue
     }
 
-    # add the duration, in minutes, to the durations object
+    # convert to rounded minutes
+    duration="$( awk '{printf("%.2f", ($1/60))}' <<< "$(( end - start ))" )"
+
+    # add the duration to the durations object
     durations="$(
       jq \
-        --argjson pStart "${start}" \
-        --argjson pEnd "${end}" \
+        --argjson duration "$duration" \
         --arg phase "${outputName}" \
-        '. + { "\($phase)" : ((($pEnd - $pStart)/60)*100 | round / 100) }' \
+        '. + { "\($phase)" : $duration }' \
         <<< "$durations"
     )"
   done
