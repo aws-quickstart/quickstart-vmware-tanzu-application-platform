@@ -1,26 +1,26 @@
 :xrefstyle: short
 
-There are two deployment cluster architecture options for deploying {partner-product-short-name}: single cluster architecture and multicluster architecture. The default option is single cluster, which deploys with default parameters that builds the following {partner-product-short-name} environment in the AWS Cloud.
+There are two deployment cluster architecture options for deploying {partner-product-short-name}: single cluster architecture and multicluster architecture. The default option is a single-cluster deployment, which deploys with default parameters that builds the following {partner-product-short-name} environment in the AWS Cloud.
 
 // Replace this example diagram with your own. Follow our wiki guidelines: https://w.amazon.com/bin/view/AWS_Quick_Starts/Process_for_PSAs/#HPrepareyourarchitecturediagram. Upload your source PowerPoint file to the GitHub {deployment name}/docs/images/ directory in its repository.
 
 [#architecture1]
-.Partner Solution architecture for {partner-product-short-name} on AWS
-image::../docs/deployment_guide/images/architecture_diagram.png[Architecture]
+.Partner Solution single-cluster architecture for {partner-product-short-name} on AWS
+image::../docs/deployment_guide/images/wmare-TAP-architecture-diagram-one-cluster.png[Architecture]
 
-As shown in <<architecture1>>, this Partner Solution sets up the following:
+As shown in <<architecture1>>, the single-cluster version of this Partner Solution sets up the following:
 
 * A highly available architecture that spans either two or three Availability Zones.*
 * A virtual private cloud (VPC) configured with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS.*
 * An Amazon Route 53 private hosted zone for the {partner-product-acronym} user interface.
 * In the public subnets:
-** Managed network address translation (NAT) gateways to allow outbound internet access for resources in the private subnets.
+** Managed NAT gateways to allow outbound internet access for resources in the private subnets.
 ** In one public subnet:
 *** An Amazon Elastic Compute Cloud (Amazon EC2) Linux instance to bootstrap the installation of {partner-product-name} in an Amazon EKS cluster and serve as administrator bastion host.
-*** An Amazon EC2 Windows bastion host for access to the {partner-product-short-name} user interface.
+*** An Amazon EC2 Windows bastion host for access to the {partner-product-acronym} user interface.
 * In the private subnets:
-** A group of Amazon EKS nodes in an Auto Scaling Group with Contour Envoy ingress controller pods and the {partner-product-acronym} installation. For a complete list of the {partner-product-short-name} packages, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install-components.html#verify-the-installed-packages-1[Verify the installed packages^].
-** A Network Load Balancer (NLB) attached to the private subnets to direct traffic to the Contour Envoy pod. The Contour Envoy container provides ingress and reverse proxy to the {partner-product-acronym} pods for the {partner-product-acronym} user interface and metadata store.
+** A group of Amazon EKS nodes in an Auto Scaling Group with Contour Envoy ingress controller pods and the {partner-product-acronym} installation. For a complete list of the {partner-product-acronym} packages, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install-components.html#verify-the-installed-packages-1[Verify the installed packages^].
+** A Network Load Balancer attached to the private subnets to direct traffic to the Contour Envoy pod. The Contour Envoy container provides ingress and reverse proxy to the {partner-product-acronym} pods for the {partner-product-acronym} user interface and metadata store.
 * Amazon CloudWatch for storing Linux bastion host metrics and {partner-product-acronym} bootstrap logs.
 * AWS Secrets Manager for storing {partner-registry} credentials for the {partner-product-acronym} cluster.
 * Amazon Elastic Container Registry (Amazon ECR) for five private repositories: three for {partner-product-acronym} installation and two for sample workload installation.
@@ -29,15 +29,13 @@ As shown in <<architecture1>>, this Partner Solution sets up the following:
 [.small]#* The template that deploys the Partner Solution into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#
 
 [#architecture2]
-.Partner Solution multicluster architecture for {partner-product-short-name} on AWS
-image::../docs/deployment_guide/images/architecture_diagram2.png[Architecture]
+.Partner Solution multi-cluster architecture for {partner-product-short-name} on AWS
+image::../docs/deployment_guide/images/wmare-TAP-architecture-diagram-multi-cluster.png[Architecture]
 
-As shown in <<architecture2>>, below are additional resources set up in the multi-cluster deployment options:
+As shown in <<architecture2>>, the multi-cluster version of this Partner Solution sets up the same environment as the single-cluster version but with the following differences:
 
-* Four auto-scaling groups
-* Four Amazon EKS clusters
-* {partner-product-short-name} installed on all four EKS clusters with {partner-product-short-name} profiles: build, run, view & iterate
-* Contour Envoy & Ingress Controllers are on three EKS clusters (run, view & iterate)
-* Three Network Load balancers (NLB) are used for above three ingress controllers
+* In the private subnets, four Amazon EKS clusters with a group of Amazon EKS nodes in Auto Scaling groups.
+** In three of the Amazon EKS clusters, a Network Load Balancer, Contour Envoy ingress controller pods, and TAP installations with Run, View, and Iterate TAP installation profiles.
+** In one Amazon EKS cluster, a TAP installation with a Build TAP installation profile. 
 
 More details see https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/multicluster-about.html[Multicluster {partner-product-short-name} Overview^]
