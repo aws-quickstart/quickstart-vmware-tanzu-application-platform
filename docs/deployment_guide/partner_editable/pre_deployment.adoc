@@ -2,7 +2,7 @@
 
 == Predeployment steps
 
-=== Technical Requirements
+=== Technical requirements
 
 Before you launch the Partner Solution, review the following information and ensure that your account is properly configured. Otherwise, the deployment might fail.
 
