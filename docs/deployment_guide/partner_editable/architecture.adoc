@@ -6,7 +6,7 @@ There are two deployment cluster architecture options for deploying {partner-pro
 
 [#architecture1]
 .Partner Solution single-cluster architecture for {partner-product-short-name} on AWS
-image::../docs/deployment_guide/images/wmare-TAP-architecture-diagram-one-cluster.png[Architecture]
+image::../docs/deployment_guide/images/wmare-TAP-architecture-diagram-one-cluster.PNG[Architecture]
 
 As shown in <<architecture1>>, the single-cluster version of this Partner Solution sets up the following:
 
@@ -30,7 +30,7 @@ As shown in <<architecture1>>, the single-cluster version of this Partner Soluti
 
 [#architecture2]
 .Partner Solution multi-cluster architecture for {partner-product-short-name} on AWS
-image::../docs/deployment_guide/images/wmare-TAP-architecture-diagram-multi-cluster.png[Architecture]
+image::../docs/deployment_guide/images/wmare-TAP-architecture-diagram-multi-cluster.PNG[Architecture]
 
 As shown in <<architecture2>>, the multi-cluster version of this Partner Solution sets up the same environment as the single-cluster version but with the following differences:
 
