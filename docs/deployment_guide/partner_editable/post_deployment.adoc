@@ -39,7 +39,7 @@
 |Choose `Yes` to relocate {partner-product-acronym} images from the {partner-registry} registry to your ECR registry. If you do not relocate the images, {partner-product-short-name} uses the {partner-registry} registry to operate.
 
 |`TAPClusterArch`
-|EKS single or multi-cluster / TAP Cluster Architecture
+|EKS single or multicluster / TAP Cluster Architecture
 |`single`
 |Choose `multi` to deploy {partner-product-acronym} with multicluster.
 |====
@@ -250,7 +250,7 @@
 //|Choose `Yes` to relocate {partner-product-acronym} images from the {partner-registry} registry to your ECR registry. If you do not relocate the images, {partner-product-short-name} uses the {partner-registry} registry to operate.
 
 //|`TAPClusterArch`
-//|EKS single or multi-cluster / TAP Cluster Architecture
+//|EKS single or multicluster / TAP Cluster Architecture
 //|`single`
 //|Choose `multi` to deploy {partner-product-acronym} with multicluster.
 //|====
