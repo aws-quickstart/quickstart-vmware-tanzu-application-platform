@@ -543,7 +543,7 @@ Mappings:
       #!   docker pull registry.tanzu.vmware.com/tanzu-cluster-essentials/cluster-essentials-bundle:1.4.1
       ClusterEssentialsHash: sha256:2354688e46d4bb4060f74fca069513c9b42ffa17a0a6d5b0dbb81ed52242ea44
       PivNet: 3.0.1
-      DockerCredPass:  0.6.4
+      DockerCredPass:  0.7.0
   AwsAmiRegionMap:
     af-south-1:
       US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
