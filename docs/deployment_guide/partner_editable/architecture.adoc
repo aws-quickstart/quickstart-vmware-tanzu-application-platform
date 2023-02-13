@@ -29,10 +29,10 @@ As shown in <<architecture1>>, the single-cluster version of this Partner Soluti
 [.small]#* The template that deploys the Partner Solution into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#
 
 [#architecture2]
-.Partner Solution multi-cluster architecture for {partner-product-short-name} on AWS
+.Partner Solution multicluster architecture for {partner-product-short-name} on AWS
 image::../docs/deployment_guide/images/wmare-TAP-architecture-diagram-multi-cluster.PNG[Architecture]
 
-As shown in <<architecture2>>, the multi-cluster version of this Partner Solution sets up the same environment as the single-cluster version but with the following differences:
+As shown in <<architecture2>>, the multicluster version of this Partner Solution sets up the same environment as the single-cluster version but with the following differences:
 
 * In the private subnets, four Amazon EKS clusters with a group of Amazon EKS nodes in Auto Scaling groups.
 ** In three of the Amazon EKS clusters, a Network Load Balancer, Contour Envoy ingress controller pods, and TAP installations with Run, View, and Iterate TAP installation profiles.
