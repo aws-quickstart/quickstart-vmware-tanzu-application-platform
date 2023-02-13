@@ -533,7 +533,7 @@ Parameters:
 Mappings:
   Versions:
     current:
-      TAP: 1.4.0
+      TAP: 1.4.1
       EKS: '1.24'
       #! https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
       Kubectl: 1.24.9/2023-01-11
