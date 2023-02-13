@@ -535,10 +535,13 @@ Mappings:
     current:
       TAP: 1.4.0
       EKS: '1.24'
-      # https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
+      #! https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
       Kubectl: 1.24.9/2023-01-11
-      ClusterEssentialsVersion: 1.3.0
-      ClusterEssentialsHash: sha256:54bf611711923dccd7c7f10603c846782b90644d48f1cb570b43a082d18e23b9
+      ClusterEssentialsVersion: 1.4.1
+      #! Note: this is not the hash of the pivnet artifact, but rather the image hash for the bundle image;
+      #! You can get it e.g. by 
+      #!   docker pull registry.tanzu.vmware.com/tanzu-cluster-essentials/cluster-essentials-bundle:1.4.1
+      ClusterEssentialsHash: sha256:2354688e46d4bb4060f74fca069513c9b42ffa17a0a6d5b0dbb81ed52242ea44
       PivNet: 3.0.1
       DockerCredPass:  0.6.4
   AwsAmiRegionMap:
