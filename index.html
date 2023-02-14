@@ -860,7 +860,7 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_deployment_options">Deployment options</a></li>
 <li><a href="#_predeployment_steps">Predeployment steps</a>
 <ul class="sectlevel2">
-<li><a href="#_technical_requirements">Technical Requirements</a></li>
+<li><a href="#_technical_requirements">Technical requirements</a></li>
 <li><a href="#_vmware_tanzu_network_account">VMware Tanzu Network account</a></li>
 <li><a href="#_accept_vmware_eulas">Accept VMware EULAs</a></li>
 <li><a href="#_vmware_customer_experience_improvement_program_ceip">VMware Customer Experience Improvement Program (CEIP)</a></li>
@@ -935,7 +935,7 @@ Refer to the <a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-
 <h2 id="_overview">Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This Partner Solution deploys VMware Tanzu Application Platform (TAP) to the AWS Cloud. This Partner Solution is for users who want a repeatable and customizable reference deployment for <a href="https://tanzu.vmware.com/application-platform" target="_blank" rel="noopener">VMware Tanzu Application Platform</a> on Amazon Elastic Kubernetes Service (Amazon EKS) using AWS CloudFormation. This guide provides instructions for deploying the Tanzu Application Platform to Amazon EKS clusters. For more information about Tanzu Application Platform, refer to <a href="https://tanzu.vmware.com/application-platform" target="_blank" rel="noopener">https://tanzu.vmware.com/application-platform</a>.</p>
+<p>This Partner Solution deploys VMware Tanzu Application Platform (TAP) to the AWS Cloud. This Partner Solution is for users who want a repeatable and customizable reference deployment for <a href="https://tanzu.vmware.com/application-platform" target="_blank" rel="noopener">VMware Tanzu Application Platform</a> on Amazon Elastic Kubernetes Service (Amazon EKS) using AWS CloudFormation. This guide provides instructions for deploying the Tanzu Application Platform to Amazon EKS clusters. For more information about Tanzu Application Platform, refer to <a href="https://tanzu.vmware.com/application-platform" target="_blank" rel="noopener">VMware Tanzu Application Platform</a>.</p>
 </div>
 </div>
 </div>
@@ -955,17 +955,16 @@ For more information, refer to the <a href="https://fwd.aws/rA69w?" target="_bla
 <h2 id="_architecture">Architecture</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Deploying this Partner Solution with default parameters builds the following Tanzu Application Platform environment in the
-AWS Cloud.</p>
+<p>There are two deployment cluster architecture options for deploying Tanzu Application Platform: single cluster architecture and multicluster architecture. The default option is a single-cluster deployment, which deploys with default parameters that builds the following Tanzu Application Platform environment in the AWS Cloud.</p>
 </div>
 <div id="architecture1" class="imageblock">
 <div class="content">
-<img src="docs/deployment_guide/images/architecture_diagram.png" alt="Architecture">
+<img src="docs/deployment_guide/images/wmare-TAP-architecture-diagram-one-cluster.PNG" alt="Architecture">
 </div>
-<div class="title">Figure 1. Partner Solution architecture for Tanzu Application Platform on AWS</div>
+<div class="title">Figure 1. Partner Solution single-cluster architecture for Tanzu Application Platform on AWS</div>
 </div>
 <div class="paragraph">
-<p>As shown in <a href="#architecture1">Figure 1</a>, this Partner Solution sets up the following:</p>
+<p>As shown in <a href="#architecture1">Figure 1</a>, the single-cluster version of this Partner Solution sets up the following:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -983,7 +982,7 @@ AWS Cloud.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Managed network address translation (NAT) gateways to allow outbound internet access for resources in the private subnets.</p>
+<p>Managed NAT gateways to allow outbound internet access for resources in the private subnets.</p>
 </li>
 <li>
 <p>In one public subnet:</p>
@@ -993,7 +992,7 @@ AWS Cloud.</p>
 <p>An Amazon Elastic Compute Cloud (Amazon EC2) Linux instance to bootstrap the installation of VMware Tanzu Application Platform in an Amazon EKS cluster and serve as administrator bastion host.</p>
 </li>
 <li>
-<p>An Amazon EC2 Windows bastion host for access to the Tanzu Application Platform user interface.</p>
+<p>An Amazon EC2 Windows bastion host for access to the TAP user interface.</p>
 </li>
 </ul>
 </div>
@@ -1006,10 +1005,10 @@ AWS Cloud.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>A group of Amazon EKS nodes in an Auto Scaling Group with Contour Envoy ingress controller pods and the TAP installation. For a complete list of the Tanzu Application Platform packages, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install-components.html#verify-the-installed-packages-1" target="_blank" rel="noopener">Verify the installed packages</a>.</p>
+<p>A group of Amazon EKS nodes in an Auto Scaling group with Contour Envoy ingress controller pods and the TAP installation. For a complete list of the TAP packages, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install-components.html#verify-the-installed-packages-1" target="_blank" rel="noopener">Verify the installed packages</a>.</p>
 </li>
 <li>
-<p>A Network Load Balancer (NLB) attached to the private subnets to direct traffic to the Contour Envoy pod. The Contour Envoy container provides ingress and reverse proxy to the TAP pods for the TAP user interface and metadata store.</p>
+<p>A Network Load Balancer attached to the private subnets to direct traffic to the Contour Envoy pod. The Contour Envoy container provides ingress and reverse proxy to the TAP pods for the TAP user interface and metadata store.</p>
 </li>
 </ul>
 </div>
@@ -1031,27 +1030,53 @@ AWS Cloud.</p>
 <div class="paragraph">
 <p><span class="small">* The template that deploys the Partner Solution into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.</span></p>
 </div>
+<div id="architecture2" class="imageblock">
+<div class="content">
+<img src="docs/deployment_guide/images/wmare-TAP-architecture-diagram-multi-cluster.PNG" alt="Architecture">
+</div>
+<div class="title">Figure 2. Partner Solution multicluster architecture for Tanzu Application Platform on AWS</div>
+</div>
+<div class="paragraph">
+<p>As shown in <a href="#architecture2">Figure 2</a>, the multicluster version of this Partner Solution sets up the same environment as the single-cluster version but with the following differences:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>In the private subnets, four Amazon EKS clusters with a group of Amazon EKS nodes in Auto Scaling groups.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>In three of the Amazon EKS clusters, a Network Load Balancer, Contour Envoy ingress controller pods, and TAP installations with Run, View, and Iterate TAP installation profiles.</p>
+</li>
+<li>
+<p>In one Amazon EKS cluster, a TAP installation with a Build TAP installation profile.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/multicluster-about.html" target="_blank" rel="noopener">Multicluster Tanzu Application Platform Overview</a></p>
+</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_deployment_options">Deployment options</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This Partner Solution provides the following deployment options:</p>
+<p>This Partner Solution provides the following deployment option:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://fwd.aws/DJ34n?" target="_blank" rel="noopener">Deploy Tanzu Application Platform into a new VPC</a>. This option builds a new AWS environment that consists of the VPC, subnets, NAT gateways, security groups, bastion hosts, and other infrastructure components.
-It then deploys Tanzu Application Platform into this new VPC.</p>
-</li>
-<li>
-<p><a href="https://fwd.aws/DdRVe?" target="_blank" rel="noopener">Deploy Tanzu Application Platform into an existing VPC</a>. This option provisions Tanzu Application Platform in your existing AWS infrastructure.</p>
+<p><a href="https://fwd.aws/DJ34n?" target="_blank" rel="noopener">Deploy Tanzu Application Platform into a new VPC</a>. This option builds a new AWS environment that consists of the VPC, subnets, NAT gateways, security groups, bastion hosts, and other infrastructure components. It then deploys Tanzu Application Platform into this new VPC. Predeployment and deployment steps are provided later in this guide.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>This Partner Solution provides separate templates for these options. It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instance types, and Tanzu Application Platform settings.</p>
+<p>This Partner Solution lets you configure Classless Inter-Domain Routing (CIDR)
+blocks, instance types, and Tanzu Application Platform settings. Deployment options include either a single-cluster or multicluster architecture.</p>
 </div>
 </div>
 </div>
@@ -1059,7 +1084,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <h2 id="_predeployment_steps">Predeployment steps</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_technical_requirements">Technical Requirements</h3>
+<h3 id="_technical_requirements">Technical requirements</h3>
 <div class="paragraph">
 <p>Before you launch the Partner Solution, review the following information and ensure that your account is properly configured. Otherwise, the deployment might fail.</p>
 </div>
@@ -1120,7 +1145,11 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EKS clusters</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1, 4 (multicluster)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EKS nodes (min/desired/max)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">single cluster:3/3/6 multicluster:12/12/24</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Secrets Manager secrets</p></td>
@@ -1137,6 +1166,10 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Route 53 private hosted zones</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Elastic IP</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
 </tr>
 </tbody>
 </table>
@@ -1238,7 +1271,7 @@ It then deploys Tanzu Application Platform into this new VPC.</p>
 </table>
 </div>
 <div class="paragraph">
-<p>For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install.html#install-your-tanzu-application-platform-profile-1" target="_blank" rel="noopener">Install your Tanzu Application Platform profile</a>. To opt out of telemetry reporting after installation completes, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-opting-out-telemetry.html" target="_blank" rel="noopener">Opting out of telemetry collection</a>.</p>
+<p>For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/install.html#install-your-tanzu-application-platform-profile-1" target="_blank" rel="noopener">Install your Tanzu Application Platform profile</a>. To opt out of telemetry reporting after installation completes, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/opting-out-telemetry.html" target="_blank" rel="noopener">Opting out of telemetry collection</a>.</p>
 </div>
 </div>
 </div>
@@ -1346,6 +1379,12 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> to relocate TAP images from the VMware Tanzu Network registry to your ECR registry. If you do not relocate the images, Tanzu Application Platform uses the VMware Tanzu Network registry to operate.</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPClusterArch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EKS single or multicluster / TAP Cluster Architecture</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>single</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>multi</code> to deploy TAP with multicluster.</p></td>
+</tr>
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all fit-content stretch">
@@ -1368,8 +1407,8 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPVersion</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Version</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.3.0</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Version of TAP to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3" target="_blank" rel="noopener">Kubernetes cluster requirements</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.4.0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Version of TAP to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3" target="_blank" rel="noopener">Kubernetes cluster requirements</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPDomainName</code></p></td>
@@ -1534,8 +1573,8 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>KubernetesVersion</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Kubernetes version</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.22</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Version of Kubernetes control plane to deploy. The selected version must support the selected version of TAP. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3" target="_blank" rel="noopener">Kubernetes cluster requirements</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.23</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Version of Kubernetes control plane to deploy. The selected version must support the selected version of TAP. For more information, refer to  <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3" target="_blank" rel="noopener">Kubernetes cluster requirements</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>NodeInstanceType</code></p></td>
@@ -1552,14 +1591,14 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>NumberOfNodes</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of nodes</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>4</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Minimum number of nodes to create for the TAP EKS cluster.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>3</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Minimum number of nodes to create for each TAP EKS cluster.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>MaxNumberOfNodes</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of nodes</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>6</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of available nodes for the TAP EKS cluster in auto scaling.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of available nodes for each TAP EKS cluster in auto scaling.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1596,323 +1635,6 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 </table>
 <table class="tableblock frame-all grid-all fit-content stretch">
 <caption class="title">Table 8. AWS Partner Solution S3 bucket configuration</caption>
-<colgroup>
-<col>
-<col>
-<col>
-<col>
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Parameter Label</th>
-<th class="tableblock halign-left valign-top">Default Value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>QSS3BucketName</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>aws-quickstart</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the S3 bucket for your copy of the Partner Solution assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Partner Solution location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>QSS3BucketRegion</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Region</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>us-east-1</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AWS Region where the Partner Solution S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.  Changing this Region updates code references to point to a new Partner Solution location. When using your own bucket, specify the Region. For more information, refer to <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>QSS3KeyPrefix</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Key prefix</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix that is used to simulate a directory for your copy of the Partner Solution assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Partner Solution location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html" class="bare">https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html</a> and <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_parameters_for_deploying_a_tanzu_application_platform_cluster_to_an_existing_vpc">Parameters for deploying a Tanzu Application Platform cluster to an existing VPC</h4>
-<table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 9. VMware Tanzu Network configuration</caption>
-<colgroup>
-<col>
-<col>
-<col>
-<col>
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Parameter Label</th>
-<th class="tableblock halign-left valign-top">Default Value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>AcceptEULAs</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Have all applicable VMware Tanzu Network EULAs been accepted?</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you already accepted the <a href="https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/" target="_blank" rel="noopener">Cluster Essentials for VMware Tanzu</a> and <a href="https://network.tanzu.vmware.com/products/tanzu-application-platform/" target="_blank" rel="noopener">VMware Tanzu Application Platform</a> EULAs. TAP will fail to install successfully if both EULAs are not accepted for the specified VMware Tanzu Network user account.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>AcceptCEIP</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Have you read and accepted the VMware CEIP policy?</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> if you have read and accepted the <a href="https://www.vmware.com/solutions/trustvmware/ceip.html" target="_blank" rel="noopener">VMware CEIP policy</a>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetUsername</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Username</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network user name. To create an account, sign up at <a href="https://account.run.pivotal.io/z/uaa/sign-up" class="bare">https://account.run.pivotal.io/z/uaa/sign-up</a>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetPassword</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Password</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network password.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuApiToken</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">API Token</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VMware Tanzu Network UAA API refresh token. For more information, refer to the <a href="https://network.tanzu.vmware.com/docs/api" target="_blank" rel="noopener">VMware Tanzu Network API documentation</a>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TanzuNetRelocateImages</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Relocate TAP images</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>No</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>Yes</code> to relocate TAP images from the VMware Tanzu Network registry to your ECR registry. If you do not relocate the images, Tanzu Application Platform uses the VMware Tanzu Network registry to operate.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 10. VMware Tanzu Application Platform configuration</caption>
-<colgroup>
-<col>
-<col>
-<col>
-<col>
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Parameter Label</th>
-<th class="tableblock halign-left valign-top">Default Value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPVersion</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Version</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.3.0</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Version of TAP to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3" target="_blank" rel="noopener">Kubernetes cluster requirements</a>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPDomainName</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Domain name</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Private DNS domain name to access the TAP user interface and project URLs.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 11. Sample app configuration</caption>
-<colgroup>
-<col>
-<col>
-<col>
-<col>
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Parameter Label</th>
-<th class="tableblock halign-left valign-top">Default Value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SampleAppName</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tanzu-java-web-app-workload</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name of sample application to deploy into the Amazon EKS cluster.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 12. Basic configuration</caption>
-<colgroup>
-<col>
-<col>
-<col>
-<col>
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Parameter Label</th>
-<th class="tableblock halign-left valign-top">Default Value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>KeyPairName</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">EC2 key pair name</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html" target="_blank" rel="noopener">Amazon EC2 key pairs and Windows instances</a>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>RemoteAccessCidr</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Remote access CIDR</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IPv4 CIDR block permitted to connect to the Windows and Linux bastion hosts. We recommend that you set this value to a trusted network.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 13. VPC network configuration</caption>
-<colgroup>
-<col>
-<col>
-<col>
-<col>
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Parameter Label</th>
-<th class="tableblock halign-left valign-top">Default Value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>VpcId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VPC ID</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ID of your existing VPC (for example, <code>vpc-0343606e</code>).</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PrivateSubnet1Id</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Private subnet 1 ID</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the private subnet in Availability Zone 1 of your existing VPC (for example, <code>subnet-fe9a8b32</code>).</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PrivateSubnet2Id</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Private subnet 2 ID</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the private subnet in Availability Zone 2 of your existing VPC (for example, <code>subnet-be8b01ea</code>).</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PrivateSubnet3Id</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Private subnet 3 ID</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the private subnet in Availability Zone 3 of your existing VPC (for example, <code>subnet-abd39039</code>).</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PublicSubnet1Id</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Public subnet 1 ID</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the public subnet in Availability Zone 1 of your existing VPC (for example, <code>subnet-a0246dcd</code>)</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 14. Amazon EKS configuration</caption>
-<colgroup>
-<col>
-<col>
-<col>
-<col>
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Parameter Label</th>
-<th class="tableblock halign-left valign-top">Default Value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>EKSClusterName</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">EKS cluster name</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the EKS cluster where TAP will be deployed.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>KubernetesVersion</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Kubernetes version</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.22</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Version of Kubernetes control plane to deploy. The selected version must support the selected version of TAP. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3" target="_blank" rel="noopener">Kubernetes cluster requirements</a>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NodeInstanceType</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instance type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>m5.xlarge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EKS cluster node instance type.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NodeVolumeSize</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Volume size</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>80</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EBS root volume size for Amazon EKS nodes.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NumberOfNodes</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of nodes</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>4</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Minimum number of nodes to create for the TAP EKS cluster.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MaxNumberOfNodes</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of nodes</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>6</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of available nodes for the TAP EKS cluster in auto scaling.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 15. Linux bastion host/bootstrap instance configuration</caption>
-<colgroup>
-<col>
-<col>
-<col>
-<col>
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Parameter Label</th>
-<th class="tableblock halign-left valign-top">Default Value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LinuxBastionOS</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">OS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Ubuntu-Server-22.04-LTS-HVM</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Operating system for the Linux bastion host/bootstrap instance.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LinuxBastionSshPort</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">SSH port</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>22</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">TCP port to use for the Linux bastion host listening port.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 16. AWS Partner Solution S3 bucket configuration</caption>
 <colgroup>
 <col>
 <col>
@@ -1988,6 +1710,9 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 <div class="paragraph">
 <p>The VMware Tanzu Application Platform user interface is not available as a public URL. You can use <a href="https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html" target="_blank" rel="noopener">Site&#8209;to&#8209;Site VPN</a> or <a href="https://aws.amazon.com/directconnect/" target="_blank" rel="noopener">AWS Direct Connect</a> to configure direct access to the VPC from your enterprise network.</p>
 </div>
+<div class="paragraph">
+<p>To learn more about deploying the first application to VMware Tanzu Application Platform, visit <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/getting-started-deploy-first-app.html">the how-to guides for developers</a>.</p>
+</div>
 </div>
 </div>
 </div>
@@ -2005,10 +1730,10 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html" target="_blank" rel="noopener">Troubleshoot installing Tanzu Application Platform</a></p>
+<p><a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/troubleshooting-tap-troubleshoot-install-tap.html" target="_blank" rel="noopener">Troubleshoot installing Tanzu Application Platform</a></p>
 </li>
 <li>
-<p><a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-troubleshooting-tap-troubleshoot-using-tap.html" target="_blank" rel="noopener">Troubleshoot using Tanzu Application Platform</a></p>
+<p><a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/troubleshooting-tap-troubleshoot-using-tap.html" target="_blank" rel="noopener">Troubleshoot using Tanzu Application Platform</a></p>
 </li>
 </ul>
 </div>
@@ -2086,7 +1811,7 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 <div class="sect2">
 <h3 id="_tanzu_application_platform_installation_failed_with_a_eula_error">Tanzu Application Platform installation failed with a EULA error</h3>
 <div class="paragraph">
-<p>You must accept the relevant EULAs before you can download the Tanzu Application Platform packages from the VMware Tanzu Network. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0" target="_blank" rel="noopener">Accept the End User License Agreements</a>.</p>
+<p>You must accept the relevant EULAs before you can download the Tanzu Application Platform packages from the VMware Tanzu Network. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/install-tanzu-cli.html#accept-the-end-user-license-agreements-0" target="_blank" rel="noopener">Accept the End User License Agreements</a>.</p>
 </div>
 <div class="paragraph">
 <p>For more details about the <code>.status.usefulErrorMessage</code> error, connect to the Linux bastion host using SSH. Then run the following commands. For <code>&lt;PACKAGE-NAME&gt;</code>, substitute the name of the package to target.</p>
@@ -2226,15 +1951,15 @@ If so, run the following command.</p>
         <!-- We can use document attributes: -->
         <!-- Generated with Asciidoctor v2.0.17. -->
         <a href="https://aws.amazon.com/privacy/">Privacy</a> | <a href="https://aws.amazon.com/terms/">Site terms</a> |
-        &copy; 2022, Amazon Web Services, Inc. or its affiliates and VMware, Inc.. All rights reserved.
+        &copy; 2023, Amazon Web Services, Inc. or its affiliates and VMware, Inc.. All rights reserved.
     </p>
 </footer>
 </body>
 </html>
 <!--
 repo commit:
-a77d726e37b20021a25cf60085534ab7524e893f
+b35abbe85d96eded27b5c0a3b6028a89dceb96e1
 
 submodule config:
- 7fa56a2f3f3ee511f887dd638f655e0c141bc19b docs/boilerplate (heads/main)
+ 7fa56a2f3f3ee511f887dd638f655e0c141bc19b docs/boilerplate (7fa56a2)
 -->

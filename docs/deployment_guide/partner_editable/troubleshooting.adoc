@@ -6,8 +6,8 @@ For troubleshooting common Partner Solution issues, refer to the https://fwd.aws
 
 Refer to the following resources to troubleshoot {partner-product-name}.
 
-* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-troubleshooting-tap-troubleshoot-install-tap.html[Troubleshoot installing {partner-product-short-name}^]
-* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-troubleshooting-tap-troubleshoot-using-tap.html[Troubleshoot using {partner-product-short-name}^]
+* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/troubleshooting-tap-troubleshoot-install-tap.html[Troubleshoot installing {partner-product-short-name}^]
+* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/troubleshooting-tap-troubleshoot-using-tap.html[Troubleshoot using {partner-product-short-name}^]
 
 === I can't access the {partner-product-short-name} user interface
 
@@ -33,7 +33,7 @@ The following issues can cause you to not be able to access the {partner-product
 
 === {partner-product-short-name} installation failed with a EULA error
 
-You must accept the relevant EULAs before you can download the {partner-product-short-name} packages from the {partner-registry}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.2/tap/GUID-install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements^].
+You must accept the relevant EULAs before you can download the {partner-product-short-name} packages from the {partner-registry}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements^].
 
 For more details about the `+.status.usefulErrorMessage+` error, connect to the Linux bastion host using SSH. Then run the following commands. For `<PACKAGE-NAME>`, substitute the name of the package to target.
 

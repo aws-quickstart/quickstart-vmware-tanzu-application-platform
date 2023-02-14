@@ -2,7 +2,7 @@
 
 == Predeployment steps
 
-=== Technical Requirements
+=== Technical requirements
 
 Before you launch the Partner Solution, review the following information and ensure that your account is properly configured. Otherwise, the deployment might fail.
 
@@ -38,7 +38,10 @@ If necessary, request https://console.aws.amazon.com/servicequotas/home/[service
 |5
 
 |Amazon EKS clusters
-|1
+|1, 4 (multicluster)
+
+|EKS nodes (min/desired/max)
+|single cluster:3/3/6 multicluster:12/12/24
 
 |Secrets Manager secrets
 |1
@@ -51,6 +54,9 @@ If necessary, request https://console.aws.amazon.com/servicequotas/home/[service
 
 |Route 53 private hosted zones
 |1
+
+|Elastic IP
+|5
 |====
 
 === {partner-registry} account
@@ -96,4 +102,4 @@ You may join or leave CEIP at any time. The CEIP Standard Participation Level pr
 You must acknowledge that you have read the {partner-company-short-name} CEIP policy before you can proceed with the installation.
 ====
 
-For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install.html#install-your-tanzu-application-platform-profile-1[Install your {partner-product-short-name} profile^]. To opt out of telemetry reporting after installation completes, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-opting-out-telemetry.html[Opting out of telemetry collection^].
+For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/install.html#install-your-tanzu-application-platform-profile-1[Install your {partner-product-short-name} profile^]. To opt out of telemetry reporting after installation completes, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/opting-out-telemetry.html[Opting out of telemetry collection^].
