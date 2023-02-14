@@ -8,8 +8,8 @@
 :partner-product-acronym: TAP
 :partner-company-name: VMware, Inc.
 :partner-registry: {partner-product-family-full} Network
-:doc-month: October
-:doc-year: 2022
+:doc-month: February
+:doc-year: 2023
 :partner-contributors: Satya Dillikar and Siteng Yu, {partner-company-name}
 // :other-contributors: Akua Mansa, Trek10
 :aws-contributors: Elvis Pappachen, AWS VMware Partner team
