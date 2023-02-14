@@ -36,6 +36,7 @@ Metadata:
         Parameters:
           - TAPVersion
           - TAPDomainName
+          - TAPClusterArch
       - Label:
           default: Sample app configuration
         Parameters:
@@ -98,6 +99,8 @@ Metadata:
         default: SSH port
       TAPDomainName:
         default: Domain name
+      TAPClusterArch:
+        default: EKS single or multi cluster
       EKSClusterName:
         default: EKS cluster name
       KubernetesVersion:
@@ -159,6 +162,13 @@ Parameters:
    Description: >-
       Private DNS domain name for accessing the TAP graphical user interface
       (GUI) and project URLs.
+  TAPClusterArch:
+    Type: String
+    Description: TAP cluster architecture.
+    AllowedValues:
+      - multi
+      - single
+    Default: single
   VpcId:
     Type: AWS::EC2::VPC::Id
     Description: >-
@@ -213,14 +223,14 @@ Parameters:
       refer to Kubernetes cluster requirements
       (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
-      - 1.22
-    Default: 1.22
+      - 1.23
+    Default: 1.23
   NumberOfNodes:
     Type: Number
     Description: Minimum number of nodes to create for the TAP EKS cluster.
-    MinValue: 4
+    MinValue: 3
     MaxValue: 450
-    Default: 4
+    Default: 3
   MaxNumberOfNodes:
     Type: Number
     Description: >-
@@ -434,9 +444,9 @@ Parameters:
   NodeVolumeSize:
     Type: Number
     Description: Amazon EBS root volume size for Amazon EKS nodes.
-    MinValue: 80
+    MinValue: 100
     MaxValue: 16384
-    Default: 80
+    Default: 100
   RemoteAccessCidr:
     Type: String
     Description: >-
@@ -495,8 +505,8 @@ Parameters:
       refer to Kubernetes cluster requirements
       (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
-      - 1.3.0
-    Default: 1.3.0
+      - 1.4.0
+    Default: 1.4.0
   SampleAppName:
     Type: String
     Description: >-
@@ -644,10 +654,10 @@ Mappings:
       Name: registry.tanzu.vmware.com
   KubernetesVersion:
   # https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
-    '1.22':
+    '1.23':
       AwsKubectlVersion: 1.23.7/2022-06-29
   TAPVersion:
-    1.3.0:
+    1.4.0:
       ClusterEssentialsBundleVersion: 1.3.0
   ClusterEssentialsBundle:
     1.1.0:
@@ -683,6 +693,8 @@ Mappings:
               ref:
                 branch: main
 Conditions:
+  CreateMultiCluster: !Equals [!Ref TAPClusterArch, multi]
+  CreateSingleCluster: !Equals [!Ref TAPClusterArch, single]
   3AZDeployment: !Not [!Equals [!Ref PrivateSubnet3Id, '']]
   Ubuntu: !Equals [!FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, OS], Ubuntu]
   # TODO: Finish building logic to only deploy ECR-related resources if when
@@ -690,6 +702,211 @@ Conditions:
   # UseEcr: !Equals [!Ref TanzuNetRelocateImages, 'Yes']
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
 Resources:
+  BUILDEKSEBSCSIDriverRole:
+    Type: AWS::IAM::Role
+    Condition: CreateMultiCluster
+    Properties:
+      RoleName: !Sub
+        - BUILDEKSEBSCSIDriverRole-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      Description: >-
+        VMware Tanzu Application Platform role for EBSSCI Driver.
+      AssumeRolePolicyDocument: !Sub
+        - |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
+                },
+                "Action": "sts:AssumeRoleWithWebIdentity",
+                "Condition": {
+                  "StringEquals": {
+                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
+                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+                  }
+                }
+              }
+            ]
+          }
+        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
+          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt BUILDEKSQSStack.Outputs.OIDCIssuerURL]]
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+  RUNEKSEBSCSIDriverRole:
+    Type: AWS::IAM::Role
+    Condition: CreateMultiCluster
+    Properties:
+      RoleName: !Sub
+        - RUNEKSEBSCSIDriverRole-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      Description: >-
+        VMware Tanzu Application Platform role for EBSSCI Driver.
+      AssumeRolePolicyDocument: !Sub
+        - |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
+                },
+                "Action": "sts:AssumeRoleWithWebIdentity",
+                "Condition": {
+                  "StringEquals": {
+                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
+                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+                  }
+                }
+              }
+            ]
+          }
+        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
+          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt RUNEKSQSStack.Outputs.OIDCIssuerURL]]
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+  VIEWEKSEBSCSIDriverRole:
+    Type: AWS::IAM::Role
+    Condition: CreateMultiCluster
+    Properties:
+      RoleName: !Sub
+        - VIEWEKSEBSCSIDriverRole-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      Description: >-
+        VMware Tanzu Application Platform role for EBSSCI Driver.
+      AssumeRolePolicyDocument: !Sub
+        - |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
+                },
+                "Action": "sts:AssumeRoleWithWebIdentity",
+                "Condition": {
+                  "StringEquals": {
+                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
+                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+                  }
+                }
+              }
+            ]
+          }
+        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
+          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt VIEWEKSQSStack.Outputs.OIDCIssuerURL]]
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+  ITERATEEKSEBSCSIDriverRole:
+    Type: AWS::IAM::Role
+    Condition: CreateMultiCluster
+    Properties:
+      RoleName: !Sub
+        - ITERATEEKSEBSCSIDriverRole-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      Description: >-
+        VMware Tanzu Application Platform role for EBSSCI Driver.
+      AssumeRolePolicyDocument: !Sub
+        - |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
+                },
+                "Action": "sts:AssumeRoleWithWebIdentity",
+                "Condition": {
+                  "StringEquals": {
+                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
+                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+                  }
+                }
+              }
+            ]
+          }
+        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
+          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt ITERATEEKSQSStack.Outputs.OIDCIssuerURL]]
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+  SINGLEEKSEBSCSIDriverRole:
+    Type: AWS::IAM::Role
+    Condition: CreateSingleCluster
+    Properties:
+      RoleName: !Sub
+        - SINGLEEKSEBSCSIDriverRole-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      Description: >-
+        VMware Tanzu Application Platform role for EBSSCI Driver.
+      AssumeRolePolicyDocument: !Sub
+        - |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
+                },
+                "Action": "sts:AssumeRoleWithWebIdentity",
+                "Condition": {
+                  "StringEquals": {
+                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
+                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+                  }
+                }
+              }
+            ]
+          }
+        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
+          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+  BUILDEBSSCIAddon:
+    Type: AWS::EKS::Addon
+    Condition: CreateMultiCluster
+    Properties:
+      AddonName: aws-ebs-csi-driver
+      ClusterName: !Sub ${EKSClusterName}-build
+      ResolveConflicts: NONE
+      ServiceAccountRoleArn: !GetAtt BUILDEKSEBSCSIDriverRole.Arn
+  RUNEBSSCIAddon:
+    Type: AWS::EKS::Addon
+    Condition: CreateMultiCluster
+    Properties:
+      AddonName: aws-ebs-csi-driver
+      ClusterName: !Sub ${EKSClusterName}-run
+      ResolveConflicts: NONE
+      ServiceAccountRoleArn: !GetAtt RUNEKSEBSCSIDriverRole.Arn
+  VIEWEBSSCIAddon:
+    Type: AWS::EKS::Addon
+    Condition: CreateMultiCluster
+    Properties:
+      AddonName: aws-ebs-csi-driver
+      ClusterName: !Sub ${EKSClusterName}-view
+      ResolveConflicts: NONE
+      ServiceAccountRoleArn: !GetAtt VIEWEKSEBSCSIDriverRole.Arn
+  ITERATEEBSSCIAddon:
+    Type: AWS::EKS::Addon
+    Condition: CreateMultiCluster
+    Properties:
+      AddonName: aws-ebs-csi-driver
+      ClusterName: !Sub ${EKSClusterName}-iterate
+      ResolveConflicts: NONE
+      ServiceAccountRoleArn: !GetAtt ITERATEEKSEBSCSIDriverRole.Arn
+  SINGLEEBSSCIAddon:
+    Type: AWS::EKS::Addon
+    Condition: CreateSingleCluster
+    Properties:
+      AddonName: aws-ebs-csi-driver
+      ClusterName: !Ref EKSClusterName
+      ResolveConflicts: NONE
+      ServiceAccountRoleArn: !GetAtt SINGLEEKSEBSCSIDriverRole.Arn
   TanzuNetSecretCredentials:
     Type: AWS::SecretsManager::Secret
     Properties:
@@ -794,6 +1011,7 @@ Resources:
         KubernetesVersion: !Ref KubernetesVersion
   EKSQSStack:
     Type: AWS::CloudFormation::Stack
+    Condition: CreateSingleCluster
     DependsOn:
       - EKSAdvancedConfigStack
     Properties:
@@ -827,6 +1045,378 @@ Resources:
         ClusterAutoScaler: Enabled
         MonitoringStack: None
         ALBIngressController: Enabled
+#eks stacks multi cluster start
+  RUNEKSQSStack:
+    Type: AWS::CloudFormation::Stack
+    Condition: CreateMultiCluster
+    DependsOn:
+      - EKSAdvancedConfigStack
+    Properties:
+      TemplateURL: !Sub
+        - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
+        - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+          S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
+      Parameters:
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3BucketRegion: !Ref QSS3BucketRegion
+        QSS3KeyPrefix: !Sub ${QSS3KeyPrefix}submodules/quickstart-amazon-eks/
+        ConfigSetName: !Ref AWS::StackName
+        VPCID: !Ref VpcId
+        PrivateSubnet1ID: !Ref PrivateSubnet1Id
+        PrivateSubnet2ID: !Ref PrivateSubnet2Id
+        PrivateSubnet3ID: !If
+          - 3AZDeployment
+          - !Ref PrivateSubnet3Id
+          - !Ref AWS::NoValue
+        RemoteAccessCIDR: !Ref RemoteAccessCidr
+        EKSPublicAccessEndpoint: Disabled
+        AdditionalEKSAdminRoleArn: !GetAtt LinuxBastionIamRole.Arn
+        KeyPairName: !Ref KeyPairName
+        NumberOfNodes: !Ref NumberOfNodes
+        MaxNumberOfNodes: !Ref MaxNumberOfNodes
+        NodeInstanceType: !Ref NodeInstanceType
+        NodeInstanceFamily: Standard
+        NodeGroupType: Managed
+        NodeGroupOS: Amazon Linux 2
+        EKSClusterName: !Sub ${EKSClusterName}-run
+        ClusterAutoScaler: Enabled
+        MonitoringStack: None
+        ALBIngressController: Enabled
+  VIEWEKSQSStack:
+    Type: AWS::CloudFormation::Stack
+    Condition: CreateMultiCluster
+    DependsOn:
+      - EKSAdvancedConfigStack
+    Properties:
+      TemplateURL: !Sub
+        - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
+        - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+          S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
+      Parameters:
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3BucketRegion: !Ref QSS3BucketRegion
+        QSS3KeyPrefix: !Sub ${QSS3KeyPrefix}submodules/quickstart-amazon-eks/
+        ConfigSetName: !Ref AWS::StackName
+        VPCID: !Ref VpcId
+        PrivateSubnet1ID: !Ref PrivateSubnet1Id
+        PrivateSubnet2ID: !Ref PrivateSubnet2Id
+        PrivateSubnet3ID: !If
+          - 3AZDeployment
+          - !Ref PrivateSubnet3Id
+          - !Ref AWS::NoValue
+        RemoteAccessCIDR: !Ref RemoteAccessCidr
+        EKSPublicAccessEndpoint: Disabled
+        AdditionalEKSAdminRoleArn: !GetAtt LinuxBastionIamRole.Arn
+        KeyPairName: !Ref KeyPairName
+        NumberOfNodes: !Ref NumberOfNodes
+        MaxNumberOfNodes: !Ref MaxNumberOfNodes
+        NodeInstanceType: !Ref NodeInstanceType
+        NodeInstanceFamily: Standard
+        NodeGroupType: Managed
+        NodeGroupOS: Amazon Linux 2
+        EKSClusterName: !Sub ${EKSClusterName}-view
+        ClusterAutoScaler: Enabled
+        MonitoringStack: None
+        ALBIngressController: Enabled
+  BUILDEKSQSStack:
+    Type: AWS::CloudFormation::Stack
+    Condition: CreateMultiCluster
+    DependsOn:
+      - EKSAdvancedConfigStack
+    Properties:
+      TemplateURL: !Sub
+        - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
+        - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+          S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
+      Parameters:
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3BucketRegion: !Ref QSS3BucketRegion
+        QSS3KeyPrefix: !Sub ${QSS3KeyPrefix}submodules/quickstart-amazon-eks/
+        ConfigSetName: !Ref AWS::StackName
+        VPCID: !Ref VpcId
+        PrivateSubnet1ID: !Ref PrivateSubnet1Id
+        PrivateSubnet2ID: !Ref PrivateSubnet2Id
+        PrivateSubnet3ID: !If
+          - 3AZDeployment
+          - !Ref PrivateSubnet3Id
+          - !Ref AWS::NoValue
+        RemoteAccessCIDR: !Ref RemoteAccessCidr
+        EKSPublicAccessEndpoint: Disabled
+        AdditionalEKSAdminRoleArn: !GetAtt LinuxBastionIamRole.Arn
+        KeyPairName: !Ref KeyPairName
+        NumberOfNodes: !Ref NumberOfNodes
+        MaxNumberOfNodes: !Ref MaxNumberOfNodes
+        NodeInstanceType: !Ref NodeInstanceType
+        NodeInstanceFamily: Standard
+        NodeGroupType: Managed
+        NodeGroupOS: Amazon Linux 2
+        EKSClusterName: !Sub ${EKSClusterName}-build
+        ClusterAutoScaler: Enabled
+        MonitoringStack: None
+        ALBIngressController: Enabled
+  ITERATEEKSQSStack:
+    Type: AWS::CloudFormation::Stack
+    Condition: CreateMultiCluster
+    DependsOn:
+      - EKSAdvancedConfigStack
+    Properties:
+      TemplateURL: !Sub
+        - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
+        - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+          S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
+      Parameters:
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3BucketRegion: !Ref QSS3BucketRegion
+        QSS3KeyPrefix: !Sub ${QSS3KeyPrefix}submodules/quickstart-amazon-eks/
+        ConfigSetName: !Ref AWS::StackName
+        VPCID: !Ref VpcId
+        PrivateSubnet1ID: !Ref PrivateSubnet1Id
+        PrivateSubnet2ID: !Ref PrivateSubnet2Id
+        PrivateSubnet3ID: !If
+          - 3AZDeployment
+          - !Ref PrivateSubnet3Id
+          - !Ref AWS::NoValue
+        RemoteAccessCIDR: !Ref RemoteAccessCidr
+        EKSPublicAccessEndpoint: Disabled
+        AdditionalEKSAdminRoleArn: !GetAtt LinuxBastionIamRole.Arn
+        KeyPairName: !Ref KeyPairName
+        NumberOfNodes: !Ref NumberOfNodes
+        MaxNumberOfNodes: !Ref MaxNumberOfNodes
+        NodeInstanceType: !Ref NodeInstanceType
+        NodeInstanceFamily: Standard
+        NodeGroupType: Managed
+        NodeGroupOS: Amazon Linux 2
+        EKSClusterName: !Sub ${EKSClusterName}-iterate
+        ClusterAutoScaler: Enabled
+        MonitoringStack: None
+        ALBIngressController: Enabled
+#eks stacks for multi cluster end
+#Rules for multi cluster start
+  RunLinuxBastionSshToNodesEgressRule:
+    Type: AWS::EC2::SecurityGroupEgress
+    Condition: CreateMultiCluster
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      Description: >-
+        Allow SSH from the Linux bastion host / bootstrap instance to the EKS
+        nodes.
+      GroupId: !Ref LinuxBastionSecurityGroup
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      DestinationSecurityGroupId: !GetAtt RUNEKSQSStack.Outputs.NodeGroupSecurityGroup
+  RunNodesSshIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: CreateMultiCluster
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      Description: >-
+        Allow SSH from the Linux bastion host / bootstrap instance to the EKS
+        nodes.
+      GroupId: !GetAtt RUNEKSQSStack.Outputs.NodeGroupSecurityGroup
+      IpProtocol: tcp
+      ToPort: 22
+      FromPort: 22
+      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+  RunLinuxBastionK8sToApiEgressRule:
+    Type: AWS::EC2::SecurityGroupEgress
+    Condition: CreateMultiCluster
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      Description: >-
+        Allow the Linux bastion host / bootstrap instance to connect to the EKS
+        control plane for Kubernetes API traffic.
+      GroupId: !Ref LinuxBastionSecurityGroup
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      DestinationSecurityGroupId: !GetAtt RUNEKSQSStack.Outputs.ControlPlaneSecurityGroup
+  RunEKSControlPlaneApiIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: CreateMultiCluster
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      Description: >-
+        Allow the Linux bastion host / bootstrap instance to connect to the EKS
+        control plane for Kubernetes API traffic.
+      GroupId: !GetAtt RUNEKSQSStack.Outputs.ControlPlaneSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+      FromPort: 443
+      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+  ViewLinuxBastionSshToNodesEgressRule:
+    Type: AWS::EC2::SecurityGroupEgress
+    Condition: CreateMultiCluster
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      Description: >-
+        Allow SSH from the Linux bastion host / bootstrap instance to the EKS
+        nodes.
+      GroupId: !Ref LinuxBastionSecurityGroup
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      DestinationSecurityGroupId: !GetAtt VIEWEKSQSStack.Outputs.NodeGroupSecurityGroup
+  ViewNodesSshIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: CreateMultiCluster
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      Description: >-
+        Allow SSH from the Linux bastion host / bootstrap instance to the EKS
+        nodes.
+      GroupId: !GetAtt VIEWEKSQSStack.Outputs.NodeGroupSecurityGroup
+      IpProtocol: tcp
+      ToPort: 22
+      FromPort: 22
+      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+  ViewLinuxBastionK8sToApiEgressRule:
+    Type: AWS::EC2::SecurityGroupEgress
+    Condition: CreateMultiCluster
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      Description: >-
+        Allow the Linux bastion host / bootstrap instance to connect to the EKS
+        control plane for Kubernetes API traffic.
+      GroupId: !Ref LinuxBastionSecurityGroup
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      DestinationSecurityGroupId: !GetAtt VIEWEKSQSStack.Outputs.ControlPlaneSecurityGroup
+  ViewEKSControlPlaneApiIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: CreateMultiCluster
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      Description: >-
+        Allow the Linux bastion host / bootstrap instance to connect to the EKS
+        control plane for Kubernetes API traffic.
+      GroupId: !GetAtt VIEWEKSQSStack.Outputs.ControlPlaneSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+      FromPort: 443
+      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+  BuildLinuxBastionSshToNodesEgressRule:
+    Type: AWS::EC2::SecurityGroupEgress
+    Condition: CreateMultiCluster
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      Description: >-
+        Allow SSH from the Linux bastion host / bootstrap instance to the EKS
+        nodes.
+      GroupId: !Ref LinuxBastionSecurityGroup
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      DestinationSecurityGroupId: !GetAtt BUILDEKSQSStack.Outputs.NodeGroupSecurityGroup
+  BuildNodesSshIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: CreateMultiCluster
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      Description: >-
+        Allow SSH from the Linux bastion host / bootstrap instance to the EKS
+        nodes.
+      GroupId: !GetAtt BUILDEKSQSStack.Outputs.NodeGroupSecurityGroup
+      IpProtocol: tcp
+      ToPort: 22
+      FromPort: 22
+      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+  BuildinuxBastionK8sToApiEgressRule:
+    Type: AWS::EC2::SecurityGroupEgress
+    Condition: CreateMultiCluster
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      Description: >-
+        Allow the Linux bastion host / bootstrap instance to connect to the EKS
+        control plane for Kubernetes API traffic.
+      GroupId: !Ref LinuxBastionSecurityGroup
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      DestinationSecurityGroupId: !GetAtt BUILDEKSQSStack.Outputs.ControlPlaneSecurityGroup
+  BuildEKSControlPlaneApiIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: CreateMultiCluster
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      Description: >-
+        Allow the Linux bastion host / bootstrap instance to connect to the EKS
+        control plane for Kubernetes API traffic.
+      GroupId: !GetAtt BUILDEKSQSStack.Outputs.ControlPlaneSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+      FromPort: 443
+      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+  IterateLinuxBastionSshToNodesEgressRule:
+    Type: AWS::EC2::SecurityGroupEgress
+    Condition: CreateMultiCluster
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      Description: >-
+        Allow SSH from the Linux bastion host / bootstrap instance to the EKS
+        nodes.
+      GroupId: !Ref LinuxBastionSecurityGroup
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      DestinationSecurityGroupId: !GetAtt ITERATEEKSQSStack.Outputs.NodeGroupSecurityGroup
+  IterateNodesSshIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: CreateMultiCluster
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      Description: >-
+        Allow SSH from the Linux bastion host / bootstrap instance to the EKS
+        nodes.
+      GroupId: !GetAtt ITERATEEKSQSStack.Outputs.NodeGroupSecurityGroup
+      IpProtocol: tcp
+      ToPort: 22
+      FromPort: 22
+      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+  IterateLinuxBastionK8sToApiEgressRule:
+    Type: AWS::EC2::SecurityGroupEgress
+    Condition: CreateMultiCluster
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      Description: >-
+        Allow the Linux bastion host / bootstrap instance to connect to the EKS
+        control plane for Kubernetes API traffic.
+      GroupId: !Ref LinuxBastionSecurityGroup
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      DestinationSecurityGroupId: !GetAtt ITERATEEKSQSStack.Outputs.ControlPlaneSecurityGroup
+  IterateEKSControlPlaneApiIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: CreateMultiCluster
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      Description: >-
+        Allow the Linux bastion host / bootstrap instance to connect to the EKS
+        control plane for Kubernetes API traffic.
+      GroupId: !GetAtt ITERATEEKSQSStack.Outputs.ControlPlaneSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+      FromPort: 443
+      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+#Rules for multi cluster end
   TAPLogGroup:
     Type: AWS::Logs::LogGroup
     UpdateReplacePolicy: Retain
@@ -872,6 +1462,7 @@ Resources:
       CidrIp: 0.0.0.0/0
   LinuxBastionSshToNodesEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
+    Condition: CreateSingleCluster
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Properties:
@@ -885,6 +1476,7 @@ Resources:
       DestinationSecurityGroupId: !GetAtt EKSQSStack.Outputs.NodeGroupSecurityGroup
   NodesSshIngressRule:
     Type: AWS::EC2::SecurityGroupIngress
+    Condition: CreateSingleCluster
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Properties:
@@ -898,6 +1490,7 @@ Resources:
       SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
   LinuxBastionK8sToApiEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
+    Condition: CreateSingleCluster
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Properties:
@@ -911,6 +1504,7 @@ Resources:
       DestinationSecurityGroupId: !GetAtt EKSQSStack.Outputs.ControlPlaneSecurityGroup
   EKSControlPlaneApiIngressRule:
     Type: AWS::EC2::SecurityGroupIngress
+    Condition: CreateSingleCluster
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Properties:
@@ -922,6 +1516,48 @@ Resources:
       ToPort: 443
       FromPort: 443
       SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+  IterateEKSViewClusterApiIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Condition: CreateMultiCluster
+    Properties:
+      Description: >-
+        Allow the View Cluster to connect to the Iterate Cluster EKS
+        control plane for Kubernetes API traffic.
+      GroupId: !GetAtt ITERATEEKSQSStack.Outputs.ControlPlaneSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+      FromPort: 443
+      SourceSecurityGroupId: !GetAtt VIEWEKSQSStack.Outputs.NodeGroupSecurityGroup
+  RunEKSViewClusterApiIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Condition: CreateMultiCluster
+    Properties:
+      Description: >-
+        Allow the View Cluster to connect to the Run Cluster EKS
+        control plane for Kubernetes API traffic.
+      GroupId: !GetAtt RUNEKSQSStack.Outputs.ControlPlaneSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+      FromPort: 443
+      SourceSecurityGroupId: !GetAtt VIEWEKSQSStack.Outputs.NodeGroupSecurityGroup
+  BuildEKSViewClusterApiIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Condition: CreateMultiCluster
+    Properties:
+      Description: >-
+        Allow the View Cluster to connect to the Build Cluster EKS
+        control plane for Kubernetes API traffic.
+      GroupId: !GetAtt BUILDEKSQSStack.Outputs.ControlPlaneSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+      FromPort: 443
+      SourceSecurityGroupId: !GetAtt VIEWEKSQSStack.Outputs.NodeGroupSecurityGroup
   LinuxBastionEIP:
     Type: AWS::EC2::EIP
     Properties:
@@ -964,7 +1600,12 @@ Resources:
                   - eks:DescribeAddonVersions
                   - eks:DescribeCluster
                   - eks:DescribeNodegroup
-                Resource: !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}
+                Resource:
+                  - !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}
+                  - !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}-run
+                  - !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}-build
+                  - !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}-iterate
+                  - !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}-view
               - Sid: DescribeEksAddons
                 Effect: Allow
                 Action:
@@ -1063,6 +1704,7 @@ Resources:
   TAPBuildServiceIamRole:
     Type: AWS::IAM::Role
     # Condition: UseEcr
+    Condition: CreateSingleCluster
     Properties:
       RoleName: !Sub
         - TAPBuildServiceIamRole-${StackId}
@@ -1095,7 +1737,7 @@ Resources:
               }
             ]
           }
-        - IamOidcProviderArn: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider
+        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
           OidcProviderEndpoint: !Select [1, !Split ["//", !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
       Policies:
         - PolicyName: TAPEcrBuildService
@@ -1165,6 +1807,7 @@ Resources:
   TAPWorkloadIamRole:
     Type: AWS::IAM::Role
     # Condition: UseEcr
+    Condition: CreateSingleCluster
     Properties:
       RoleName: !Sub
         - TAPWorkloadIamRole-${StackId}
@@ -1191,7 +1834,7 @@ Resources:
               }
             ]
           }
-        - IamOidcProviderArn: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider
+        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
           OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
       Policies:
         - PolicyName: TAPEcrWorkload
@@ -1255,11 +1898,408 @@ Resources:
                     # repos with the stack ID prefix post-deployment.
                       - arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${StackId}/*
                       - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+#roles muli cluster start
+  BUILDBuildServiceIamRole:
+    Type: AWS::IAM::Role
+    # Condition: UseEcr
+    Condition: CreateMultiCluster
+    Properties:
+      RoleName: !Sub
+        - BUILDBuildServiceIamRole-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      Description: >-
+        VMware Tanzu Application Platform role to allow Tanzu Build Service
+        to write to ECR.
+      AssumeRolePolicyDocument: !Sub
+        - |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
+                },
+                "Action": "sts:AssumeRoleWithWebIdentity",
+                "Condition": {
+                  "StringEquals": {
+                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com"
+                  },
+                  "StringLike": {
+                    "${OidcProviderEndpoint}:sub": [
+                      "system:serviceaccount:kpack:controller",
+                      "system:serviceaccount:build-service:dependency-updater-controller-serviceaccount"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
+          OidcProviderEndpoint: !Select [1, !Split ["//", !GetAtt BUILDEKSQSStack.Outputs.OIDCIssuerURL]]
+      Policies:
+        - PolicyName: TAPEcrBuildService
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: TAPEcrBuildServiceGlobal
+                Effect: Allow
+                Action:
+                  - ecr:DescribeRegistry
+                  - ecr:GetAuthorizationToken
+                  - ecr:GetRegistryPolicy
+                  - ecr:PutRegistryPolicy
+                  - ecr:PutReplicationConfiguration
+                  - ecr:DeleteRegistryPolicy
+                Resource: '*'
+              - Sid: TAPEcrBuildServiceScoped
+                Effect: Allow
+                Action:
+                  - ecr:DescribeImages
+                  - ecr:ListImages
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:BatchGetImage
+                  - ecr:BatchGetRepositoryScanningConfiguration
+                  - ecr:DescribeImageReplicationStatus
+                  - ecr:DescribeImageScanFindings
+                  - ecr:DescribeRepositories
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:GetLifecyclePolicy
+                  - ecr:GetLifecyclePolicyPreview
+                  - ecr:GetRegistryScanningConfiguration
+                  - ecr:GetRepositoryPolicy
+                  - ecr:ListTagsForResource
+                  - ecr:TagResource
+                  - ecr:UntagResource
+                  - ecr:BatchDeleteImage
+                  - ecr:BatchImportUpstreamImage
+                  - ecr:CompleteLayerUpload
+                  - ecr:CreatePullThroughCacheRule
+                  - ecr:CreateRepository
+                  - ecr:DeleteLifecyclePolicy
+                  - ecr:DeletePullThroughCacheRule
+                  - ecr:DeleteRepository
+                  - ecr:InitiateLayerUpload
+                  - ecr:PutImage
+                  - ecr:PutImageScanningConfiguration
+                  - ecr:PutImageTagMutability
+                  - ecr:PutLifecyclePolicy
+                  - ecr:PutRegistryScanningConfiguration
+                  - ecr:ReplicateImage
+                  - ecr:StartImageScan
+                  - ecr:StartLifecyclePolicyPreview
+                  - ecr:UploadLayerPart
+                  - ecr:DeleteRepositoryPolicy
+                  - ecr:SetRepositoryPolicy
+                Resource:
+                  - !GetAtt TAPBuildServiceRepo.Arn
+                  - !GetAtt TAPClusterEssentialsBundleRepo.Arn
+                  - !GetAtt TAPPackagesRepo.Arn
+                  - !GetAtt TAPWorkloadRepo.Arn
+                  - !GetAtt TAPWorkloadBundleRepo.Arn
+                  - !Sub
+                    # Allows TAP to deploy & manage new workloads from other
+                    # repos with the stack ID prefix post-deployment.
+                      - arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${StackId}/*
+                      - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+  BUILDWorkloadIamRole:
+    Type: AWS::IAM::Role
+    # Condition: UseEcr
+    Condition: CreateMultiCluster
+    Properties:
+      RoleName: !Sub
+        - BUILDWorkloadIamRole-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      Description: >-
+        VMware Tanzu Application Platform role to create a workload.
+      AssumeRolePolicyDocument: !Sub
+        - |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
+                },
+                "Action": "sts:AssumeRoleWithWebIdentity",
+                "Condition": {
+                  "StringEquals": {
+                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
+                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:tap-workload:default"
+                  }
+                }
+              }
+            ]
+          }
+        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
+          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt BUILDEKSQSStack.Outputs.OIDCIssuerURL]]
+      Policies:
+        - PolicyName: TAPEcrWorkload
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: TAPEcrWorkloadGlobal
+                Effect: Allow
+                Action:
+                  - ecr:DescribeRegistry
+                  - ecr:GetAuthorizationToken
+                  - ecr:GetRegistryPolicy
+                  - ecr:PutRegistryPolicy
+                  - ecr:PutReplicationConfiguration
+                  - ecr:DeleteRegistryPolicy
+                Resource: '*'
+              - Sid: TAPEcrWorkloadScoped
+                Effect: Allow
+                Action:
+                  - ecr:DescribeImages
+                  - ecr:ListImages
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:BatchGetImage
+                  - ecr:BatchGetRepositoryScanningConfiguration
+                  - ecr:DescribeImageReplicationStatus
+                  - ecr:DescribeImageScanFindings
+                  - ecr:DescribeRepositories
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:GetLifecyclePolicy
+                  - ecr:GetLifecyclePolicyPreview
+                  - ecr:GetRegistryScanningConfiguration
+                  - ecr:GetRepositoryPolicy
+                  - ecr:ListTagsForResource
+                  - ecr:TagResource
+                  - ecr:UntagResource
+                  - ecr:BatchDeleteImage
+                  - ecr:BatchImportUpstreamImage
+                  - ecr:CompleteLayerUpload
+                  - ecr:CreatePullThroughCacheRule
+                  - ecr:CreateRepository
+                  - ecr:DeleteLifecyclePolicy
+                  - ecr:DeletePullThroughCacheRule
+                  - ecr:DeleteRepository
+                  - ecr:InitiateLayerUpload
+                  - ecr:PutImage
+                  - ecr:PutImageScanningConfiguration
+                  - ecr:PutImageTagMutability
+                  - ecr:PutLifecyclePolicy
+                  - ecr:PutRegistryScanningConfiguration
+                  - ecr:ReplicateImage
+                  - ecr:StartImageScan
+                  - ecr:StartLifecyclePolicyPreview
+                  - ecr:UploadLayerPart
+                  - ecr:DeleteRepositoryPolicy
+                  - ecr:SetRepositoryPolicy
+                Resource:
+                  - !GetAtt TAPWorkloadRepo.Arn
+                  - !GetAtt TAPWorkloadBundleRepo.Arn
+                  - !Sub
+                    # Allows TAP to deploy & manage new workloads from other
+                    # repos with the stack ID prefix post-deployment.
+                      - arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${StackId}/*
+                      - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+  ITERATEBuildServiceIamRole:
+    Type: AWS::IAM::Role
+    # Condition: UseEcr
+    Condition: CreateMultiCluster
+    Properties:
+      RoleName: !Sub
+        - ITERATEBuildServiceIamRole-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      Description: >-
+        VMware Tanzu Application Platform role to allow Tanzu Build Service
+        to write to ECR.
+      AssumeRolePolicyDocument: !Sub
+        - |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
+                },
+                "Action": "sts:AssumeRoleWithWebIdentity",
+                "Condition": {
+                  "StringEquals": {
+                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com"
+                  },
+                  "StringLike": {
+                    "${OidcProviderEndpoint}:sub": [
+                      "system:serviceaccount:kpack:controller",
+                      "system:serviceaccount:build-service:dependency-updater-controller-serviceaccount"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
+          OidcProviderEndpoint: !Select [1, !Split ["//", !GetAtt ITERATEEKSQSStack.Outputs.OIDCIssuerURL]]
+      Policies:
+        - PolicyName: TAPEcrBuildService
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: TAPEcrBuildServiceGlobal
+                Effect: Allow
+                Action:
+                  - ecr:DescribeRegistry
+                  - ecr:GetAuthorizationToken
+                  - ecr:GetRegistryPolicy
+                  - ecr:PutRegistryPolicy
+                  - ecr:PutReplicationConfiguration
+                  - ecr:DeleteRegistryPolicy
+                Resource: '*'
+              - Sid: TAPEcrBuildServiceScoped
+                Effect: Allow
+                Action:
+                  - ecr:DescribeImages
+                  - ecr:ListImages
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:BatchGetImage
+                  - ecr:BatchGetRepositoryScanningConfiguration
+                  - ecr:DescribeImageReplicationStatus
+                  - ecr:DescribeImageScanFindings
+                  - ecr:DescribeRepositories
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:GetLifecyclePolicy
+                  - ecr:GetLifecyclePolicyPreview
+                  - ecr:GetRegistryScanningConfiguration
+                  - ecr:GetRepositoryPolicy
+                  - ecr:ListTagsForResource
+                  - ecr:TagResource
+                  - ecr:UntagResource
+                  - ecr:BatchDeleteImage
+                  - ecr:BatchImportUpstreamImage
+                  - ecr:CompleteLayerUpload
+                  - ecr:CreatePullThroughCacheRule
+                  - ecr:CreateRepository
+                  - ecr:DeleteLifecyclePolicy
+                  - ecr:DeletePullThroughCacheRule
+                  - ecr:DeleteRepository
+                  - ecr:InitiateLayerUpload
+                  - ecr:PutImage
+                  - ecr:PutImageScanningConfiguration
+                  - ecr:PutImageTagMutability
+                  - ecr:PutLifecyclePolicy
+                  - ecr:PutRegistryScanningConfiguration
+                  - ecr:ReplicateImage
+                  - ecr:StartImageScan
+                  - ecr:StartLifecyclePolicyPreview
+                  - ecr:UploadLayerPart
+                  - ecr:DeleteRepositoryPolicy
+                  - ecr:SetRepositoryPolicy
+                Resource:
+                  - !GetAtt TAPBuildServiceRepo.Arn
+                  - !GetAtt TAPClusterEssentialsBundleRepo.Arn
+                  - !GetAtt TAPPackagesRepo.Arn
+                  - !GetAtt TAPWorkloadRepo.Arn
+                  - !GetAtt TAPWorkloadBundleRepo.Arn
+                  - !Sub
+                    # Allows TAP to deploy & manage new workloads from other
+                    # repos with the stack ID prefix post-deployment.
+                      - arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${StackId}/*
+                      - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+  ITERATEWorkloadIamRole:
+    Type: AWS::IAM::Role
+    # Condition: UseEcr
+    Condition: CreateMultiCluster
+    Properties:
+      RoleName: !Sub
+        - ITERATEWorkloadIamRole-${StackId}
+        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+      Description: >-
+        VMware Tanzu Application Platform role to create a workload.
+      AssumeRolePolicyDocument: !Sub
+        - |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
+                },
+                "Action": "sts:AssumeRoleWithWebIdentity",
+                "Condition": {
+                  "StringEquals": {
+                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
+                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:tap-workload:default"
+                  }
+                }
+              }
+            ]
+          }
+        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
+          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt ITERATEEKSQSStack.Outputs.OIDCIssuerURL]]
+      Policies:
+        - PolicyName: TAPEcrWorkload
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: TAPEcrWorkloadGlobal
+                Effect: Allow
+                Action:
+                  - ecr:DescribeRegistry
+                  - ecr:GetAuthorizationToken
+                  - ecr:GetRegistryPolicy
+                  - ecr:PutRegistryPolicy
+                  - ecr:PutReplicationConfiguration
+                  - ecr:DeleteRegistryPolicy
+                Resource: '*'
+              - Sid: TAPEcrWorkloadScoped
+                Effect: Allow
+                Action:
+                  - ecr:DescribeImages
+                  - ecr:ListImages
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:BatchGetImage
+                  - ecr:BatchGetRepositoryScanningConfiguration
+                  - ecr:DescribeImageReplicationStatus
+                  - ecr:DescribeImageScanFindings
+                  - ecr:DescribeRepositories
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:GetLifecyclePolicy
+                  - ecr:GetLifecyclePolicyPreview
+                  - ecr:GetRegistryScanningConfiguration
+                  - ecr:GetRepositoryPolicy
+                  - ecr:ListTagsForResource
+                  - ecr:TagResource
+                  - ecr:UntagResource
+                  - ecr:BatchDeleteImage
+                  - ecr:BatchImportUpstreamImage
+                  - ecr:CompleteLayerUpload
+                  - ecr:CreatePullThroughCacheRule
+                  - ecr:CreateRepository
+                  - ecr:DeleteLifecyclePolicy
+                  - ecr:DeletePullThroughCacheRule
+                  - ecr:DeleteRepository
+                  - ecr:InitiateLayerUpload
+                  - ecr:PutImage
+                  - ecr:PutImageScanningConfiguration
+                  - ecr:PutImageTagMutability
+                  - ecr:PutLifecyclePolicy
+                  - ecr:PutRegistryScanningConfiguration
+                  - ecr:ReplicateImage
+                  - ecr:StartImageScan
+                  - ecr:StartLifecyclePolicyPreview
+                  - ecr:UploadLayerPart
+                  - ecr:DeleteRepositoryPolicy
+                  - ecr:SetRepositoryPolicy
+                Resource:
+                  - !GetAtt TAPWorkloadRepo.Arn
+                  - !GetAtt TAPWorkloadBundleRepo.Arn
+                  - !Sub
+                    # Allows TAP to deploy & manage new workloads from other
+                    # repos with the stack ID prefix post-deployment.
+                      - arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${StackId}/*
+                      - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
+# roles multi cluster end
   UbuntuBastion:
   # TODO: Implement CloudFormation helper scripts once Ubuntu 22.04 is
   # supported.
     Type: AWS::EC2::Instance
-    Condition: Ubuntu
+    Metadata:
+      cfn-lint: { config: { ignore_checks: [I3042] } }
     Properties:
       InstanceType: m5.large
       IamInstanceProfile: !Ref LinuxBastionInstanceProfile
@@ -1379,7 +2419,6 @@ Resources:
             chmod 755 ./kubectl
             mv ./kubectl /usr/local/bin/
             kubectl completion bash > /etc/bash_completion.d/kubectl
-            su - $user -c "aws eks update-kubeconfig --name ${EKSQSStack.Outputs.EKSClusterName}"
             popd
             echo "Configuring Docker..."
             getent group docker || groupadd docker
@@ -1409,12 +2448,28 @@ Resources:
             pushd "$tap_dir/src"
             aws s3 cp --no-progress "${QSS3BucketPath}/src/tap-main.sh" ./tap-main.sh
             chmod +x ./tap-main.sh
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/tap-relocate.sh" ./tap-relocate.sh
+            chmod +x ./tap-relocate.sh
             aws s3 cp --no-progress "${QSS3BucketPath}/src/install-tools.sh" ./install-tools.sh
             chmod +x ./install-tools.sh
             aws s3 cp --no-progress "${QSS3BucketPath}/src/functions.sh" ./functions.sh
             popd
             pushd "$tap_dir/src/inputs"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values.yaml" ./tap-values.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-build.yaml" ./tap-values-build.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-run.yaml" ./tap-values-run.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-iterate.yaml" ./tap-values-iterate.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-view.yaml" ./tap-values-view.yaml
+            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-single.yaml" ./tap-values-single.yaml
+            echo "Logging script input parameters"
+            echo ClusterArch ${ClusterArch}
+            echo BuildClusterBuildServiceArn ${BuildClusterBuildServiceArn}
+            echo BuildClusterWorkloadArn ${BuildClusterWorkloadArn}
+            echo IterateClusterBuildServiceArn ${IterateClusterBuildServiceArn}
+            echo IterateClusterWorkloadArn ${IterateClusterWorkloadArn}
+            echo BuildClusterName ${BuildClusterName}
+            echo RunClusterName ${RunClusterName}
+            echo ViewClusterName ${ViewClusterName}
+            echo IterateClusterName ${IterateClusterName}
             cat <<EOF > ./user-input-values.yaml
             #@data/values
             ---
@@ -1433,9 +2488,11 @@ Resources:
               repository: ${TanzuNetRegistryServer}/${TAPRepo}
               version: ${TAPVersion}
             cluster:
-              name: ${EKSQSStack.Outputs.EKSClusterName}
+              arch: ${ClusterArch}
+              name: ${EKSClusterName}
             buildservice:
-              buildservice_arn: ${TAPBuildServiceIamRole.Arn}
+              build_cluster_arn: ${BuildClusterBuildServiceArn}
+              iterate_cluster_arn: ${IterateClusterBuildServiceArn}
             dns:
               domain_name: ${TAPDomainName}
               zone_id: ${PrivateHostedZone}
@@ -1448,15 +2505,12 @@ Resources:
                 namespace: ${SampleAppNamespace}
                 repository: ${TAPWorkloadRepo.RepositoryUri}
                 bundle_repository: ${TAPWorkloadBundleRepo.RepositoryUri}
-                arn: ${TAPWorkloadIamRole.Arn}
+                build_cluster_arn: ${BuildClusterWorkloadArn}
+                iterate_cluster_arn: ${IterateClusterWorkloadArn}
             EOF
             popd
             pushd "$tap_dir/src/resources"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/developer-namespace.yaml" ./developer-namespace.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/git-ssh-basic-auth.yaml" ./git-ssh-basic-auth.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/pipeline.yaml" ./pipeline.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/scan-policy.yaml" ./scan-policy.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/resources/metadata-store-ready-only.yaml" ./metadata-store-ready-only.yaml
+            aws s3 cp --no-progress --recursive --exclude '*' --include '*.yaml' "${QSS3BucketPath}/src/resources/" .
             cat <<EOF > ./workload-aws.yaml
             ${SampleAppConfig}
             EOF
@@ -1465,16 +2519,39 @@ Resources:
             echo "Installing pivnet CLI..."
             wget -O "$tap_dir/downloads/pivnet" "https://github.com/pivotal-cf/pivnet-cli/releases/download/v${PivNetVersion}/pivnet-linux-$(dpkg --print-architecture)-${PivNetVersion}"
             install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
-            echo "Installing tanzu CLI and staging tanzu-cluster-essentials..."
+            echo "Installing Tanzu CLI and Staging Tanzu-cluster-essentials..."
             su - $user -c "$tap_dir/src/install-tools.sh"
             echo TanzuNetRelocateImages ${TanzuNetRelocateImages}
             if [[ "${TanzuNetRelocateImages}" == "Yes" ]]
             then
               echo "Creating local copies of key TAP container repos per VMware best practices..."
-              su - $user -c "$tap_dir/src/tap-main.sh -c relocate"
+              su - $user -c "$tap_dir/src/tap-relocate.sh"
             fi
             echo "Installing Tanzu Application Platform..."
-            su - $user -c "$tap_dir/src/tap-main.sh -c install"
+            echo ClusterArch ${ClusterArch}
+            if [[ "${ClusterArch}" == "multi" ]]
+            then
+              echo "Setup TAP Multiple Clusters..."
+              su - $user -c "$tap_dir/src/tap-main.sh -c install view"
+              su - $user -c "$tap_dir/src/tap-main.sh -c install run"
+              su - $user -c "$tap_dir/src/tap-main.sh -c install build"
+              su - $user -c "$tap_dir/src/tap-main.sh -c install iterate"
+              su - $user -c "$tap_dir/src/tap-main.sh -c prepview view"
+              su - $user -c "$tap_dir/src/tap-main.sh -c installwk iterate"
+              su - $user -c "$tap_dir/src/tap-main.sh -c installwk build"
+              su - $user -c "$tap_dir/src/tap-main.sh -c installwk run"
+              echo "wait till the workload to go through the supply-chain (8mins)"
+              sleep 480
+              su - $user -c "$tap_dir/src/tap-main.sh -c runtests run"
+              su - $user -c "$tap_dir/src/tap-main.sh -c runtests iterate"
+            else
+              echo "Setup TAP Single Cluster..."
+              su - $user -c "$tap_dir/src/tap-main.sh -c install single"
+              su - $user -c "$tap_dir/src/tap-main.sh -c installwk single"
+              echo "wait till the workload to go through the supply-chain (8mins)"
+              sleep 480
+              su - $user -c "$tap_dir/src/tap-main.sh -c runtests single"
+            fi
             echo "Completed successfully!"
           - AwsKubectlVersion: !FindInMap [KubernetesVersion, !Ref KubernetesVersion, AwsKubectlVersion]
             ClusterEssentialsBundleRepo: tanzu-cluster-essentials/cluster-essentials-bundle
@@ -1489,6 +2566,15 @@ Resources:
               - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
             TanzuNetRegistryServer: !FindInMap [TanzuNetRegistryServer, Server, Name]
             TAPRepo: tanzu-application-platform/tap-packages
+            ClusterArch: !Ref TAPClusterArch
+            BuildClusterName: !If [CreateMultiCluster, !GetAtt BUILDEKSQSStack.Outputs.EKSClusterName, !GetAtt EKSQSStack.Outputs.EKSClusterName]
+            BuildClusterBuildServiceArn: !If [CreateMultiCluster, !GetAtt BUILDBuildServiceIamRole.Arn, !GetAtt TAPBuildServiceIamRole.Arn]
+            BuildClusterWorkloadArn: !If [CreateMultiCluster, !GetAtt BUILDWorkloadIamRole.Arn, !GetAtt TAPWorkloadIamRole.Arn]
+            IterateClusterName: !If [CreateMultiCluster, !GetAtt ITERATEEKSQSStack.Outputs.EKSClusterName, ""]
+            IterateClusterBuildServiceArn: !If [CreateMultiCluster, !GetAtt ITERATEBuildServiceIamRole.Arn, ""]
+            IterateClusterWorkloadArn: !If [CreateMultiCluster, !GetAtt ITERATEWorkloadIamRole.Arn, ""]
+            RunClusterName: !If [CreateMultiCluster, !GetAtt RUNEKSQSStack.Outputs.EKSClusterName, ""]
+            ViewClusterName: !If [CreateMultiCluster, !GetAtt VIEWEKSQSStack.Outputs.EKSClusterName, ""]
   UbuntuBastionEipAssociation:
     Type: AWS::EC2::EIPAssociation
     UpdateReplacePolicy: Delete
@@ -1607,36 +2693,35 @@ Outputs:
       The public IP address of the Linux bastion host / bootstrap instance.
     Value: !Ref LinuxBastionEIP
   UbuntuBastionAZ:
-    Condition: Ubuntu
     Description: >-
       The Availability Zone that the Ubuntu bastion host / bootstrap instance
       is deployed in.
     Value: !GetAtt UbuntuBastion.AvailabilityZone
   UbuntuBastionId:
-    Condition: Ubuntu
     Description: >-
       The EC2 instance ID of the Ubuntu bastion host / bootstrap instance.
     Value: !Ref UbuntuBastion
   UbuntuBastionPublicDnsName:
-    Condition: Ubuntu
     Description: >-
       The public DNS name of the Ubuntu bastion host / bootstrap instance.
     Value: !GetAtt UbuntuBastion.PublicDnsName
   EKSClusterName:
     Description: The Amazon EKS cluster name.
     Value: !GetAtt EKSQSStack.Outputs.EKSClusterName
+    Condition: CreateSingleCluster
   TAPGuiUrl:
     Description: >-
       The URL of the VMware Tanzu Application Platform GUI that is accessible
       from within the VPC, such as the Windows bastion instance.
-    Value: !Sub http://tap-gui.${TAPDomainName}
+    Value: !If [CreateMultiCluster, !Sub 'http://tap-gui.view.${TAPDomainName}', !Sub 'http://tap-gui.${TAPDomainName}']
   TAPWorkloadUrl:
     Description: >-
       The URL of the VMware Tanzu Application Platform sample workload that is
       accessible from within the VPC, such as the Windows bastion instance.
     Value: !Sub
-      - http://${SampleAppName}.${Namespace}.${TAPDomainName}
-      - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
+      - http://${SampleAppName}.${Namespace}${ClusterName}.${TAPDomainName}
+      - ClusterName: !If [CreateMultiCluster, .run, '']
+        Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
   WindowsBastionAZ:
     Description: >-
       The Availability Zone that the Windows bastion instance is deployed in.
@@ -1658,6 +2743,27 @@ Outputs:
   Postdeployment:
     Description: See the deployment guide for postdeployment steps.
     Value: https://fwd.aws/gDY8k?
+#start multi cluster outputs
+  ViewEKSClusterName:
+    Description: The TAP View cluster name.
+    Value: !GetAtt VIEWEKSQSStack.Outputs.EKSClusterName
+    Condition: CreateMultiCluster
+  RunEKSClusterName:
+    Description: The TAP Run cluster name.
+    Value: !GetAtt RUNEKSQSStack.Outputs.EKSClusterName
+    Condition: CreateMultiCluster
+  BuildEKSClusterName:
+    Description: The TAP Build cluster name.
+    Value: !GetAtt BUILDEKSQSStack.Outputs.EKSClusterName
+    Condition: CreateMultiCluster
+  IterateEKSClusterName:
+    Description: The TAP Iterate cluster name.
+    Value: !GetAtt ITERATEEKSQSStack.Outputs.EKSClusterName
+    Condition: CreateMultiCluster
+  TAPClusterArch:
+    Description: TAP cluster architecture.
+    Value: !Ref TAPClusterArch
+#end multi cluster outputs
 Rules:
   AcceptEULAs:
     Assertions:
@@ -1673,7 +2779,7 @@ Rules:
           Customer Experience Improvement Program (CEIP) policy before you can
           proceed with the installation.
   TAPInterop:
-    RuleCondition: !Contains [[1.3.0], !Ref TAPVersion]
+    RuleCondition: !Contains [[1.4.0], !Ref TAPVersion]
     Assertions:
       # The values below require quotes to force string comparison.
       - Assert: !Contains [['1.22', '1.23', '1.24'], !Ref KubernetesVersion]

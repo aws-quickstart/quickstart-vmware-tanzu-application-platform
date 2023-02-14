@@ -100,7 +100,6 @@ function installTanzuCLI {
 
     pivnet login --api-token="$PIVNET_TOKEN"
 
-    TANZUCLI_FILE_NAME="tanzu-framework-linux-$(dpkg --print-architecture).tar"
     TANZUCLI_FILE_ID=$(pivnet product-files \
       -p tanzu-application-platform \
       -r $TAP_VERSION \
@@ -112,7 +111,9 @@ function installTanzuCLI {
       --release-version=$TAP_VERSION \
       --product-file-id=$TANZUCLI_FILE_ID
 
-    tar xvf $DOWNLOADS/$TANZUCLI_FILE_NAME -C $TANZU_DIR
+    TANZUCLI_FILE_NAME=`ls $DOWNLOADS/tanzu-framework-linux-*`
+    # echo TANZUCLI_FILE_NAME $TANZUCLI_FILE_NAME
+    tar xvf $TANZUCLI_FILE_NAME -C $TANZU_DIR
     export TANZU_CLI_NO_INIT=true
     MOST_RECENT_CLI=$(find $TANZU_DIR/cli/core/ -name tanzu-core-linux_$(dpkg --print-architecture) | xargs ls -t | head -n 1)
     echo "Installing Tanzu CLI"
@@ -157,9 +158,6 @@ function readUserInputs {
   banner "Reading $INPUTS/user-input-values.yaml"
 
   AWS_ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
-
-  CLUSTER_NAME=$(yq -r .cluster.name $INPUTS/user-input-values.yaml)
-
   DOMAIN_NAME=$(yq -r .dns.domain_name $INPUTS/user-input-values.yaml)
   ZONE_ID=$(yq -r .dns.zone_id $INPUTS/user-input-values.yaml)
 
@@ -186,7 +184,6 @@ function readUserInputs {
   TAP_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.tap_packages $INPUTS/user-input-values.yaml)
   ESSENTIALS_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.cluster_essentials $INPUTS/user-input-values.yaml)
   TBS_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.build_service $INPUTS/user-input-values.yaml)
-  DEV_NAMESPACE_ARN=$(yq -r .repositories.workload.arn $INPUTS/user-input-values.yaml)
 
   SAMPLE_APP_NAME=$(yq -r .repositories.workload.name $INPUTS/user-input-values.yaml)
   DEVELOPER_NAMESPACE=$(yq -r .repositories.workload.namespace $INPUTS/user-input-values.yaml)
@@ -194,47 +191,136 @@ function readUserInputs {
   SAMPLE_APP_BUNDLE_ECR_REGISTRY_REPOSITORY=$(yq -r .repositories.workload.bundle_repository $INPUTS/user-input-values.yaml)
 }
 
-function parseUserInputs {
-  requireValue AWS_ACCOUNT AWS_REGION GENERATED INPUTS TANZUNET_REGISTRY_USERNAME TANZUNET_REGISTRY_PASSWORD \
+
+function parseUserInputsSC {
+  requireValue AWS_ACCOUNT GENERATED INPUTS \
     SAMPLE_APP_ECR_REGISTRY_REPOSITORY
 
-  banner "getting ECR registry credentials"
-
-  ECR_REGISTRY_HOSTNAME=${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
-  ECR_REGISTRY_USERNAME=AWS
-  ECR_REGISTRY_PASSWORD=$(aws ecr get-login-password)
-
-  rm -rf $GENERATED
+  rm -rf $GENERATED/tap-values-single.yaml
   mkdir -p $GENERATED
 
   cat $INPUTS/user-input-values.yaml > $GENERATED/user-input-values.yaml
 
-  kubectl apply -f $RESOURCES/metadata-store-ready-only.yaml
+  kubectl apply -f $RESOURCES/metadata-store-read-only.yaml
   METADATA_STORE_ACCESS_TOKEN=$(kubectl get secret \
     $(kubectl get sa -n metadata-store metadata-store-read-client -o json \
     | jq -r '.secrets[0].name') -n metadata-store -o json \
     | jq -r '.data.token' \
     | base64 -d)
 
-  banner "Generating tap-values.yaml"
+  banner "Generating tap-values-single.yaml"
 
-  ytt -f $INPUTS/tap-values.yaml -f $GENERATED/user-input-values.yaml \
-    --data-value ecr_registry.username=$ECR_REGISTRY_USERNAME \
-    --data-value ecr_registry.password=$ECR_REGISTRY_PASSWORD \
+  ytt -f $INPUTS/tap-values-single.yaml -f $GENERATED/user-input-values.yaml \
     --data-value repositories.workload.server=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f1) \
     --data-value repositories.workload.ootb_repo_prefix=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f2-3) \
-    --data-value tanzunet.username=$TANZUNET_REGISTRY_USERNAME \
-    --data-value tanzunet.password=$TANZUNET_REGISTRY_PASSWORD \
     --data-value metadata_store.access_token="Bearer $METADATA_STORE_ACCESS_TOKEN" \
-    --ignore-unknown-comments > $GENERATED/tap-values.yaml
+    --ignore-unknown-comments > $GENERATED/tap-values-single.yaml
 }
 
+function parseUserInputsMC {
+  requireValue AWS_ACCOUNT GENERATED INPUTS \
+    SAMPLE_APP_ECR_REGISTRY_REPOSITORY
+
+  rm -rf $GENERATED/tap-values-build.yaml
+  rm -rf $GENERATED/tap-values-run.yaml
+  rm -rf $GENERATED/tap-values-view.yaml
+  rm -rf $GENERATED/tap-values-iterate.yaml
+
+  mkdir -p $GENERATED
+
+  cat $INPUTS/user-input-values.yaml > $GENERATED/user-input-values.yaml
+
+  banner "Generating tap-values.yaml for all clusters"
+
+  ytt -f $INPUTS/tap-values-build.yaml -f $GENERATED/user-input-values.yaml \
+    --data-value repositories.workload.server=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f1) \
+    --data-value repositories.workload.ootb_repo_prefix=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f2-3) \
+    --ignore-unknown-comments > $GENERATED/tap-values-build.yaml
+
+  ytt -f $INPUTS/tap-values-run.yaml -f $GENERATED/user-input-values.yaml \
+    --data-value repositories.workload.server=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f1) \
+    --data-value repositories.workload.ootb_repo_prefix=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f2-3) \
+    --ignore-unknown-comments > $GENERATED/tap-values-run.yaml
+
+  METADATA_STORE_ACCESS_TOKEN=""
+  RUN_CLUSTER_URL=""
+  BUILD_CLUSTER_URL=""
+  ITERATE_CLUSTER_URL=""
+  RUN_CLUSTER_TOKEN=""
+  BUILD_CLUSTER_TOKEN=""
+  ITERATE_CLUSTER_TOKEN=""
+  ytt -f $INPUTS/tap-values-view.yaml -f $GENERATED/user-input-values.yaml \
+    --data-value cluster.run.url=$RUN_CLUSTER_URL \
+    --data-value cluster.run.token=$RUN_CLUSTER_TOKEN \
+    --data-value cluster.build.url=$BUILD_CLUSTER_URL \
+    --data-value cluster.build.token=$BUILD_CLUSTER_TOKEN \
+    --data-value cluster.iterate.url=$ITERATE_CLUSTER_URL \
+    --data-value cluster.iterate.token=$ITERATE_CLUSTER_TOKEN \
+    --data-value metadata_store.access_token="Bearer $METADATA_STORE_ACCESS_TOKEN" \
+    --data-value repositories.workload.server=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f1) \
+    --data-value repositories.workload.ootb_repo_prefix=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f2-3) \
+    --ignore-unknown-comments > $GENERATED/tap-values-view.yaml
+
+  ytt -f $INPUTS/tap-values-iterate.yaml -f $GENERATED/user-input-values.yaml \
+    --data-value repositories.workload.server=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f1) \
+    --data-value repositories.workload.ootb_repo_prefix=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f2-3) \
+    --ignore-unknown-comments > $GENERATED/tap-values-iterate.yaml
+}
+
+function parseUserInputsViewCluster {
+  requireValue GENERATED INPUTS \
+    SAMPLE_APP_ECR_REGISTRY_REPOSITORY
+
+  rm -rf $GENERATED/tap-values-view.yaml
+  mkdir -p $GENERATED
+  cat $INPUTS/user-input-values.yaml > $GENERATED/user-input-values.yaml
+
+  banner "Generating tap-values.yaml for View cluster"
+
+  ITERATE_CLUSTER_URL=`cat $GENERATED/iterate-cluster-url.txt`
+  ITERATE_CLUSTER_TOKEN=`cat $GENERATED/iterate-cluster-token.txt`
+  BUILD_CLUSTER_URL=`cat $GENERATED/build-cluster-url.txt`
+  BUILD_CLUSTER_TOKEN=`cat $GENERATED/build-cluster-token.txt`
+  RUN_CLUSTER_URL=`cat $GENERATED/run-cluster-url.txt`
+  RUN_CLUSTER_TOKEN=`cat $GENERATED/run-cluster-token.txt`
+  METADATA_STORE_ACCESS_TOKEN=`cat $GENERATED/view-cluster-metadata-token.txt`
+
+  # echo ITERATE_CLUSTER_URL: $ITERATE_CLUSTER_URL
+  # echo ITERATE_CLUSTER_TOKEN: $ITERATE_CLUSTER_TOKEN
+  # echo BUILD_CLUSTER_URL: $BUILD_CLUSTER_URL
+  # echo BUILD_CLUSTER_TOKEN: $BUILD_CLUSTER_TOKEN
+  # echo RUN_CLUSTER_URL: $RUN_CLUSTER_URL
+  # echo RUN_CLUSTER_TOKEN: $RUN_CLUSTER_TOKEN
+  # echo METADATA_STORE_ACCESS_TOKEN $METADATA_STORE_ACCESS_TOKEN
+
+  ytt -f $INPUTS/tap-values-view.yaml -f $GENERATED/user-input-values.yaml \
+    --data-value cluster.run.url=$RUN_CLUSTER_URL \
+    --data-value cluster.run.token=$RUN_CLUSTER_TOKEN \
+    --data-value cluster.build.url=$BUILD_CLUSTER_URL \
+    --data-value cluster.build.token=$BUILD_CLUSTER_TOKEN \
+    --data-value cluster.iterate.url=$ITERATE_CLUSTER_URL \
+    --data-value cluster.iterate.token=$ITERATE_CLUSTER_TOKEN \
+    --data-value metadata_store.access_token="Bearer $METADATA_STORE_ACCESS_TOKEN" \
+    --data-value repositories.workload.server=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f1) \
+    --data-value repositories.workload.ootb_repo_prefix=$(echo $SAMPLE_APP_ECR_REGISTRY_REPOSITORY | cut -d '/' -f2-3) \
+    --ignore-unknown-comments > $GENERATED/tap-values-view.yaml
+}
+
+function parseUserInputs {
+    MY_CLUSTER_NAME_SUFFIX=$1
+    if [[ $MY_CLUSTER_NAME_SUFFIX == "single" ]]
+    then
+      parseUserInputsSC
+    else
+      parseUserInputsMC
+    fi
+}
 function installTanzuClusterEssentials {
   requireValue TAP_VERSION ESSENTIALS_ECR_REGISTRY_REPOSITORY \
     ESSENTIALS_FILE_HASH TANZUNET_RELOCATE_IMAGES \
-    ECR_REGISTRY_HOSTNAME ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD \
     ESSENTIALS_BUNDLE TANZUNET_REGISTRY_SERVER \
-    TANZUNET_REGISTRY_USERNAME TANZUNET_REGISTRY_PASSWORD
+    TANZUNET_REGISTRY_USERNAME TANZUNET_REGISTRY_PASSWORD \
+    AWS_REGION
 
   banner "Deploy kapp, secretgen configuration bundle & install tanzu CLI"
 
@@ -250,9 +336,9 @@ function installTanzuClusterEssentials {
   then
     echo "Changed ESSENTIALS_REGISTRY_REPOSITORY to ECR Repository"
     ESSENTIALS_REGISTRY_REPOSITORY=$ESSENTIALS_ECR_REGISTRY_REPOSITORY
-    ESSENTIALS_REGISTRY_HOSTNAME=$ECR_REGISTRY_HOSTNAME
-    ESSENTIALS_REGISTRY_USERNAME=$ECR_REGISTRY_USERNAME
-    ESSENTIALS_REGISTRY_PASSWORD=$ECR_REGISTRY_PASSWORD
+    ESSENTIALS_REGISTRY_HOSTNAME=${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+    ESSENTIALS_REGISTRY_USERNAME=AWS
+    ESSENTIALS_REGISTRY_PASSWORD=$(aws ecr get-login-password)
   fi
 
   INSTALL_BUNDLE=$ESSENTIALS_REGISTRY_REPOSITORY@$ESSENTIALS_FILE_HASH \
@@ -263,10 +349,9 @@ function installTanzuClusterEssentials {
 }
 
 function verifyK8ClusterAccess {
-  requireValue CLUSTER_NAME
-
-  banner "Verify EKS Cluster ${CLUSTER_NAME} access"
-  aws eks update-kubeconfig --name ${CLUSTER_NAME}
+  MY_CLUSTER_NAME=$1
+  banner "Verify EKS Cluster ${MY_CLUSTER_NAME} access"
+  aws eks update-kubeconfig --name ${MY_CLUSTER_NAME}
   kubectl config current-context
   kubectl get nodes
 }
@@ -327,33 +412,58 @@ function createTapRegistrySecret {
     --export-to-all-namespaces --namespace $TAP_NAMESPACE --yes
 }
 
-# This function is not used - can be removed
-function createTapECRRegistrySecret {
-  requireValue ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD ECR_REGISTRY_HOSTNAME TAP_NAMESPACE
+function ensurePackageOverlays() {
+  local -
+  set -e
+  set -u
+  set -o pipefail
 
-  banner "Creating tap-registry registry secret"
+  local tapVersion="${1?needs to be the TAP version}"
+  local tapNamespace="${2?needs to be the namespace where TAPs pkgis get deployed into}"
+  local resourcesDir="${3?needs to be the directory with additional resource files}"
+  local tapValuesFile="${4?needs to be the path to the TAP data values file}"
 
-  tanzu secret registry delete tap-registry --namespace $TAP_NAMESPACE -y
-  waitForRemoval kubectl get secret tap-registry --namespace $TAP_NAMESPACE -o json
+  local olSecrets="${resourcesDir}/package_overlay_secrets.yaml"
+  local olApply="${resourcesDir}/package_overlay_apply.yaml"
 
-  tanzu secret registry add tap-registry \
-    --username "$ECR_REGISTRY_USERNAME" --password "$ECR_REGISTRY_PASSWORD" \
-    --server $ECR_REGISTRY_HOSTNAME \
-    --export-to-all-namespaces --namespace $TAP_NAMESPACE --yes
+  local f
+  for f in "$olSecrets" "$olApply" ; do
+    [ -e "$f" ] || {
+      echo >&2 "$f does not exist, skipping applying package overlays"
+      return 0
+    }
+  done
+
+  banner 'Adding package overlays'
+
+  # create the overlay secrets in the tap-install namespace
+  ytt \
+    -f "$olSecrets" \
+    -v tapVersion="$tapVersion" \
+    -v tapNamespace="$tapNamespace" \
+    | kubectl apply -f -
+
+  # patch the tap data values with the package overlays
+  local newTapValues
+  newTapValues="$( ytt -f "$tapValuesFile" -f "$olApply" )"
+  echo "$newTapValues" > "$tapValuesFile"
 }
 
 function tapInstallFull {
   requireValue TAP_PACKAGE_NAME TAP_VERSION TAP_NAMESPACE
 
-  banner "Installing TAP values from $GENERATED/tap-values.yaml..."
+  TAP_VALUES_FILE=$1
+  banner "Installing TAP values from $GENERATED/$TAP_VALUES_FILE for TAP_VERSION $TAP_VERSION ..."
 
   first_time=$(tanzu package installed get $TAP_PACKAGE_NAME -n $TAP_NAMESPACE -o json 2>/dev/null)
 
+  ensurePackageOverlays "$TAP_VERSION" "$TAP_NAMESPACE" "$RESOURCES" "${GENERATED}/${TAP_VALUES_FILE}"
+
   if [[ -z $first_time ]]
   then
-    tanzu package install $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE || true
+    tanzu package install $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/$TAP_VALUES_FILE -n $TAP_NAMESPACE || true
   else
-    tanzu package installed update $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/tap-values.yaml -n $TAP_NAMESPACE || true
+    tanzu package installed update $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/$TAP_VALUES_FILE -n $TAP_NAMESPACE || true
   fi
 
   banner "Checking state of all packages"
@@ -397,42 +507,11 @@ function tapInstallFull {
   banner "TAP Installation is Complete."
 }
 
-function tapWorkloadInstallFull {
-  requireValue ECR_REGISTRY_USERNAME ECR_REGISTRY_PASSWORD ECR_REGISTRY_HOSTNAME \
-    DEVELOPER_NAMESPACE SAMPLE_APP_NAME DEV_NAMESPACE_ARN
-
-  banner "Installing Sample Workload"
-
-  kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/developer-namespace.yaml
-  kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/pipeline.yaml
-  kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/scan-policy.yaml
-  kubectl -n $DEVELOPER_NAMESPACE annotate serviceaccount default eks.amazonaws.com/role-arn=$DEV_NAMESPACE_ARN --overwrite
-
-  tanzu apps workload apply -f $RESOURCES/workload-aws.yaml -n $DEVELOPER_NAMESPACE --yes
-}
-
-function tapWorkloadUninstallFull {
-  requireValue DEVELOPER_NAMESPACE SAMPLE_APP_NAME
-
-  banner "Deleting workload $SAMPLE_APP_NAME from Developer namespace"
-  tanzu apps workload delete $SAMPLE_APP_NAME -n $DEVELOPER_NAMESPACE --yes
-
-  banner "Removing registry-credentials secret from Developer namespace"
-  tanzu secret registry delete registry-credentials --namespace $DEVELOPER_NAMESPACE --yes
-  waitForRemoval kubectl get secret registry-credentials --namespace $DEVELOPER_NAMESPACE -o json
-
-  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/developer-namespace.yaml
-  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/pipeline.yaml
-  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/scan-policy.yaml
-}
-
 function tapUninstallFull {
   requireValue TAP_PACKAGE_NAME TAP_NAMESPACE
 
-  banner "Uninstalling TAP..."
-  tanzu package installed delete $TAP_PACKAGE_NAME -n $TAP_NAMESPACE --yes
-  waitForRemoval tanzu package installed get $TAP_PACKAGE_NAME -n $TAP_NAMESPACE -o json
-  kubectl delete -f $RESOURCES/metadata-store-ready-only.yaml
+  banner "Uninstalling TAP from cluster ..."
+  tanzu package installed delete $TAP_PACKAGE_NAME -n $TAP_NAMESPACE --yes || true
 }
 
 function deleteTapRegistrySecret {
@@ -440,8 +519,7 @@ function deleteTapRegistrySecret {
 
   banner "Removing tap-registry registry secret"
 
-  tanzu secret registry delete tap-registry --namespace $TAP_NAMESPACE -y
-  waitForRemoval kubectl get secret tap-registry --namespace $TAP_NAMESPACE -o json
+  tanzu secret registry delete tap-registry --namespace $TAP_NAMESPACE -y || true
 }
 
 function deletePackageRepository {
@@ -449,8 +527,7 @@ function deletePackageRepository {
 
   banner "Removing current TAP package repository"
 
-  tanzu package repository delete tanzu-tap-repository -n $TAP_NAMESPACE --yes
-  waitForRemoval tanzu package repository get tanzu-tap-repository -n $TAP_NAMESPACE -o json
+  tanzu package repository delete tanzu-tap-repository -n $TAP_NAMESPACE --yes || true
 }
 
 function deleteTanzuClusterEssentials {
@@ -464,12 +541,8 @@ function deleteTanzuClusterEssentials {
 function deleteTapNamespace {
   requireValue TAP_NAMESPACE
 
-  banner "Removing Developer namespace"
-  kubectl delete ns $DEVELOPER_NAMESPACE
-  waitForRemoval kubectl get ns $DEVELOPER_NAMESPACE -o json
-
   banner "Removing TAP namespace"
-  kubectl delete namespace $TAP_NAMESPACE
+  kubectl delete namespace $TAP_NAMESPACE || true
   waitForRemoval kubectl get namespace $TAP_NAMESPACE -o json
 }
 
@@ -500,22 +573,30 @@ function relocateTAPPackages {
   echo "Ignore the non-distributable skipped layer warning- non-issue"
 }
 
-function printOutputParams {
+function createRoute53Record {
   # envoy loadbalancer ip
   requireValue INPUTS GENERATED DOMAIN_NAME ZONE_ID
 
+  MY_CLUSTER_NAME_SUFFIX=$1
+  if [[ $MY_CLUSTER_NAME_SUFFIX == "single" ]]
+  then
+    export ROUTE53_RECORD_NAME="*.$DOMAIN_NAME"
+  else
+    export ROUTE53_RECORD_NAME="*.$MY_CLUSTER_NAME_SUFFIX.$DOMAIN_NAME"
+  fi
+
   elb_hostname=$(kubectl get svc envoy -n tanzu-system-ingress -o jsonpath='{ .status.loadBalancer.ingress[0].hostname }')
-  echo "Create Route53 DNS CNAME record for *.$DOMAIN_NAME with $elb_hostname"
+  echo "Create Route53 DNS CNAME record for $ROUTE53_RECORD_NAME with $elb_hostname"
 
   pushd $GENERATED
-  cat <<EOF > ./tap-gui-route53-wildcard-resource-record-set-config.json
+  cat <<EOF > ./cluster-$MY_CLUSTER_NAME_SUFFIX-tap-gui-route53-wildcard-resource-record-set-config.json
 {
   "Comment": "UPSERT TAP GUI records",
   "Changes": [
     {
       "Action": "UPSERT",
         "ResourceRecordSet": {
-          "Name": "*.$DOMAIN_NAME",
+          "Name": "$ROUTE53_RECORD_NAME",
           "Type": "CNAME",
           "TTL": 300,
         "ResourceRecords": [{ "Value": "$elb_hostname"}]
@@ -524,29 +605,34 @@ function printOutputParams {
   ]
 }
 EOF
-  aws route53 change-resource-record-sets --hosted-zone-id $ZONE_ID --change-batch "file://./tap-gui-route53-wildcard-resource-record-set-config.json"
+  aws route53 change-resource-record-sets --hosted-zone-id $ZONE_ID --change-batch "file://./cluster-$MY_CLUSTER_NAME_SUFFIX-tap-gui-route53-wildcard-resource-record-set-config.json"
   popd
 
-  tap_gui_url=$(yq -r .tap_gui.app_config.backend.baseUrl $GENERATED/tap-values.yaml)
-  echo "TAP GUI URL $tap_gui_url"
 }
 
 function deleteRoute53Record {
   # envoy loadbalancer ip
   requireValue GENERATED DOMAIN_NAME ZONE_ID
 
-  elb_hostname=$(kubectl get svc envoy -n tanzu-system-ingress -o jsonpath='{ .status.loadBalancer.ingress[0].hostname }')
-  echo "Delete Route53 DNS CNAME record for *.$DOMAIN_NAME with $elb_hostname"
+  MY_CLUSTER_NAME_SUFFIX=$1
+  if [[ $MY_CLUSTER_NAME_SUFFIX == "single" ]]
+  then
+    export ROUTE53_RECORD_NAME="*.$DOMAIN_NAME"
+  else
+    export ROUTE53_RECORD_NAME="*.$MY_CLUSTER_NAME_SUFFIX.$DOMAIN_NAME"
+  fi
+  elb_hostname=$(kubectl get svc envoy -n tanzu-system-ingress -o jsonpath='{ .status.loadBalancer.ingress[0].hostname }') || true
+  echo "Delete Route53 DNS CNAME record for $ROUTE53_RECORD_NAME with $elb_hostname"
 
   pushd $GENERATED
-  cat <<EOF > ./tap-gui-route53-wildcard-resource-record-delete-config.json
+  cat <<EOF > ./cluster-$MY_CLUSTER_NAME_SUFFIX-tap-gui-route53-wildcard-resource-record-delete-config.json
 {
   "Comment": "DELETE TAP GUI records",
   "Changes": [
     {
       "Action": "DELETE",
         "ResourceRecordSet": {
-          "Name": "*.$DOMAIN_NAME",
+          "Name": "$ROUTE53_RECORD_NAME",
           "Type": "CNAME",
           "TTL": 300,
         "ResourceRecords": [{ "Value": "$elb_hostname"}]
@@ -555,22 +641,17 @@ function deleteRoute53Record {
   ]
 }
 EOF
-  aws route53 change-resource-record-sets --hosted-zone-id $ZONE_ID --change-batch "file://./tap-gui-route53-wildcard-resource-record-delete-config.json"
+  aws route53 change-resource-record-sets --hosted-zone-id $ZONE_ID --change-batch "file://./cluster-$MY_CLUSTER_NAME_SUFFIX-tap-gui-route53-wildcard-resource-record-delete-config.json" || true
   popd
 }
 
-function runTestCases {
-  requireValue DEVELOPER_NAMESPACE SAMPLE_APP_NAME  DOMAIN_NAME
 
-  TAP_GUI_URL="http://tap-gui.${DOMAIN_NAME}"
-  WORKLOAD_URL="http://${SAMPLE_APP_NAME}.${DEVELOPER_NAMESPACE}.${DOMAIN_NAME}"
-
-  echo "Running Tests..."
+function runTestCasesTAPGUI {
+  TAP_GUI_URL=$1
   echo TAP_GUI_URL $TAP_GUI_URL
-  echo WORKLOAD_URL $WORKLOAD_URL
 
   #test-1:
-  rx_str=`curl -LI $TAP_GUI_URL  -o /dev/null -w '%{http_code}\n' -s`
+  rx_str=`curl -LIk $TAP_GUI_URL  -o /dev/null -w '%{http_code}\n' -s` || true
   expected_str="200"
 
   echo "Test1: Access TAP GUI"
@@ -580,9 +661,14 @@ function runTestCases {
   else
     echo "Test1 Fail"
   fi
+}
+
+function runTestCasesTAPWK {
+  WORKLOAD_URL=$1
+  echo WORKLOAD_URL $WORKLOAD_URL
 
   #test-2:
-  rx_str=`curl -LI  $WORKLOAD_URL -o /dev/null -w '%{http_code}\n' -s`
+  rx_str=`curl -LIk $WORKLOAD_URL -o /dev/null -w '%{http_code}\n' -s` || true
   expected_str="200"
 
   echo "Test2: Access Sample Workload GUI"
@@ -594,7 +680,7 @@ function runTestCases {
   fi
 
   #test-3: workload output
-  rx_str=`curl -s $WORKLOAD_URL`
+  rx_str=`curl -sk $WORKLOAD_URL` || true
   expected_str="Greetings from Spring Boot + Tanzu!"
 
   echo "Test3: Verify Sample Workload Output"
@@ -604,4 +690,150 @@ function runTestCases {
   else
     echo "Test3 Fail"
   fi
+}
+
+
+function tapPrepIterateClusterToken {
+  MY_CLUSTER_NAME="$CLUSTER_NAME_PREFIX-iterate"
+  aws eks update-kubeconfig --name ${MY_CLUSTER_NAME}
+
+  ITERATE_CLUSTER_URL=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+  ITERATE_CLUSTER_SECRET=$(kubectl -n tap-gui get sa tap-gui-viewer -o=json  | jq -r '.secrets[0].name')
+  ITERATE_CLUSTER_TOKEN=$(kubectl -n tap-gui get secret ${ITERATE_CLUSTER_SECRET} -o=json \
+   | jq -r '.data["token"]' \
+   | base64 --decode)
+
+  echo $ITERATE_CLUSTER_URL > $GENERATED/iterate-cluster-url.txt
+  echo $ITERATE_CLUSTER_TOKEN > $GENERATED/iterate-cluster-token.txt
+
+  # cat $GENERATED/iterate-cluster-token.txt
+  # cat $GENERATED/iterate-cluster-url.txt
+
+  #store_ca.yaml and view-cluster-metadata-token.txt are generated in function tapPrepViewClusterToken
+  kubectl apply -f $GENERATED/store_ca.yaml
+  METADATA_STORE_ACCESS_TOKEN=`cat $GENERATED/view-cluster-metadata-token.txt`
+  kubectl delete secret store-auth-token -n metadata-store-secrets || true
+  kubectl create secret generic store-auth-token --from-literal=auth_token=$METADATA_STORE_ACCESS_TOKEN -n metadata-store-secrets
+
+}
+
+function tapPrepBuildClusterToken {
+  MY_CLUSTER_NAME="$CLUSTER_NAME_PREFIX-build"
+  aws eks update-kubeconfig --name ${MY_CLUSTER_NAME}
+
+  BUILD_CLUSTER_URL=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+  BUILD_CLUSTER_SECRET=$(kubectl -n tap-gui get sa tap-gui-viewer -o=json  | jq -r '.secrets[0].name')
+  BUILD_CLUSTER_TOKEN=$(kubectl -n tap-gui get secret ${BUILD_CLUSTER_SECRET} -o=json \
+   | jq -r '.data["token"]' \
+   | base64 --decode)
+
+  echo $BUILD_CLUSTER_URL > $GENERATED/build-cluster-url.txt
+  echo $BUILD_CLUSTER_TOKEN > $GENERATED/build-cluster-token.txt
+
+  # cat $GENERATED/build-cluster-token.txt
+  # cat $GENERATED/build-cluster-url.txt
+
+  #store_ca.yaml and view-cluster-metadata-token.txt are generated in function tapPrepViewClusterToken
+  kubectl apply -f $GENERATED/store_ca.yaml
+  METADATA_STORE_ACCESS_TOKEN=`cat $GENERATED/view-cluster-metadata-token.txt`
+  kubectl delete secret store-auth-token -n metadata-store-secrets || true
+  kubectl create secret generic store-auth-token --from-literal=auth_token=$METADATA_STORE_ACCESS_TOKEN -n metadata-store-secrets 
+
+}
+
+function tapPrepRunClusterToken {
+  MY_CLUSTER_NAME="$CLUSTER_NAME_PREFIX-run"
+  aws eks update-kubeconfig --name ${MY_CLUSTER_NAME}
+
+  RUN_CLUSTER_URL=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+  RUN_CLUSTER_SECRET=$(kubectl -n tap-gui get sa tap-gui-viewer -o=json  | jq -r '.secrets[0].name')
+  RUN_CLUSTER_TOKEN=$(kubectl -n tap-gui get secret ${RUN_CLUSTER_SECRET} -o=json \
+   | jq -r '.data["token"]' \
+   | base64 --decode)
+
+  echo $RUN_CLUSTER_URL > $GENERATED/run-cluster-url.txt
+  echo $RUN_CLUSTER_TOKEN > $GENERATED/run-cluster-token.txt
+
+  # cat $GENERATED/run-cluster-url.txt
+  # cat $GENERATED/run-cluster-token.txt
+
+  #store_ca.yaml and view-cluster-metadata-token.txt are generated in function tapPrepViewClusterToken
+  kubectl apply -f $GENERATED/store_ca.yaml
+  METADATA_STORE_ACCESS_TOKEN=`cat $GENERATED/view-cluster-metadata-token.txt`
+  kubectl delete secret store-auth-token -n metadata-store-secrets || true
+  kubectl create secret generic store-auth-token --from-literal=auth_token=$METADATA_STORE_ACCESS_TOKEN -n metadata-store-secrets
+
+}
+
+function tapPrepViewClusterToken {
+  MY_CLUSTER_NAME="$CLUSTER_NAME_PREFIX-view"
+  aws eks update-kubeconfig --name ${MY_CLUSTER_NAME}
+
+  METADATA_STORE_ACCESS_TOKEN=$(kubectl get secrets -n metadata-store -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='metadata-store-read-write-client')].data.token}" | cut -f1 -d' '| base64 -d)
+
+  # echo METADATA_STORE_ACCESS_TOKEN $METADATA_STORE_ACCESS_TOKEN
+  echo $METADATA_STORE_ACCESS_TOKEN > $GENERATED/view-cluster-metadata-token.txt
+  # echo $GENERATED/view-cluster-metadata-token.txt
+  # cat $GENERATED/view-cluster-metadata-token.txt
+
+  kubectl get secret ingress-cert -n metadata-store -o json | jq -r '.data."ca.crt"' | base64 -d > $GENERATED/insight-ca.crt
+
+  # echo $GENERATED/insight-ca.crt
+  # cat $GENERATED/insight-ca.crt
+
+  METADATA_STORE_DOMAIN="https://metadata-store.view.$DOMAIN_NAME"
+  rm -rf $HOME/.config/tanzu/insight/config.yaml
+  tanzu insight config set-target $METADATA_STORE_DOMAIN --ca-cert $GENERATED/insight-ca.crt
+}
+
+
+function tapPrepWorkloadInstall {
+  requireValue DEVELOPER_NAMESPACE SAMPLE_APP_NAME
+
+  banner "Creating $DEVELOPER_NAMESPACE namespace"
+  (kubectl get ns $DEVELOPER_NAMESPACE 2> /dev/null) ||
+    kubectl create ns $DEVELOPER_NAMESPACE
+
+  kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/developer-namespace.yaml
+}
+
+function tapPrepWorkloadUninstall {
+  requireValue DEVELOPER_NAMESPACE SAMPLE_APP_NAME
+
+  banner "Removing $DEVELOPER_NAMESPACE namespace"
+  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/developer-namespace.yaml || true
+}
+
+function tapWorkloadGenerateDeliverable {
+  requireValue  DEVELOPER_NAMESPACE SAMPLE_APP_NAME GENERATED
+
+  echo "Generating ${GENERATED}/${SAMPLE_APP_NAME}-delivery.yaml "
+
+  kubectl get configmap "${SAMPLE_APP_NAME}-deliverable"  -n $DEVELOPER_NAMESPACE  -o go-template='{{.data.deliverable}}' > "${GENERATED}/${SAMPLE_APP_NAME}-delivery.yaml"
+
+  cat ${GENERATED}/${SAMPLE_APP_NAME}-delivery.yaml
+
+}
+
+function tapWorkloadApplyDeliverable {
+  requireValue  DEVELOPER_NAMESPACE SAMPLE_APP_NAME GENERATED
+
+  banner "Creating $DEVELOPER_NAMESPACE namespace"
+
+  (kubectl get ns $DEVELOPER_NAMESPACE 2> /dev/null) ||
+    kubectl create ns $DEVELOPER_NAMESPACE
+
+  echo "Applying ${GENERATED}/${SAMPLE_APP_NAME}-delivery.yaml "
+
+  kubectl apply -f ${GENERATED}/${SAMPLE_APP_NAME}-delivery.yaml -n $DEVELOPER_NAMESPACE
+  # let the service be up
+  sleep 60
+  kubectl get deliverable -n $DEVELOPER_NAMESPACE
+
+  echo "get app URL and copy into browser to test the app"
+  kubectl get ksvc -n $DEVELOPER_NAMESPACE
+
+  # workaround to see target-cluster in tap-gui
+  kubectl patch deliverable ${SAMPLE_APP_NAME} -n ${DEVELOPER_NAMESPACE} --type merge --patch "{\"metadata\":{\"labels\":{\"carto.run/workload-name\":\"${SAMPLE_APP_NAME}\",\"carto.run/workload-namespace\":\"${DEVELOPER_NAMESPACE}\"}}}"
+
 }

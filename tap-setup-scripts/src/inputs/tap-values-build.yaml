@@ -1,0 +1,35 @@
+#@ load("@ytt:data", "data")
+---
+profile: build
+ceip_policy_disclosed: true # Installation fails if this is set to 'false'
+buildservice:
+  kp_default_repository: #@ data.values.repositories.build_service
+  kp_default_repository_aws_iam_role_arn: #@ data.values.buildservice.build_cluster_arn
+  enable_automatic_dependency_updates: false
+
+supply_chain: testing_scanning
+
+ootb_supply_chain_testing_scanning:
+  registry:
+    server: #@ data.values.repositories.workload.server
+    repository: #@ data.values.repositories.workload.ootb_repo_prefix
+  gitops:
+    ssh_secret: ""
+
+grype:
+  namespace: #@ data.values.repositories.workload.namespace
+  metadataStore:
+    url: #@ "https://metadata-store.view.{}".format(data.values.dns.domain_name)
+    caSecret:
+      name: store-ca-cert
+      importFromNamespace: metadata-store-secrets
+    authSecret:
+      name: store-auth-token
+      importFromNamespace: metadata-store-secrets
+
+scanning:
+  metadataStore:
+    url: ""
+
+ootb_templates:
+  iaas_auth: true

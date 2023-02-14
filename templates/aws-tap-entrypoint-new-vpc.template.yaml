@@ -36,6 +36,7 @@ Metadata:
         Parameters:
           - TAPVersion
           - TAPDomainName
+          - TAPClusterArch
       - Label:
           default: Sample app configuration
         Parameters:
@@ -110,6 +111,8 @@ Metadata:
         default: SSH port
       TAPDomainName:
         default: Domain name
+      TAPClusterArch:
+        default: EKS single or multi cluster
       EKSClusterName:
         default: EKS cluster name
       KubernetesVersion:
@@ -171,6 +174,13 @@ Parameters:
    Description: >-
       Private DNS domain name for accessing the TAP graphical user interface
       (GUI) and project URLs.
+  TAPClusterArch:
+    Type: String
+    Description: TAP cluster architecture.
+    AllowedValues:
+      - multi
+      - single
+    Default: single
   NumberOfAZs:
     Type: String
     Description: >-
@@ -263,14 +273,14 @@ Parameters:
       refer to Kubernetes cluster requirements
       (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
-      - 1.22
-    Default: 1.22
+      - 1.23
+    Default: 1.23
   NumberOfNodes:
     Type: Number
     Description: Minimum number of nodes to create for the TAP EKS cluster.
-    MinValue: 4
+    MinValue: 3
     MaxValue: 450
-    Default: 4
+    Default: 3
   MaxNumberOfNodes:
     Type: Number
     Description: >-
@@ -484,9 +494,9 @@ Parameters:
   NodeVolumeSize:
     Type: Number
     Description: Amazon EBS root volume size for Amazon EKS nodes.
-    MinValue: 80
+    MinValue: 100
     MaxValue: 16384
-    Default: 80
+    Default: 100
   RemoteAccessCidr:
     Type: String
     Description: >-
@@ -545,8 +555,8 @@ Parameters:
       refer to Kubernetes cluster requirements
       (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
     AllowedValues:
-      - 1.3.0
-    Default: 1.3.0
+      - 1.4.0
+    Default: 1.4.0
   SampleAppName:
     Type: String
     Description: >-
@@ -596,15 +606,11 @@ Parameters:
      location. When using your own bucket, specify the Region. For more
      information, refer to https://aws-quickstart.github.io/option1.html.
     Default: us-east-1
-Mappings:
-  AwsAmiNameMap:
-    Ubuntu-Server-22.04-LTS-HVM:
-      Code: US2204HVM
-      OS: Ubuntu
 Conditions:
   3AZDeployment: !Equals [!Ref NumberOfAZs, 3]
-  Ubuntu: !Equals [!FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, OS], Ubuntu]
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
+  CreateMultiCluster: !Equals [!Ref TAPClusterArch, multi]
+  CreateSingleCluster: !Equals [!Ref TAPClusterArch, single]
 Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
@@ -655,6 +661,7 @@ Resources:
         EKSClusterName: !Ref EKSClusterName
         KubernetesVersion: !Ref KubernetesVersion
         TAPDomainName: !Ref TAPDomainName
+        TAPClusterArch: !Ref TAPClusterArch
         TanzuNetUsername: !Ref TanzuNetUsername
         TanzuNetPassword: !Ref TanzuNetPassword
         TanzuNetApiToken: !Ref TanzuNetApiToken
@@ -665,29 +672,46 @@ Resources:
         QSS3BucketRegion: !Ref QSS3BucketRegion
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
 Outputs:
+  ClusterArch:
+    Description: TAP cluster architecture.
+    Value: !Ref TAPClusterArch
   LinuxBastionEIP:
     Description: >-
       The public IP address of the Linux bastion host / bootstrap instance.
     Value: !GetAtt ExistingVpcStack.Outputs.LinuxBastionEIP
   UbuntuBastionAZ:
-    Condition: Ubuntu
     Description: >-
       The Availability Zone that the Linux bastion host / bootstrap instance
       is deployed in.
     Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionAZ
   UbuntuBastionId:
-    Condition: Ubuntu
     Description: >-
       The EC2 instance ID of the Linux bastion host / bootstrap instance.
     Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionId
   UbuntuBastionPublicDnsName:
-    Condition: Ubuntu
     Description: >-
       The public DNS name of the Linux bastion host / bootstrap instance.
     Value: !GetAtt ExistingVpcStack.Outputs.UbuntuBastionPublicDnsName
   EKSClusterName:
     Description: The Amazon EKS cluster name.
     Value: !GetAtt ExistingVpcStack.Outputs.EKSClusterName
+    Condition: CreateSingleCluster
+  ViewEKSClusterName:
+    Description: The TAP View cluster name.
+    Value: !GetAtt ExistingVpcStack.Outputs.ViewEKSClusterName
+    Condition: CreateMultiCluster
+  RunEKSClusterName:
+    Description: The TAP Run cluster name.
+    Value: !GetAtt ExistingVpcStack.Outputs.RunEKSClusterName
+    Condition: CreateMultiCluster
+  BuildEKSClusterName:
+    Description: The TAP Build cluster name.
+    Value: !GetAtt ExistingVpcStack.Outputs.BuildEKSClusterName
+    Condition: CreateMultiCluster
+  IterateEKSClusterName:
+    Description: The TAP Iterate cluster name.
+    Value: !GetAtt ExistingVpcStack.Outputs.IterateEKSClusterName
+    Condition: CreateMultiCluster
   TAPGuiUrl:
     Description: >-
       The URL of the VMware Tanzu Application Platform GUI that is accessible
@@ -734,7 +758,7 @@ Rules:
           Customer Experience Improvement Program (CEIP) policy before you can
           proceed with the installation.
   TAPInterop:
-    RuleCondition: !Contains [[1.3.0], !Ref TAPVersion]
+    RuleCondition: !Contains [[1.4.0], !Ref TAPVersion]
     Assertions:
       # The values below require quotes to force string comparison.
       - Assert: !Contains [['1.22', '1.23', '1.24'], !Ref KubernetesVersion]

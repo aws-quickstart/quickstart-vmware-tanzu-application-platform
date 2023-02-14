@@ -16,8 +16,6 @@ project:
     RemoteAccessCidr: --override--
     S3TAPConfigBucketName: $[taskcat_random-string]-$[taskcat_current_region]
     EKSClusterName: $[taskcat_random-string]
-    NumberOfNodes: 4
-    MaxNumberOfNodes: 4
     TanzuNetUsername: --override--
     TanzuNetPassword: --override--
     TanzuNetApiToken: --override--
@@ -28,6 +26,13 @@ project:
   regions:
     - us-east-1
 tests:
-  default:
+  single-cluster:
+    parameters:
+      TAPClusterArch: single
     regions:
       - us-east-1
+  multi-cluster:
+    parameters:
+      TAPClusterArch: multi
+    regions:
+      - us-west-2

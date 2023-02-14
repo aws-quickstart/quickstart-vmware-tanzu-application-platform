@@ -16,7 +16,6 @@ clean-aws:
 
 lint:
 	cfn-lint templates/*.yaml
-	cfn-lint templates/workload/*.yaml
 
 init-submodules:
 	scripts/init-submodules.sh
