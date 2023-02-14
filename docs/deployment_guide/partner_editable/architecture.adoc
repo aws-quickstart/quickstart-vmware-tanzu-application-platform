@@ -26,8 +26,6 @@ As shown in <<architecture1>>, the single-cluster version of this Partner Soluti
 * Amazon Elastic Container Registry (Amazon ECR) for five private repositories: three for {partner-product-acronym} installation and two for sample workload installation.
 * Amazon EKS for the Kubernetes control plane cluster that runs {partner-product-acronym}, Contour Envoy, and other containerized applications.
 
-[.small]#* The template that deploys the Partner Solution into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#
-
 [#architecture2]
 .Partner Solution multicluster architecture for {partner-product-short-name} on AWS
 image::../docs/deployment_guide/images/wmare-TAP-architecture-diagram-multi-cluster.PNG[Architecture]
