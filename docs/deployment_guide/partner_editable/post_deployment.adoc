@@ -420,6 +420,9 @@
 
 |`WindowsBastionEIP`
 |The Elastic IP address associated with the Windows bastion host instance.
+
+|`TAPWorkloadUrl`
+|The sample workload URL accessible from the Windows bastion instance.
 |====
 
 === Security configuration and management tasks
