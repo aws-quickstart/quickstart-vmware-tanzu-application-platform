@@ -20,3 +20,7 @@ publish-bucket:
 
 ci-bucket:
   name-without-region: tcat-9d0156f41d3b503b8360120b8214b6f1
+
+housekeeping:
+  #! all regions we run tests in, see .taskcat.yml
+  regions: us-east-1 us-west-2

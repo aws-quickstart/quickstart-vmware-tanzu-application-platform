@@ -395,6 +395,8 @@ jobs:
   - *getCloudGateCreds
   - task: stacks-housekeeping
     file: ci-repo/ci/tasks/aws-housekeeping/stacks.yml
+    params:
+      REGIONS: ((housekeeping.regions))
 
 - name: housekeeping-check-pr-resource-token
   << : *alertingOnJobs
@@ -429,4 +431,5 @@ jobs:
     file: ci-repo/ci/tasks/aws-housekeeping/cleanup-stacks.yml
     params:
       REALLY_DELETE: "1"
+      REGIONS: ((housekeeping.regions))
 #! ---< housekeeping ----
