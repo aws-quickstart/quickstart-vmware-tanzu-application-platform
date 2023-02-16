@@ -14,7 +14,6 @@ project:
     NumberOfAZs: 3
     KeyPairName: --override--
     RemoteAccessCidr: --override--
-    S3TAPConfigBucketName: $[taskcat_random-string]-$[taskcat_current_region]
     EKSClusterName: $[taskcat_random-string]
     TanzuNetUsername: --override--
     TanzuNetPassword: --override--

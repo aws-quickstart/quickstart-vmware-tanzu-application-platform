@@ -1,7 +1,18 @@
+#! Overlay some things we need in CI
+#! Tests come from the "main" taskcat config
+
+#! Things we do:
+#! - change the project name; this will be used e.g. in `taskcat upload` as the
+#!   prefix key in the bucket
+#! - set all parameters, esp. ensure
+#!   QSS3BucketName/QSS3BucketRegion/QSS3KeyPrefix are set corretly
+#! - add some tags, so that we have an easier way to identify created resources
+
+#@ load("@ytt:overlay", "overlay")
 #@ load("@ytt:data", "data")
 #@ load("@ytt:regexp", "regexp")
 
-#@ region = "us-east-1"
+#@ bucketRegion = "us-east-1"
 #@ accessCIDR = "0.0.0.0/0"
 
 #@ domain = data.values.domain
@@ -13,47 +24,27 @@
 #@ tanzunet_refreshToken = data.values.tanzunet_refreshToken
 #@ keypairName = data.values.keypairName
 
+#@overlay/match by=overlay.all, expects=1
+#@overlay/match-child-defaults missing_ok=True
 ---
 project:
   name: #@ gitSha
-  owner: quickstart-eng@amazon.com
   s3_bucket: #@ bucket
-  s3_regional_buckets: true
   shorten_stack_name: true
-  template: templates/aws-tap-entrypoint-new-vpc.template.yaml
-  package_lambda: true
-  lambda_source_path: functions/source
-  lambda_zip_path: functions/packages
-  build_submodules: true
   parameters:
     AcceptEULAs: "Yes"
     AcceptCEIP: "Yes"
     AvailabilityZones: $[taskcat_genaz_3]
-    NumberOfAZs: 3
     KeyPairName: #@ keypairName
     RemoteAccessCidr: #@ accessCIDR
-    EKSClusterName: $[taskcat_random-string]
     TanzuNetUsername: #@ tanzunet_username
     TanzuNetPassword: #@ tanzunet_password
     TanzuNetApiToken: #@ tanzunet_refreshToken
     TanzuNetRelocateImages: "No"
     TAPDomainName: #@ "{}.{}".format("$[taskcat_random-string]", domain)
-    QSS3BucketName: #@ bucket + "-" + region
-    QSS3BucketRegion: #@ region
+    QSS3BucketName: #@ bucket + "-" + bucketRegion
+    QSS3BucketRegion: #@ bucketRegion
     QSS3KeyPrefix: #@ gitSha + "/"
-  regions:
-    - #@ region
   tags:
     gitSha: #@ gitSha
     gitRemote: #@ gitRemote
-tests:
-  single:
-    regions:
-      - #@ region
-    parameters:
-      TAPClusterArch: single
-  multi:
-    regions:
-      - #@ region
-    parameters:
-      TAPClusterArch: multi
