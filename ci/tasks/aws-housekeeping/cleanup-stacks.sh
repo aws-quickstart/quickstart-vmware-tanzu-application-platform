@@ -163,7 +163,7 @@ getDeleteFailedStacks() {
   local allStacks='[]'
   local regionalStacks
 
-  for r in ${REGION:-us-east-1}; do
+  for r in ${REGIONS:-us-east-1}; do
     regionalStacks="$(
       # shellcheck disable=SC2016
       aws cloudformation describe-stacks \
