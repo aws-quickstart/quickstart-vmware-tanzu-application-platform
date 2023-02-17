@@ -2208,7 +2208,7 @@ Resources:
             popd
 
             echo "Installing aws-cfn-bootstrap tools & setting signal trap"
-            pip3 install "https://s3.${!AWS_REGION}.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz"
+            pip3 install "https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz"
 
             # Set and export the cfn trap
             cfnSignal() {

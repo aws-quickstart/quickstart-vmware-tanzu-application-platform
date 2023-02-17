@@ -8,7 +8,8 @@ gitSha="$( cd repo && git rev-parse HEAD )"
 gitRemote="$( cd repo && git config --get remote.origin.url || echo 'unknown' )"
 
 ytt \
-  --file ci-repo/ci/qs-test/taskcat.yml \
+  --file repo/.taskcat.yml \
+  --file ci-repo/ci/qs-test/taskcat_overlay.yml \
   --data-values-env VAR \
   --data-value gitSha="$gitSha" \
   --data-value gitRemote="$gitRemote" \
