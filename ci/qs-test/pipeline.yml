@@ -212,7 +212,7 @@ jobs:
   - task: taskcat-test
     file: ci-repo/ci/tasks/taskcat-run-test/task.yml
     params:
-      TEST_NAME: single
+      TEST_NAME: single-cluster
     ensure: &postTest
       in_parallel:
       - task: print-logs
@@ -244,7 +244,7 @@ jobs:
   - task: taskcat-test
     file: ci-repo/ci/tasks/taskcat-run-test/task.yml
     params:
-      TEST_NAME: multi
+      TEST_NAME: multi-cluster
     ensure: *postTest
 
 - name: publish-bucket
@@ -340,7 +340,7 @@ jobs:
   - task: taskcat-test
     file: ci-repo/ci/tasks/taskcat-run-test/task.yml
     params:
-      TEST_NAME: single
+      TEST_NAME: single-cluster
     ensure: *postTest
 
 - name: pr-test-multi
@@ -361,7 +361,7 @@ jobs:
   - task: taskcat-test
     file: ci-repo/ci/tasks/taskcat-run-test/task.yml
     params:
-      TEST_NAME: multi
+      TEST_NAME: multi-cluster
     ensure: *postTest
 
 - name: pr-set-success
