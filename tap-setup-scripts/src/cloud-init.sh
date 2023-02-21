@@ -74,10 +74,8 @@ getent group docker || groupadd docker
 usermod -aG docker $user
 mkdir -p /root/.docker
 su - $user -c "mkdir -p /home/$user/.docker"
-pushd /tmp
-curl -fsSL "https://github.com/docker/docker-credential-helpers/releases/download/v${DockerCredPassVersion}/docker-credential-pass-v${DockerCredPassVersion}-$arch.tar.gz" | tar xz -C .
-mv docker-credential-pass /usr/local/bin/
-popd
+dockerCredHelperURI="https://github.com/docker/docker-credential-helpers/releases/download/v${DockerCredPassVersion}/docker-credential-pass-v${DockerCredPassVersion}.linux-${arch}"
+install -m 0750 <( curl -fsSL "$dockerCredHelperURI" ) /usr/local/bin/docker-credential-pass
 
 
 cat <<EOF > /root/.docker/config.json
