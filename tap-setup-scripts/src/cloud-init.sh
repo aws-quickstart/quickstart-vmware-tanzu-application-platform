@@ -62,8 +62,10 @@ systemctl start amazon-cloudwatch-agent.service
 systemctl status amazon-cloudwatch-agent.service
 echo "Installing kubectl..."
 pushd /tmp
-aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl" ./kubectl
-aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl.sha256" ./kubectl.sha256
+# aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl" ./kubectl
+# aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl.sha256" ./kubectl.sha256
+curl --retry 5 -o ./kubectl "https://amazon-eks.s3.${AWS_REGION}.amazonaws.com/${AwsKubectlVersion}/bin/linux/$arch/kubectl"
+curl --retry 5 -o ./kubectl.sha256 "https://amazon-eks.s3.${AWS_REGION}.amazonaws.com/${AwsKubectlVersion}/bin/linux/$arch/kubectl.sha256"
 openssl sha1 -sha256 ./kubectl
 chmod 755 ./kubectl
 mv ./kubectl /usr/local/bin/
