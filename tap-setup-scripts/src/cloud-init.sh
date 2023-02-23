@@ -63,7 +63,7 @@ systemctl status amazon-cloudwatch-agent.service
 echo "Installing kubectl..."
 pushd /tmp
 curl --retry 5 -o ./kubectl "https://s3.us-west-2.amazonaws.com/amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl"
-curl --retry 5 -o ./kubectl.sha256 "https://s3.us-west-2.amazonaws.com/amazon-eks/${AwsKubectlVersion}/linux/$arch/kubectl.sha256"
+curl --retry 5 -o ./kubectl.sha256 "https://s3.us-west-2.amazonaws.com/amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl.sha256"
 openssl sha1 -sha256 ./kubectl
 chmod 755 ./kubectl
 mv ./kubectl /usr/local/bin/
