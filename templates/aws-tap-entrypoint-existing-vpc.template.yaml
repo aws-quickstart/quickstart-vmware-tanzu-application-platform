@@ -811,8 +811,7 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Ref EKSClusterName
         ClusterAutoScaler: Enabled
-        MonitoringStack: None
-        ALBIngressController: Enabled
+        LoadBalancerController: Enabled
 #eks stacks multi cluster start
   RUNEKSQSStack:
     Type: AWS::CloudFormation::Stack
@@ -848,8 +847,7 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Sub ${EKSClusterName}-run
         ClusterAutoScaler: Enabled
-        MonitoringStack: None
-        ALBIngressController: Enabled
+        LoadBalancerController: Enabled
   VIEWEKSQSStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateMultiCluster
@@ -884,8 +882,7 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Sub ${EKSClusterName}-view
         ClusterAutoScaler: Enabled
-        MonitoringStack: None
-        ALBIngressController: Enabled
+        LoadBalancerController: Enabled
   BUILDEKSQSStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateMultiCluster
@@ -920,8 +917,7 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Sub ${EKSClusterName}-build
         ClusterAutoScaler: Enabled
-        MonitoringStack: None
-        ALBIngressController: Enabled
+        LoadBalancerController: Enabled
   ITERATEEKSQSStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateMultiCluster
@@ -956,8 +952,7 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Sub ${EKSClusterName}-iterate
         ClusterAutoScaler: Enabled
-        MonitoringStack: None
-        ALBIngressController: Enabled
+        LoadBalancerController: Enabled
 #eks stacks for multi cluster end
 #Rules for multi cluster start
   RunLinuxBastionSshToNodesEgressRule:
