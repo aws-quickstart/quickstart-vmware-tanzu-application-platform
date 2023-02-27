@@ -30,7 +30,6 @@ tests:
       TAPClusterArch: single
     regions:
       - us-east-1
-      - eu-south-1
   multi-cluster:
     parameters:
       TAPClusterArch: multi
