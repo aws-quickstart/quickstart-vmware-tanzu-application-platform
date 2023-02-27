@@ -64,7 +64,7 @@ echo "Installing kubectl..."
 pushd /tmp
 curl -LsSf --retry 5 -o ./kubectl "https://s3.us-west-2.amazonaws.com/amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl"
 curl -LsSf --retry 5 -o ./kubectl.sha256 "https://s3.us-west-2.amazonaws.com/amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl.sha256"
-sha256 --check ./kubectl.sha256
+sha256sum --check ./kubectl.sha256
 chmod 755 ./kubectl
 mv ./kubectl /usr/local/bin/
 kubectl completion bash > /etc/bash_completion.d/kubectl
