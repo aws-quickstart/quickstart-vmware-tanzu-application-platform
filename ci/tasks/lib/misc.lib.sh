@@ -62,7 +62,20 @@ bucket::printDetails() {
 #   mapfile -t -d $'\t' coords < <( bucket::getCoords .taskcat.yml )
 bucket::getCoords() {
   local taskcatConfig="${1?}"
-  yq -jr \
-    '.project.parameters | [ .QSS3BucketName, .QSS3KeyPrefix, .QSS3BucketRegion ] | @tsv' \
-    "$taskcatConfig"
+  yq -jer '
+    .project
+    | .s3_regional_buckets as $regional
+    | .s3_bucket as $bucket
+    | .regions[0] as $region
+    | .name as $prefix
+    | if $bucket == null then error("bucket name missing")   else . end
+    | if $region == null then error("bucket region missing") else . end
+    | if $regional
+      then
+        [ "\($bucket)-\($region)", "\($prefix)/", $region ]
+      else
+        [ $bucket, "\($prefix)/", $region ]
+      end
+    | @tsv
+  ' "$taskcatConfig"
 }
