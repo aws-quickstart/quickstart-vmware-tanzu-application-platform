@@ -37,6 +37,7 @@ function tapInstallMain {
   case $CLUSTER_NAME_SUFFIX in
     build)
       kubectl create -f $RESOURCES/tap-gui-viewer-service-account-rbac.yaml || true
+      kubectl create -f $RESOURCES/tap-gui-viewer-secret.yaml || true
       ytt -f $RESOURCES/metadata-store-exportsecret.yaml  \
         --data-value workload.namespace=$DEVELOPER_NAMESPACE \
         --ignore-unknown-comments > $GENERATED/metadata-store-exportsecret.yaml
@@ -45,6 +46,7 @@ function tapInstallMain {
       ;;
     run)
       kubectl create -f $RESOURCES/tap-gui-viewer-service-account-rbac.yaml || true
+      kubectl create -f $RESOURCES/tap-gui-viewer-secret.yaml || true
       ytt -f $RESOURCES/metadata-store-exportsecret.yaml  \
         --data-value workload.namespace=$DEVELOPER_NAMESPACE \
         --ignore-unknown-comments > $GENERATED/metadata-store-exportsecret.yaml
@@ -53,6 +55,7 @@ function tapInstallMain {
       ;;
     iterate)
       kubectl create -f $RESOURCES/tap-gui-viewer-service-account-rbac.yaml || true
+      kubectl create -f $RESOURCES/tap-gui-viewer-secret.yaml || true
       ytt -f $RESOURCES/metadata-store-exportsecret.yaml  \
         --data-value workload.namespace=$DEVELOPER_NAMESPACE \
         --ignore-unknown-comments > $GENERATED/metadata-store-exportsecret.yaml
@@ -81,16 +84,20 @@ function tapUninstallMain {
   case $CLUSTER_NAME_SUFFIX in
     build)
       kubectl delete -f $RESOURCES/tap-gui-viewer-service-account-rbac.yaml || true
+      kubectl delete -f $RESOURCES/tap-gui-viewer-secret.yaml || true
+
       kubectl delete -f $GENERATED/store_ca.yaml || true
       kubectl delete secret generic store-auth-token -n metadata-store-secrets || true
       ;;
     run)
       kubectl delete -f $RESOURCES/tap-gui-viewer-service-account-rbac.yaml || true
+      kubectl delete -f $RESOURCES/tap-gui-viewer-secret.yaml || true
       kubectl delete -f $GENERATED/store_ca.yaml || true
       kubectl delete secret generic store-auth-token -n metadata-store-secrets || true
       ;;
     iterate)
       kubectl delete -f $RESOURCES/tap-gui-viewer-service-account-rbac.yaml || true
+      kubectl delete -f $RESOURCES/tap-gui-viewer-secret.yaml || true
       kubectl delete -f $GENERATED/store_ca.yaml || true
       kubectl delete secret generic store-auth-token -n metadata-store-secrets || true
       ;;
@@ -205,14 +212,17 @@ function tapTestPreReqs {
   echo "TAP test prerequisites done..."
 }
 
-function tapConfigViewCluster  {
-  banner "tapPrepMultiCluster ..."
+function tapPrepViewCluster  {
+  banner "tapPrepViewCluster ..."
   readUserInputs
+  tapPrepViewClusterToken
+  tapPrepIterateClusterToken
+  tapPrepBuildClusterToken
+  tapPrepRunClusterToken
+  parseUserInputsViewCluster
   aws eks update-kubeconfig --name ${TAP_CLUSTER_NAME}
-
-  tapPrepViewCluster
+  tapInstallFull "tap-values-$CLUSTER_NAME_SUFFIX.yaml"  
 }
-
 
 function tapRunTestsMain {
   echo "tapRunTestsMain ..."
@@ -286,7 +296,7 @@ then
   cat <<EOT
   Usage: $0 -c {install | uninstall | prereqs} { build | run | view | iterate | single } [-s | --skipinit]
 EOT
-  exit 1
+  fail "Try Again"
 fi
 
 echo COMMAND=$cmd SKIPINIT=$skipinit CLUTER_SUFFIX=$CLUSTER_NAME_SUFFIX SCRIPT_DIR=$SCRIPT_DIR
@@ -324,13 +334,6 @@ case $cmd in
   tapTestPreReqs
   ;;
 "prepview")
-  readUserInputs
-  tapPrepViewClusterToken
-  tapPrepIterateClusterToken
-  tapPrepBuildClusterToken
-  tapPrepRunClusterToken
-  parseUserInputsViewCluster
-  aws eks update-kubeconfig --name ${TAP_CLUSTER_NAME}
-  tapInstallFull "tap-values-$CLUSTER_NAME_SUFFIX.yaml"
+  tapPrepViewCluster
   ;;
 esac
