@@ -41,7 +41,7 @@
 |`TAPClusterArch`
 |EKS single or multicluster / TAP Cluster Architecture
 |`single`
-|Choose `multi` to deploy {partner-product-acronym} with multicluster.
+|Choose `multi` to deploy {partner-product-acronym} with multiple EKS clusters.
 |====
 
 [%autowidth.stretch]
@@ -49,26 +49,10 @@
 |====
 |Parameter |Parameter Label |Default Value |Description
 
-|`TAPVersion`
-|Version
-|`1.4.0`
-|Version of {partner-product-acronym} to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements^].
-
 |`TAPDomainName`
 |Domain name
 |
 |Private DNS domain name that will be used for accessing the {partner-product-acronym} graphical user interface (GUI) and project URLs.
-|====
-
-[%autowidth.stretch]
-.Sample app configuration
-|====
-|Parameter |Parameter Label |Default Value |Description
-
-|`SampleAppName`
-|Name
-|`tanzu-java-web-app-workload`
-|Name of sample application to deploy into the Amazon EKS cluster.
 |====
 
 [%autowidth.stretch]
@@ -145,13 +129,8 @@
 
 |`EKSClusterName`
 |EKS cluster name
-|
+|`cluster-eks-tap`
 |Name of the EKS cluster where {partner-product-acronym} deploys.
-
-|`KubernetesVersion`
-|Kubernetes version
-|`1.23`
-|Version of Kubernetes control plane to deploy. The selected version must support the selected version of {partner-product-acronym}. For more information, refer to  https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements^].
 
 |`NodeInstanceType`
 |Instance type
@@ -175,22 +154,6 @@
 |====
 
 [%autowidth.stretch]
-.Linux bastion host/bootstrap instance configuration
-|====
-|Parameter |Parameter Label |Default Value |Description
-
-|`LinuxBastionOS`
-|OS
-|`Ubuntu-Server-22.04-LTS-HVM`
-|Operating system for the Linux bastion host/bootstrap instance.
-
-|`LinuxBastionSshPort`
-|SSH port
-|`22`
-|TCP port to use for the Linux bastion host listening port.
-|====
-
-[%autowidth.stretch]
 .AWS Partner Solution S3 bucket configuration
 |====
 |Parameter |Parameter Label |Default Value |Description
@@ -207,210 +170,31 @@
 
 |`QSS3KeyPrefix`
 |Key prefix
-|
+|`quickstart-vmware-tanzu-application-platform/`
 |S3 key prefix that is used to simulate a directory for your copy of the Partner Solution assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Partner Solution location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html and https://aws-quickstart.github.io/option1.html.
 |====
-
-//Edit after completing new VPC parameters; open template I have locally to the side
-// ==== Parameters for deploying a {partner-product-short-name} cluster to an existing VPC
-
-// [%autowidth.stretch]
-//.{partner-registry} configuration
-//|====
-//|Parameter |Parameter Label |Default Value |Description
-
-//|`AcceptEULAs`
-//|Have all applicable {partner-registry} EULAs been accepted?
-//|`No`
-//|Choose `Yes` if you already accepted the https://network.tanzu.vmware.com/products/tanzu-cluster-essentials/[Cluster Essentials for {partner-product-family-full}^] and https://network.tanzu.vmware.com/products/tanzu-application-platform/[{partner-product-name}^] EULAs. {partner-product-acronym} will fail to install successfully if both EULAs are not accepted for the specified {partner-registry} user account.
-
-//|`AcceptCEIP`
-//|Have you read and accepted the {partner-company-short-name} CEIP policy?
-//|`No`
-//|Choose `Yes` if you have read and accepted the https://www.vmware.com/solutions/trustvmware/ceip.html[{partner-company-short-name} CEIP policy^].
-
-//|`TanzuNetUsername`
-//|Username
-//|
-//|{partner-registry} user name. To create an account, sign up at https://account.run.pivotal.io/z/uaa/sign-up.
-
-//|`TanzuNetPassword`
-//|Password
-//|
-//|{partner-registry} password.
-
-//|`TanzuApiToken`
-//|API Token
-//|
-//|{partner-registry} UAA API refresh token. For more information, refer to the https://network.tanzu.vmware.com/docs/api[{partner-registry} API documentation^].
-
-//|`TanzuNetRelocateImages`
-//|Relocate {partner-product-acronym} images
-//|`No`
-//|Choose `Yes` to relocate {partner-product-acronym} images from the {partner-registry} registry to your ECR registry. If you do not relocate the images, {partner-product-short-name} uses the {partner-registry} registry to operate.
-
-//|`TAPClusterArch`
-//|EKS single or multicluster / TAP Cluster Architecture
-//|`single`
-//|Choose `multi` to deploy {partner-product-acronym} with multicluster.
-//|====
-
-//[%autowidth.stretch]
-//.{partner-product-name} configuration
-//|====
-//|Parameter |Parameter Label |Default Value |Description
-
-//|`TAPVersion`
-//|Version
-//|`1.4.0`
-//|Version of {partner-product-acronym} to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements^].
-
-//|`TAPDomainName`
-//|Domain name
-//|
-//|Private DNS domain name to access the {partner-product-acronym} user interface and project URLs.
-//|====
-
-//[%autowidth.stretch]
-//.Sample app configuration
-//|====
-//|Parameter |Parameter Label |Default Value |Description
-
-//|`SampleAppName`
-//|Name
-//|`tanzu-java-web-app-workload`
-//|Name of sample application to deploy into the Amazon EKS cluster.
-//|====
-
-//[%autowidth.stretch]
-//.Basic configuration
-//|====
-//|Parameter |Parameter Label |Default Value |Description
-
-//|`KeyPairName`
-//|EC2 key pair name
-//|
-//|The name of the EC2 key pair used for SSH access to the Linux bastion host / bootstrap instance and EKS cluster nodes, and for encrypting the Windows bastion host password. As of June 21, 2022, only RSA key types are supported due to Windows instances not supporting ED25519. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances^].
-
-//|`RemoteAccessCidr`
-//|Remote access CIDR
-//|
-//|IPv4 CIDR block permitted to connect to the Windows and Linux bastion hosts. We recommend that you set this value to a trusted network.
-//|====
-
-//[%autowidth.stretch]
-//.VPC network configuration
-//|====
-//|Parameter |Parameter Label |Default Value |Description
-
-//|`VpcId`
-//|VPC ID
-//|
-//|ID of your existing VPC (for example, `vpc-0343606e`).
-
-//|`PrivateSubnet1Id`
-//|Private subnet 1 ID
-//|
-//|ID of the private subnet in Availability Zone 1 of your existing VPC (for example, `subnet-fe9a8b32`).
-
-//|`PrivateSubnet2Id`
-//|Private subnet 2 ID
-//|
-//|ID of the private subnet in Availability Zone 2 of your existing VPC (for example, `subnet-be8b01ea`).
-
-//|`PrivateSubnet3Id`
-//|Private subnet 3 ID
-//|
-//|ID of the private subnet in Availability Zone 3 of your existing VPC (for example, `subnet-abd39039`).
-
-//|`PublicSubnet1Id`
-//|Public subnet 1 ID
-//|
-//|ID of the public subnet in Availability Zone 1 of your existing VPC (for example, `subnet-a0246dcd`)
-//|====
-
-//[%autowidth.stretch]
-//.Amazon EKS configuration
-//|====
-//|Parameter |Parameter Label |Default Value |Description
-
-//|`EKSClusterName`
-//|EKS cluster name
-//|
-//|Name of the EKS cluster where {partner-product-acronym} will be deployed.
-
-//|`KubernetesVersion`
-//|Kubernetes version
-//|`1.23`
-//|Version of Kubernetes control plane to deploy. The selected version must support the selected version of {partner-product-acronym}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3[Kubernetes cluster requirements^].
-
-
-//|`NodeInstanceType`
-//|Instance type
-//|`m5.xlarge`
-//|Amazon EKS cluster node instance type.
-
-//|`NodeVolumeSize`
-//|Volume size
-//|`80`
-//|Amazon EBS root volume size for Amazon EKS nodes.
-
-//|`NumberOfNodes`
-//|Number of nodes
-//|`3` 
-//|Minimum number of nodes to create for each {partner-product-acronym} EKS cluster.
-
-//|`MaxNumberOfNodes`
-//|Maximum number of nodes
-//|`6`
-//|Maximum number of available nodes for each {partner-product-acronym} EKS cluster in auto scaling.
-//|====
-
-//[%autowidth.stretch]
-//.Linux bastion host/bootstrap instance configuration
-//|====
-//|Parameter |Parameter Label |Default Value |Description
-
-//|`LinuxBastionOS`
-//|OS
-//|`Ubuntu-Server-22.04-LTS-HVM`
-//|Operating system for the Linux bastion host/bootstrap instance.
-
-//|`LinuxBastionSshPort`
-//|SSH port
-//|`22`
-//|TCP port to use for the Linux bastion host listening port.
-//|====
-
-//[%autowidth.stretch]
-//.AWS Partner Solution S3 bucket configuration
-//|====
-//|Parameter |Parameter Label |Default Value |Description
-
-//|`QSS3BucketName`
-//|Name
-//|`aws-quickstart`
-//|Name of the S3 bucket for your copy of the Partner Solution assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Partner Solution location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). For more information, refer to https://aws-quickstart.github.io/option1.html.
-
-//|`QSS3BucketRegion`
-//|Region
-//|`us-east-1`
-//|AWS Region where the Partner Solution S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template.  Changing this Region updates code references to point to a new Partner Solution location. When using your own bucket, specify the Region. For more information, refer to https://aws-quickstart.github.io/option1.html.
-
-//|`QSS3KeyPrefix`
-//|Key prefix
-//|
-//|S3 key prefix that is used to simulate a directory for your copy of the Partner Solution assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Partner Solution location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html and https://aws-quickstart.github.io/option1.html.
-//|====
 
 == Postdeployment steps
 
 === CloudFormation outputs
 
-After deployment, refer to the *Outputs* tab in the AWS CloudFormation console for the following information:
+[%autowidth.stretch]
+.CloudFormation outputs
+|====
+|Key |Description
 
-. The Elastic IP addresses associated with the Amazon EC2 Linux and Windows bastion host instances.
-. The {partner-product-short-name} website URL. For more information, refer to <<Access the {partner-product-name} user interface>>, later in this guide.
+|`TAPGuiUrl`
+|The {partner-product-short-name} graphical user interface URL. For more information, refer to <<Access the {partner-product-name} user interface>>, later in this guide.
+
+|`LinuxBastionEIP`
+|The Elastic IP address associated with the Amazon EC2 Linux instance.
+
+|`WindowsBastionEIP`
+|The Elastic IP address associated with the Windows bastion host instance.
+
+|`TAPWorkloadUrl`
+|The sample workload URL accessible from the Windows bastion instance.
+|====
 
 === Security configuration and management tasks
 
