@@ -17,13 +17,14 @@ readonly TASKCAT_CONFIG_FILE="${BUILD_DIR}/taskcat-config/taskcat.yml"
 main() {
   cd repo
 
-  ensurePackageZips
+  local bucketCoords
+  mapfile -t -d $'\t' bucketCoords < <( bucket::getCoords "$TASKCAT_CONFIG_FILE" )
+
+  ensurePackageZips "${bucketCoords[0]}"
 
   run::logged 'running taskcat upload' \
     taskcat upload --config-file "$TASKCAT_CONFIG_FILE" --disable-lambda-packaging
 
-  local bucketCoords
-  mapfile -t -d $'\t' bucketCoords < <( bucket::getCoords "$TASKCAT_CONFIG_FILE" )
   run::logged 'quick create' \
     bucket::printDetails "${bucketCoords[0]}" "${bucketCoords[1]}" "${bucketCoords[2]}"
 }
@@ -40,12 +41,13 @@ main() {
 # If we ever introduce additional top-level submodules, we also need to ensure
 # to package those up too, similar as we do right now for the eks packages.
 ensurePackageZips() {
+  local bucket="$1"
+
   local submodulePath='submodules/quickstart-amazon-eks'
-  local name rev bucket
+  local name rev
 
   name="$(basename "$submodulePath")"
   rev="$( cd "$submodulePath" && git rev-parse HEAD )"
-  bucket="$( yq -r .project.parameters.QSS3BucketName "$TASKCAT_CONFIG_FILE" )"
 
   local tarball="${name}-${rev}.tar.gz"
   local s3Path="s3://${bucket}/ci/cached-packages/${tarball}"
