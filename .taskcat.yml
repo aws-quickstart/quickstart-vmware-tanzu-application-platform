@@ -23,6 +23,8 @@ project:
     QSS3BucketName: $[taskcat_autobucket]
     QSS3BucketRegion: $[taskcat_current_region]
   regions:
+    #! Don't change that without adapting the internal pipeline, we use the
+    #! first .project.region as the default for CI buckets (for caching, ...)
     - us-east-1
 tests:
   single-cluster:
