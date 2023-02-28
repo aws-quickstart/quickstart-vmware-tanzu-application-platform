@@ -4,7 +4,7 @@
 #! Things we do:
 #! - change the project name; this will be used e.g. in `taskcat upload` as the
 #!   prefix key in the bucket
-#! - set all parameters, esp. ensure QSS3KeyPrefix are set corretly
+#! - set all parameters, esp. ensure QSS3KeyPrefix are set correctly
 #! - add some tags, so that we have an easier way to identify created resources
 
 #@ load("@ytt:overlay", "overlay")
