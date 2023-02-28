@@ -43,7 +43,7 @@ project:
     TanzuNetRelocateImages: "No"
     TAPDomainName: #@ "{}.{}".format("$[taskcat_random-string]", domain)
     QSS3BucketName: #@ bucket + "-" + bucketRegion
-    QSS3BucketRegion: #@ bucketRegion
+    QSS3BucketRegion:  $[taskcat_current_region]
     QSS3KeyPrefix: #@ gitSha + "/"
   tags:
     gitSha: #@ gitSha

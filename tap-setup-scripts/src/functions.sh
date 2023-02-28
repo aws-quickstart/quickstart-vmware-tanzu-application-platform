@@ -494,14 +494,15 @@ function tapInstallFull {
   done
 
   banner "Checking for ERRORs in all packages"
+  # Add some delay before checking status again
+  sleep 60
   tanzu package installed list --namespace $TAP_NAMESPACE -o json |
     jq -r '.[] | (.name + " " + .status)' |
     while read package status
     do
       if [ "$status" != "Reconcile succeeded" ]
       then
-        message "ERROR: At least one package ($package) failed to reconcile ($status)"
-        exit 1
+        fatal "ERROR: At least one package ($package) failed to reconcile ($status)"
       fi
     done
   banner "TAP Installation is Complete."
@@ -698,16 +699,11 @@ function tapPrepIterateClusterToken {
   aws eks update-kubeconfig --name ${MY_CLUSTER_NAME}
 
   ITERATE_CLUSTER_URL=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
-  ITERATE_CLUSTER_SECRET=$(kubectl -n tap-gui get sa tap-gui-viewer -o=json  | jq -r '.secrets[0].name')
-  ITERATE_CLUSTER_TOKEN=$(kubectl -n tap-gui get secret ${ITERATE_CLUSTER_SECRET} -o=json \
+  ITERATE_CLUSTER_TOKEN=$(kubectl -n tap-gui get secret tap-gui-viewer -o=json \
    | jq -r '.data["token"]' \
    | base64 --decode)
-
   echo $ITERATE_CLUSTER_URL > $GENERATED/iterate-cluster-url.txt
   echo $ITERATE_CLUSTER_TOKEN > $GENERATED/iterate-cluster-token.txt
-
-  # cat $GENERATED/iterate-cluster-token.txt
-  # cat $GENERATED/iterate-cluster-url.txt
 
   #store_ca.yaml and view-cluster-metadata-token.txt are generated in function tapPrepViewClusterToken
   kubectl apply -f $GENERATED/store_ca.yaml
@@ -722,16 +718,12 @@ function tapPrepBuildClusterToken {
   aws eks update-kubeconfig --name ${MY_CLUSTER_NAME}
 
   BUILD_CLUSTER_URL=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
-  BUILD_CLUSTER_SECRET=$(kubectl -n tap-gui get sa tap-gui-viewer -o=json  | jq -r '.secrets[0].name')
-  BUILD_CLUSTER_TOKEN=$(kubectl -n tap-gui get secret ${BUILD_CLUSTER_SECRET} -o=json \
+  BUILD_CLUSTER_TOKEN=$(kubectl -n tap-gui get secret tap-gui-viewer -o=json \
    | jq -r '.data["token"]' \
    | base64 --decode)
 
   echo $BUILD_CLUSTER_URL > $GENERATED/build-cluster-url.txt
   echo $BUILD_CLUSTER_TOKEN > $GENERATED/build-cluster-token.txt
-
-  # cat $GENERATED/build-cluster-token.txt
-  # cat $GENERATED/build-cluster-url.txt
 
   #store_ca.yaml and view-cluster-metadata-token.txt are generated in function tapPrepViewClusterToken
   kubectl apply -f $GENERATED/store_ca.yaml
@@ -746,16 +738,12 @@ function tapPrepRunClusterToken {
   aws eks update-kubeconfig --name ${MY_CLUSTER_NAME}
 
   RUN_CLUSTER_URL=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
-  RUN_CLUSTER_SECRET=$(kubectl -n tap-gui get sa tap-gui-viewer -o=json  | jq -r '.secrets[0].name')
-  RUN_CLUSTER_TOKEN=$(kubectl -n tap-gui get secret ${RUN_CLUSTER_SECRET} -o=json \
+  RUN_CLUSTER_TOKEN=$(kubectl -n tap-gui get secret tap-gui-viewer -o=json \
    | jq -r '.data["token"]' \
    | base64 --decode)
 
   echo $RUN_CLUSTER_URL > $GENERATED/run-cluster-url.txt
   echo $RUN_CLUSTER_TOKEN > $GENERATED/run-cluster-token.txt
-
-  # cat $GENERATED/run-cluster-url.txt
-  # cat $GENERATED/run-cluster-token.txt
 
   #store_ca.yaml and view-cluster-metadata-token.txt are generated in function tapPrepViewClusterToken
   kubectl apply -f $GENERATED/store_ca.yaml
@@ -771,15 +759,9 @@ function tapPrepViewClusterToken {
 
   METADATA_STORE_ACCESS_TOKEN=$(kubectl get secrets -n metadata-store -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='metadata-store-read-write-client')].data.token}" | cut -f1 -d' '| base64 -d)
 
-  # echo METADATA_STORE_ACCESS_TOKEN $METADATA_STORE_ACCESS_TOKEN
   echo $METADATA_STORE_ACCESS_TOKEN > $GENERATED/view-cluster-metadata-token.txt
-  # echo $GENERATED/view-cluster-metadata-token.txt
-  # cat $GENERATED/view-cluster-metadata-token.txt
 
   kubectl get secret ingress-cert -n metadata-store -o json | jq -r '.data."ca.crt"' | base64 -d > $GENERATED/insight-ca.crt
-
-  # echo $GENERATED/insight-ca.crt
-  # cat $GENERATED/insight-ca.crt
 
   METADATA_STORE_DOMAIN="https://metadata-store.view.$DOMAIN_NAME"
   rm -rf $HOME/.config/tanzu/insight/config.yaml
