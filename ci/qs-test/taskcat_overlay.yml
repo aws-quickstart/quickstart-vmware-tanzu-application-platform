@@ -4,15 +4,13 @@
 #! Things we do:
 #! - change the project name; this will be used e.g. in `taskcat upload` as the
 #!   prefix key in the bucket
-#! - set all parameters, esp. ensure
-#!   QSS3BucketName/QSS3BucketRegion/QSS3KeyPrefix are set corretly
+#! - set all parameters, esp. ensure QSS3KeyPrefix are set corretly
 #! - add some tags, so that we have an easier way to identify created resources
 
 #@ load("@ytt:overlay", "overlay")
 #@ load("@ytt:data", "data")
 #@ load("@ytt:regexp", "regexp")
 
-#@ bucketRegion = "us-east-1"
 #@ accessCIDR = "0.0.0.0/0"
 
 #@ domain = data.values.domain
@@ -34,7 +32,6 @@ project:
   parameters:
     AcceptEULAs: "Yes"
     AcceptCEIP: "Yes"
-    AvailabilityZones: $[taskcat_genaz_3]
     KeyPairName: #@ keypairName
     RemoteAccessCidr: #@ accessCIDR
     TanzuNetUsername: #@ tanzunet_username
@@ -42,8 +39,6 @@ project:
     TanzuNetApiToken: #@ tanzunet_refreshToken
     TanzuNetRelocateImages: "No"
     TAPDomainName: #@ "{}.{}".format("$[taskcat_random-string]", domain)
-    QSS3BucketName: #@ bucket + "-" + bucketRegion
-    QSS3BucketRegion:  $[taskcat_current_region]
     QSS3KeyPrefix: #@ gitSha + "/"
   tags:
     gitSha: #@ gitSha
