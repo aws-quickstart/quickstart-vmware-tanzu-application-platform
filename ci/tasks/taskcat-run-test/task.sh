@@ -13,6 +13,7 @@ rc=0
 taskcat test run \
   --skip-upload \
   --input-file ../taskcat-config/taskcat.yml \
+  --regions "$REGIONS" \
   --test-names "$TEST_NAME" \
   --minimal-output \
   --no-delete \
