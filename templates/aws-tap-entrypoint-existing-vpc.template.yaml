@@ -37,10 +37,6 @@ Metadata:
           - TAPDomainName
           - TAPClusterArch
       - Label:
-          default: Sample app configuration
-        Parameters:
-          - SampleAppName
-      - Label:
           default: Basic configuration
         Parameters:
           - KeyPairName
@@ -108,8 +104,6 @@ Metadata:
         default: API token
       TanzuNetRelocateImages:
         default: Relocate TAP images
-      SampleAppName:
-        default: Name
       QSS3BucketName:
         default: Name
       QSS3BucketRegion:
@@ -459,13 +453,6 @@ Parameters:
       - 'Yes'
       - 'No'
     Default: 'No'
-  SampleAppName:
-    Type: String
-    Description: >-
-      Name of the sample application to deploy into your Amazon EKS cluster.
-    AllowedValues:
-      - tanzu-java-web-app-workload
-    Default: tanzu-java-web-app-workload
   QSS3BucketName:
     Type: String
     Description: >-
@@ -711,7 +698,7 @@ Resources:
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
           Prefix: !FindInMap [SampleAppProperties, OotbRepoPrefix, Name]
           Suffix: !Sub
-            - '${SampleAppName}-${Namespace}'
+            - 'tanzu-java-web-app-workload-${Namespace}'
             - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
       EncryptionConfiguration:
         EncryptionType: AES256
@@ -726,7 +713,7 @@ Resources:
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
           Prefix: !FindInMap [SampleAppProperties, OotbRepoPrefix, Name]
           Suffix: !Sub
-            - '${SampleAppName}-${Namespace}'
+            - 'tanzu-java-web-app-workload-${Namespace}'
             - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
       EncryptionConfiguration:
         EncryptionType: AES256
@@ -2105,7 +2092,6 @@ Resources:
               export QSS3BucketPath='${QSS3BucketPath}'
               export RunClusterName='${RunClusterName}'
               export SampleAppConfig='${SampleAppConfig}'
-              export SampleAppName='${SampleAppName}'
               export SampleAppNamespace='${SampleAppNamespace}'
               export TAPBuildServiceRepo_RepositoryUri='${TAPBuildServiceRepo.RepositoryUri}'
               export TAPClusterEssentialsBundleRepo_RepositoryUri='${TAPClusterEssentialsBundleRepo.RepositoryUri}'
@@ -2219,7 +2205,7 @@ Resources:
             ClusterEssentialsBundleVersion: !FindInMap [ Versions, current, ClusterEssentialsVersion ]
             DockerCredPassVersion: !FindInMap [ Versions, current, DockerCredPass ]
             PivNetVersion: !FindInMap [ Versions, current, PivNet ]
-            SampleAppConfig: !FindInMap [SampleAppConfig, !Ref SampleAppName, Config]
+            SampleAppConfig: !FindInMap [SampleAppConfig, tanzu-java-web-app-workload, Config]
             SampleAppNamespace: !FindInMap [SampleAppProperties, Namespace, Name]
             QSS3BucketPath: !Sub
               - s3://${S3Bucket}/${QSS3KeyPrefix}tap-setup-scripts
@@ -2432,7 +2418,7 @@ Outputs:
       The URL of the VMware Tanzu Application Platform sample workload that is
       accessible from within the VPC, such as the Windows bastion instance.
     Value: !Sub
-      - http://${SampleAppName}.${Namespace}${ClusterName}.${TAPDomainName}
+      - http://tanzu-java-web-app-workload.${Namespace}${ClusterName}.${TAPDomainName}
       - ClusterName: !If [CreateMultiCluster, .run, '']
         Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
   WindowsBastionAZ:
