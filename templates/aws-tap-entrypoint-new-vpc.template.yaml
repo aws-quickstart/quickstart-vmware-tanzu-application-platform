@@ -590,8 +590,6 @@ Resources:
           - !Ref AWS::NoValue
         PublicSubnet1Id: !GetAtt VPCStack.Outputs.PublicSubnet1ID
         RemoteAccessCidr: !Ref RemoteAccessCidr
-        LinuxBastionOS: Ubuntu-Server-22.04-LTS-HVM
-        LinuxBastionSshPort: 22
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes

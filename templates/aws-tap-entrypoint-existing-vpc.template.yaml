@@ -62,11 +62,6 @@ Metadata:
           - NumberOfNodes
           - MaxNumberOfNodes
       - Label:
-          default: Linux bastion host / bootstrap instance configuration
-        Parameters:
-          - LinuxBastionOS
-          - LinuxBastionSshPort
-      - Label:
           default: AWS Quick Start S3 bucket configuration
         Parameters:
           - QSS3BucketName
@@ -91,10 +86,6 @@ Metadata:
         default: Public subnet 1 ID
       RemoteAccessCidr:
         default: Remote access CIDR
-      LinuxBastionOS:
-        default: OS
-      LinuxBastionSshPort:
-        default: SSH port
       TAPDomainName:
         default: Domain name
       TAPClusterArch:
@@ -438,19 +429,6 @@ Parameters:
       hosts. We recommend that you set this value to a trusted network.
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(3[0-2]|[1-2][0-9]|[0-9]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/0-32
-  LinuxBastionOS:
-    Type: String
-    Description: >-
-      Operating system for the Linux bastion host / bootstrap instance.
-    AllowedValues:
-      - Ubuntu-Server-22.04-LTS-HVM
-    Default: Ubuntu-Server-22.04-LTS-HVM
-  LinuxBastionSshPort:
-    Type: Number
-    Description: TCP port to use for the Linux bastion host listening port.
-    MinValue: 0
-    MaxValue: 65535
-    Default: 22
   TanzuNetUsername:
     Type: String
     Description: >-
@@ -539,7 +517,7 @@ Mappings:
       Kubectl: 1.24.9/2023-01-11
       ClusterEssentialsVersion: 1.4.1
       #! Note: this is not the hash of the pivnet artifact, but rather the image hash for the bundle image;
-      #! You can get it e.g. by 
+      #! You can get it e.g. by
       #!   docker pull registry.tanzu.vmware.com/tanzu-cluster-essentials/cluster-essentials-bundle:1.4.1
       ClusterEssentialsHash: sha256:2354688e46d4bb4060f74fca069513c9b42ffa17a0a6d5b0dbb81ed52242ea44
       PivNet: 3.0.1
@@ -669,7 +647,6 @@ Conditions:
   CreateMultiCluster: !Equals [!Ref TAPClusterArch, multi]
   CreateSingleCluster: !Equals [!Ref TAPClusterArch, single]
   3AZDeployment: !Not [!Equals [!Ref PrivateSubnet3Id, '']]
-  Ubuntu: !Equals [!FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, OS], Ubuntu]
   # TODO: Finish building logic to only deploy ECR-related resources if when
   # necessary.
   # UseEcr: !Equals [!Ref TanzuNetRelocateImages, 'Yes']
@@ -1209,8 +1186,6 @@ Resources:
       Description: Allow SSH to the Linux bastion host / bootstrap instance.
       GroupId: !Ref LinuxBastionSecurityGroup
       IpProtocol: tcp
-      FromPort: !Ref LinuxBastionSshPort
-      ToPort: !Ref LinuxBastionSshPort
       CidrIp: !Ref RemoteAccessCidr
   LinuxBastionDefaultEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
@@ -2069,7 +2044,7 @@ Resources:
       ImageId: !FindInMap
         - AwsAmiRegionMap
         - !Ref AWS::Region
-        - !FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, Code]
+        - !FindInMap [AwsAmiNameMap, Ubuntu-Server-22.04-LTS-HVM, Code]
       KeyName: !Ref KeyPairName
       Monitoring: true
       SecurityGroupIds:
@@ -2125,7 +2100,6 @@ Resources:
               export IterateClusterBuildServiceArn='${IterateClusterBuildServiceArn}'
               export IterateClusterName='${IterateClusterName}'
               export IterateClusterWorkloadArn='${IterateClusterWorkloadArn}'
-              export LinuxBastionSshPort='${LinuxBastionSshPort}'
               export PivNetVersion='${PivNetVersion}'
               export PrivateHostedZone='${PrivateHostedZone}'
               export QSS3BucketPath='${QSS3BucketPath}'
@@ -2318,7 +2292,6 @@ Resources:
   UbuntuBastionEipAssociation:
     Type: AWS::EC2::EIPAssociation
     UpdateReplacePolicy: Delete
-    Condition: Ubuntu
     Properties:
       InstanceId: !Ref UbuntuBastion
       AllocationId: !GetAtt LinuxBastionEIP.AllocationId
