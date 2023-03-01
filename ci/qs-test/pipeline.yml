@@ -213,6 +213,7 @@ jobs:
     file: ci-repo/ci/tasks/taskcat-run-test/task.yml
     params:
       TEST_NAME: single-cluster
+      REGIONS: "us-east-1"
     ensure: &postTest
       in_parallel:
       - task: print-logs
@@ -245,6 +246,7 @@ jobs:
     file: ci-repo/ci/tasks/taskcat-run-test/task.yml
     params:
       TEST_NAME: multi-cluster
+      REGIONS: "us-west-2"
     ensure: *postTest
 
 - name: publish-bucket
@@ -341,6 +343,7 @@ jobs:
     file: ci-repo/ci/tasks/taskcat-run-test/task.yml
     params:
       TEST_NAME: single-cluster
+      REGIONS: "us-east-1"
     ensure: *postTest
 
 - name: pr-test-multi
@@ -362,6 +365,7 @@ jobs:
     file: ci-repo/ci/tasks/taskcat-run-test/task.yml
     params:
       TEST_NAME: multi-cluster
+      REGIONS: "us-west-2"
     ensure: *postTest
 
 - name: pr-set-success

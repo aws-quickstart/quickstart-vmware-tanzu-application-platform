@@ -14,5 +14,6 @@ outputs:
 - name: test-result
 params:
   TEST_NAME: single
+  REGIONS:
 run:
   path: ci-repo/ci/tasks/taskcat-run-test/task.sh
