@@ -108,7 +108,7 @@ alerting:
 
 groups:
 - name: main
-  jobs: [ prepare-bucket, test-static, test-single, test-multi, publish-bucket, set-pipeline ]
+  jobs: [ prepare-bucket, test-static, test-single-us-east-1, test-multi-us-west-2, publish-bucket, set-pipeline ]
 - name: pr
   jobs: [ "pr-*", set-pipeline ]
 - name: housekeeping
@@ -190,9 +190,10 @@ jobs:
       NIMBUS_DEPLOY_OPTS: '--cpus=6 --memory=4096'
       DOCKER_HUB_PROXY: ((dockerhub-proxy))
 
-- name: test-single
+- name: test-single-us-east-1
   << : *alertingOnJobs
   serial: true
+  old_name: test-single
   plan:
   - in_parallel:
     - get: ci-repo
@@ -223,9 +224,10 @@ jobs:
       - task: cleanup-stack
         file: ci-repo/ci/tasks/aws-delete-stack/task.yml
 
-- name: test-multi
+- name: test-multi-us-west-2
   << : *alertingOnJobs
   serial: true
+  old_name: test-multi
   plan:
   - in_parallel:
     - get: ci-repo
@@ -257,12 +259,12 @@ jobs:
       params:
         submodules: none
       trigger: true
-      passed: [ test-single, test-multi ]
+      passed: [ test-single-us-east-1, test-multi-us-west-2 ]
     - get: repo
       params:
         submodules: none
       trigger: true
-      passed: [ test-single, test-multi ]
+      passed: [ test-single-us-east-1, test-multi-us-west-2 ]
   - *setup
   - task: publish-bucket
     file: ci-repo/ci/tasks/taskcat-bucket-sync/task.yml
@@ -324,9 +326,10 @@ jobs:
       NIMBUS_DEPLOY_OPTS: '--cpus=6 --memory=4096'
       DOCKER_HUB_PROXY: ((dockerhub-proxy))
 
-- name: pr-test-single
+- name: pr-test-single-us-east-1
   << : *alertginOnPrJobs
   serial: true
+  old_name: pr-test-single
   plan:
   - in_parallel:
     - get: ci-repo
@@ -346,9 +349,10 @@ jobs:
       REGIONS: "us-east-1"
     ensure: *postTest
 
-- name: pr-test-multi
+- name: pr-test-multi-us-west-2
   << : *alertginOnPrJobs
   serial: true
+  old_name: pr-test-multi
   plan:
   - in_parallel:
     - get: ci-repo
@@ -373,7 +377,7 @@ jobs:
   - get: repo
     resource: pull-request
     trigger: true
-    passed: [ pr-test-single, pr-test-multi ]
+    passed: [ pr-test-single-us-east-1, pr-test-multi-us-west-2 ]
   - put: pull-request
     params:
       path: repo
