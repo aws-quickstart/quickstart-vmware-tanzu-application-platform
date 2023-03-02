@@ -357,7 +357,7 @@
 
 //|`NumberOfNodes`
 //|Number of nodes
-//|`3` 
+//|`3`
 //|Minimum number of nodes to create for each {partner-product-acronym} EKS cluster.
 
 //|`MaxNumberOfNodes`
@@ -407,10 +407,23 @@
 
 === CloudFormation outputs
 
-After deployment, refer to the *Outputs* tab in the AWS CloudFormation console for the following information:
+[%autowidth.stretch]
+.CloudFormation outputs
+|====
+|Key |Description
 
-. The Elastic IP addresses associated with the Amazon EC2 Linux and Windows bastion host instances.
-. The {partner-product-short-name} website URL. For more information, refer to <<Access the {partner-product-name} user interface>>, later in this guide.
+|`TAPGuiUrl`
+|The {partner-product-short-name} graphical user interface URL. For more information, refer to <<Access the {partner-product-name} user interface>>, later in this guide.
+
+|`LinuxBastionEIP`
+|The Elastic IP address associated with the Amazon EC2 Linux instance.
+
+|`WindowsBastionEIP`
+|The Elastic IP address associated with the Windows bastion host instance.
+
+|`TAPWorkloadUrl`
+|The sample workload URL accessible from the Windows bastion instance.
+|====
 
 === Security configuration and management tasks
 
