@@ -602,7 +602,6 @@ Resources:
         TanzuNetPassword: !Ref TanzuNetPassword
         TanzuNetApiToken: !Ref TanzuNetApiToken
         TanzuNetRelocateImages: !Ref TanzuNetRelocateImages
-        SampleAppName: tanzu-java-web-app-workload
         QSS3BucketName: !Ref QSS3BucketName
         QSS3BucketRegion: !Ref QSS3BucketRegion
         QSS3KeyPrefix: !Ref QSS3KeyPrefix

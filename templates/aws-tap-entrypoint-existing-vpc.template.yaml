@@ -605,6 +605,8 @@ Mappings:
     Server:
       Name: registry.tanzu.vmware.com
   SampleAppProperties:
+    SampleAppName:
+      Name: tanzu-java-web-app-workload
     Namespace:
       Name: tap-workload
     OotbRepoPrefix:
@@ -698,8 +700,9 @@ Resources:
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
           Prefix: !FindInMap [SampleAppProperties, OotbRepoPrefix, Name]
           Suffix: !Sub
-            - 'tanzu-java-web-app-workload-${Namespace}'
+            - '${SampleAppName}-${Namespace}'
             - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
+            - SampleAppName: !FindInMap [SampleAppProperties, SampleAppName, Name]
       EncryptionConfiguration:
         EncryptionType: AES256
   TAPWorkloadBundleRepo:
@@ -713,8 +716,9 @@ Resources:
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
           Prefix: !FindInMap [SampleAppProperties, OotbRepoPrefix, Name]
           Suffix: !Sub
-            - 'tanzu-java-web-app-workload-${Namespace}'
+            - '${SampleAppName}-${Namespace}'
             - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
+            - SampleAppName: !FindInMap [SampleAppProperties, SampleAppName, Name]
       EncryptionConfiguration:
         EncryptionType: AES256
   PrivateHostedZone:
@@ -2093,6 +2097,7 @@ Resources:
               export RunClusterName='${RunClusterName}'
               export SampleAppConfig='${SampleAppConfig}'
               export SampleAppNamespace='${SampleAppNamespace}'
+              export SampleAppName='${SampleAppName}'
               export TAPBuildServiceRepo_RepositoryUri='${TAPBuildServiceRepo.RepositoryUri}'
               export TAPClusterEssentialsBundleRepo_RepositoryUri='${TAPClusterEssentialsBundleRepo.RepositoryUri}'
               export TAPDomainName='${TAPDomainName}'
@@ -2207,6 +2212,7 @@ Resources:
             PivNetVersion: !FindInMap [ Versions, current, PivNet ]
             SampleAppConfig: !FindInMap [SampleAppConfig, tanzu-java-web-app-workload, Config]
             SampleAppNamespace: !FindInMap [SampleAppProperties, Namespace, Name]
+            SampleAppName: !FindInMap [SampleAppProperties, SampleAppName, Name]
             QSS3BucketPath: !Sub
               - s3://${S3Bucket}/${QSS3KeyPrefix}tap-setup-scripts
               - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
@@ -2418,9 +2424,10 @@ Outputs:
       The URL of the VMware Tanzu Application Platform sample workload that is
       accessible from within the VPC, such as the Windows bastion instance.
     Value: !Sub
-      - http://tanzu-java-web-app-workload.${Namespace}${ClusterName}.${TAPDomainName}
+      - http://${SampleAppName}.${Namespace}${ClusterName}.${TAPDomainName}
       - ClusterName: !If [CreateMultiCluster, .run, '']
         Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
+        SampleAppName: !FindInMap [SampleAppProperties, SampleAppName, Name]
   WindowsBastionAZ:
     Description: >-
       The Availability Zone that the Windows bastion instance is deployed in.
