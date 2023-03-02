@@ -702,7 +702,7 @@ Resources:
           Suffix: !Sub
             - '${SampleAppName}-${Namespace}'
             - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
-            - SampleAppName: !FindInMap [SampleAppProperties, SampleAppName, Name]
+              SampleAppName: !FindInMap [SampleAppProperties, SampleAppName, Name]
       EncryptionConfiguration:
         EncryptionType: AES256
   TAPWorkloadBundleRepo:
@@ -718,7 +718,7 @@ Resources:
           Suffix: !Sub
             - '${SampleAppName}-${Namespace}'
             - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
-            - SampleAppName: !FindInMap [SampleAppProperties, SampleAppName, Name]
+              SampleAppName: !FindInMap [SampleAppProperties, SampleAppName, Name]
       EncryptionConfiguration:
         EncryptionType: AES256
   PrivateHostedZone:
