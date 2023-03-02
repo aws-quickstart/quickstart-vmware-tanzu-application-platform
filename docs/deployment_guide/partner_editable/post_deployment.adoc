@@ -127,11 +127,6 @@
 |====
 |Parameter |Parameter Label |Default Value |Description
 
-|`EKSClusterName`
-|EKS cluster name
-|`cluster-eks-tap`
-|Name of the EKS cluster where {partner-product-acronym} deploys.
-
 |`NodeInstanceType`
 |Instance type
 |`m5.xlarge`
