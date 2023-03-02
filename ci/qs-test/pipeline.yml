@@ -248,14 +248,7 @@ jobs:
     params:
       TEST_NAME: single-cluster
       REGIONS: "eu-south-1"
-    ensure: &postTest
-      in_parallel:
-      - task: print-logs
-        file: ci-repo/ci/tasks/taskcat-print-logs/task.yml
-      - task: print-durations
-        file: ci-repo/ci/tasks/taskcat-print-durations/task.yml
-      - task: cleanup-stack
-        file: ci-repo/ci/tasks/aws-delete-stack/task.yml
+    ensure: *postTest
 
 - name: test-multi-us-west-2
   << : *alertingOnJobs
