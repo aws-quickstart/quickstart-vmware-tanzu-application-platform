@@ -594,15 +594,11 @@ Mappings:
   TanzuNetRegistryServer:
     Server:
       Name: registry.tanzu.vmware.com
-  SampleAppProperties:
-    SampleAppName:
+  Apps:
+    Sample:
       Name: tanzu-java-web-app-workload
-    Namespace:
-      Name: tap-workload
-    OotbRepoPrefix:
-      Name: tap-supply-chain
-  SampleAppConfig:
-    tanzu-java-web-app-workload:
+      Namespace: tap-workload
+      OotbRepoPrefix: tap-supply-chain
       Config: |
         apiVersion: carto.run/v1alpha1
         kind: Workload
@@ -688,11 +684,11 @@ Resources:
       RepositoryName: !Sub
         - '${StackId}/${Prefix}/${Suffix}'
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-          Prefix: !FindInMap [SampleAppProperties, OotbRepoPrefix, Name]
+          Prefix: !FindInMap [Apps, Sample, OotbRepoPrefix]
           Suffix: !Sub
             - '${SampleAppName}-${Namespace}'
-            - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
-              SampleAppName: !FindInMap [SampleAppProperties, SampleAppName, Name]
+            - Namespace: !FindInMap [Apps, Sample, Namespace]
+              SampleAppName: !FindInMap [Apps, Sample, Name]
       EncryptionConfiguration:
         EncryptionType: AES256
   TAPWorkloadBundleRepo:
@@ -704,11 +700,11 @@ Resources:
       RepositoryName: !Sub
         - '${StackId}/${Prefix}/${Suffix}-bundle'
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-          Prefix: !FindInMap [SampleAppProperties, OotbRepoPrefix, Name]
+          Prefix: !FindInMap [Apps, Sample, OotbRepoPrefix]
           Suffix: !Sub
             - '${SampleAppName}-${Namespace}'
-            - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
-              SampleAppName: !FindInMap [SampleAppProperties, SampleAppName, Name]
+            - Namespace: !FindInMap [Apps, Sample, Namespace]
+              SampleAppName: !FindInMap [Apps, Sample, Name]
       EncryptionConfiguration:
         EncryptionType: AES256
   PrivateHostedZone:
@@ -2197,9 +2193,9 @@ Resources:
             ClusterEssentialsBundleVersion: !FindInMap [ Versions, current, ClusterEssentialsVersion ]
             DockerCredPassVersion: !FindInMap [ Versions, current, DockerCredPass ]
             PivNetVersion: !FindInMap [ Versions, current, PivNet ]
-            SampleAppConfig: !FindInMap [SampleAppConfig, tanzu-java-web-app-workload, Config]
-            SampleAppNamespace: !FindInMap [SampleAppProperties, Namespace, Name]
-            SampleAppName: !FindInMap [SampleAppProperties, SampleAppName, Name]
+            SampleAppConfig: !FindInMap [Apps, Sample, Config]
+            SampleAppNamespace: !FindInMap [Apps, Sample, Namespace]
+            SampleAppName: !FindInMap [Apps, Sample, Name]
             QSS3BucketPath: !Sub
               - s3://${S3Bucket}/${QSS3KeyPrefix}tap-setup-scripts
               - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
@@ -2413,8 +2409,8 @@ Outputs:
     Value: !Sub
       - http://${SampleAppName}.${Namespace}${ClusterName}.${TAPDomainName}
       - ClusterName: !If [CreateMultiCluster, .run, '']
-        Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
-        SampleAppName: !FindInMap [SampleAppProperties, SampleAppName, Name]
+        Namespace: !FindInMap [Apps, Sample, Namespace]
+        SampleAppName: !FindInMap [Apps, Sample, Name]
   WindowsBastionAZ:
     Description: >-
       The Availability Zone that the Windows bastion instance is deployed in.
