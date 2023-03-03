@@ -11,3 +11,5 @@ than v5.0.0 then you need to delete the following CloudFormation Stacks:
 
 Deleting the above can affect existing EKS deployments, alternatively, you can create a new AWS account.
 ====
+
+For more information about changes please refer to the <<release-notes, Release Notes>>.
