@@ -1164,6 +1164,8 @@ Resources:
       GroupId: !Ref LinuxBastionSecurityGroup
       IpProtocol: tcp
       CidrIp: !Ref RemoteAccessCidr
+      FromPort: 22
+      ToPort: 22
   LinuxBastionDefaultEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
     UpdateReplacePolicy: Delete
