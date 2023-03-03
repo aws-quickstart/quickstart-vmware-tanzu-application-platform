@@ -1,0 +1,20 @@
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: tappc-docker-local.artifactory.eng.vmware.com/ci/docker-image
+    tag: latest
+outputs:
+- name: creds
+inputs:
+- name: ci-repo
+run:
+  path: ci-repo/ci/tasks/get-cloudgate-creds/task.sh
+params:
+  CLOUDGATE_BASE_URL: https://api.console.cloudgate.vmware.com
+  CLOUDGATE_CLIENT_ID:
+  CLOUDGATE_CLIENT_SECRET:
+  CLOUDGATE_MASTER_ACCOUNT_ID:
+  CLOUDGATE_ORG_ACCOUNT_ID:
+  CLOUDGATE_OU_ID:
+  CLOUDGATE_TTL: 1800

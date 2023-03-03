@@ -34,7 +34,6 @@ Metadata:
       - Label:
           default: VMware Tanzu Application Platform configuration
         Parameters:
-          - TAPVersion
           - TAPDomainName
           - TAPClusterArch
       - Label:
@@ -62,7 +61,6 @@ Metadata:
           default: Amazon EKS configuration
         Parameters:
           - EKSClusterName
-          - KubernetesVersion
           - NodeInstanceType
           - NodeVolumeSize
           - NumberOfNodes
@@ -115,8 +113,6 @@ Metadata:
         default: EKS single or multi cluster
       EKSClusterName:
         default: EKS cluster name
-      KubernetesVersion:
-        default: Kubernetes version
       NodeInstanceType:
         default: Instance type
       NodeVolumeSize:
@@ -133,8 +129,6 @@ Metadata:
         default: API token
       TanzuNetRelocateImages:
         default: Relocate TAP images
-      TAPVersion:
-        default: Version
       SampleAppName:
         default: Name
       QSS3BucketName:
@@ -265,16 +259,6 @@ Parameters:
       Minimum length of 1. Maximum length of 100. Must start with a letter or
       number.
     Default: cluster-eks-tap
-  KubernetesVersion:
-    Type: String
-    Description: >-
-      Version of Kubernetes control plane to deploy. The selected version must
-      be supported the selected TAP version (TAPVersion). For more information,
-      refer to Kubernetes cluster requirements
-      (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
-    AllowedValues:
-      - 1.23
-    Default: 1.23
   NumberOfNodes:
     Type: Number
     Description: Minimum number of nodes to create for the TAP EKS cluster.
@@ -547,16 +531,6 @@ Parameters:
       - 'Yes'
       - 'No'
     Default: 'No'
-  TAPVersion:
-    Type: String
-    Description: >-
-      Version of TAP to deploy. The selected version must also support the
-      selected Kubernetes version (KubernetesVersion). For more information,
-      refer to Kubernetes cluster requirements
-      (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
-    AllowedValues:
-      - 1.4.0
-    Default: 1.4.0
   SampleAppName:
     Type: String
     Description: >-
@@ -659,14 +633,12 @@ Resources:
         NodeInstanceType: !Ref NodeInstanceType
         NodeVolumeSize: !Ref NodeVolumeSize
         EKSClusterName: !Ref EKSClusterName
-        KubernetesVersion: !Ref KubernetesVersion
         TAPDomainName: !Ref TAPDomainName
         TAPClusterArch: !Ref TAPClusterArch
         TanzuNetUsername: !Ref TanzuNetUsername
         TanzuNetPassword: !Ref TanzuNetPassword
         TanzuNetApiToken: !Ref TanzuNetApiToken
         TanzuNetRelocateImages: !Ref TanzuNetRelocateImages
-        TAPVersion: !Ref TAPVersion
         SampleAppName: !Ref SampleAppName
         QSS3BucketName: !Ref QSS3BucketName
         QSS3BucketRegion: !Ref QSS3BucketRegion
@@ -757,12 +729,3 @@ Rules:
           You must acknowledge that you have read and accepted the VMware
           Customer Experience Improvement Program (CEIP) policy before you can
           proceed with the installation.
-  TAPInterop:
-    RuleCondition: !Contains [[1.4.0], !Ref TAPVersion]
-    Assertions:
-      # The values below require quotes to force string comparison.
-      - Assert: !Contains [['1.22', '1.23', '1.24'], !Ref KubernetesVersion]
-        AssertDescription: >-
-          The VMware Tanzu Application Platform version selection is
-          incompatible with the Kubernetes version selection (reference:
-          https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).

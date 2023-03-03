@@ -1,0 +1,13 @@
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: tappc-docker-local.artifactory.eng.vmware.com/ci/docker-image
+    tag: latest
+inputs:
+- name: ci-repo
+- name: repo
+outputs:
+- name: taskcat-config
+run:
+  path: ci-repo/ci/tasks/taskcat-generate-config/task.sh

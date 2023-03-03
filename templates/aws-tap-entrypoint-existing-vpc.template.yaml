@@ -34,7 +34,6 @@ Metadata:
       - Label:
           default: VMware Tanzu Application Platform configuration
         Parameters:
-          - TAPVersion
           - TAPDomainName
           - TAPClusterArch
       - Label:
@@ -58,7 +57,6 @@ Metadata:
           default: Amazon EKS configuration
         Parameters:
           - EKSClusterName
-          - KubernetesVersion
           - NodeInstanceType
           - NodeVolumeSize
           - NumberOfNodes
@@ -103,8 +101,6 @@ Metadata:
         default: EKS single or multi cluster
       EKSClusterName:
         default: EKS cluster name
-      KubernetesVersion:
-        default: Kubernetes version
       NodeInstanceType:
         default: Instance type
       NodeVolumeSize:
@@ -121,8 +117,6 @@ Metadata:
         default: API token
       TanzuNetRelocateImages:
         default: Relocate TAP images
-      TAPVersion:
-        default: Version
       SampleAppName:
         default: Name
       QSS3BucketName:
@@ -215,16 +209,6 @@ Parameters:
       Minimum length of 1. Maximum length of 100. Must start with a letter or
       number.
     Default: cluster-eks-tap
-  KubernetesVersion:
-    Type: String
-    Description: >-
-      Version of Kubernetes control plane to deploy. The selected version must
-      be supported the selected TAP version (TAPVersion). For more information,
-      refer to Kubernetes cluster requirements
-      (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
-    AllowedValues:
-      - 1.23
-    Default: 1.23
   NumberOfNodes:
     Type: Number
     Description: Minimum number of nodes to create for the TAP EKS cluster.
@@ -497,16 +481,6 @@ Parameters:
       - 'Yes'
       - 'No'
     Default: 'No'
-  TAPVersion:
-    Type: String
-    Description: >-
-      Version of TAP to deploy. The selected version must also support the
-      selected Kubernetes version (KubernetesVersion). For more information,
-      refer to Kubernetes cluster requirements
-      (https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).
-    AllowedValues:
-      - 1.4.0
-    Default: 1.4.0
   SampleAppName:
     Type: String
     Description: >-
@@ -557,6 +531,19 @@ Parameters:
      information, refer to https://aws-quickstart.github.io/option1.html.
     Default: us-east-1
 Mappings:
+  Versions:
+    current:
+      TAP: 1.4.1
+      EKS: '1.24'
+      #! https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
+      Kubectl: 1.24.9/2023-01-11
+      ClusterEssentialsVersion: 1.4.1
+      #! Note: this is not the hash of the pivnet artifact, but rather the image hash for the bundle image;
+      #! You can get it e.g. by 
+      #!   docker pull registry.tanzu.vmware.com/tanzu-cluster-essentials/cluster-essentials-bundle:1.4.1
+      ClusterEssentialsHash: sha256:2354688e46d4bb4060f74fca069513c9b42ffa17a0a6d5b0dbb81ed52242ea44
+      PivNet: 3.0.1
+      DockerCredPass:  0.7.0
   AwsAmiRegionMap:
     af-south-1:
       US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
@@ -652,20 +639,6 @@ Mappings:
   TanzuNetRegistryServer:
     Server:
       Name: registry.tanzu.vmware.com
-  KubernetesVersion:
-  # https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
-    '1.23':
-      AwsKubectlVersion: 1.23.7/2022-06-29
-  TAPVersion:
-    1.4.0:
-      ClusterEssentialsBundleVersion: 1.3.0
-  ClusterEssentialsBundle:
-    1.1.0:
-      FileHash: sha256:ab0a3539da241a6ea59c75c0743e9058511d7c56312ea3906178ec0f3491f51d
-    1.2.0:
-      FileHash: sha256:e00f33b92d418f49b1af79f42cb13d6765f1c8c731f4528dfff8343af042dc3e
-    1.3.0:
-      FileHash: sha256:54bf611711923dccd7c7f10603c846782b90644d48f1cb570b43a082d18e23b9
   SampleAppProperties:
     Namespace:
       Name: tap-workload
@@ -702,211 +675,6 @@ Conditions:
   # UseEcr: !Equals [!Ref TanzuNetRelocateImages, 'Yes']
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
 Resources:
-  BUILDEKSEBSCSIDriverRole:
-    Type: AWS::IAM::Role
-    Condition: CreateMultiCluster
-    Properties:
-      RoleName: !Sub
-        - BUILDEKSEBSCSIDriverRole-${StackId}
-        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: >-
-        VMware Tanzu Application Platform role for EBSSCI Driver.
-      AssumeRolePolicyDocument: !Sub
-        - |
-          {
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Effect": "Allow",
-                "Principal": {
-                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
-                },
-                "Action": "sts:AssumeRoleWithWebIdentity",
-                "Condition": {
-                  "StringEquals": {
-                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
-                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
-                  }
-                }
-              }
-            ]
-          }
-        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
-          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt BUILDEKSQSStack.Outputs.OIDCIssuerURL]]
-      ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
-  RUNEKSEBSCSIDriverRole:
-    Type: AWS::IAM::Role
-    Condition: CreateMultiCluster
-    Properties:
-      RoleName: !Sub
-        - RUNEKSEBSCSIDriverRole-${StackId}
-        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: >-
-        VMware Tanzu Application Platform role for EBSSCI Driver.
-      AssumeRolePolicyDocument: !Sub
-        - |
-          {
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Effect": "Allow",
-                "Principal": {
-                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
-                },
-                "Action": "sts:AssumeRoleWithWebIdentity",
-                "Condition": {
-                  "StringEquals": {
-                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
-                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
-                  }
-                }
-              }
-            ]
-          }
-        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
-          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt RUNEKSQSStack.Outputs.OIDCIssuerURL]]
-      ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
-  VIEWEKSEBSCSIDriverRole:
-    Type: AWS::IAM::Role
-    Condition: CreateMultiCluster
-    Properties:
-      RoleName: !Sub
-        - VIEWEKSEBSCSIDriverRole-${StackId}
-        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: >-
-        VMware Tanzu Application Platform role for EBSSCI Driver.
-      AssumeRolePolicyDocument: !Sub
-        - |
-          {
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Effect": "Allow",
-                "Principal": {
-                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
-                },
-                "Action": "sts:AssumeRoleWithWebIdentity",
-                "Condition": {
-                  "StringEquals": {
-                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
-                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
-                  }
-                }
-              }
-            ]
-          }
-        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
-          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt VIEWEKSQSStack.Outputs.OIDCIssuerURL]]
-      ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
-  ITERATEEKSEBSCSIDriverRole:
-    Type: AWS::IAM::Role
-    Condition: CreateMultiCluster
-    Properties:
-      RoleName: !Sub
-        - ITERATEEKSEBSCSIDriverRole-${StackId}
-        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: >-
-        VMware Tanzu Application Platform role for EBSSCI Driver.
-      AssumeRolePolicyDocument: !Sub
-        - |
-          {
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Effect": "Allow",
-                "Principal": {
-                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
-                },
-                "Action": "sts:AssumeRoleWithWebIdentity",
-                "Condition": {
-                  "StringEquals": {
-                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
-                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
-                  }
-                }
-              }
-            ]
-          }
-        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
-          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt ITERATEEKSQSStack.Outputs.OIDCIssuerURL]]
-      ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
-  SINGLEEKSEBSCSIDriverRole:
-    Type: AWS::IAM::Role
-    Condition: CreateSingleCluster
-    Properties:
-      RoleName: !Sub
-        - SINGLEEKSEBSCSIDriverRole-${StackId}
-        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: >-
-        VMware Tanzu Application Platform role for EBSSCI Driver.
-      AssumeRolePolicyDocument: !Sub
-        - |
-          {
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Effect": "Allow",
-                "Principal": {
-                  "Federated": "${IamOidcProviderArn}/${OidcProviderEndpoint}"
-                },
-                "Action": "sts:AssumeRoleWithWebIdentity",
-                "Condition": {
-                  "StringEquals": {
-                    "${OidcProviderEndpoint}:aud": "sts.amazonaws.com",
-                    "${OidcProviderEndpoint}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
-                  }
-                }
-              }
-            ]
-          }
-        - IamOidcProviderArn: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider
-          OidcProviderEndpoint: !Select [1, !Split [//, !GetAtt EKSQSStack.Outputs.OIDCIssuerURL]]
-      ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
-  BUILDEBSSCIAddon:
-    Type: AWS::EKS::Addon
-    Condition: CreateMultiCluster
-    Properties:
-      AddonName: aws-ebs-csi-driver
-      ClusterName: !Sub ${EKSClusterName}-build
-      ResolveConflicts: NONE
-      ServiceAccountRoleArn: !GetAtt BUILDEKSEBSCSIDriverRole.Arn
-  RUNEBSSCIAddon:
-    Type: AWS::EKS::Addon
-    Condition: CreateMultiCluster
-    Properties:
-      AddonName: aws-ebs-csi-driver
-      ClusterName: !Sub ${EKSClusterName}-run
-      ResolveConflicts: NONE
-      ServiceAccountRoleArn: !GetAtt RUNEKSEBSCSIDriverRole.Arn
-  VIEWEBSSCIAddon:
-    Type: AWS::EKS::Addon
-    Condition: CreateMultiCluster
-    Properties:
-      AddonName: aws-ebs-csi-driver
-      ClusterName: !Sub ${EKSClusterName}-view
-      ResolveConflicts: NONE
-      ServiceAccountRoleArn: !GetAtt VIEWEKSEBSCSIDriverRole.Arn
-  ITERATEEBSSCIAddon:
-    Type: AWS::EKS::Addon
-    Condition: CreateMultiCluster
-    Properties:
-      AddonName: aws-ebs-csi-driver
-      ClusterName: !Sub ${EKSClusterName}-iterate
-      ResolveConflicts: NONE
-      ServiceAccountRoleArn: !GetAtt ITERATEEKSEBSCSIDriverRole.Arn
-  SINGLEEBSSCIAddon:
-    Type: AWS::EKS::Addon
-    Condition: CreateSingleCluster
-    Properties:
-      AddonName: aws-ebs-csi-driver
-      ClusterName: !Ref EKSClusterName
-      ResolveConflicts: NONE
-      ServiceAccountRoleArn: !GetAtt SINGLEEKSEBSCSIDriverRole.Arn
   TanzuNetSecretCredentials:
     Type: AWS::SecretsManager::Secret
     Properties:
@@ -1008,7 +776,7 @@ Resources:
       Parameters:
         ConfigSetName: !Ref AWS::StackName
         NodeVolumeSize: !Ref NodeVolumeSize
-        KubernetesVersion: !Ref KubernetesVersion
+        KubernetesVersion: !FindInMap [ Versions, current, EKS ]
   EKSQSStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateSingleCluster
@@ -1043,8 +811,7 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Ref EKSClusterName
         ClusterAutoScaler: Enabled
-        MonitoringStack: None
-        ALBIngressController: Enabled
+        LoadBalancerController: Enabled
 #eks stacks multi cluster start
   RUNEKSQSStack:
     Type: AWS::CloudFormation::Stack
@@ -1080,8 +847,7 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Sub ${EKSClusterName}-run
         ClusterAutoScaler: Enabled
-        MonitoringStack: None
-        ALBIngressController: Enabled
+        LoadBalancerController: Enabled
   VIEWEKSQSStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateMultiCluster
@@ -1116,8 +882,7 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Sub ${EKSClusterName}-view
         ClusterAutoScaler: Enabled
-        MonitoringStack: None
-        ALBIngressController: Enabled
+        LoadBalancerController: Enabled
   BUILDEKSQSStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateMultiCluster
@@ -1152,8 +917,7 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Sub ${EKSClusterName}-build
         ClusterAutoScaler: Enabled
-        MonitoringStack: None
-        ALBIngressController: Enabled
+        LoadBalancerController: Enabled
   ITERATEEKSQSStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateMultiCluster
@@ -1188,8 +952,7 @@ Resources:
         NodeGroupOS: Amazon Linux 2
         EKSClusterName: !Sub ${EKSClusterName}-iterate
         ClusterAutoScaler: Enabled
-        MonitoringStack: None
-        ALBIngressController: Enabled
+        LoadBalancerController: Enabled
 #eks stacks for multi cluster end
 #Rules for multi cluster start
   RunLinuxBastionSshToNodesEgressRule:
@@ -2329,236 +2092,159 @@ Resources:
         Fn::Base64: !Sub
           - |
             #!/bin/bash
-            set -xe
-            user=ubuntu
-            arch=$(dpkg --print-architecture)
-            uname=$(uname -m)
-            tap_dir=/home/$user/tap-setup-scripts
+            set -e
+            set -u
+            set -o pipefail
+
+            set -x
+
             cat <<EOF >> /etc/environment
             AWS_REGION=${AWS::Region}
             AWS_DEFAULT_REGION=${AWS::Region}
             EOF
-            set -a
-            source /etc/environment
+            . /etc/environment
+            export AWS_REGION AWS_DEFAULT_REGION
+
+            set +x
+              # TODO: we should ensure to
+              #       - only export actually used vars
+              #       - never print/log those, or at least sensitive ones
+              #       - use consistent/proper/clear var names
+              #       - handle multiline/quoted/... vars correctly
+              export AWSAccountID='${AWS::AccountId}'
+              export AwsKubectlVersion='${AwsKubectlVersion}'
+              export BuildClusterBuildServiceArn='${BuildClusterBuildServiceArn}'
+              export BuildClusterName='${BuildClusterName}'
+              export BuildClusterWorkloadArn='${BuildClusterWorkloadArn}'
+              export ClusterArch='${ClusterArch}'
+              export ClusterEssentialsBundleFileHash='${ClusterEssentialsBundleFileHash}'
+              export ClusterEssentialsBundleRepo='${ClusterEssentialsBundleRepo}'
+              export ClusterEssentialsBundleVersion='${ClusterEssentialsBundleVersion}'
+              export DockerCredPassVersion='${DockerCredPassVersion}'
+              export EKSClusterName='${EKSClusterName}'
+              export IterateClusterBuildServiceArn='${IterateClusterBuildServiceArn}'
+              export IterateClusterName='${IterateClusterName}'
+              export IterateClusterWorkloadArn='${IterateClusterWorkloadArn}'
+              export LinuxBastionSshPort='${LinuxBastionSshPort}'
+              export PivNetVersion='${PivNetVersion}'
+              export PrivateHostedZone='${PrivateHostedZone}'
+              export QSS3BucketPath='${QSS3BucketPath}'
+              export RunClusterName='${RunClusterName}'
+              export SampleAppConfig='${SampleAppConfig}'
+              export SampleAppName='${SampleAppName}'
+              export SampleAppNamespace='${SampleAppNamespace}'
+              export TAPBuildServiceRepo_RepositoryUri='${TAPBuildServiceRepo.RepositoryUri}'
+              export TAPClusterEssentialsBundleRepo_RepositoryUri='${TAPClusterEssentialsBundleRepo.RepositoryUri}'
+              export TAPDomainName='${TAPDomainName}'
+              export TAPLogGroup='${TAPLogGroup}'
+              export TAPPackagesRepo_RepositoryUri='${TAPPackagesRepo.RepositoryUri}'
+              export TAPRepo='${TAPRepo}'
+              export TAPVersion='${TAPVersion}'
+              export TAPWorkloadRepo_RepositoryUri='${TAPWorkloadRepo.RepositoryUri}'
+              export TanzuNetRegistryServer='${TanzuNetRegistryServer}'
+              export TanzuNetRelocateImages='${TanzuNetRelocateImages}'
+              export TanzuNetSecretCredentials='${TanzuNetSecretCredentials}'
+              export ViewClusterName='${ViewClusterName}'
+
+              # WaitConditionHanldes
+              export CloudInitHandle='${CloudInitHandle}'
+              export TAPInstallHandle='${TAPInstallHandle}'
+              export TAPWorkloadInstallHandle='${TAPWorkloadInstallHandle}'
+              export TAPTestsHandle='${TAPTestsHandle}'
+            set -x
+
+            arch=$(dpkg --print-architecture)
+
             echo "Removing built-in Docker..."
             apt-get -y remove containerd runc
+
             echo "Adding Docker CE repo..."
             mkdir -p /usr/local/share/keyrings/
             curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
               gpg --dearmor -o /usr/local/share/keyrings/docker-archive-keyring.gpg --yes
             printf "deb [arch=$arch signed-by=/usr/local/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" |
               tee /etc/apt/sources.list.d/docker.list
+
             echo "Updating & upgrading..."
             apt-get -y update
             apt-get -y upgrade
+
             echo "Installing system dependencies..."
-            apt-get -y install amazon-ecr-credential-helper ca-certificates containerd.io curl docker-ce \
-              docker-ce-cli docker-compose-plugin git gnupg gnupg2 jq lsb-release openssl pass perl python3-pip \
-              python3-setuptools sed sudo traceroute unzip uuid-runtime vim wget
+            apt-get -y install \
+              amazon-ecr-credential-helper \
+              ca-certificates \
+              containerd.io \
+              curl \
+              docker-ce \
+              docker-ce-cli \
+              docker-compose-plugin \
+              git \
+              gnupg \
+              gnupg2 \
+              jq \
+              lsb-release \
+              openssl \
+              pass \
+              perl \
+              python3-pip \
+              python3-setuptools \
+              sed \
+              sudo \
+              traceroute \
+              unzip \
+              uuid-runtime \
+              vim \
+              wget
+
+            # TODO: use mktemp and a trap to clean up (or use an AMI with AWS CLI preinstalled)
+            # Note: the Ubuntu AMI seems to come with `wget` and `curl` already installed
             echo "Installing aws cli..."
             pushd /tmp
-            wget -O "./awscliv2.zip" "https://awscli.amazonaws.com/awscli-exe-linux-$uname.zip"
+            wget -O "./awscliv2.zip" "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip"
             unzip ./awscliv2.zip
             ./aws/install
             popd
-            echo "Installing python dependencies for $user..."
-            su - $user -c "mkdir -p /home/$user/.local/bin; source /home/$user/.profile; python3 -m pip install --upgrade pip setuptools wheel yq"
-            echo "Updating certificate authority certificates..."
-            update-ca-certificates
-            echo "Installing Amazon CloudWatch agent..."
-            mkdir -p /opt/aws/amazon-cloudwatch-agent/etc/
-            cat <<EOF >> /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
-            {
-              "metrics": {
-                "append_dimensions": {
-                  "ImageId": "\${!aws:ImageId}",
-                  "InstanceId": "\${!aws:InstanceId}",
-                  "InstanceType": "\${!aws:InstanceType}"
-                },
-                "metrics_collected": {
-                  "mem": {
-                    "measurement": [
-                      "mem_used_percent"
-                    ]
-                  },
-                  "swap": {
-                    "measurement": [
-                      "swap_used_percent"
-                    ]
-                  }
-                }
-              },
-              "logs": {
-                "logs_collected": {
-                  "files": {
-                    "collect_list": [
-                      {
-                        "file_path": "/var/log/cloud-init-output.log",
-                        "log_group_name": "${TAPLogGroup}",
-                        "log_stream_name": "{instance_id}_/var/log/cloud-init-output.log"
-                      }
-                    ]
-                  }
-                }
+
+            echo "Installing aws-cfn-bootstrap tools & setting signal trap"
+            pip3 install "https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz"
+
+            # Set and export the cfn trap
+            cfnSignal() {
+              local -
+              set +x
+
+              local rc="${!1:-42}"
+              local handleURL="${!2:-${CloudInitHandle}}"
+              local reason='installation succeeded'
+              local ctxLines=10
+
+              (( rc != 0 )) && {
+                local nl=$'\n'
+                # We don't care about the last 3 lines of the log, because
+                # that's logging the cfnSignal itself.
+                reason="${!nl}$( tail -n $(( ctxLines + 3 )) /var/log/cloud-init-output.log | head -n -3 )${!nl}"
               }
+
+              cfn-signal --region "${!AWS_REGION}" --exit-code "$rc" --reason "$reason" "$handleURL" \
+                || echo >&2 'could not run cfn-signal'
             }
-            EOF
-            pushd /tmp
-            aws s3 cp --no-progress "s3://amazoncloudwatch-agent-${AWS::Region}/ubuntu/$arch/latest/amazon-cloudwatch-agent.deb" ./amazon-cloudwatch-agent.deb
-            dpkg -i ./amazon-cloudwatch-agent.deb
-            popd
-            /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
-            systemctl enable amazon-cloudwatch-agent.service
-            systemctl start amazon-cloudwatch-agent.service
-            systemctl status amazon-cloudwatch-agent.service
-            echo "Installing kubectl..."
-            pushd /tmp
-            aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl" ./kubectl
-            aws s3 cp --no-progress "s3://amazon-eks/${AwsKubectlVersion}/bin/linux/$arch/kubectl.sha256" ./kubectl.sha256
-            openssl sha1 -sha256 ./kubectl
-            chmod 755 ./kubectl
-            mv ./kubectl /usr/local/bin/
-            kubectl completion bash > /etc/bash_completion.d/kubectl
-            popd
-            echo "Configuring Docker..."
-            getent group docker || groupadd docker
-            usermod -aG docker $user
-            mkdir -p /root/.docker
-            su - $user -c "mkdir -p /home/$user/.docker"
-            pushd /tmp
-            curl -fsSL "https://github.com/docker/docker-credential-helpers/releases/download/v${DockerCredPassVersion}/docker-credential-pass-v${DockerCredPassVersion}-$arch.tar.gz" | tar xz -C .
-            mv docker-credential-pass /usr/local/bin/
-            popd
-            cat <<EOF > /root/.docker/config.json
-            {
-              "credHelpers": {
-                "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com": "ecr-login",
-                "public.ecr.aws": "ecr-login"
-              }
-            }
-            EOF
-            cp /root/.docker/config.json /home/$user/.docker/
-            chown $user:$user /home/$user/.docker/config.json
-            echo "Configuring the SSH listening port..."
-            printf "Port ${LinuxBastionSshPort}\n" > /etc/ssh/sshd_config.d/port.conf
-            systemctl restart sshd.service
-            systemctl status sshd.service
-            echo "Downloading the VMware Tanzu Application Platform Quick Start scripts..."
-            su - $user -c "mkdir -p \"$tap_dir/downloads\" \"$tap_dir/generated\" \"$tap_dir/src/inputs\" \"$tap_dir/src/resources\""
-            pushd "$tap_dir/src"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/tap-main.sh" ./tap-main.sh
-            chmod +x ./tap-main.sh
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/tap-relocate.sh" ./tap-relocate.sh
-            chmod +x ./tap-relocate.sh
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/install-tools.sh" ./install-tools.sh
-            chmod +x ./install-tools.sh
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/functions.sh" ./functions.sh
-            popd
-            pushd "$tap_dir/src/inputs"
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-build.yaml" ./tap-values-build.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-run.yaml" ./tap-values-run.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-iterate.yaml" ./tap-values-iterate.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-view.yaml" ./tap-values-view.yaml
-            aws s3 cp --no-progress "${QSS3BucketPath}/src/inputs/tap-values-single.yaml" ./tap-values-single.yaml
-            echo "Logging script input parameters"
-            echo ClusterArch ${ClusterArch}
-            echo BuildClusterBuildServiceArn ${BuildClusterBuildServiceArn}
-            echo BuildClusterWorkloadArn ${BuildClusterWorkloadArn}
-            echo IterateClusterBuildServiceArn ${IterateClusterBuildServiceArn}
-            echo IterateClusterWorkloadArn ${IterateClusterWorkloadArn}
-            echo BuildClusterName ${BuildClusterName}
-            echo RunClusterName ${RunClusterName}
-            echo ViewClusterName ${ViewClusterName}
-            echo IterateClusterName ${IterateClusterName}
-            cat <<EOF > ./user-input-values.yaml
-            #@data/values
-            ---
-            tanzunet:
-              server: ${TanzuNetRegistryServer}
-              relocate_images: "${TanzuNetRelocateImages}"
-              secrets:
-                credentials_arn: ${TanzuNetSecretCredentials}
-            cluster_essentials_bundle:
-              bundle: ${TanzuNetRegistryServer}/${ClusterEssentialsBundleRepo}
-              file_hash: ${ClusterEssentialsBundleFileHash}
-              version: ${ClusterEssentialsBundleVersion}
-            tap:
-              name: tap
-              namespace: tap-install
-              repository: ${TanzuNetRegistryServer}/${TAPRepo}
-              version: ${TAPVersion}
-            cluster:
-              arch: ${ClusterArch}
-              name: ${EKSClusterName}
-            buildservice:
-              build_cluster_arn: ${BuildClusterBuildServiceArn}
-              iterate_cluster_arn: ${IterateClusterBuildServiceArn}
-            dns:
-              domain_name: ${TAPDomainName}
-              zone_id: ${PrivateHostedZone}
-            repositories:
-              tap_packages: ${TAPPackagesRepo.RepositoryUri}
-              cluster_essentials: ${TAPClusterEssentialsBundleRepo.RepositoryUri}
-              build_service: ${TAPBuildServiceRepo.RepositoryUri}
-              workload:
-                name: ${SampleAppName}
-                namespace: ${SampleAppNamespace}
-                repository: ${TAPWorkloadRepo.RepositoryUri}
-                bundle_repository: ${TAPWorkloadBundleRepo.RepositoryUri}
-                build_cluster_arn: ${BuildClusterWorkloadArn}
-                iterate_cluster_arn: ${IterateClusterWorkloadArn}
-            EOF
-            popd
-            pushd "$tap_dir/src/resources"
-            aws s3 cp --no-progress --recursive --exclude '*' --include '*.yaml' "${QSS3BucketPath}/src/resources/" .
-            cat <<EOF > ./workload-aws.yaml
-            ${SampleAppConfig}
-            EOF
-            popd
-            chown -R $user:$user "$tap_dir"
-            echo "Installing pivnet CLI..."
-            wget -O "$tap_dir/downloads/pivnet" "https://github.com/pivotal-cf/pivnet-cli/releases/download/v${PivNetVersion}/pivnet-linux-$(dpkg --print-architecture)-${PivNetVersion}"
-            install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
-            echo "Installing Tanzu CLI and Staging Tanzu-cluster-essentials..."
-            su - $user -c "$tap_dir/src/install-tools.sh"
-            echo TanzuNetRelocateImages ${TanzuNetRelocateImages}
-            if [[ "${TanzuNetRelocateImages}" == "Yes" ]]
-            then
-              echo "Creating local copies of key TAP container repos per VMware best practices..."
-              su - $user -c "$tap_dir/src/tap-relocate.sh"
-            fi
-            echo "Installing Tanzu Application Platform..."
-            echo ClusterArch ${ClusterArch}
-            if [[ "${ClusterArch}" == "multi" ]]
-            then
-              echo "Setup TAP Multiple Clusters..."
-              su - $user -c "$tap_dir/src/tap-main.sh -c install view"
-              su - $user -c "$tap_dir/src/tap-main.sh -c install run"
-              su - $user -c "$tap_dir/src/tap-main.sh -c install build"
-              su - $user -c "$tap_dir/src/tap-main.sh -c install iterate"
-              su - $user -c "$tap_dir/src/tap-main.sh -c prepview view"
-              su - $user -c "$tap_dir/src/tap-main.sh -c installwk iterate"
-              su - $user -c "$tap_dir/src/tap-main.sh -c installwk build"
-              su - $user -c "$tap_dir/src/tap-main.sh -c installwk run"
-              echo "wait till the workload to go through the supply-chain (8mins)"
-              sleep 480
-              su - $user -c "$tap_dir/src/tap-main.sh -c runtests run"
-              su - $user -c "$tap_dir/src/tap-main.sh -c runtests iterate"
-            else
-              echo "Setup TAP Single Cluster..."
-              su - $user -c "$tap_dir/src/tap-main.sh -c install single"
-              su - $user -c "$tap_dir/src/tap-main.sh -c installwk single"
-              echo "wait till the workload to go through the supply-chain (8mins)"
-              sleep 480
-              su - $user -c "$tap_dir/src/tap-main.sh -c runtests single"
-            fi
-            echo "Completed successfully!"
-          - AwsKubectlVersion: !FindInMap [KubernetesVersion, !Ref KubernetesVersion, AwsKubectlVersion]
+            export -f cfnSignal
+            trap 'cfnSignal $?' ERR
+
+            cInit="${!QSS3BucketPath}/src/cloud-init.sh"
+            echo "kicking off cloud-init from '${!cInit}'"
+            bash -xe <(
+              aws s3 cp --no-progress "${!cInit}" -
+            )
+
+            cfnSignal 0
+          - AwsKubectlVersion: !FindInMap [ Versions, current, Kubectl ]
+            TAPVersion: !FindInMap [ Versions, current, TAP ]
             ClusterEssentialsBundleRepo: tanzu-cluster-essentials/cluster-essentials-bundle
-            ClusterEssentialsBundleFileHash: !FindInMap [ClusterEssentialsBundle, !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion], FileHash]
-            ClusterEssentialsBundleVersion: !FindInMap [TAPVersion, !Ref TAPVersion, ClusterEssentialsBundleVersion]
-            DockerCredPassVersion: 0.6.4
-            PivNetVersion: 3.0.1
+            ClusterEssentialsBundleFileHash: !FindInMap [ Versions, current, ClusterEssentialsHash ]
+            ClusterEssentialsBundleVersion: !FindInMap [ Versions, current, ClusterEssentialsVersion ]
+            DockerCredPassVersion: !FindInMap [ Versions, current, DockerCredPass ]
+            PivNetVersion: !FindInMap [ Versions, current, PivNet ]
             SampleAppConfig: !FindInMap [SampleAppConfig, !Ref SampleAppName, Config]
             SampleAppNamespace: !FindInMap [SampleAppProperties, Namespace, Name]
             QSS3BucketPath: !Sub
@@ -2575,6 +2261,60 @@ Resources:
             IterateClusterWorkloadArn: !If [CreateMultiCluster, !GetAtt ITERATEWorkloadIamRole.Arn, ""]
             RunClusterName: !If [CreateMultiCluster, !GetAtt RUNEKSQSStack.Outputs.EKSClusterName, ""]
             ViewClusterName: !If [CreateMultiCluster, !GetAtt VIEWEKSQSStack.Outputs.EKSClusterName, ""]
+
+            CloudInitHandle:          !Ref PhaseCloudInitHandle
+            TAPInstallHandle:         !Ref PhaseTAPInstallHandle
+            TAPWorkloadInstallHandle: !Ref PhaseTAPWorkloadInstallHandle
+            TAPTestsHandle:           !Ref PhaseTAPTestsHandle
+
+  # Phase for the whole cloud-init process
+  # from the creation of the instance to finished cloud-init run
+  PhaseCloudInitHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+  PhaseCloudInit:
+    Type: AWS::CloudFormation::WaitCondition
+    DependsOn: UbuntuBastion
+    Properties:
+      Count: 1
+      Handle: !Ref "PhaseCloudInitHandle"
+      Timeout: "3600" # 60m
+
+  # Phase for TAP install
+  # from the creation of the instance to finished TAP install
+  PhaseTAPInstallHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+  PhaseTAPInstall:
+    Type: AWS::CloudFormation::WaitCondition
+    DependsOn: UbuntuBastion
+    Properties:
+      Count: 1
+      Handle: !Ref "PhaseTAPInstallHandle"
+      Timeout: "1800" # 30m
+
+  # Phase for TAP workload install
+  # from finished TAP install to finished workload deployment
+  PhaseTAPWorkloadInstallHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+  PhaseTAPWorkloadInstall:
+    Type: AWS::CloudFormation::WaitCondition
+    DependsOn: PhaseTAPInstall
+    Properties:
+      Count: 1
+      Handle: !Ref "PhaseTAPWorkloadInstallHandle"
+      Timeout: "1200" # 20min
+
+  # Phase for TAP (smoke) tests
+  # from finished TAP workload deployment to finished test runs
+  PhaseTAPTestsHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+  PhaseTAPTests:
+    Type: AWS::CloudFormation::WaitCondition
+    DependsOn: PhaseTAPWorkloadInstall
+    Properties:
+      Count: 1
+      Handle: !Ref "PhaseTAPTestsHandle"
+      Timeout: "600" # 10m
+
   UbuntuBastionEipAssociation:
     Type: AWS::EC2::EIPAssociation
     UpdateReplacePolicy: Delete
@@ -2778,12 +2518,3 @@ Rules:
           You must acknowledge that you have read and accept the VMware
           Customer Experience Improvement Program (CEIP) policy before you can
           proceed with the installation.
-  TAPInterop:
-    RuleCondition: !Contains [[1.4.0], !Ref TAPVersion]
-    Assertions:
-      # The values below require quotes to force string comparison.
-      - Assert: !Contains [['1.22', '1.23', '1.24'], !Ref KubernetesVersion]
-        AssertDescription: >-
-          The VMware Tanzu Application Platform version selection is
-          incompatible with the Kubernetes version selection (reference:
-          https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-prerequisites.html#kubernetes-cluster-requirements-3).

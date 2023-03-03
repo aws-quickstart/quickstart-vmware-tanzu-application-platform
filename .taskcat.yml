@@ -14,7 +14,6 @@ project:
     NumberOfAZs: 3
     KeyPairName: --override--
     RemoteAccessCidr: --override--
-    S3TAPConfigBucketName: $[taskcat_random-string]-$[taskcat_current_region]
     EKSClusterName: $[taskcat_random-string]
     TanzuNetUsername: --override--
     TanzuNetPassword: --override--
@@ -24,6 +23,8 @@ project:
     QSS3BucketName: $[taskcat_autobucket]
     QSS3BucketRegion: $[taskcat_current_region]
   regions:
+    #! Don't change that without adapting the internal pipeline, we use the
+    #! first .project.region as the default for CI buckets (for caching, ...)
     - us-east-1
 tests:
   single-cluster:
@@ -31,6 +32,7 @@ tests:
       TAPClusterArch: single
     regions:
       - us-east-1
+      - eu-south-1
   multi-cluster:
     parameters:
       TAPClusterArch: multi
