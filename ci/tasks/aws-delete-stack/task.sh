@@ -4,11 +4,27 @@ set -e
 set -u
 set -o pipefail
 
-. creds/env.inc.sh
+loadCreds() {
+  local -
+  set +x
 
-REGION="$( cat test-result/region )"
-STACK_NAME="$( cat test-result/stackName )"
+  . creds/env.inc.sh
+}
 
-aws cloudformation delete-stack \
-  --stack-name "$STACK_NAME" \
-  --region "$REGION"
+main() {
+  local -
+  set -x
+
+  local region stackName
+
+  region="$( cat test-result/region )"
+  stackName="$( cat test-result/stackName )"
+
+  loadCreds
+
+  aws cloudformation delete-stack \
+    --stack-name "$stackName" \
+    --region "$region"
+}
+
+main "$@"
