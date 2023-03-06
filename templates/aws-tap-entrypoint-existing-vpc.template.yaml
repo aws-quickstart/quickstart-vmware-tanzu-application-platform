@@ -37,10 +37,6 @@ Metadata:
           - TAPDomainName
           - TAPClusterArch
       - Label:
-          default: Sample app configuration
-        Parameters:
-          - SampleAppName
-      - Label:
           default: Basic configuration
         Parameters:
           - KeyPairName
@@ -61,11 +57,6 @@ Metadata:
           - NodeVolumeSize
           - NumberOfNodes
           - MaxNumberOfNodes
-      - Label:
-          default: Linux bastion host / bootstrap instance configuration
-        Parameters:
-          - LinuxBastionOS
-          - LinuxBastionSshPort
       - Label:
           default: AWS Quick Start S3 bucket configuration
         Parameters:
@@ -91,10 +82,6 @@ Metadata:
         default: Public subnet 1 ID
       RemoteAccessCidr:
         default: Remote access CIDR
-      LinuxBastionOS:
-        default: OS
-      LinuxBastionSshPort:
-        default: SSH port
       TAPDomainName:
         default: Domain name
       TAPClusterArch:
@@ -117,8 +104,6 @@ Metadata:
         default: API token
       TanzuNetRelocateImages:
         default: Relocate TAP images
-      SampleAppName:
-        default: Name
       QSS3BucketName:
         default: Name
       QSS3BucketRegion:
@@ -438,19 +423,6 @@ Parameters:
       hosts. We recommend that you set this value to a trusted network.
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(3[0-2]|[1-2][0-9]|[0-9]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/0-32
-  LinuxBastionOS:
-    Type: String
-    Description: >-
-      Operating system for the Linux bastion host / bootstrap instance.
-    AllowedValues:
-      - Ubuntu-Server-22.04-LTS-HVM
-    Default: Ubuntu-Server-22.04-LTS-HVM
-  LinuxBastionSshPort:
-    Type: Number
-    Description: TCP port to use for the Linux bastion host listening port.
-    MinValue: 0
-    MaxValue: 65535
-    Default: 22
   TanzuNetUsername:
     Type: String
     Description: >-
@@ -481,13 +453,6 @@ Parameters:
       - 'Yes'
       - 'No'
     Default: 'No'
-  SampleAppName:
-    Type: String
-    Description: >-
-      Name of the sample application to deploy into your Amazon EKS cluster.
-    AllowedValues:
-      - tanzu-java-web-app-workload
-    Default: tanzu-java-web-app-workload
   QSS3BucketName:
     Type: String
     Description: >-
@@ -539,7 +504,7 @@ Mappings:
       Kubectl: 1.24.9/2023-01-11
       ClusterEssentialsVersion: 1.4.1
       #! Note: this is not the hash of the pivnet artifact, but rather the image hash for the bundle image;
-      #! You can get it e.g. by 
+      #! You can get it e.g. by
       #!   docker pull registry.tanzu.vmware.com/tanzu-cluster-essentials/cluster-essentials-bundle:1.4.1
       ClusterEssentialsHash: sha256:2354688e46d4bb4060f74fca069513c9b42ffa17a0a6d5b0dbb81ed52242ea44
       PivNet: 3.0.1
@@ -626,26 +591,14 @@ Mappings:
     us-west-2:
       US2204HVM: '{{resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id}}'
       WS2022FullBase: '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base}}'
-  AwsAmiNameMap:
-    Ubuntu-Server-22.04-LTS-HVM:
-    # Official AMI name pattern is 'ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-????????'
-    # Alternative: Ubuntu Server lookup: https://cloud-images.ubuntu.com/locator/ec2/
-      Code: US2204HVM
-      OS: Ubuntu
-    Windows-Server-2022-English-Full-Base:
-    # Official AMI name pattern is 'Windows_Server-2022-English-Full-Base-????.??.??'
-      Code: WS2022FullBase
-      OS: Windows
   TanzuNetRegistryServer:
     Server:
       Name: registry.tanzu.vmware.com
-  SampleAppProperties:
-    Namespace:
-      Name: tap-workload
-    OotbRepoPrefix:
-      Name: tap-supply-chain
-  SampleAppConfig:
-    tanzu-java-web-app-workload:
+  Apps:
+    Sample:
+      Name: tanzu-java-web-app-workload
+      Namespace: tap-workload
+      OotbRepoPrefix: tap-supply-chain
       Config: |
         apiVersion: carto.run/v1alpha1
         kind: Workload
@@ -669,7 +622,6 @@ Conditions:
   CreateMultiCluster: !Equals [!Ref TAPClusterArch, multi]
   CreateSingleCluster: !Equals [!Ref TAPClusterArch, single]
   3AZDeployment: !Not [!Equals [!Ref PrivateSubnet3Id, '']]
-  Ubuntu: !Equals [!FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, OS], Ubuntu]
   # TODO: Finish building logic to only deploy ECR-related resources if when
   # necessary.
   # UseEcr: !Equals [!Ref TanzuNetRelocateImages, 'Yes']
@@ -732,10 +684,11 @@ Resources:
       RepositoryName: !Sub
         - '${StackId}/${Prefix}/${Suffix}'
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-          Prefix: !FindInMap [SampleAppProperties, OotbRepoPrefix, Name]
+          Prefix: !FindInMap [Apps, Sample, OotbRepoPrefix]
           Suffix: !Sub
             - '${SampleAppName}-${Namespace}'
-            - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
+            - Namespace: !FindInMap [Apps, Sample, Namespace]
+              SampleAppName: !FindInMap [Apps, Sample, Name]
       EncryptionConfiguration:
         EncryptionType: AES256
   TAPWorkloadBundleRepo:
@@ -747,10 +700,11 @@ Resources:
       RepositoryName: !Sub
         - '${StackId}/${Prefix}/${Suffix}-bundle'
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-          Prefix: !FindInMap [SampleAppProperties, OotbRepoPrefix, Name]
+          Prefix: !FindInMap [Apps, Sample, OotbRepoPrefix]
           Suffix: !Sub
             - '${SampleAppName}-${Namespace}'
-            - Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
+            - Namespace: !FindInMap [Apps, Sample, Namespace]
+              SampleAppName: !FindInMap [Apps, Sample, Name]
       EncryptionConfiguration:
         EncryptionType: AES256
   PrivateHostedZone:
@@ -1209,9 +1163,9 @@ Resources:
       Description: Allow SSH to the Linux bastion host / bootstrap instance.
       GroupId: !Ref LinuxBastionSecurityGroup
       IpProtocol: tcp
-      FromPort: !Ref LinuxBastionSshPort
-      ToPort: !Ref LinuxBastionSshPort
       CidrIp: !Ref RemoteAccessCidr
+      FromPort: 22
+      ToPort: 22
   LinuxBastionDefaultEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
     UpdateReplacePolicy: Delete
@@ -2066,10 +2020,7 @@ Resources:
     Properties:
       InstanceType: m5.large
       IamInstanceProfile: !Ref LinuxBastionInstanceProfile
-      ImageId: !FindInMap
-        - AwsAmiRegionMap
-        - !Ref AWS::Region
-        - !FindInMap [AwsAmiNameMap, !Ref LinuxBastionOS, Code]
+      ImageId: !FindInMap [AwsAmiRegionMap, !Ref AWS::Region, US2204HVM]
       KeyName: !Ref KeyPairName
       Monitoring: true
       SecurityGroupIds:
@@ -2125,14 +2076,13 @@ Resources:
               export IterateClusterBuildServiceArn='${IterateClusterBuildServiceArn}'
               export IterateClusterName='${IterateClusterName}'
               export IterateClusterWorkloadArn='${IterateClusterWorkloadArn}'
-              export LinuxBastionSshPort='${LinuxBastionSshPort}'
               export PivNetVersion='${PivNetVersion}'
               export PrivateHostedZone='${PrivateHostedZone}'
               export QSS3BucketPath='${QSS3BucketPath}'
               export RunClusterName='${RunClusterName}'
               export SampleAppConfig='${SampleAppConfig}'
-              export SampleAppName='${SampleAppName}'
               export SampleAppNamespace='${SampleAppNamespace}'
+              export SampleAppName='${SampleAppName}'
               export TAPBuildServiceRepo_RepositoryUri='${TAPBuildServiceRepo.RepositoryUri}'
               export TAPClusterEssentialsBundleRepo_RepositoryUri='${TAPClusterEssentialsBundleRepo.RepositoryUri}'
               export TAPDomainName='${TAPDomainName}'
@@ -2245,8 +2195,9 @@ Resources:
             ClusterEssentialsBundleVersion: !FindInMap [ Versions, current, ClusterEssentialsVersion ]
             DockerCredPassVersion: !FindInMap [ Versions, current, DockerCredPass ]
             PivNetVersion: !FindInMap [ Versions, current, PivNet ]
-            SampleAppConfig: !FindInMap [SampleAppConfig, !Ref SampleAppName, Config]
-            SampleAppNamespace: !FindInMap [SampleAppProperties, Namespace, Name]
+            SampleAppConfig: !FindInMap [Apps, Sample, Config]
+            SampleAppNamespace: !FindInMap [Apps, Sample, Namespace]
+            SampleAppName: !FindInMap [Apps, Sample, Name]
             QSS3BucketPath: !Sub
               - s3://${S3Bucket}/${QSS3KeyPrefix}tap-setup-scripts
               - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
@@ -2318,7 +2269,6 @@ Resources:
   UbuntuBastionEipAssociation:
     Type: AWS::EC2::EIPAssociation
     UpdateReplacePolicy: Delete
-    Condition: Ubuntu
     Properties:
       InstanceId: !Ref UbuntuBastion
       AllocationId: !GetAtt LinuxBastionEIP.AllocationId
@@ -2461,7 +2411,8 @@ Outputs:
     Value: !Sub
       - http://${SampleAppName}.${Namespace}${ClusterName}.${TAPDomainName}
       - ClusterName: !If [CreateMultiCluster, .run, '']
-        Namespace: !FindInMap [SampleAppProperties, Namespace, Name]
+        Namespace: !FindInMap [Apps, Sample, Namespace]
+        SampleAppName: !FindInMap [Apps, Sample, Name]
   WindowsBastionAZ:
     Description: >-
       The Availability Zone that the Windows bastion instance is deployed in.

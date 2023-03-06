@@ -88,10 +88,6 @@ cat <<EOF > /root/.docker/config.json
 EOF
 cp /root/.docker/config.json /home/$user/.docker/
 chown $user:$user /home/$user/.docker/config.json
-echo "Configuring the SSH listening port..."
-printf "Port ${LinuxBastionSshPort}\n" > /etc/ssh/sshd_config.d/port.conf
-systemctl restart sshd.service
-systemctl status sshd.service
 echo "Downloading the VMware Tanzu Application Platform Quick Start scripts..."
 su - $user -c "mkdir -p \"$tap_dir/downloads\" \"$tap_dir/generated\" \"$tap_dir/src/inputs\" \"$tap_dir/src/resources\""
 pushd "$tap_dir/src"
