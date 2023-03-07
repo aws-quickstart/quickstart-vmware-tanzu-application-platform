@@ -8,7 +8,6 @@ shared:
 
 learningcenter:
   ingressDomain: #@ "learning-center.view.{}".format(data.values.dns.domain_name)
-  ingressClass: contour
 
 tap_gui:
   ingressEnabled: true
