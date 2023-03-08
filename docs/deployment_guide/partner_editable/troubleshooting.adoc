@@ -101,22 +101,21 @@ Verify that an RSA key pair used during deployment. If not, try the following op
 :eks-1_24-cl: https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html#kubernetes-1.24
 :eksqs-5_0_0-cl: https://github.com/aws-quickstart/quickstart-amazon-eks/releases/tag/v5.0.0
 
-* Version 1.4.1
-** The stack reports back if the TAP deployment and the installation of the
-   sample application succeeded after all the infrastructure has been deployed
-** Deletion issues, where VPCs could not be cleaned up because of left-over
-   security groups, has been fixed
-** Version upgrades to:
-*** {tap-1_4_1-cl}[{partner-product-acronym}^] 1.4.1
-*** {ce-1_4_1-cl}[ClusterEssentials^] 1.4
-*** {eksqs-5_0_0-cl}[EKS QuickStart^] 5.0.0
-*** {eks-1_24-cl}[EKS^] 1.24
-** Removed configuration options for:
-*** Version of {partner-product-short-name}
-*** Version of EKS
-*** Linux Bastion host AMI
-*** Linux Bastion host's SSH port
-*** sample application name
-** Download of artifacts (e.g. `kubectl`) has been fixed for regions other than `us-east-1`
-* Version 1.4.0
-** Multi cluster architecture has been introduced
+=== Version 1.4.1
+* The stack now reports the status of the  {partner-product-short-name} deployment and installation of the sample application  after all of the infrastructure has been deployed.
+* Fixed an issue that occurred when deleting VPCs because of stale security groups.
+* Upgraded the following versions:
+** {tap-1_4_1-cl}[{partner-product-acronym}^] 1.4.1.
+** {ce-1_4_1-cl}[ClusterEssentials^] 1.4.
+** {eksqs-5_0_0-cl}[EKS QuickStart^] 5.0.0.
+** {eks-1_24-cl}[EKS^] 1.24.
+* Removed the following configuration options:
+** {partner-product-short-name} version.
+** EKS version.
+** Linux Bastion host AMI.
+** Linux Bastion host's SSH port.
+** Sample application name.
+* Fixed an issue with downloading artifacts (for example, `kubectl`) for Regions other than `us-east-1`.
+
+=== Version 1.4.0
+* You can now deploy a multicluster architecture by setting the *EKS single or multicluster / TAP cluster architecture* (`TAPClusterArch`) parameter to `multi`.
