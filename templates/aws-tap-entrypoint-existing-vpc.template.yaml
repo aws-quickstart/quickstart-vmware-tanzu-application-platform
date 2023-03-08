@@ -2011,6 +2011,18 @@ Resources:
                       - arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${StackId}/*
                       - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
 # roles multi cluster end
+  UbuntuBastionLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Metadata: {}
+      #! AWS::EC2::LaunchTemplate:
+      #! AWS::CloudFormation::Authentication:
+    Properties:
+      LaunchTemplateData:
+        MetadataOptions:
+          HttpEndpoint: enabled
+          #! Troy: [...] you also need to set the hop limit to 2, because the default of 1 effectively disables EC2 host profile authentication [...]
+          HttpPutResponseHopLimit: 2
+          HttpTokens: required
   UbuntuBastion:
   # TODO: Implement CloudFormation helper scripts once Ubuntu 22.04 is
   # supported.
@@ -2018,6 +2030,9 @@ Resources:
     Metadata:
       cfn-lint: { config: { ignore_checks: [I3042] } }
     Properties:
+      LaunchTemplate:
+        LaunchTemplateId: !Ref UbuntuBastionLaunchTemplate
+        Version: !GetAtt [UbuntuBastionLaunchTemplate, DefaultVersionNumber]
       InstanceType: m5.large
       IamInstanceProfile: !Ref LinuxBastionInstanceProfile
       ImageId: !FindInMap [AwsAmiRegionMap, !Ref AWS::Region, US2204HVM]
@@ -2335,9 +2350,22 @@ Resources:
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Roles:
         - !Ref WindowsBastionIamRole
+  WindowsBastionLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Metadata: {}
+    Properties:
+      LaunchTemplateData:
+        MetadataOptions:
+          HttpEndpoint: enabled
+          #! Troy: [...] you also need to set the hop limit to 2, because the default of 1 effectively disables EC2 host profile authentication [...]
+          HttpPutResponseHopLimit: 2
+          HttpTokens: required
   WindowsBastion:
     Type: AWS::EC2::Instance
     Properties:
+      LaunchTemplate:
+        LaunchTemplateId: !Ref WindowsBastionLaunchTemplate
+        Version: !GetAtt [WindowsBastionLaunchTemplate, DefaultVersionNumber]
       InstanceType: t3.medium
       IamInstanceProfile: !Ref WindowsBastionInstanceProfile
       ImageId: !FindInMap [AwsAmiRegionMap, !Ref AWS::Region, WS2022FullBase]
