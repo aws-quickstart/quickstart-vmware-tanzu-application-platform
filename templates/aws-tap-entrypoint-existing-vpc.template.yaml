@@ -2018,6 +2018,22 @@ Resources:
       #! AWS::CloudFormation::Authentication:
     Properties:
       LaunchTemplateData:
+        SecurityGroupIds:
+          - !Ref LinuxBastionSecurityGroup
+        Monitoring:
+          Enabled: true
+        KeyName: !Ref KeyPairName
+        ImageId: !FindInMap [AwsAmiRegionMap, !Ref AWS::Region, US2204HVM]
+        InstanceType: m5.large
+        IamInstanceProfile:
+          Arn: !GetAtt LinuxBastionInstanceProfile.Arn
+        BlockDeviceMappings:
+          - DeviceName: /dev/sda1
+            Ebs:
+              VolumeSize: 50
+              VolumeType: gp2
+              Encrypted: true
+              DeleteOnTermination: true
         MetadataOptions:
           HttpEndpoint: enabled
           #! Troy: [...] you also need to set the hop limit to 2, because the default of 1 effectively disables EC2 host profile authentication [...]
@@ -2033,21 +2049,7 @@ Resources:
       LaunchTemplate:
         LaunchTemplateId: !Ref UbuntuBastionLaunchTemplate
         Version: !GetAtt [UbuntuBastionLaunchTemplate, DefaultVersionNumber]
-      InstanceType: m5.large
-      IamInstanceProfile: !Ref LinuxBastionInstanceProfile
-      ImageId: !FindInMap [AwsAmiRegionMap, !Ref AWS::Region, US2204HVM]
-      KeyName: !Ref KeyPairName
-      Monitoring: true
-      SecurityGroupIds:
-        - !Ref LinuxBastionSecurityGroup
       SubnetId: !Ref PublicSubnet1Id
-      BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            VolumeSize: 50
-            VolumeType: gp2
-            Encrypted: true
-            DeleteOnTermination: true
       Tags:
         - Key: Name
           Value: VMwareLinuxBastionInstance
@@ -2355,6 +2357,18 @@ Resources:
     Metadata: {}
     Properties:
       LaunchTemplateData:
+        SecurityGroupIds:
+          - !Ref WindowsBastionSecurityGroup
+        KeyName: !Ref KeyPairName
+        ImageId: !FindInMap [AwsAmiRegionMap, !Ref AWS::Region, WS2022FullBase]
+        InstanceType: t3.medium
+        IamInstanceProfile:
+          Arn: !GetAtt WindowsBastionInstanceProfile.Arn
+        BlockDeviceMappings:
+          - DeviceName: /dev/xvda
+            Ebs:
+              VolumeSize: 80
+              VolumeType: gp2
         MetadataOptions:
           HttpEndpoint: enabled
           #! Troy: [...] you also need to set the hop limit to 2, because the default of 1 effectively disables EC2 host profile authentication [...]
@@ -2366,18 +2380,7 @@ Resources:
       LaunchTemplate:
         LaunchTemplateId: !Ref WindowsBastionLaunchTemplate
         Version: !GetAtt [WindowsBastionLaunchTemplate, DefaultVersionNumber]
-      InstanceType: t3.medium
-      IamInstanceProfile: !Ref WindowsBastionInstanceProfile
-      ImageId: !FindInMap [AwsAmiRegionMap, !Ref AWS::Region, WS2022FullBase]
-      KeyName: !Ref KeyPairName
-      SecurityGroupIds:
-        - !Ref WindowsBastionSecurityGroup
       SubnetId: !Ref PublicSubnet1Id
-      BlockDeviceMappings:
-        - DeviceName: /dev/xvda
-          Ebs:
-            VolumeSize: 80
-            VolumeType: gp2
       Tags:
         - Key: Name
           Value: VMwareWindowsBastionInstance
