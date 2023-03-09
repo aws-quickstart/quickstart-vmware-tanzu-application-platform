@@ -887,6 +887,12 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_its_been_more_than_four_minutes_and_the_windows_bastion_host_administrator_password_still_isnt_available">It&#8217;s been more than four minutes and the Windows bastion host administrator password still isn&#8217;t available</a></li>
 </ul>
 </li>
+<li><a href="#release-notes">Release Notes</a>
+<ul class="sectlevel2">
+<li><a href="#_version_1_4_1">Version 1.4.1</a></li>
+<li><a href="#_version_1_4_0">Version 1.4.0</a></li>
+</ul>
+</li>
 <li><a href="#_customer_responsibility">Customer responsibility</a></li>
 <li><a href="#_feedback">Feedback</a></li>
 <li><a href="#_notices">Notices</a></li>
@@ -935,7 +941,37 @@ Refer to the <a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-
 <h2 id="_overview">Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This Partner Solution deploys VMware Tanzu Application Platform (TAP) to the AWS Cloud. This Partner Solution is for users who want a repeatable and customizable reference deployment for <a href="https://tanzu.vmware.com/application-platform" target="_blank" rel="noopener">VMware Tanzu Application Platform</a> on Amazon Elastic Kubernetes Service (Amazon EKS) using AWS CloudFormation. This guide provides instructions for deploying the Tanzu Application Platform to Amazon EKS clusters. For more information about Tanzu Application Platform, refer to <a href="https://tanzu.vmware.com/application-platform" target="_blank" rel="noopener">VMware Tanzu Application Platform</a>.</p>
+<p>This Partner Solution deploys VMware Tanzu Application Platform (TAP 1.4.2) to the AWS Cloud. This Partner Solution is for users who want a repeatable and customizable reference deployment for <a href="https://tanzu.vmware.com/application-platform" target="_blank" rel="noopener">VMware Tanzu Application Platform</a> on Amazon Elastic Kubernetes Service (Amazon EKS 1.24) using AWS CloudFormation. This guide provides instructions for deploying the Tanzu Application Platform to Amazon EKS clusters. For more information about Tanzu Application Platform, refer to <a href="https://tanzu.vmware.com/application-platform" target="_blank" rel="noopener">VMware Tanzu Application Platform</a>.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This Partner Solution uses the <a href="https://github.com/aws-quickstart/quickstart-amazon-eks/releases/tag/v5.0.0">Amazon EKS on the AWS Cloud reference deployment</a> as a submodule. The Version 5.0.0 update to Amazon EKS on the AWS Cloud contain breaking changes. If you previously installed the VMware Tanzu Application Platform Partner Solution or installed any resources using a version of the Amazon EKS reference deployment earlier than 5.0.0, you must delete the following CloudFormation stacks before upgrading:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>eks-quickstart-RegionalSharedResources</code> in all AWS Regions.</p>
+</li>
+<li>
+<p><code>eks-quickstart-AccountSharedResources</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Deleting these stacks can affect your existing Amazon EKS deployments. Or, you can create a new AWS account.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>For more information about changes in this version of Tanzu Application Platform on AWS, refer to <a href="#release-notes">Release Notes</a>, later in this guide.</p>
 </div>
 </div>
 </div>
@@ -1378,9 +1414,9 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPClusterArch</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">EKS single or multicluster / TAP Cluster Architecture</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EKS single or multicluster / TAP cluster architecture</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>single</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>multi</code> to deploy TAP with multicluster.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose <code>multi</code> to deploy TAP with multiple EKS clusters.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1402,12 +1438,6 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPVersion</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Version</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.4.0</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Version of TAP to deploy. The selected version must also support the selected Kubernetes version. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3" target="_blank" rel="noopener">Kubernetes cluster requirements</a>.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPDomainName</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Domain name</p></td>
 <td class="tableblock halign-left valign-top"></td>
@@ -1416,32 +1446,7 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 3. Sample app configuration</caption>
-<colgroup>
-<col>
-<col>
-<col>
-<col>
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Parameter Label</th>
-<th class="tableblock halign-left valign-top">Default Value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SampleAppName</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tanzu-java-web-app-workload</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name of sample application to deploy into the Amazon EKS cluster.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 4. Basic configuration</caption>
+<caption class="title">Table 3. Basic configuration</caption>
 <colgroup>
 <col>
 <col>
@@ -1484,7 +1489,7 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 5. Default VPC configuration</caption>
+<caption class="title">Table 4. Default VPC configuration</caption>
 <colgroup>
 <col>
 <col>
@@ -1545,7 +1550,7 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 6. Amazon EKS configuration</caption>
+<caption class="title">Table 5. Amazon EKS configuration</caption>
 <colgroup>
 <col>
 <col>
@@ -1561,18 +1566,6 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 </tr>
 </thead>
 <tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>EKSClusterName</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">EKS cluster name</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the EKS cluster where TAP deploys.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>KubernetesVersion</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Kubernetes version</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1.23</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Version of Kubernetes control plane to deploy. The selected version must support the selected version of TAP. For more information, refer to  <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/prerequisites.html#kubernetes-cluster-requirements-3" target="_blank" rel="noopener">Kubernetes cluster requirements</a>.</p></td>
-</tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>NodeInstanceType</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Instance type</p></td>
@@ -1600,38 +1593,7 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 7. Linux bastion host/bootstrap instance configuration</caption>
-<colgroup>
-<col>
-<col>
-<col>
-<col>
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Parameter Label</th>
-<th class="tableblock halign-left valign-top">Default Value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LinuxBastionOS</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">OS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Ubuntu-Server-22.04-LTS-HVM</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Operating system for the Linux bastion host/bootstrap instance.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LinuxBastionSshPort</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">SSH port</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>22</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">TCP port to use for the Linux bastion host listening port.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all fit-content stretch">
-<caption class="title">Table 8. AWS Partner Solution S3 bucket configuration</caption>
+<caption class="title">Table 6. AWS Partner Solution S3 bucket configuration</caption>
 <colgroup>
 <col>
 <col>
@@ -1662,7 +1624,7 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>QSS3KeyPrefix</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Key prefix</p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quickstart-vmware-tanzu-application-platform/</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix that is used to simulate a directory for your copy of the Partner Solution assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Partner Solution location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. For more information, refer to <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html" class="bare">https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html</a> and <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
 </tr>
 </tbody>
@@ -1676,19 +1638,37 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_cloudformation_outputs">CloudFormation outputs</h3>
-<div class="paragraph">
-<p>After deployment, refer to the <strong>Outputs</strong> tab in the AWS CloudFormation console for the following information:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>The Elastic IP addresses associated with the Amazon EC2 Linux and Windows bastion host instances.</p>
-</li>
-<li>
-<p>The Tanzu Application Platform website URL. For more information, refer to <a href="#_access_the_vmware_tanzu_application_platform_user_interface">Access the VMware Tanzu Application Platform user interface</a>, later in this guide.</p>
-</li>
-</ol>
-</div>
+<table class="tableblock frame-all grid-all fit-content stretch">
+<caption class="title">Table 7. CloudFormation outputs</caption>
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Key</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPGuiUrl</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Tanzu Application Platform graphical user interface URL. For more information, refer to <a href="#_access_the_vmware_tanzu_application_platform_user_interface">Access the VMware Tanzu Application Platform user interface</a>, later in this guide.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LinuxBastionEIP</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Elastic IP address associated with the Amazon EC2 Linux instance.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>WindowsBastionEIP</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Elastic IP address associated with the Windows bastion host instance.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TAPWorkloadUrl</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The sample workload URL accessible from the Windows bastion instance.</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect2">
 <h3 id="_security_configuration_and_management_tasks">Security configuration and management tasks</h3>
@@ -1900,6 +1880,78 @@ If so, run the following command.</p>
 </div>
 </div>
 <div class="sect1">
+<h2 id="release-notes">Release Notes</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_version_1_4_1">Version 1.4.1</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>The stack now reports the status of the  Tanzu Application Platform deployment and installation of the sample application  after all of the infrastructure has been deployed.</p>
+</li>
+<li>
+<p>Fixed an issue that occurred when deleting VPCs because of stale security groups.</p>
+</li>
+<li>
+<p>Upgraded the following versions:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/release-notes.html#v141-0" target="_blank" rel="noopener">TAP</a> 1.4.1.</p>
+</li>
+<li>
+<p><a href="https://docs.vmware.com/en/Cluster-Essentials-for-VMware-Tanzu/1.4/cluster-essentials/release-notes.html#v141-0" target="_blank" rel="noopener">ClusterEssentials</a> 1.4.</p>
+</li>
+<li>
+<p><a href="https://github.com/aws-quickstart/quickstart-amazon-eks/releases/tag/v5.0.0" target="_blank" rel="noopener">EKS QuickStart</a> 5.0.0.</p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html#kubernetes-1.24" target="_blank" rel="noopener">EKS</a> 1.24.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Removed the following configuration options:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Tanzu Application Platform version.</p>
+</li>
+<li>
+<p>EKS version.</p>
+</li>
+<li>
+<p>Linux Bastion host AMI.</p>
+</li>
+<li>
+<p>Linux Bastion host&#8217;s SSH port.</p>
+</li>
+<li>
+<p>Sample application name.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Fixed an issue with downloading artifacts (for example, <code>kubectl</code>) for Regions other than <code>us-east-1</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_version_1_4_0">Version 1.4.0</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>You can now deploy a multicluster architecture by setting the <strong>EKS single or multicluster / TAP cluster architecture</strong> (<code>TAPClusterArch</code>) parameter to <code>multi</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_customer_responsibility">Customer responsibility</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -1955,7 +2007,7 @@ If so, run the following command.</p>
 </html>
 <!--
 repo commit:
-26f67803433efc8dfeac14b067158c6eaecf7b91
+efeef0d281771b74707f6cd090886a4bc904c560
 
 submodule config:
  7fa56a2f3f3ee511f887dd638f655e0c141bc19b docs/boilerplate (7fa56a2)
