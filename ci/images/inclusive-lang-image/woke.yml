@@ -1,0 +1,121 @@
+ignore_files:
+  - submodules/**  #! we can't do much about submodules
+  - woke.yml       #! exclude the woke config itself
+
+rules:
+  #! those rules come from 'https://term-scan.esp.eng.vmware.com/api/rules/regex?severity=medium,high' (2022-09-19)
+  - name: black-hat
+    terms:
+      - blackhat
+      - black-hat
+      - black hat
+      - black_hat
+    alternatives:
+      - unethical hacker
+  - name: black-out
+    terms:
+      - blackout
+      - black out
+      - black-out
+      - black_out
+    alternatives:
+      - restriction(n)
+      - outage(n)
+      - restrict(v)
+      - failed (adj)
+  - name: brown-out
+    terms:
+      - brownout
+      - brown out
+      - brown_out
+      - brown-out
+    alternatives:
+      - restriction(n)
+      - outage(n)
+      - restrict(v)
+      - failed (adj)
+      - network degradation (np)
+  - name: cake-walk
+    terms:
+      - cakewalk
+      - cake walk
+      - cake-walk
+      - cake_walk
+    alternatives:
+      - easy
+  - name: female
+    terms:
+      - female
+    alternatives:
+      - jack(n)
+      - socket(n)
+  - name: male
+    terms:
+      - male
+    alternatives:
+      - plug
+  - name: disabled
+    terms:
+      - disabled
+      - disable
+    alternatives:
+      - deactivate
+  - name: grandfathered
+    terms:
+      - grandfathered
+    alternatives:
+      - legacy
+  - name: handicap
+    terms:
+      - handicap
+    alternatives:
+      - obstacle (n)
+      - impede (v)
+      - restrict (v)
+  - name: kill
+    terms:
+      - kill
+    alternatives:
+      - stop
+      - halt
+  - name: rule of thumb
+    terms:
+      - rule-of-thumb
+      - rule of thumb
+      - rules-of-thumb
+      - rules of thumb
+    alternatives:
+      - rule
+      - guideline
+  - name: segregate
+    terms:
+      - segregate
+      - segregation
+    alternatives:
+      - separate
+      - separation
+  - name: suffer
+    terms:
+      - suffer
+    alternatives:
+      - decrease
+      - lessen
+      - shrink
+      - increase
+      - growth
+      - experience
+  - name: war-room
+    terms:
+      - war room
+      - war-room
+    alternatives:
+      - operations room
+      - ops room
+  - name: white-hat
+    terms:
+      - whitehat
+      - white-hat
+      - white hat
+      - white_hat
+    alternatives:
+      - ethical hacker

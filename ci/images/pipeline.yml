@@ -1,0 +1,191 @@
+resource_types:
+- name: slack-alert
+  type: registry-image
+  source:
+    repository: ((dockerhub-proxy))/arbourd/concourse-slack-alert-resource
+
+resources:
+- &ciRepo
+  name: ci-repo
+  type: git
+  check_every: 1m
+  icon: github
+  source: &ciRepoSource
+    uri: https://((ci-repo.host))/((ci-repo.slug))
+    branch: ((ci-repo.branch))
+    paths:
+    - ci/
+- << : *ciRepo
+  name: docker-image-files
+  source:
+    << : *ciRepoSource
+    paths:
+    - ci/images/docker-image/
+- name: docker-image
+  type: registry-image
+  icon: docker
+  source:
+    repository: ((tappc-registry.url))/ci/docker-image
+    username: ((tappc-registry.username))
+    password: ((tappc-registry.password))
+    tag: latest
+- << : *ciRepo
+  name: inclusive-lang-image-files
+  source:
+    << : *ciRepoSource
+    paths:
+    - ci/images/inclusive-lang-image/
+- name: inclusive-lang-image
+  type: registry-image
+  icon: docker
+  source:
+    repository: ((tappc-registry.url))/ci/inclusive-lang-image
+    username: ((tappc-registry.username))
+    password: ((tappc-registry.password))
+    tag: latest
+- << : *ciRepo
+  name: shellcheck-image-files
+  source:
+    << : *ciRepoSource
+    paths:
+    - ci/images/shellcheck-image/
+- name: shellcheck-image
+  type: registry-image
+  icon: docker
+  source:
+    repository: ((tappc-registry.url))/ci/shellcheck-image
+    username: ((tappc-registry.username))
+    password: ((tappc-registry.password))
+    tag: latest
+- name: notify
+  icon: slack
+  type: slack-alert
+  source:
+    url: ((ci/slack.webhook))
+
+alerting:
+  onJobs: &alertingOnJobs
+    on_failure:
+      put: notify
+      params: { alert_type: failed }
+    on_error:
+      put: notify
+      params: { alert_type: errored }
+
+jobs:
+- name: set-pipeline
+  << : *alertingOnJobs
+  plan:
+  - get: ci-repo
+    params:
+      submodules: none
+    trigger: true
+  - set_pipeline: self
+    file: ci-repo/ci/images/pipeline.yml
+    var_files:
+    - ci-repo/ci/images/pipeline.vars.yml
+
+- name: build-docker-image
+  << : *alertingOnJobs
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      passed:
+      - set-pipeline
+    - get: docker-image-files
+      params:
+        submodules: none
+      trigger: true
+  - task: build
+    file: ci-repo/ci/tasks/build-image/task.yml
+    vars:
+      repo: ((docker-in-nimbus.repo))
+      tag: ((docker-in-nimbus.tag))
+    input_mapping:
+      input: docker-image-files
+    params:
+      NIMBUS_USER: ((ci/nimbus.user))
+      BUILD_ARG_BASE: ((docker-in-nimbus.repo)):((docker-in-nimbus.tag))
+      CONTEXT: input/ci/images/docker-image
+  - put: docker-image
+    params:
+      image: image/image.tar
+    on_success:
+      put: notify
+      params:
+        alert_type: success
+        text: new `docker-image` pushed
+
+- name: build-inclusive-lang-image
+  << : *alertingOnJobs
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      passed:
+      - set-pipeline
+    - get: inclusive-lang-image-files
+      params:
+        submodules: none
+      trigger: true
+  - task: build
+    file: ci-repo/ci/tasks/build-image/task.yml
+    vars:
+      repo: ((docker-in-nimbus.repo))
+      tag: ((docker-in-nimbus.tag))
+    input_mapping:
+      input: inclusive-lang-image-files
+    params:
+      NIMBUS_USER: ((ci/nimbus.user))
+      #! for woke we don't need a shell, because we just need to run the
+      #! binary, thus the `tiny` variant should suffice
+      BUILD_ARG_BASE: ((dockerhub-proxy))/paketobuildpacks/run-jammy-tiny:latest
+      BUILD_ARG_WOKE: ((dockerhub-proxy))/getwoke/woke:latest
+      CONTEXT: input/ci/images/inclusive-lang-image
+  - put: inclusive-lang-image
+    params:
+      image: image/image.tar
+    on_success:
+      put: notify
+      params:
+        alert_type: success
+        text: new `inclusive-lang-image` pushed
+
+- name: build-shellcheck-image
+  << : *alertingOnJobs
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      passed:
+      - set-pipeline
+    - get: shellcheck-image-files
+      params:
+        submodules: none
+      trigger: true
+  - task: build
+    file: ci-repo/ci/tasks/build-image/task.yml
+    vars:
+      repo: ((docker-in-nimbus.repo))
+      tag: ((docker-in-nimbus.tag))
+    input_mapping:
+      input: shellcheck-image-files
+    params:
+      NIMBUS_USER: ((ci/nimbus.user))
+      #! for shellcheck we need a shell (to `find` all files we want it to run
+      #! against), thus we use the `base` variant here
+      BUILD_ARG_BASE: ((dockerhub-proxy))/paketobuildpacks/run-jammy-base:latest
+      BUILD_ARG_SHELLCHECK: ((dockerhub-proxy))/koalaman/shellcheck:stable
+      CONTEXT: input/ci/images/shellcheck-image
+  - put: shellcheck-image
+    params:
+      image: image/image.tar
+    on_success:
+      put: notify
+      params:
+        alert_type: success
+        text: new `shellcheck-image` pushed

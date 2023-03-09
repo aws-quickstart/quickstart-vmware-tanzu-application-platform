@@ -1,0 +1,13 @@
+---
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: tappc-docker-local.artifactory.eng.vmware.com/ci/docker-image
+    tag: latest
+inputs:
+- name: test-result
+- name: creds
+- name: ci-repo
+run:
+  path: ci-repo/ci/tasks/aws-delete-stack/task.sh

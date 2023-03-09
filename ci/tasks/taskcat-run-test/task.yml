@@ -1,0 +1,19 @@
+---
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: tappc-docker-local.artifactory.eng.vmware.com/ci/docker-image
+    tag: latest
+inputs:
+- name: taskcat-config
+- name: repo
+- name: ci-repo
+- name: creds
+outputs:
+- name: test-result
+params:
+  TEST_NAME: single
+  REGIONS:
+run:
+  path: ci-repo/ci/tasks/taskcat-run-test/task.sh

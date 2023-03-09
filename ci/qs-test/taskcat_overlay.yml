@@ -1,0 +1,45 @@
+#! Overlay some things we need in CI
+#! Tests come from the "main" taskcat config
+
+#! Things we do:
+#! - change the project name; this will be used e.g. in `taskcat upload` as the
+#!   prefix key in the bucket
+#! - set all parameters, esp. ensure QSS3KeyPrefix are set correctly
+#! - add some tags, so that we have an easier way to identify created resources
+
+#@ load("@ytt:overlay", "overlay")
+#@ load("@ytt:data", "data")
+#@ load("@ytt:regexp", "regexp")
+
+#@ accessCIDR = "0.0.0.0/0"
+
+#@ domain = data.values.domain
+#@ gitSha = data.values.gitSha
+#@ gitRemote = regexp.replace("(https?://)[^@]+(@)", data.values.gitRemote, "$1--redacted--$2")
+#@ bucket = data.values.bucket
+#@ tanzunet_username = data.values.tanzunet_username
+#@ tanzunet_password = data.values.tanzunet_password
+#@ tanzunet_refreshToken = data.values.tanzunet_refreshToken
+#@ keypairName = data.values.keypairName
+
+#@overlay/match by=overlay.all, expects=1
+#@overlay/match-child-defaults missing_ok=True
+---
+project:
+  name: #@ gitSha
+  s3_bucket: #@ bucket
+  shorten_stack_name: true
+  parameters:
+    AcceptEULAs: "Yes"
+    AcceptCEIP: "Yes"
+    KeyPairName: #@ keypairName
+    RemoteAccessCidr: #@ accessCIDR
+    TanzuNetUsername: #@ tanzunet_username
+    TanzuNetPassword: #@ tanzunet_password
+    TanzuNetApiToken: #@ tanzunet_refreshToken
+    TanzuNetRelocateImages: "No"
+    TAPDomainName: #@ "{}.{}".format("$[taskcat_random-string]", domain)
+    QSS3KeyPrefix: #@ gitSha + "/"
+  tags:
+    gitSha: #@ gitSha
+    gitRemote: #@ gitRemote

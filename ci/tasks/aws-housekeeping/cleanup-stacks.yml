@@ -1,0 +1,16 @@
+---
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: tappc-docker-local.artifactory.eng.vmware.com/ci/docker-image
+    tag: latest
+inputs:
+- name: creds
+- name: ci-repo
+params:
+  REGIONS: us-east-1
+  #! REALLY_DELETE: 1
+  #! IGNORE_ROOT_STACK_RE: "^(foo|bar)$"
+run:
+  path: ci-repo/ci/tasks/aws-housekeeping/cleanup-stacks.sh
