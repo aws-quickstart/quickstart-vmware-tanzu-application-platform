@@ -1,1 +1,13 @@
-This Partner Solution deploys {partner-product-name} ({partner-product-acronym}) to the AWS Cloud. This Partner Solution is for users who want a repeatable and customizable reference deployment for https://tanzu.vmware.com/application-platform[{partner-product-name}^] on Amazon Elastic Kubernetes Service (Amazon EKS) using AWS CloudFormation. This guide provides instructions for deploying the {partner-product-short-name} to Amazon EKS clusters. For more information about {partner-product-short-name}, refer to https://tanzu.vmware.com/application-platform[VMware Tanzu Application Platform^].
+This Partner Solution deploys {partner-product-name} ({partner-product-acronym} {partner-product-version}) to the AWS Cloud. This Partner Solution is for users who want a repeatable and customizable reference deployment for https://tanzu.vmware.com/application-platform[{partner-product-name}^] on Amazon Elastic Kubernetes Service (Amazon EKS {eks-version}) using AWS CloudFormation. This guide provides instructions for deploying the {partner-product-short-name} to Amazon EKS clusters. For more information about {partner-product-short-name}, refer to https://tanzu.vmware.com/application-platform[VMware Tanzu Application Platform^].
+
+[WARNING]
+====
+This Partner Solution uses the https://github.com/aws-quickstart/quickstart-amazon-eks/releases/tag/v5.0.0[Amazon EKS on the AWS Cloud reference deployment] as a submodule. The Version 5.0.0 update to Amazon EKS on the AWS Cloud contain breaking changes. If you previously installed the {partner-company-short-name} {partner-product-short-name} Partner Solution or installed any resources using a version of the Amazon EKS reference deployment earlier than 5.0.0, you must delete the following CloudFormation stacks before upgrading:
+
+* `eks-quickstart-RegionalSharedResources` in all AWS Regions.
+* `eks-quickstart-AccountSharedResources`.
+
+Deleting these stacks can affect your existing Amazon EKS deployments. Or, you can create a new AWS account.
+====
+
+For more information about changes in this version of {partner-product-short-name} on AWS, refer to <<release-notes, Release Notes>>, later in this guide.
