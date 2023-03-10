@@ -731,11 +731,23 @@ Resources:
         ConfigSetName: !Ref AWS::StackName
         NodeVolumeSize: !Ref NodeVolumeSize
         KubernetesVersion: !FindInMap [ Versions, current, EKS ]
+  AutoDetectSharedResources:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/workloads/amazon-eks-prerequisites.template.yaml
+        - S3Region: !If [UsingDefaultBucket, !Ref AWS::Region, !Ref QSS3BucketRegion]
+          S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3BucketRegion: !Ref QSS3BucketRegion
+        QSS3KeyPrefix: !Sub ${QSS3KeyPrefix}submodules/quickstart-amazon-eks/
   EKSQSStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateSingleCluster
     DependsOn:
       - EKSAdvancedConfigStack
+      - AutoDetectSharedResources
     Properties:
       TemplateURL: !Sub
         - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
@@ -766,12 +778,15 @@ Resources:
         EKSClusterName: !Ref EKSClusterName
         ClusterAutoScaler: Enabled
         LoadBalancerController: Enabled
+        PerRegionSharedResources: 'No'
+        PerAccountSharedResources: 'No'
 #eks stacks multi cluster start
   RUNEKSQSStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateMultiCluster
     DependsOn:
       - EKSAdvancedConfigStack
+      - AutoDetectSharedResources
     Properties:
       TemplateURL: !Sub
         - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
@@ -802,11 +817,14 @@ Resources:
         EKSClusterName: !Sub ${EKSClusterName}-run
         ClusterAutoScaler: Enabled
         LoadBalancerController: Enabled
+        PerRegionSharedResources: 'No'
+        PerAccountSharedResources: 'No'
   VIEWEKSQSStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateMultiCluster
     DependsOn:
       - EKSAdvancedConfigStack
+      - AutoDetectSharedResources
     Properties:
       TemplateURL: !Sub
         - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
@@ -837,11 +855,14 @@ Resources:
         EKSClusterName: !Sub ${EKSClusterName}-view
         ClusterAutoScaler: Enabled
         LoadBalancerController: Enabled
+        PerRegionSharedResources: 'No'
+        PerAccountSharedResources: 'No'
   BUILDEKSQSStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateMultiCluster
     DependsOn:
       - EKSAdvancedConfigStack
+      - AutoDetectSharedResources
     Properties:
       TemplateURL: !Sub
         - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
@@ -872,11 +893,14 @@ Resources:
         EKSClusterName: !Sub ${EKSClusterName}-build
         ClusterAutoScaler: Enabled
         LoadBalancerController: Enabled
+        PerRegionSharedResources: 'No'
+        PerAccountSharedResources: 'No'
   ITERATEEKSQSStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateMultiCluster
     DependsOn:
       - EKSAdvancedConfigStack
+      - AutoDetectSharedResources
     Properties:
       TemplateURL: !Sub
         - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-eks/templates/amazon-eks-entrypoint-existing-vpc.template.yaml
@@ -907,6 +931,8 @@ Resources:
         EKSClusterName: !Sub ${EKSClusterName}-iterate
         ClusterAutoScaler: Enabled
         LoadBalancerController: Enabled
+        PerRegionSharedResources: 'No'
+        PerAccountSharedResources: 'No'
 #eks stacks for multi cluster end
 #Rules for multi cluster start
   RunLinuxBastionSshToNodesEgressRule:
