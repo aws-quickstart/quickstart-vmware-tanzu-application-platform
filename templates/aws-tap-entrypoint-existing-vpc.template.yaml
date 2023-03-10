@@ -2037,6 +2037,209 @@ Resources:
                       - arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${StackId}/*
                       - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
 # roles multi cluster end
+  UbuntuBastionLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        SecurityGroupIds:
+          - !Ref LinuxBastionSecurityGroup
+        Monitoring:
+          Enabled: true
+        KeyName: !Ref KeyPairName
+        ImageId: !FindInMap [AwsAmiRegionMap, !Ref AWS::Region, US2204HVM]
+        InstanceType: m5.large
+        IamInstanceProfile:
+          Arn: !GetAtt LinuxBastionInstanceProfile.Arn
+        BlockDeviceMappings:
+          - DeviceName: /dev/sda1
+            Ebs:
+              VolumeSize: 50
+              VolumeType: gp2
+              Encrypted: true
+              DeleteOnTermination: true
+        MetadataOptions:
+          HttpEndpoint: enabled
+          #! Troy: [...] you also need to set the hop limit to 2, because the default of 1 effectively disables EC2 host profile authentication [...]
+          HttpPutResponseHopLimit: 2
+          HttpTokens: required
+        UserData:
+          Fn::Base64: !Sub
+            - |
+              #!/bin/bash
+              set -e
+              set -u
+              set -o pipefail
+
+              set -x
+
+              cat <<EOF >> /etc/environment
+              AWS_REGION=${AWS::Region}
+              AWS_DEFAULT_REGION=${AWS::Region}
+              EOF
+              . /etc/environment
+              export AWS_REGION AWS_DEFAULT_REGION
+
+              set +x
+                # TODO: we should ensure to
+                #       - only export actually used vars
+                #       - never print/log those, or at least sensitive ones
+                #       - use consistent/proper/clear var names
+                #       - handle multiline/quoted/... vars correctly
+                export AWSAccountID='${AWS::AccountId}'
+                export AwsKubectlVersion='${AwsKubectlVersion}'
+                export BuildClusterBuildServiceArn='${BuildClusterBuildServiceArn}'
+                export BuildClusterName='${BuildClusterName}'
+                export BuildClusterWorkloadArn='${BuildClusterWorkloadArn}'
+                export ClusterArch='${ClusterArch}'
+                export ClusterEssentialsBundleFileHash='${ClusterEssentialsBundleFileHash}'
+                export ClusterEssentialsBundleRepo='${ClusterEssentialsBundleRepo}'
+                export ClusterEssentialsBundleVersion='${ClusterEssentialsBundleVersion}'
+                export DockerCredPassVersion='${DockerCredPassVersion}'
+                export EKSClusterName='${EKSClusterName}'
+                export IterateClusterBuildServiceArn='${IterateClusterBuildServiceArn}'
+                export IterateClusterName='${IterateClusterName}'
+                export IterateClusterWorkloadArn='${IterateClusterWorkloadArn}'
+                export PivNetVersion='${PivNetVersion}'
+                export PrivateHostedZone='${PrivateHostedZone}'
+                export QSS3BucketPath='${QSS3BucketPath}'
+                export RunClusterName='${RunClusterName}'
+                export SampleAppConfig='${SampleAppConfig}'
+                export SampleAppNamespace='${SampleAppNamespace}'
+                export SampleAppName='${SampleAppName}'
+                export TAPBuildServiceRepo_RepositoryUri='${TAPBuildServiceRepo.RepositoryUri}'
+                export TAPClusterEssentialsBundleRepo_RepositoryUri='${TAPClusterEssentialsBundleRepo.RepositoryUri}'
+                export TAPDomainName='${TAPDomainName}'
+                export TAPLogGroup='${TAPLogGroup}'
+                export TAPPackagesRepo_RepositoryUri='${TAPPackagesRepo.RepositoryUri}'
+                export TAPRepo='${TAPRepo}'
+                export TAPVersion='${TAPVersion}'
+                export TAPWorkloadRepo_RepositoryUri='${TAPWorkloadRepo.RepositoryUri}'
+                export TanzuNetRegistryServer='${TanzuNetRegistryServer}'
+                export TanzuNetRelocateImages='${TanzuNetRelocateImages}'
+                export TanzuNetSecretCredentials='${TanzuNetSecretCredentials}'
+                export ViewClusterName='${ViewClusterName}'
+
+                # WaitConditionHanldes
+                export CloudInitHandle='${CloudInitHandle}'
+                export TAPInstallHandle='${TAPInstallHandle}'
+                export TAPWorkloadInstallHandle='${TAPWorkloadInstallHandle}'
+                export TAPTestsHandle='${TAPTestsHandle}'
+              set -x
+
+              arch=$(dpkg --print-architecture)
+
+              echo "Removing built-in Docker..."
+              apt-get -y remove containerd runc
+
+              echo "Adding Docker CE repo..."
+              mkdir -p /usr/local/share/keyrings/
+              curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
+                gpg --dearmor -o /usr/local/share/keyrings/docker-archive-keyring.gpg --yes
+              printf "deb [arch=$arch signed-by=/usr/local/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" |
+                tee /etc/apt/sources.list.d/docker.list
+
+              echo "Updating & upgrading..."
+              apt-get -y update
+              apt-get -y upgrade
+
+              echo "Installing system dependencies..."
+              apt-get -y install \
+                amazon-ecr-credential-helper \
+                ca-certificates \
+                containerd.io \
+                curl \
+                docker-ce \
+                docker-ce-cli \
+                docker-compose-plugin \
+                git \
+                gnupg \
+                gnupg2 \
+                jq \
+                lsb-release \
+                openssl \
+                pass \
+                perl \
+                python3-pip \
+                python3-setuptools \
+                sed \
+                sudo \
+                traceroute \
+                unzip \
+                uuid-runtime \
+                vim \
+                wget
+
+              # TODO: use mktemp and a trap to clean up (or use an AMI with AWS CLI preinstalled)
+              # Note: the Ubuntu AMI seems to come with `wget` and `curl` already installed
+              echo "Installing aws cli..."
+              pushd /tmp
+              wget -O "./awscliv2.zip" "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip"
+              unzip ./awscliv2.zip
+              ./aws/install
+              popd
+
+              echo "Installing aws-cfn-bootstrap tools & setting signal trap"
+              pip3 install "https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz"
+
+              # Set and export the cfn trap
+              cfnSignal() {
+                local -
+                set +x
+
+                local rc="${!1:-42}"
+                local handleURL="${!2:-${CloudInitHandle}}"
+                local reason='installation succeeded'
+                local ctxLines=10
+
+                (( rc != 0 )) && {
+                  local nl=$'\n'
+                  # We don't care about the last 3 lines of the log, because
+                  # that's logging the cfnSignal itself.
+                  reason="${!nl}$( tail -n $(( ctxLines + 3 )) /var/log/cloud-init-output.log | head -n -3 )${!nl}"
+                }
+
+                cfn-signal --region "${!AWS_REGION}" --exit-code "$rc" --reason "$reason" "$handleURL" \
+                  || echo >&2 'could not run cfn-signal'
+              }
+              export -f cfnSignal
+              trap 'cfnSignal $?' ERR
+
+              cInit="${!QSS3BucketPath}/src/cloud-init.sh"
+              echo "kicking off cloud-init from '${!cInit}'"
+              bash -xe <(
+                aws s3 cp --no-progress "${!cInit}" -
+              )
+
+              cfnSignal 0
+            - AwsKubectlVersion: !FindInMap [ Versions, current, Kubectl ]
+              TAPVersion: !FindInMap [ Versions, current, TAP ]
+              ClusterEssentialsBundleRepo: tanzu-cluster-essentials/cluster-essentials-bundle
+              ClusterEssentialsBundleFileHash: !FindInMap [ Versions, current, ClusterEssentialsHash ]
+              ClusterEssentialsBundleVersion: !FindInMap [ Versions, current, ClusterEssentialsVersion ]
+              DockerCredPassVersion: !FindInMap [ Versions, current, DockerCredPass ]
+              PivNetVersion: !FindInMap [ Versions, current, PivNet ]
+              SampleAppConfig: !FindInMap [Apps, Sample, Config]
+              SampleAppNamespace: !FindInMap [Apps, Sample, Namespace]
+              SampleAppName: !FindInMap [Apps, Sample, Name]
+              QSS3BucketPath: !Sub
+                - s3://${S3Bucket}/${QSS3KeyPrefix}tap-setup-scripts
+                - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+              TanzuNetRegistryServer: !FindInMap [TanzuNetRegistryServer, Server, Name]
+              TAPRepo: tanzu-application-platform/tap-packages
+              ClusterArch: !Ref TAPClusterArch
+              BuildClusterName: !If [CreateMultiCluster, !GetAtt BUILDEKSQSStack.Outputs.EKSClusterName, !GetAtt EKSQSStack.Outputs.EKSClusterName]
+              BuildClusterBuildServiceArn: !If [CreateMultiCluster, !GetAtt BUILDBuildServiceIamRole.Arn, !GetAtt TAPBuildServiceIamRole.Arn]
+              BuildClusterWorkloadArn: !If [CreateMultiCluster, !GetAtt BUILDWorkloadIamRole.Arn, !GetAtt TAPWorkloadIamRole.Arn]
+              IterateClusterName: !If [CreateMultiCluster, !GetAtt ITERATEEKSQSStack.Outputs.EKSClusterName, ""]
+              IterateClusterBuildServiceArn: !If [CreateMultiCluster, !GetAtt ITERATEBuildServiceIamRole.Arn, ""]
+              IterateClusterWorkloadArn: !If [CreateMultiCluster, !GetAtt ITERATEWorkloadIamRole.Arn, ""]
+              RunClusterName: !If [CreateMultiCluster, !GetAtt RUNEKSQSStack.Outputs.EKSClusterName, ""]
+              ViewClusterName: !If [CreateMultiCluster, !GetAtt VIEWEKSQSStack.Outputs.EKSClusterName, ""]
+
+              CloudInitHandle:          !Ref PhaseCloudInitHandle
+              TAPInstallHandle:         !Ref PhaseTAPInstallHandle
+              TAPWorkloadInstallHandle: !Ref PhaseTAPWorkloadInstallHandle
+              TAPTestsHandle:           !Ref PhaseTAPTestsHandle
   UbuntuBastion:
   # TODO: Implement CloudFormation helper scripts once Ubuntu 22.04 is
   # supported.
@@ -2044,205 +2247,15 @@ Resources:
     Metadata:
       cfn-lint: { config: { ignore_checks: [I3042] } }
     Properties:
-      InstanceType: m5.large
-      IamInstanceProfile: !Ref LinuxBastionInstanceProfile
-      ImageId: !FindInMap [AwsAmiRegionMap, !Ref AWS::Region, US2204HVM]
-      KeyName: !Ref KeyPairName
-      Monitoring: true
-      SecurityGroupIds:
-        - !Ref LinuxBastionSecurityGroup
+      LaunchTemplate:
+        LaunchTemplateId: !Ref UbuntuBastionLaunchTemplate
+        Version: !GetAtt [UbuntuBastionLaunchTemplate, DefaultVersionNumber]
       SubnetId: !Ref PublicSubnet1Id
-      BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            VolumeSize: 50
-            VolumeType: gp2
-            Encrypted: true
-            DeleteOnTermination: true
       Tags:
         - Key: Name
           Value: VMwareLinuxBastionInstance
         - Key: Description
-          Value: >-
-            VMware Tanzu Application Platform EKS cluster bootstrap instance.
-      UserData:
-        Fn::Base64: !Sub
-          - |
-            #!/bin/bash
-            set -e
-            set -u
-            set -o pipefail
-
-            set -x
-
-            cat <<EOF >> /etc/environment
-            AWS_REGION=${AWS::Region}
-            AWS_DEFAULT_REGION=${AWS::Region}
-            EOF
-            . /etc/environment
-            export AWS_REGION AWS_DEFAULT_REGION
-
-            set +x
-              # TODO: we should ensure to
-              #       - only export actually used vars
-              #       - never print/log those, or at least sensitive ones
-              #       - use consistent/proper/clear var names
-              #       - handle multiline/quoted/... vars correctly
-              export AWSAccountID='${AWS::AccountId}'
-              export AwsKubectlVersion='${AwsKubectlVersion}'
-              export BuildClusterBuildServiceArn='${BuildClusterBuildServiceArn}'
-              export BuildClusterName='${BuildClusterName}'
-              export BuildClusterWorkloadArn='${BuildClusterWorkloadArn}'
-              export ClusterArch='${ClusterArch}'
-              export ClusterEssentialsBundleFileHash='${ClusterEssentialsBundleFileHash}'
-              export ClusterEssentialsBundleRepo='${ClusterEssentialsBundleRepo}'
-              export ClusterEssentialsBundleVersion='${ClusterEssentialsBundleVersion}'
-              export DockerCredPassVersion='${DockerCredPassVersion}'
-              export EKSClusterName='${EKSClusterName}'
-              export IterateClusterBuildServiceArn='${IterateClusterBuildServiceArn}'
-              export IterateClusterName='${IterateClusterName}'
-              export IterateClusterWorkloadArn='${IterateClusterWorkloadArn}'
-              export PivNetVersion='${PivNetVersion}'
-              export PrivateHostedZone='${PrivateHostedZone}'
-              export QSS3BucketPath='${QSS3BucketPath}'
-              export RunClusterName='${RunClusterName}'
-              export SampleAppConfig='${SampleAppConfig}'
-              export SampleAppNamespace='${SampleAppNamespace}'
-              export SampleAppName='${SampleAppName}'
-              export TAPBuildServiceRepo_RepositoryUri='${TAPBuildServiceRepo.RepositoryUri}'
-              export TAPClusterEssentialsBundleRepo_RepositoryUri='${TAPClusterEssentialsBundleRepo.RepositoryUri}'
-              export TAPDomainName='${TAPDomainName}'
-              export TAPLogGroup='${TAPLogGroup}'
-              export TAPPackagesRepo_RepositoryUri='${TAPPackagesRepo.RepositoryUri}'
-              export TAPRepo='${TAPRepo}'
-              export TAPVersion='${TAPVersion}'
-              export TAPWorkloadRepo_RepositoryUri='${TAPWorkloadRepo.RepositoryUri}'
-              export TanzuNetRegistryServer='${TanzuNetRegistryServer}'
-              export TanzuNetRelocateImages='${TanzuNetRelocateImages}'
-              export TanzuNetSecretCredentials='${TanzuNetSecretCredentials}'
-              export ViewClusterName='${ViewClusterName}'
-
-              # WaitConditionHanldes
-              export CloudInitHandle='${CloudInitHandle}'
-              export TAPInstallHandle='${TAPInstallHandle}'
-              export TAPWorkloadInstallHandle='${TAPWorkloadInstallHandle}'
-              export TAPTestsHandle='${TAPTestsHandle}'
-            set -x
-
-            arch=$(dpkg --print-architecture)
-
-            echo "Removing built-in Docker..."
-            apt-get -y remove containerd runc
-
-            echo "Adding Docker CE repo..."
-            mkdir -p /usr/local/share/keyrings/
-            curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
-              gpg --dearmor -o /usr/local/share/keyrings/docker-archive-keyring.gpg --yes
-            printf "deb [arch=$arch signed-by=/usr/local/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" |
-              tee /etc/apt/sources.list.d/docker.list
-
-            echo "Updating & upgrading..."
-            apt-get -y update
-            apt-get -y upgrade
-
-            echo "Installing system dependencies..."
-            apt-get -y install \
-              amazon-ecr-credential-helper \
-              ca-certificates \
-              containerd.io \
-              curl \
-              docker-ce \
-              docker-ce-cli \
-              docker-compose-plugin \
-              git \
-              gnupg \
-              gnupg2 \
-              jq \
-              lsb-release \
-              openssl \
-              pass \
-              perl \
-              python3-pip \
-              python3-setuptools \
-              sed \
-              sudo \
-              traceroute \
-              unzip \
-              uuid-runtime \
-              vim \
-              wget
-
-            # TODO: use mktemp and a trap to clean up (or use an AMI with AWS CLI preinstalled)
-            # Note: the Ubuntu AMI seems to come with `wget` and `curl` already installed
-            echo "Installing aws cli..."
-            pushd /tmp
-            wget -O "./awscliv2.zip" "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip"
-            unzip ./awscliv2.zip
-            ./aws/install
-            popd
-
-            echo "Installing aws-cfn-bootstrap tools & setting signal trap"
-            pip3 install "https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz"
-
-            # Set and export the cfn trap
-            cfnSignal() {
-              local -
-              set +x
-
-              local rc="${!1:-42}"
-              local handleURL="${!2:-${CloudInitHandle}}"
-              local reason='installation succeeded'
-              local ctxLines=10
-
-              (( rc != 0 )) && {
-                local nl=$'\n'
-                # We don't care about the last 3 lines of the log, because
-                # that's logging the cfnSignal itself.
-                reason="${!nl}$( tail -n $(( ctxLines + 3 )) /var/log/cloud-init-output.log | head -n -3 )${!nl}"
-              }
-
-              cfn-signal --region "${!AWS_REGION}" --exit-code "$rc" --reason "$reason" "$handleURL" \
-                || echo >&2 'could not run cfn-signal'
-            }
-            export -f cfnSignal
-            trap 'cfnSignal $?' ERR
-
-            cInit="${!QSS3BucketPath}/src/cloud-init.sh"
-            echo "kicking off cloud-init from '${!cInit}'"
-            bash -xe <(
-              aws s3 cp --no-progress "${!cInit}" -
-            )
-
-            cfnSignal 0
-          - AwsKubectlVersion: !FindInMap [ Versions, current, Kubectl ]
-            TAPVersion: !FindInMap [ Versions, current, TAP ]
-            ClusterEssentialsBundleRepo: tanzu-cluster-essentials/cluster-essentials-bundle
-            ClusterEssentialsBundleFileHash: !FindInMap [ Versions, current, ClusterEssentialsHash ]
-            ClusterEssentialsBundleVersion: !FindInMap [ Versions, current, ClusterEssentialsVersion ]
-            DockerCredPassVersion: !FindInMap [ Versions, current, DockerCredPass ]
-            PivNetVersion: !FindInMap [ Versions, current, PivNet ]
-            SampleAppConfig: !FindInMap [Apps, Sample, Config]
-            SampleAppNamespace: !FindInMap [Apps, Sample, Namespace]
-            SampleAppName: !FindInMap [Apps, Sample, Name]
-            QSS3BucketPath: !Sub
-              - s3://${S3Bucket}/${QSS3KeyPrefix}tap-setup-scripts
-              - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-            TanzuNetRegistryServer: !FindInMap [TanzuNetRegistryServer, Server, Name]
-            TAPRepo: tanzu-application-platform/tap-packages
-            ClusterArch: !Ref TAPClusterArch
-            BuildClusterName: !If [CreateMultiCluster, !GetAtt BUILDEKSQSStack.Outputs.EKSClusterName, !GetAtt EKSQSStack.Outputs.EKSClusterName]
-            BuildClusterBuildServiceArn: !If [CreateMultiCluster, !GetAtt BUILDBuildServiceIamRole.Arn, !GetAtt TAPBuildServiceIamRole.Arn]
-            BuildClusterWorkloadArn: !If [CreateMultiCluster, !GetAtt BUILDWorkloadIamRole.Arn, !GetAtt TAPWorkloadIamRole.Arn]
-            IterateClusterName: !If [CreateMultiCluster, !GetAtt ITERATEEKSQSStack.Outputs.EKSClusterName, ""]
-            IterateClusterBuildServiceArn: !If [CreateMultiCluster, !GetAtt ITERATEBuildServiceIamRole.Arn, ""]
-            IterateClusterWorkloadArn: !If [CreateMultiCluster, !GetAtt ITERATEWorkloadIamRole.Arn, ""]
-            RunClusterName: !If [CreateMultiCluster, !GetAtt RUNEKSQSStack.Outputs.EKSClusterName, ""]
-            ViewClusterName: !If [CreateMultiCluster, !GetAtt VIEWEKSQSStack.Outputs.EKSClusterName, ""]
-
-            CloudInitHandle:          !Ref PhaseCloudInitHandle
-            TAPInstallHandle:         !Ref PhaseTAPInstallHandle
-            TAPWorkloadInstallHandle: !Ref PhaseTAPWorkloadInstallHandle
-            TAPTestsHandle:           !Ref PhaseTAPTestsHandle
+          Value: VMware Tanzu Application Platform EKS cluster bootstrap instance.
 
   # Phase for the whole cloud-init process
   # from the creation of the instance to finished cloud-init run
@@ -2361,21 +2374,48 @@ Resources:
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Roles:
         - !Ref WindowsBastionIamRole
+  WindowsBastionLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Metadata: {}
+    Properties:
+      LaunchTemplateData:
+        SecurityGroupIds:
+          - !Ref WindowsBastionSecurityGroup
+        KeyName: !Ref KeyPairName
+        ImageId: !FindInMap [AwsAmiRegionMap, !Ref AWS::Region, WS2022FullBase]
+        InstanceType: t3.medium
+        IamInstanceProfile:
+          Arn: !GetAtt WindowsBastionInstanceProfile.Arn
+        BlockDeviceMappings:
+          - DeviceName: /dev/xvda
+            Ebs:
+              VolumeSize: 80
+              VolumeType: gp2
+        MetadataOptions:
+          HttpEndpoint: enabled
+          #! Troy: [...] you also need to set the hop limit to 2, because the default of 1 effectively disables EC2 host profile authentication [...]
+          HttpPutResponseHopLimit: 2
+          HttpTokens: required
+        UserData:
+          Fn::Base64: !Sub |
+            <powershell>
+            Write-Host -Object 'Setting AWS Region environment variables...'
+            [System.Environment]::SetEnvironmentVariable('AWS_REGION','${AWS::Region}',[System.EnvironmentVariableTarget]::System)
+            [System.Environment]::SetEnvironmentVariable('AWS_DEFAULT_REGION','${AWS::Region}',[System.EnvironmentVariableTarget]::System)
+            Write-Host -Object 'Installing Chocolatey...'
+            Set-ExecutionPolicy Bypass -Scope Process -Force
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+            Invoke-Expression -Command ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+            Write-Host -Object 'Installing Mozilla Firefox...'
+            choco install -y Firefox
+            </powershell>
   WindowsBastion:
     Type: AWS::EC2::Instance
     Properties:
-      InstanceType: t3.medium
-      IamInstanceProfile: !Ref WindowsBastionInstanceProfile
-      ImageId: !FindInMap [AwsAmiRegionMap, !Ref AWS::Region, WS2022FullBase]
-      KeyName: !Ref KeyPairName
-      SecurityGroupIds:
-        - !Ref WindowsBastionSecurityGroup
+      LaunchTemplate:
+        LaunchTemplateId: !Ref WindowsBastionLaunchTemplate
+        Version: !GetAtt [WindowsBastionLaunchTemplate, DefaultVersionNumber]
       SubnetId: !Ref PublicSubnet1Id
-      BlockDeviceMappings:
-        - DeviceName: /dev/xvda
-          Ebs:
-            VolumeSize: 80
-            VolumeType: gp2
       Tags:
         - Key: Name
           Value: VMwareWindowsBastionInstance
@@ -2384,19 +2424,6 @@ Resources:
             Windows bastion instance for accessing the
             VMware Tanzu Application Platform cluster graphical user interface
             (GUI).
-      UserData:
-        Fn::Base64: !Sub |
-          <powershell>
-          Write-Host -Object 'Setting AWS Region environment variables...'
-          [System.Environment]::SetEnvironmentVariable('AWS_REGION','${AWS::Region}',[System.EnvironmentVariableTarget]::System)
-          [System.Environment]::SetEnvironmentVariable('AWS_DEFAULT_REGION','${AWS::Region}',[System.EnvironmentVariableTarget]::System)
-          Write-Host -Object 'Installing Chocolatey...'
-          Set-ExecutionPolicy Bypass -Scope Process -Force
-          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-          Invoke-Expression -Command ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-          Write-Host -Object 'Installing Mozilla Firefox...'
-          choco install -y Firefox
-          </powershell>
   WindowsBastionEipAssociation:
     Type: AWS::EC2::EIPAssociation
     UpdateReplacePolicy: Delete
