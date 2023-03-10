@@ -2374,6 +2374,19 @@ Resources:
           #! Troy: [...] you also need to set the hop limit to 2, because the default of 1 effectively disables EC2 host profile authentication [...]
           HttpPutResponseHopLimit: 2
           HttpTokens: required
+        UserData:
+          Fn::Base64: !Sub |
+            <powershell>
+            Write-Host -Object 'Setting AWS Region environment variables...'
+            [System.Environment]::SetEnvironmentVariable('AWS_REGION','${AWS::Region}',[System.EnvironmentVariableTarget]::System)
+            [System.Environment]::SetEnvironmentVariable('AWS_DEFAULT_REGION','${AWS::Region}',[System.EnvironmentVariableTarget]::System)
+            Write-Host -Object 'Installing Chocolatey...'
+            Set-ExecutionPolicy Bypass -Scope Process -Force
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+            Invoke-Expression -Command ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+            Write-Host -Object 'Installing Mozilla Firefox...'
+            choco install -y Firefox
+            </powershell>
   WindowsBastion:
     Type: AWS::EC2::Instance
     Properties:
@@ -2389,19 +2402,6 @@ Resources:
             Windows bastion instance for accessing the
             VMware Tanzu Application Platform cluster graphical user interface
             (GUI).
-      UserData:
-        Fn::Base64: !Sub |
-          <powershell>
-          Write-Host -Object 'Setting AWS Region environment variables...'
-          [System.Environment]::SetEnvironmentVariable('AWS_REGION','${AWS::Region}',[System.EnvironmentVariableTarget]::System)
-          [System.Environment]::SetEnvironmentVariable('AWS_DEFAULT_REGION','${AWS::Region}',[System.EnvironmentVariableTarget]::System)
-          Write-Host -Object 'Installing Chocolatey...'
-          Set-ExecutionPolicy Bypass -Scope Process -Force
-          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-          Invoke-Expression -Command ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-          Write-Host -Object 'Installing Mozilla Firefox...'
-          choco install -y Firefox
-          </powershell>
   WindowsBastionEipAssociation:
     Type: AWS::EC2::EIPAssociation
     UpdateReplacePolicy: Delete
