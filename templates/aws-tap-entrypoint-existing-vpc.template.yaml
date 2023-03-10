@@ -731,7 +731,6 @@ Resources:
         ConfigSetName: !Ref AWS::StackName
         NodeVolumeSize: !Ref NodeVolumeSize
         KubernetesVersion: !FindInMap [ Versions, current, EKS ]
-#shared resources for multi cluster
   AutoDetectSharedResources:
     Type: AWS::CloudFormation::Stack
     Properties:
