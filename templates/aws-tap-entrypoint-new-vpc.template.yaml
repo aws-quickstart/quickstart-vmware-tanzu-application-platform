@@ -149,10 +149,11 @@ Parameters:
       - 'No'
     Default: 'No'
   TAPDomainName:
-   Type: String
-   Description: >-
+    Type: String
+    Description: >-
       Private DNS domain name for accessing the TAP graphical user interface
       (GUI) and project URLs.
+    AllowedPattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$  #! from cnrs
   TAPClusterArch:
     Type: String
     Description: TAP cluster architecture.
