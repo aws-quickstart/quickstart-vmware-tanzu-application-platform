@@ -29,7 +29,6 @@ resources:
     - ci/qs-test/
     - ci/tasks/
 - name: housekeeping-daily
-  old_name: houekeeping-time
   icon: wrench-clock
   type: time
   source:
@@ -207,7 +206,6 @@ jobs:
 - name: test-single-us-east-1
   << : *alertingOnJobs
   serial: true
-  old_name: test-single
   plan:
   - in_parallel:
     - get: ci-repo
@@ -267,7 +265,6 @@ jobs:
 - name: test-multi-us-west-2
   << : *alertingOnJobs
   serial: true
-  old_name: test-multi
   plan:
   - in_parallel:
     - get: ci-repo
@@ -426,7 +423,6 @@ jobs:
 - name: pr-test-single-us-east-1
   << : *alertginOnPrJobs
   serial: true
-  old_name: pr-test-single
   plan:
   - in_parallel:
     - get: ci-repo
@@ -471,7 +467,6 @@ jobs:
 - name: pr-test-multi-us-west-2
   << : *alertginOnPrJobs
   serial: true
-  old_name: pr-test-multi
   plan:
   - in_parallel:
     - get: ci-repo
