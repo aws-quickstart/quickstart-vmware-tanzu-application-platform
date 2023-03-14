@@ -2114,6 +2114,7 @@ Resources:
                 export TAPRepo='${TAPRepo}'
                 export TAPVersion='${TAPVersion}'
                 export TAPWorkloadRepo_RepositoryUri='${TAPWorkloadRepo.RepositoryUri}'
+                export TAPWorkloadBundleRepo_RepositoryUri='${TAPWorkloadBundleRepo.RepositoryUri}'
                 export TanzuNetRegistryServer='${TanzuNetRegistryServer}'
                 export TanzuNetRelocateImages='${TanzuNetRelocateImages}'
                 export TanzuNetSecretCredentials='${TanzuNetSecretCredentials}'
