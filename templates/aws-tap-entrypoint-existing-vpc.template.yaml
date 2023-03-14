@@ -618,6 +618,35 @@ Mappings:
               url: https://github.com/sample-accelerators/tanzu-java-web-app
               ref:
                 branch: main
+  #! The indirection is just there, because in Fn::FindInMap we can only
+  #! use Fn::Ref & Fn::FindInMap, but e.g. not Fn::Sub :(
+  TimeoutMap:
+    multi:
+      MapName: TimeoutsMultiCluster
+    single:
+      MapName: TimeoutsSingleCluster
+  TimeoutsSingleCluster:
+    'No': #! single cluster deployment without relocation
+      CloudInit:          "1500" # 25m
+      TAPInstall:          "600" # 10m
+      TAPWorkloadInstall:  "600" # 10m
+      TAPTests:            "300" #  5m
+    'Yes': #! single cluster deployment with relocation
+      CloudInit:          "4200" # 70m
+      TAPInstall:         "3300" # 55m
+      TAPWorkloadInstall:  "600" # 10m
+      TAPTests:            "300" #  5m
+  TimeoutsMultiCluster:
+    'No': #! multi cluster deployment without relocation
+      CloudInit:          "3300" # 55m
+      TAPInstall:         "2100" # 35m
+      TAPWorkloadInstall:  "900" # 15m
+      TAPTests:            "300" #  5m
+    'Yes': #! multi cluster deployment with relocation
+      CloudInit:          "6000" # 100m
+      TAPInstall:         "4800" #  80m
+      TAPWorkloadInstall:  "900" #  15m
+      TAPTests:            "300" #   5m
 Conditions:
   CreateMultiCluster: !Equals [!Ref TAPClusterArch, multi]
   CreateSingleCluster: !Equals [!Ref TAPClusterArch, single]
@@ -2268,7 +2297,7 @@ Resources:
     Properties:
       Count: 1
       Handle: !Ref "PhaseCloudInitHandle"
-      Timeout: "3600" # 60m
+      Timeout: !FindInMap [ !FindInMap [TimeoutMap, !Ref TAPClusterArch, MapName], !Ref TanzuNetRelocateImages, CloudInit ]
 
   # Phase for TAP install
   # from the creation of the instance to finished TAP install
@@ -2280,7 +2309,7 @@ Resources:
     Properties:
       Count: 1
       Handle: !Ref "PhaseTAPInstallHandle"
-      Timeout: "1800" # 30m
+      Timeout: !FindInMap [ !FindInMap [TimeoutMap, !Ref TAPClusterArch, MapName], !Ref TanzuNetRelocateImages, TAPInstall ]
 
   # Phase for TAP workload install
   # from finished TAP install to finished workload deployment
@@ -2292,7 +2321,7 @@ Resources:
     Properties:
       Count: 1
       Handle: !Ref "PhaseTAPWorkloadInstallHandle"
-      Timeout: "1200" # 20min
+      Timeout: !FindInMap [ !FindInMap [TimeoutMap, !Ref TAPClusterArch, MapName], !Ref TanzuNetRelocateImages, TAPWorkloadInstall ]
 
   # Phase for TAP (smoke) tests
   # from finished TAP workload deployment to finished test runs
@@ -2304,7 +2333,7 @@ Resources:
     Properties:
       Count: 1
       Handle: !Ref "PhaseTAPTestsHandle"
-      Timeout: "600" # 10m
+      Timeout: !FindInMap [ !FindInMap [TimeoutMap, !Ref TAPClusterArch, MapName], !Ref TanzuNetRelocateImages, TAPTests ]
 
   UbuntuBastionEipAssociation:
     Type: AWS::EC2::EIPAssociation
