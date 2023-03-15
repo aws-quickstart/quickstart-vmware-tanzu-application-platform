@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 
-set -ex
+set -e
+set -u
+set -o pipefail
 
-arch=$(dpkg --print-architecture)
+set -x
+
+arch="$(dpkg --print-architecture)"
 user=ubuntu
-tap_dir=/home/$user/tap-setup-scripts
-uname=$(uname -m)
-set -a
+tap_dir="/home/${user}/tap-setup-scripts"
 
 echo "Installing python dependencies for $user..."
 su - $user -c "mkdir -p /home/$user/.local/bin; source /home/$user/.profile; python3 -m pip install --upgrade pip setuptools wheel yq"
@@ -81,7 +83,7 @@ install -m 0750 <( curl -fsSL "$dockerCredHelperURI" ) /usr/local/bin/docker-cre
 cat <<EOF > /root/.docker/config.json
 {
   "credHelpers": {
-    "${AWSAccountId}.dkr.ecr.${AWS_REGION}.amazonaws.com": "ecr-login",
+    "${AWSAccountID}.dkr.ecr.${AWS_REGION}.amazonaws.com": "ecr-login",
     "public.ecr.aws": "ecr-login"
   }
 }
