@@ -190,11 +190,7 @@ EOF
 popd
 chown -R $user:$user "$tap_dir"
 
-echo "Installing pivnet CLI..."
-wget -O "$tap_dir/downloads/pivnet" "https://github.com/pivotal-cf/pivnet-cli/releases/download/v${PivNetVersion}/pivnet-linux-$(dpkg --print-architecture)-${PivNetVersion}"
-install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
-
-installOm /usr/local/bin/om '7.9.0' 'amd64'
+installOm /usr/local/bin/om "${OmCLIVersion:-7.9.0}"
 
 echo "Installing Tanzu CLI and Staging Tanzu-cluster-essentials..."
 su - $user -c "$tap_dir/src/install-tools.sh"

@@ -504,11 +504,11 @@ Mappings:
       #! https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
       Kubectl: 1.24.9/2023-01-11
       ClusterEssentialsVersion: 1.4.1
-      #! Note: this is not the hash of the pivnet artifact, but rather the image hash for the bundle image;
+      #! Note: this is not the hash of the tanzunet artifact, but rather the image hash for the bundle image;
       #! You can get it e.g. by
       #!   docker pull registry.tanzu.vmware.com/tanzu-cluster-essentials/cluster-essentials-bundle:1.4.1
       ClusterEssentialsHash: sha256:2354688e46d4bb4060f74fca069513c9b42ffa17a0a6d5b0dbb81ed52242ea44
-      PivNet: 3.0.1
+      OmCLI: 7.9.0
       DockerCredPass:  0.7.0
   AwsAmiRegionMap:
     af-south-1:
@@ -2129,7 +2129,7 @@ Resources:
                 export IterateClusterBuildServiceArn='${IterateClusterBuildServiceArn}'
                 export IterateClusterName='${IterateClusterName}'
                 export IterateClusterWorkloadArn='${IterateClusterWorkloadArn}'
-                export PivNetVersion='${PivNetVersion}'
+                export OmCLIVersion='${OmCLIVersion}'
                 export PrivateHostedZone='${PrivateHostedZone}'
                 export QSS3BucketPath='${QSS3BucketPath}'
                 export RunClusterName='${RunClusterName}'
@@ -2248,7 +2248,7 @@ Resources:
               ClusterEssentialsBundleFileHash: !FindInMap [ Versions, current, ClusterEssentialsHash ]
               ClusterEssentialsBundleVersion: !FindInMap [ Versions, current, ClusterEssentialsVersion ]
               DockerCredPassVersion: !FindInMap [ Versions, current, DockerCredPass ]
-              PivNetVersion: !FindInMap [ Versions, current, PivNet ]
+              OmCLIVersion: !FindInMap [ Versions, current, OmCLI ]
               SampleAppConfig: !FindInMap [Apps, Sample, Config]
               SampleAppNamespace: !FindInMap [Apps, Sample, Namespace]
               SampleAppName: !FindInMap [Apps, Sample, Name]
