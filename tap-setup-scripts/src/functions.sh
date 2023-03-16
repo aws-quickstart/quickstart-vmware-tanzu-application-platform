@@ -118,7 +118,7 @@ function installTanzuCLI {
     tanzunet::getFile \
       'tanzu-cluster-essentials' "${ESSENTIALS_VERSION}" "tanzu-cluster-essentials-linux-${arch}-*.tgz" \
       "$file" \
-      <<< "$PIVNET_TOKEN" \
+      <<< "$TANZUNET_REFRESH_TOKEN" \
     || {
       rc=$?
       echo >&2 'Could not download cluster essentials'
@@ -145,7 +145,7 @@ function installTanzuCLI {
     tanzunet::getFile \
       'tanzu-application-platform' "${TAP_VERSION}" "tanzu-framework-linux-${arch}-*" \
       "$file" \
-      <<< "$PIVNET_TOKEN" \
+      <<< "$TANZUNET_REFRESH_TOKEN" \
     || {
       rc=$?
       echo >&2 'Could not download the tanzu CLI / tanzu framework'
@@ -207,7 +207,7 @@ function readUserInputs {
   TANZUNET_REGISTRY_SECRETS_MANAGER_ARN=$(yq -r .tanzunet.secrets.credentials_arn $INPUTS/user-input-values.yaml)
   TANZUNET_REGISTRY_USERNAME=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .username)
   TANZUNET_REGISTRY_PASSWORD=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .password)
-  PIVNET_TOKEN=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .token)
+  TANZUNET_REFRESH_TOKEN=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .token)
 
   TANZUNET_REGISTRY_SERVER=$(yq -r .tanzunet.server $INPUTS/user-input-values.yaml)
   TANZUNET_RELOCATE_IMAGES=$(yq -r .tanzunet.relocate_images $INPUTS/user-input-values.yaml)
