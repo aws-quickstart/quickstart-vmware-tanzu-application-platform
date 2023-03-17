@@ -29,7 +29,6 @@ resources:
     - ci/qs-test/
     - ci/tasks/
 - name: housekeeping-daily
-  old_name: houekeeping-time
   icon: wrench-clock
   type: time
   source:
@@ -108,13 +107,27 @@ alerting:
 
 groups:
 - name: main
-  jobs: [ prepare-bucket, test-static, test-single-us-east-1, test-single-eu-south-1, test-multi-us-west-2, publish-bucket, set-pipeline ]
+  jobs:
+  - prepare-bucket
+  - test-static
+  - test-single-us-east-1
+  - test-single-eu-south-1
+  - test-multi-us-west-2
+  - test-relocation-single-us-west-2
+  - test-relocation-multi-us-east-1
+  - publish-bucket
+  - set-pipeline
 - name: pr
-  jobs: [ "pr-*", set-pipeline ]
+  jobs:
+  - "pr-*"
+  - set-pipeline
 - name: housekeeping
-  jobs: [ "housekeeping-*", set-pipeline ]
+  jobs:
+  - "housekeeping-*"
+  - set-pipeline
 - name: all
-  jobs: [ "*" ]
+  jobs:
+  - "*"
 
 jobs:
 - name: set-pipeline
@@ -193,7 +206,6 @@ jobs:
 - name: test-single-us-east-1
   << : *alertingOnJobs
   serial: true
-  old_name: test-single
   plan:
   - in_parallel:
     - get: ci-repo
@@ -253,7 +265,6 @@ jobs:
 - name: test-multi-us-west-2
   << : *alertingOnJobs
   serial: true
-  old_name: test-multi
   plan:
   - in_parallel:
     - get: ci-repo
@@ -277,6 +288,58 @@ jobs:
       REGIONS: "us-west-2"
     ensure: *postTest
 
+- name: test-relocation-single-us-west-2
+  << : *alertingOnJobs
+  serial: true
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ prepare-bucket ]
+    - get: repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ prepare-bucket ]
+    - get: daily-run
+      trigger: true
+      passed: [ prepare-bucket ]
+  - *setup
+  - task: taskcat-test
+    file: ci-repo/ci/tasks/taskcat-run-test/task.yml
+    params:
+      TEST_NAME: relocation-single
+      REGIONS: "us-west-2"
+    ensure: *postTest
+
+- name: test-relocation-multi-us-east-1
+  << : *alertingOnJobs
+  serial: true
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ prepare-bucket ]
+    - get: repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ prepare-bucket ]
+    - get: daily-run
+      trigger: true
+      passed: [ prepare-bucket ]
+  - *setup
+  - task: taskcat-test
+    file: ci-repo/ci/tasks/taskcat-run-test/task.yml
+    params:
+      TEST_NAME: relocation-multi
+      REGIONS: "us-east-1"
+    ensure: *postTest
+
 - name: publish-bucket
   << : *alertingOnJobs
   plan:
@@ -285,12 +348,17 @@ jobs:
       params:
         submodules: none
       trigger: true
-      passed: [ test-single-us-east-1, test-single-eu-south-1, test-multi-us-west-2 ]
+      passed: &passedForPublishBucket
+      - test-single-us-east-1
+      - test-single-eu-south-1
+      - test-multi-us-west-2
+      - test-relocation-single-us-west-2
+      - test-relocation-multi-us-east-1
     - get: repo
       params:
         submodules: none
       trigger: true
-      passed: [ test-single-us-east-1, test-single-eu-south-1, test-multi-us-west-2 ]
+      passed: *passedForPublishBucket
   - *setup
   - task: publish-bucket
     file: ci-repo/ci/tasks/taskcat-bucket-sync/task.yml
@@ -355,7 +423,6 @@ jobs:
 - name: pr-test-single-us-east-1
   << : *alertginOnPrJobs
   serial: true
-  old_name: pr-test-single
   plan:
   - in_parallel:
     - get: ci-repo
@@ -400,7 +467,6 @@ jobs:
 - name: pr-test-multi-us-west-2
   << : *alertginOnPrJobs
   serial: true
-  old_name: pr-test-multi
   plan:
   - in_parallel:
     - get: ci-repo
@@ -420,12 +486,61 @@ jobs:
       REGIONS: "us-west-2"
     ensure: *postTest
 
+- name: pr-test-relocation-single-us-west-2
+  << : *alertginOnPrJobs
+  serial: true
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ pr-prepare-bucket ]
+    - get: repo
+      resource: pull-request
+      trigger: true
+      passed: [ pr-prepare-bucket ]
+  - *setup
+  - task: taskcat-test
+    file: ci-repo/ci/tasks/taskcat-run-test/task.yml
+    params:
+      TEST_NAME: relocation-single
+      REGIONS: "us-west-2"
+    ensure: *postTest
+
+- name: pr-test-relocation-multi-us-east-1
+  << : *alertginOnPrJobs
+  serial: true
+  plan:
+  - in_parallel:
+    - get: ci-repo
+      params:
+        submodules: none
+      trigger: true
+      passed: [ pr-prepare-bucket ]
+    - get: repo
+      resource: pull-request
+      trigger: true
+      passed: [ pr-prepare-bucket ]
+  - *setup
+  - task: taskcat-test
+    file: ci-repo/ci/tasks/taskcat-run-test/task.yml
+    params:
+      TEST_NAME: relocation-multi
+      REGIONS: "us-east-1"
+    ensure: *postTest
+
 - name: pr-set-success
   plan:
   - get: repo
     resource: pull-request
     trigger: true
-    passed: [ pr-test-single-us-east-1, pr-test-single-eu-south-1, pr-test-multi-us-west-2 ]
+    passed:
+    - pr-test-single-us-east-1
+    - pr-test-single-eu-south-1
+    - pr-test-multi-us-west-2
+    - pr-test-relocation-single-us-west-2
+    - pr-test-relocation-multi-us-east-1
   - put: pull-request
     params:
       path: repo
