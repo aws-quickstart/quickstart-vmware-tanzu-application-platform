@@ -53,6 +53,29 @@ cat <<EOF >> /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
 }
 EOF
 
+installOm() (
+  local dest="${1}"
+  local version="${2:-7.9.0}"
+  local arch="${3:-amd64}"
+
+  downloadDir="$( mktemp --directory --suffix=-om-installation )"
+  trap 'rm -rf -- "$downloadDir"' EXIT
+
+  echo "Installing om CLI ($version) ..."
+
+  cd "$downloadDir"
+
+  local baseName="om-linux-${arch}-${version}"
+
+  curl -fsSL --remote-name-all \
+    "https://github.com/pivotal-cf/om/releases/download/${version}/${baseName}" \
+    "https://github.com/pivotal-cf/om/releases/download/${version}/checksums.txt"
+
+  sha256sum --check --status --strict <( grep '\s'"$baseName"'$' checksums.txt )
+
+  install -m 0755 "$baseName" "$dest"
+)
+
 
 pushd /tmp
 aws s3 cp --no-progress "s3://amazoncloudwatch-agent-${AWS_REGION}/ubuntu/${arch}/latest/amazon-cloudwatch-agent.deb" ./amazon-cloudwatch-agent.deb
@@ -166,9 +189,9 @@ ${SampleAppConfig}
 EOF
 popd
 chown -R $user:$user "$tap_dir"
-echo "Installing pivnet CLI..."
-wget -O "$tap_dir/downloads/pivnet" "https://github.com/pivotal-cf/pivnet-cli/releases/download/v${PivNetVersion}/pivnet-linux-$(dpkg --print-architecture)-${PivNetVersion}"
-install -o $user -g $user -m 0755 "$tap_dir/downloads/pivnet" /usr/local/bin/pivnet
+
+installOm /usr/local/bin/om "${OmCLIVersion:-7.9.0}"
+
 echo "Installing Tanzu CLI and Staging Tanzu-cluster-essentials..."
 su - $user -c "$tap_dir/src/install-tools.sh"
 echo TanzuNetRelocateImages ${TanzuNetRelocateImages}

@@ -58,67 +58,110 @@ function waitForRemoval {
   done
 }
 
+# tanzunet::getFile downloads a product file from tanzunet, given the product
+# slug, the product release version & the product filename glob; it will placce
+# the artefact to the provided file path.
+# Special care is taken in handling the tanzunet token:
+#   The token is expected to be provided on StdIn and it is only used in a
+#   subshell where `xtrace` & `verbose` is explicitly disabled. This is done,
+#   so that we don't leak the token in some debug output, logs, ... even if the
+#   caller would run with `xtrace` or `verbose` enabled.
+tanzunet::getFile() (
+  local -
+  set -e
+  set -u
+  set -o pipefail
+
+  local slug="$1"
+  local version="$2"
+  local fileGlob="$3"
+  local dest="$4"
+
+  downloadDir="$( mktemp --directory --suffix=-tanzunet-download )"
+  trap 'rm -rf -- "$downloadDir"' EXIT
+
+  cd "$downloadDir"
+
+  (
+    set +xv # disable `verbose` & `xtrace` so we don't leak the token
+    om download-product \
+      --pivnet-api-token="$(</dev/stdin)" \
+      --pivnet-product-slug="${slug}" \
+      --product-version="${version}" \
+      --file-glob="${fileGlob}" \
+      --output-directory='.'
+  )
+
+  local filePath
+
+  filePath="$( jq -er '.product_path' ./download-file.json )"
+
+  echo >&2 "moving '$(basename "$filePath")' to '$dest'"
+  mv "$filePath" "$dest"
+)
+
 function installTanzuCLI {
   requireValue ESSENTIALS_VERSION TAP_VERSION
 
   banner "Downloading kapp, secretgen configuration bundle & tanzu cli"
 
-  mkdir -p $DOWNLOADS
+  mkdir -p "$DOWNLOADS"
+
+  local file arch rc
+
+  arch="$(dpkg --print-architecture)"
 
   if [[ ! -f $DOWNLOADS/tanzu-cluster-essentials/install.sh ]]
   then
-    pivnet login --api-token="$PIVNET_TOKEN"
+    file="${DOWNLOADS}/cluster-essentials.tgz"
 
-    ESSENTIALS_FILE_NAME="tanzu-cluster-essentials-linux-$(dpkg --print-architecture)-$ESSENTIALS_VERSION.tgz"
+    tanzunet::getFile \
+      'tanzu-cluster-essentials' "${ESSENTIALS_VERSION}" "tanzu-cluster-essentials-linux-${arch}-*.tgz" \
+      "$file" \
+      <<< "$TANZUNET_REFRESH_TOKEN" \
+    || {
+      rc=$?
+      echo >&2 'Could not download cluster essentials'
+      return $rc
+    }
 
-    ESSENTIALS_FILE_ID=$(pivnet product-files \
-      -p tanzu-cluster-essentials \
-      -r $ESSENTIALS_VERSION \
-     --format=json | jq ".[] | select(.name == \"$ESSENTIALS_FILE_NAME\").id" )
-
-    pivnet download-product-files \
-      --download-dir $DOWNLOADS \
-      --product-slug='tanzu-cluster-essentials' \
-      --release-version=$ESSENTIALS_VERSION \
-      --product-file-id=$ESSENTIALS_FILE_ID
-
-    mkdir -p $DOWNLOADS/tanzu-cluster-essentials
-    tar xvf $DOWNLOADS/$ESSENTIALS_FILE_NAME -C $DOWNLOADS/tanzu-cluster-essentials
-    sudo cp $DOWNLOADS/tanzu-cluster-essentials/imgpkg /usr/local/bin/
-    sudo cp $DOWNLOADS/tanzu-cluster-essentials/kapp /usr/local/bin/
-    sudo cp $DOWNLOADS/tanzu-cluster-essentials/kbld /usr/local/bin/
-    sudo cp $DOWNLOADS/tanzu-cluster-essentials/ytt /usr/local/bin/
+    mkdir -p "${DOWNLOADS}/tanzu-cluster-essentials"
+    tar xvf "$file" -C "${DOWNLOADS}/tanzu-cluster-essentials"
+    sudo cp "${DOWNLOADS}/tanzu-cluster-essentials/imgpkg" /usr/local/bin/
+    sudo cp "${DOWNLOADS}/tanzu-cluster-essentials/kapp"   /usr/local/bin/
+    sudo cp "${DOWNLOADS}/tanzu-cluster-essentials/kbld"   /usr/local/bin/
+    sudo cp "${DOWNLOADS}/tanzu-cluster-essentials/ytt"    /usr/local/bin/
   else
     echo "tanzu-cluster-essentials already present"
   fi
 
-  TANZU_DIR=$DOWNLOADS/tanzu
+  TANZU_DIR="${DOWNLOADS}/tanzu"
   if [[ ! -f /usr/local/bin/tanzu ]]
   then
-    mkdir -p $TANZU_DIR
+    mkdir -p "${TANZU_DIR}"
+
+    file="${DOWNLOADS}/tap-bundle.tar"
+
+    tanzunet::getFile \
+      'tanzu-application-platform' "${TAP_VERSION}" "tanzu-framework-linux-${arch}-*" \
+      "$file" \
+      <<< "$TANZUNET_REFRESH_TOKEN" \
+    || {
+      rc=$?
+      echo >&2 'Could not download the tanzu CLI / tanzu framework'
+      return $rc
+    }
+
+    tar xvf "$file" -C "$TANZU_DIR"
     export TANZU_CLI_NO_INIT=true
-
-    pivnet login --api-token="$PIVNET_TOKEN"
-
-    TANZUCLI_FILE_ID=$(pivnet product-files \
-      -p tanzu-application-platform \
-      -r $TAP_VERSION \
-      --format=json | jq '.[] | select(.name == "tanzu-framework-bundle-linux").id' )
-
-    pivnet download-product-files \
-      --download-dir $DOWNLOADS \
-      --product-slug='tanzu-application-platform' \
-      --release-version=$TAP_VERSION \
-      --product-file-id=$TANZUCLI_FILE_ID
-
-    TANZUCLI_FILE_NAME=`ls $DOWNLOADS/tanzu-framework-linux-*`
-    # echo TANZUCLI_FILE_NAME $TANZUCLI_FILE_NAME
-    tar xvf $TANZUCLI_FILE_NAME -C $TANZU_DIR
-    export TANZU_CLI_NO_INIT=true
-    MOST_RECENT_CLI=$(find $TANZU_DIR/cli/core/ -name tanzu-core-linux_$(dpkg --print-architecture) | xargs ls -t | head -n 1)
+    MOST_RECENT_CLI="$(
+      find "${TANZU_DIR}/cli/core/" -name "tanzu-core-linux_${arch}" \
+        | xargs ls -t \
+        | head -n 1
+    )"
     echo "Installing Tanzu CLI"
-    sudo install -m 0755 $MOST_RECENT_CLI /usr/local/bin/tanzu
-    pushd $TANZU_DIR
+    sudo install -m 0755 "$MOST_RECENT_CLI" /usr/local/bin/tanzu
+    pushd "$TANZU_DIR"
     tanzu plugin install --local cli all
     popd
   else
@@ -164,7 +207,7 @@ function readUserInputs {
   TANZUNET_REGISTRY_SECRETS_MANAGER_ARN=$(yq -r .tanzunet.secrets.credentials_arn $INPUTS/user-input-values.yaml)
   TANZUNET_REGISTRY_USERNAME=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .username)
   TANZUNET_REGISTRY_PASSWORD=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .password)
-  PIVNET_TOKEN=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .token)
+  TANZUNET_REFRESH_TOKEN=$(aws secretsmanager get-secret-value --secret-id "$TANZUNET_REGISTRY_SECRETS_MANAGER_ARN" --query "SecretString" --output text | jq -r .token)
 
   TANZUNET_REGISTRY_SERVER=$(yq -r .tanzunet.server $INPUTS/user-input-values.yaml)
   TANZUNET_RELOCATE_IMAGES=$(yq -r .tanzunet.relocate_images $INPUTS/user-input-values.yaml)
