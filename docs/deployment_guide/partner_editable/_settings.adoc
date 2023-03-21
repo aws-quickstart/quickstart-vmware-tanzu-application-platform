@@ -6,7 +6,7 @@
 :partner-product-short-name: {partner-product-family} Application Platform
 :partner-product-name: {partner-company-short-name} {partner-product-short-name}
 :partner-product-acronym: TAP
-:partner-product-version: 1.4.1
+:partner-product-version: 1.4.2
 :partner-company-name: VMware, Inc.
 :partner-registry: {partner-product-family-full} Network
 :doc-month: February
