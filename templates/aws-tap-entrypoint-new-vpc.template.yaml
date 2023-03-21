@@ -56,7 +56,6 @@ Metadata:
       - Label:
           default: Amazon EKS configuration
         Parameters:
-          - EKSClusterName
           - NodeInstanceType
           - NodeVolumeSize
           - NumberOfNodes
@@ -98,8 +97,6 @@ Metadata:
         default: Domain name
       TAPClusterArch:
         default: EKS single or multi cluster
-      EKSClusterName:
-        default: EKS cluster name
       NodeInstanceType:
         default: Instance type
       NodeVolumeSize:
@@ -234,17 +231,6 @@ Parameters:
       are supported due to Windows instances not supporting ED25519. For more
       information, refer to Amazon EC2 key pairs and Windows instances
       (https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
-  EKSClusterName:
-    Type: String
-    Description: >-
-      Name of the EKS cluster where TAP will be deployed.
-    MinLength: 1
-    MaxLength: 100
-    AllowedPattern: ^[0-9A-Za-z][A-Za-z0-9\-_]*
-    ConstraintDescription: >-
-      Minimum length of 1. Maximum length of 100. Must start with a letter or
-      number.
-    Default: cluster-eks-tap
   NumberOfNodes:
     Type: Number
     Description: Minimum number of nodes to create for the TAP EKS cluster.
@@ -596,7 +582,6 @@ Resources:
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
         NodeInstanceType: !Ref NodeInstanceType
         NodeVolumeSize: !Ref NodeVolumeSize
-        EKSClusterName: !Ref EKSClusterName
         TAPDomainName: !Ref TAPDomainName
         TAPClusterArch: !Ref TAPClusterArch
         TanzuNetUsername: !Ref TanzuNetUsername

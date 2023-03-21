@@ -52,7 +52,6 @@ Metadata:
       - Label:
           default: Amazon EKS configuration
         Parameters:
-          - EKSClusterName
           - NodeInstanceType
           - NodeVolumeSize
           - NumberOfNodes
@@ -86,8 +85,6 @@ Metadata:
         default: Domain name
       TAPClusterArch:
         default: EKS single or multi cluster
-      EKSClusterName:
-        default: EKS cluster name
       NodeInstanceType:
         default: Instance type
       NodeVolumeSize:
@@ -185,16 +182,6 @@ Parameters:
       are supported due to Windows instances not supporting ED25519. For more
       information, refer to Amazon EC2 key pairs and Windows instances
       (https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html).
-  EKSClusterName:
-    Type: String
-    Description: Name of the EKS cluster where TAP will be deployed.
-    MinLength: 1
-    MaxLength: 100
-    AllowedPattern: ^[0-9A-Za-z][A-Za-z0-9\-_]*
-    ConstraintDescription: >-
-      Minimum length of 1. Maximum length of 100. Must start with a letter or
-      number.
-    Default: cluster-eks-tap
   NumberOfNodes:
     Type: Number
     Description: Minimum number of nodes to create for the TAP EKS cluster.
@@ -805,7 +792,7 @@ Resources:
         NodeInstanceFamily: Standard
         NodeGroupType: Managed
         NodeGroupOS: Amazon Linux 2
-        EKSClusterName: !Ref EKSClusterName
+        EKSClusterName: !Join ['-', ['tap', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
         ClusterAutoScaler: Enabled
         LoadBalancerController: Enabled
         PerRegionSharedResources: 'No'
@@ -844,7 +831,7 @@ Resources:
         NodeInstanceFamily: Standard
         NodeGroupType: Managed
         NodeGroupOS: Amazon Linux 2
-        EKSClusterName: !Sub ${EKSClusterName}-run
+        EKSClusterName: !Join ['-', ['tap', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], 'run']]
         ClusterAutoScaler: Enabled
         LoadBalancerController: Enabled
         PerRegionSharedResources: 'No'
@@ -882,7 +869,7 @@ Resources:
         NodeInstanceFamily: Standard
         NodeGroupType: Managed
         NodeGroupOS: Amazon Linux 2
-        EKSClusterName: !Sub ${EKSClusterName}-view
+        EKSClusterName: !Join ['-', ['tap', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], 'view']]
         ClusterAutoScaler: Enabled
         LoadBalancerController: Enabled
         PerRegionSharedResources: 'No'
@@ -920,7 +907,7 @@ Resources:
         NodeInstanceFamily: Standard
         NodeGroupType: Managed
         NodeGroupOS: Amazon Linux 2
-        EKSClusterName: !Sub ${EKSClusterName}-build
+        EKSClusterName: !Join ['-', ['tap', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], 'build']]
         ClusterAutoScaler: Enabled
         LoadBalancerController: Enabled
         PerRegionSharedResources: 'No'
@@ -958,7 +945,7 @@ Resources:
         NodeInstanceFamily: Standard
         NodeGroupType: Managed
         NodeGroupOS: Amazon Linux 2
-        EKSClusterName: !Sub ${EKSClusterName}-iterate
+        EKSClusterName: !Join ['-', ['tap', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], 'iterate']]
         ClusterAutoScaler: Enabled
         LoadBalancerController: Enabled
         PerRegionSharedResources: 'No'
@@ -1374,11 +1361,21 @@ Resources:
                   - eks:DescribeCluster
                   - eks:DescribeNodegroup
                 Resource:
-                  - !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}
-                  - !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}-run
-                  - !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}-build
-                  - !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}-iterate
-                  - !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}-view
+                  - !Sub
+                      - arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${clusterName}
+                      - clusterName: !Join ['-', ['tap', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
+                  - !Sub
+                      - arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${clusterName}
+                      - clusterName: !Join ['-', ['tap', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], 'run']]
+                  - !Sub
+                      - arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${clusterName}
+                      - clusterName: !Join ['-', ['tap', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], 'build']]
+                  - !Sub
+                      - arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${clusterName}
+                      - clusterName: !Join ['-', ['tap', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], 'iterate']]
+                  - !Sub
+                      - arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${clusterName}
+                      - clusterName: !Join ['-', ['tap', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], 'view']]
               - Sid: DescribeEksAddons
                 Effect: Allow
                 Action:
@@ -2266,6 +2263,12 @@ Resources:
               IterateClusterWorkloadArn: !If [CreateMultiCluster, !GetAtt ITERATEWorkloadIamRole.Arn, ""]
               RunClusterName: !If [CreateMultiCluster, !GetAtt RUNEKSQSStack.Outputs.EKSClusterName, ""]
               ViewClusterName: !If [CreateMultiCluster, !GetAtt VIEWEKSQSStack.Outputs.EKSClusterName, ""]
+
+              #! TODO:
+              #!   We need this regardless of deployment arch, so we can't use
+              #!   the EKS stack's output here. We should change the cloud-init
+              #!   to not rely on that for the multi-cluster case.
+              EKSClusterName: !Join ['-', ['tap', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
 
               CloudInitHandle:          !Ref PhaseCloudInitHandle
               TAPInstallHandle:         !Ref PhaseTAPInstallHandle
