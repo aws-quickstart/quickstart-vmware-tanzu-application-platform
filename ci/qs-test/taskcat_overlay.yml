@@ -37,7 +37,6 @@ project:
     TanzuNetUsername: #@ tanzunet_username
     TanzuNetPassword: #@ tanzunet_password
     TanzuNetApiToken: #@ tanzunet_refreshToken
-    TanzuNetRelocateImages: "No"
     TAPDomainName: #@ "{}.{}".format("$[taskcat_random-string]", domain)
     QSS3KeyPrefix: #@ gitSha + "/"
   tags:

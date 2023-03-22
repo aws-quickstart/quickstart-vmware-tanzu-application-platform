@@ -18,7 +18,6 @@ project:
     TanzuNetUsername: --override--
     TanzuNetPassword: --override--
     TanzuNetApiToken: --override--
-    TanzuNetRelocateImages: --override--
     TAPDomainName: --override--
     QSS3BucketName: $[taskcat_autobucket]
     QSS3BucketRegion: $[taskcat_current_region]
@@ -30,11 +29,25 @@ tests:
   single-cluster:
     parameters:
       TAPClusterArch: single
+      TanzuNetRelocateImages: "No"
     regions:
       - us-east-1
       - eu-south-1
   multi-cluster:
     parameters:
       TAPClusterArch: multi
+      TanzuNetRelocateImages: "No"
     regions:
       - us-west-2
+  relocation-single:
+    parameters:
+      TAPClusterArch: single
+      TanzuNetRelocateImages: "Yes"
+    regions:
+      - us-west-2
+  relocation-multi:
+    parameters:
+      TAPClusterArch: multi
+      TanzuNetRelocateImages: "Yes"
+    regions:
+      - us-east-1
