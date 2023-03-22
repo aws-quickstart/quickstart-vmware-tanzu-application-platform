@@ -105,10 +105,10 @@ Verify that an RSA key pair used during deployment. If not, try the following op
 === Version 1.4.2+aws.1
 * Bugfix: Relocation of the TAP images was broken, this release fixes that.
 * Removed the following configuration options:
-** EKS Cluster Name.
-* The bastion hosts now uses {imds-v2}[Instance Metadata Service Version 2 (IMDSv2)]
+** EKS Cluster name.
+* The bastion hosts now use {imds-v2}[Instance Metadata Service Version 2 (IMDSv2)].
 * We changed how we check and deploy the shared resources stacks
-  (`eks-quickstart-RegionalSharedResources` & `eks-quickstart-AccountSharedResources`) which results in a slightly faster deployments
+  (`eks-quickstart-RegionalSharedResources` & `eks-quickstart-AccountSharedResources`) which results in slightly faster deployments
   and less chance to run into race-conditions.
 
 === Version 1.4.2+aws.0
