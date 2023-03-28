@@ -70,8 +70,14 @@ tanzu package installed list -A
 If the installation has stopped running, one or more reconciliations have likely failed.
 If so, run the following command.
 
+For the single cluster install of Quickstart, run the following command.
 ----
-/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install
+/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install single
+----
+
+For the multi cluster install of Quickstart, run the command against the cluster with packages not reconciling. The cluster types for multi cluster are "view", "run", "iterate", or "build." Pass the cluster type into the install command.
+----
+/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install <cluster-type>
 ----
 
 === It's been more than four minutes and the Windows bastion host administrator password still isn't available
@@ -89,6 +95,78 @@ Verify that an RSA key pair used during deployment. If not, try the following op
 * Customize the CloudFormation template to use a separate key pair for the Windows bastion host. Then update the CloudFormation stack. This option only replaces the Windows bastion host instance. Instructions for implementing this are beyond the scope of this guide.
 
 * https://aws.amazon.com/contact-us/[Contact AWS technical support^].
+
+=== Quickstart deployment not completing
+
+If a deployment takes over two hours to complete, it is possible that the CloudFormation resources failed to deploy.
+
+* The deployment failed to complete successfully.
++
+. Verify that the CloudFormation stack deployment completed successfully.
+. If the stack deployed successfully, review the {partner-product-short-name} bootstrap logs.
+.. Sign in to the https://console.aws.amazon.com/console/home[AWS Management Console^], and open the CloudWatch console.
+.. In the left navigation pane, choose *Log groups*.
+.. Choose the `+/aws/quickstart/tanzu-application-platform/<stack ID>+` log group.
+.. Choose the `+<instance ID>_/var/log/cloud-init-output.log+` log stream.
+.. On the **Log events** page, verify that the bootstrapping completed successfully. If the bootstrapping completed successfully, then the issue might be the location you are connecting from.
+. Verify that the TAP package reconciliation and install scripts succeeded.
+.. In the CloudFormation console, choose the inner most failed nested stack.
+.. Choose the "Events" tab and look for the error description under "Status Reason." If the error can be corrected, update the stack with the "Stack Actions" dropdown on the right corner.
+.. If the stack is in "ROLLBACK_FAILED" state delete the stack and redeploy Quickstart.
+
+[NOTE]
+====
+* Logs can also be found in the `+/var/log/cloud-init-output.log+` file on the Linux bastion host.
+* `+<stack ID>+` used in the CloudWatch log group name is the ID of the AWS CloudFormation stack, and `+<instance ID>+` used in the CloudWatch log stream name is the ID of the Amazon EC2 Linux bastion host, respectively.
+====
+
+=== Diagnosing input parameter failures
+
+If some input parameters are invalid they may cause the deployment to fail.
+
+* The following are some examples of invalid parameters.
++
+. Availability zones that are not present or restricted in selected AWS region.
+. The list of availability zones and number of availability zones do not match.
+. Remote access CIDR is invalid or not formatted correctly.
+. Key pair does not exist.
+
+* Ensure the parameters are valid.
++
+. Verify that availability zones are present in the region you are deploying to.
+. Verify that the list of availability zones and the number of availability zones match.
+. Provide the remote access CIDR for your machine to connect to the Windows or Linux Bastion EC2 instance.
+. If you do not have a key pair, create a new one and it will show up in the drop down.
+
+=== Shared resources are not removed after previous Quickstart deletion
+
+By design, RegionalSharedResources and AccountSharedResources do not delete when Quickstart is deleted. These resources persist between subsequent deployments.
+
+* If the shared resources failed to deploy, delete them. If they fail to delete, manually deleting IAM roles may be necessary. There are two ways to manually delete these roles:
++
+. Open the IAM console and search for "eks-quickstart" and the specific Quickstart roles will show up. Delete them then try deleting the shared resource stack that failed to deploy in the CloudFormation console.
+. To see a comprehensive list of roles associated with the failed stack, open the CloudFormation console, choose the stack name and select the Resources tab. Delete any roles that succeeded to provision then try to delete the stack.
+If there are multiple Quickstarts running, AccountSharedResources will span across regions. To redeploy AccountSharedResources after cleanup, delete roles and deploy the Quickstart in one region.
+
+=== CloudFormation deployment fails using custom IAM role
+
+The configuration to deploy with a custom IAM role is optional and not to be used to deploy Quickstart.
+
+=== Diagnosing TAP workload failures
+
+CloudFormation and TAP may successfully deploy but if the workload fails, the TAP workload URL will not be accessible from the Windows Bastion EC2 instance and the workload will not be visible in the TAP GUI supply chain.
+
+Connect to the Linux bastion host using SSH. Then run the following commands to view the workload logs.
+
+----
+tanzu apps workload list -n tap-workload
+tanzu apps workload tail tanzu-java-web-app-workload -n tap-workload --since 10m –timestamp
+----
+
+If the logs are free of errors, check the DNS configuration.
+
+Go to Route53 console and ensure the private zone has the k8 cluster envoy-IP configured in the CNAME records.
+
 
 
 == Release Notes [[release-notes]]
