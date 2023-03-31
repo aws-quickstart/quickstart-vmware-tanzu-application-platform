@@ -11,165 +11,247 @@ Refer to the following resources to troubleshoot {partner-product-name}.
 
 === I can't access the {partner-product-short-name} user interface
 
-The following issues can cause you to not be able to access the {partner-product-short-name} user interface after deployment.
+* Problem
+** Inability to access the {partner-product-short-name} user interface after deployment.
 
-* The deployment failed to complete successfully.
-+
-. Verify that the CloudFormation stack deployment completed successfully.
-. If the stack deployed successfully, review the {partner-product-short-name} bootstrap logs.
-.. Sign in to the https://console.aws.amazon.com/console/home[AWS Management Console^], and open the CloudWatch console.
-.. In the left navigation pane, choose *Log groups*.
-.. Choose the `+/aws/quickstart/tanzu-application-platform/<stack ID>+` log group.
-.. Choose the `+<instance ID>_/var/log/cloud-init-output.log+` log stream.
-.. On the **Log events** page, verify that the bootstrapping completed successfully. If the bootstrapping completed successfully, then the issue might be the location you are connecting from.
+* Cause
+** The deployment failed to complete successfully.
+** You are attempting to accessing the site from a location that doesn't have connectivity to the {partner-product-short-name} GUI.
 
-[NOTE]
-====
-* Logs can also be found in the `+/var/log/cloud-init-output.log+` file on the Linux bastion host.
-* `+<stack ID>+` used in the CloudWatch log group name is the ID of the AWS CloudFormation stack, and `+<instance ID>+` used in the CloudWatch log stream name is the ID of the Amazon EC2 Linux bastion host, respectively.
-====
-
-* You are attempting to accessing the site from a location that doesn't have connectivity to the {partner-product-short-name} GUI. The {partner-product-short-name} website GUI URL can only be accessed from endpoints with a route to the private VPC network, such as from the Amazon EC2 Windows bastion host instance.
+* Solution
+** Verify that the CloudFormation stack deployment completed successfully.
+** If the stack deployed successfully, review the {partner-product-short-name} bootstrap logs.
+** The {partner-product-short-name} website GUI URL can only be accessed from endpoints with a route to the private VPC network, such as from the Amazon EC2 Windows bastion host instance.
 
 === {partner-product-short-name} installation failed with a EULA error
 
-You must accept the relevant EULAs before you can download the {partner-product-short-name} packages from the {partner-registry}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements^].
+* Problem
+** The deployment failed to complete successfully.
 
-For more details about the `+.status.usefulErrorMessage+` error, connect to the Linux bastion host using SSH. Then run the following commands. For `<PACKAGE-NAME>`, substitute the name of the package to target.
+* Cause
+** The EULA was not accepted.
 
+* Solution
+** You must accept the relevant EULAs before you can download the {partner-product-short-name} packages from the {partner-registry}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements^].
+** For more details about the `+.status.usefulErrorMessage+` error, connect to the Linux bastion host using SSH. Then run the following commands. For `<PACKAGE-NAME>`, substitute the name of the package to target.
++
 ----
 tanzu package installed list -A
 tanzu package installed get <PACKAGE-NAME> --namespace tap-install
 ----
-
-If you have chosen to relocate {partner-product-short-name} images to Amazon ECR and this did not complete successfully, run the following command. This command takes 30–45 minutes to complete.
-
++
+** If you have chosen to relocate {partner-product-short-name} images to Amazon ECR and this did not complete successfully, run the following command. This command takes 30–45 minutes to complete.
++
 ----
 /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c relocate
 ----
-
-Run the following command to install {partner-product-short-name}.
-
++
+** Run the following command to install {partner-product-short-name}.
++
 ----
 /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install
 ----
 
 === One or more {partner-product-short-name} packages failed to reconcile
 
-Potential causes include:
+* Problem
+** {partner-product-short-name} packages fail to reconcile.
 
-* An infrastructure issue causing the task to take longer to run than the timeout value allows.
-* A race condition between components.
+* Cause
+** An infrastructure issue causing the task to take longer to run than the timeout value allows.
+** A race condition between components.
 
-Connect to the Linux bastion host using SSH. Then run the following command to verify the installation status.
-
+* Solution
+** Connect to the Linux bastion host using SSH. Then run the following command to verify the installation status.
++
 ----
 tanzu package installed list -A
 ----
-
-If the installation has stopped running, one or more reconciliations have likely failed.
-If so, run the following command.
-
-For the single cluster install of Quickstart, run the following command.
++
+** If the installation has stopped running, one or more reconciliations have likely failed.
+** If so, run the following command.
+** For the single cluster install of Quickstart, run the following command.
++
 ----
 /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install single
 ----
-
-For the multi cluster install of Quickstart, run the command against the cluster with packages not reconciling. The cluster types for multi cluster are "view", "run", "iterate", or "build." Pass the cluster type into the install command.
++
+** For the multi cluster install of Quickstart, run the command against the cluster with packages not reconciling. The cluster types for multi cluster are "view", "run", "iterate", or "build." Pass the cluster type into the install command.
++
 ----
 /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install <cluster-type>
 ----
 
 === It's been more than four minutes and the Windows bastion host administrator password still isn't available
 
-It is likely that during deployment an ED25519 key pair was used instead of an RSA key pair. If you select an ED25519 key pair for this deployment, the CloudFormation stack deploys successfully, but you will be unable to retrieve the automatically generated password for the Windows bastion host.
+* Problem
+** Inability to log into Windows bastion EC2 instance
 
-As of June 23rd, 2022, Amazon EC2 Windows instances do not support ED25519 key pairs. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances^].
+* Cause
+** It is likely that during deployment an ED25519 key pair was used instead of an RSA key pair. If you select an ED25519 key pair for this deployment, the CloudFormation stack deploys successfully, but you will be unable to retrieve the automatically generated password for the Windows bastion host.
+** As of June 23rd, 2022, Amazon EC2 Windows instances do not support ED25519 key pairs. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances^].
 
-Verify that an RSA key pair used during deployment. If not, try the following options:
+* Solution
+** Verify that an RSA key pair used during deployment. If not, try the following options:
+** If an RSA key pair has not been created, try the following steps: https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html[Reset the Windows administrator password using EC2Launch v2^]
+** https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html[Update the CloudFormation stack^] to use an RSA key pair, which will replace all Amazon EC2 instances (Windows and Linux) and Amazon EKS nodes that use this key. For more information, refer to the https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname[documentation^].
+** Customize the CloudFormation template to use a separate key pair for the Windows bastion host. Then update the CloudFormation stack. This option only replaces the Windows bastion host instance. Instructions for implementing this are beyond the scope of this guide.
+** https://aws.amazon.com/contact-us/[Contact AWS technical support^].
 
-* https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html[Reset the Windows administrator password using EC2Launch v2^]
+=== Search logs for deployment failures
 
-* https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html[Update the CloudFormation stack^] to use an RSA key pair, which will replace all Amazon EC2 instances (Windows and Linux) and Amazon EKS nodes that use this key. For more information, refer to the https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname[documentation^].
+* Problem
+** A deployment takes over two hours to complete.
+** How to find logs to debugs Quickstart failures?
 
-* Customize the CloudFormation template to use a separate key pair for the Windows bastion host. Then update the CloudFormation stack. This option only replaces the Windows bastion host instance. Instructions for implementing this are beyond the scope of this guide.
+* Cause
+** CloudFormation fails.
+** No notifaction of Quickstart deployment completion.
 
-* https://aws.amazon.com/contact-us/[Contact AWS technical support^].
-
-=== Quickstart deployment not completing
-
-If a deployment takes over two hours to complete, it is possible that the CloudFormation resources failed to deploy.
-
-* The deployment failed to complete successfully.
+* Solution
+** Sign in to the https://console.aws.amazon.com/console/home[AWS Management Console^], and open the CloudFormation console.
+** Select the Quickstart base stack and click the Outputs tab and copy the TAPLogGroupId.
 +
-. Verify that the CloudFormation stack deployment completed successfully.
-. If the stack deployed successfully, review the {partner-product-short-name} bootstrap logs.
-.. Sign in to the https://console.aws.amazon.com/console/home[AWS Management Console^], and open the CloudWatch console.
-.. In the left navigation pane, choose *Log groups*.
-.. Choose the `+/aws/quickstart/tanzu-application-platform/<stack ID>+` log group.
-.. Choose the `+<instance ID>_/var/log/cloud-init-output.log+` log stream.
-.. On the **Log events** page, verify that the bootstrapping completed successfully. If the bootstrapping completed successfully, then the issue might be the location you are connecting from.
-. Verify that the TAP package reconciliation and install scripts succeeded.
-.. In the CloudFormation console, choose the inner most failed nested stack.
-.. Choose the "Events" tab and look for the error description under "Status Reason." If the error can be corrected, update the stack with the "Stack Actions" dropdown on the right corner.
-.. If the stack is in "ROLLBACK_FAILED" state delete the stack and redeploy Quickstart.
-
-[NOTE]
-====
-* Logs can also be found in the `+/var/log/cloud-init-output.log+` file on the Linux bastion host.
-* `+<stack ID>+` used in the CloudWatch log group name is the ID of the AWS CloudFormation stack, and `+<instance ID>+` used in the CloudWatch log stream name is the ID of the Amazon EC2 Linux bastion host, respectively.
-====
-
-=== Diagnosing input parameter failures
-
-If some input parameters are invalid they may cause the deployment to fail.
-
-* The following are some examples of invalid parameters.
+image:../docs/deployment_guide/images/TAPLogGroupOutput.PNG[LogGroupOutput]
 +
-. Availability zones that are not present or restricted in selected AWS region.
-. The list of availability zones and number of availability zones do not match.
-. Remote access CIDR is invalid or not formatted correctly.
-. Key pair does not exist.
-
-* Ensure the parameters are valid.
+** Search the CloudWatch log groups for the TAPLogGroupId.
 +
-. Verify that availability zones are present in the region you are deploying to.
-. Verify that the list of availability zones and the number of availability zones match.
-. Provide the remote access CIDR for your machine to connect to the Windows or Linux Bastion EC2 instance.
-. If you do not have a key pair, create a new one and it will show up in the drop down.
-
-=== Shared resources are not removed after previous Quickstart deletion
-
-By design, RegionalSharedResources and AccountSharedResources do not delete when Quickstart is deleted. These resources persist between subsequent deployments.
-
-* If the shared resources failed to deploy, delete them. If they fail to delete, manually deleting IAM roles may be necessary. There are two ways to manually delete these roles:
+image:../docs/deployment_guide/images/CloudWatchLogGroup.PNG[CloudWatchLogGroup]
 +
-. Open the IAM console and search for "eks-quickstart" and the specific Quickstart roles will show up. Delete them then try deleting the shared resource stack that failed to deploy in the CloudFormation console.
-. To see a comprehensive list of roles associated with the failed stack, open the CloudFormation console, choose the stack name and select the Resources tab. Delete any roles that succeeded to provision then try to delete the stack.
-If there are multiple Quickstarts running, AccountSharedResources will span across regions. To redeploy AccountSharedResources after cleanup, delete roles and deploy the Quickstart in one region.
+** Select the log group to view the log streams file "/var/log/cloud-init-output.log" where the tap setup scripts output from the Linux Bastion EC2 instance is.
++
+image:../docs/deployment_guide/images/CloudInitOutput.PNG[CloudInitOutput]
++
+** Logs can also be found in the `+/var/log/cloud-init-output.log+` file on the Linux bastion host.
 
-=== CloudFormation deployment fails using custom IAM role
 
-The configuration to deploy with a custom IAM role is optional and not to be used to deploy Quickstart.
+=== Debug CloudFormation deployment failures
 
-=== Diagnosing TAP workload failures
+* Problem
+** Quickstart CloudFormation deployment fails.
 
-CloudFormation and TAP may successfully deploy but if the workload fails, the TAP workload URL will not be accessible from the Windows Bastion EC2 instance and the workload will not be visible in the TAP GUI supply chain.
+* Cause
+** TAP packages may have failed to reconcile.
+** Cloud-init scripts may have failed.
 
-Connect to the Linux bastion host using SSH. Then run the following commands to view the workload logs.
+* Solution
+** Select inner-most nested failed CloudFormation stack.
++
+image:../docs/deployment_guide/images/NestedFailedStack.PNG[NestedFailedStack]
++
+** Select the CloudFormation Events tab.
++
+image:../docs/deployment_guide/images/FailedStackEvents.PNG[FailedStackEvents]
++
+** Find the error description in the "Status reason" column.
+** Correct the error if possible, then update the stack from the "Stack actions" dropdown on the top right corner of the console.
+** If the CloudFormation stack is in "ROLLBACK_FAILED" state, delete the stack and redeploy Quickstart.
 
+=== Quickstart CloudFormation cleanup
+
+* Problem
+** Quickstart fails to delete.
+
+* Cause
+** Inability to completely delete Quickstart CloudFormation resources.
+** VPC does not delete after Quickstart CloudFormation delete operation.
++
+image:../docs/deployment_guide/images/VpcDelete.PNG[VpcDelete]
+
+* Solution
+** There is a dependency on the security group which prevents the Quickstart VPC from deleting the first time.
+** Manually delete the VPC.
+** Once the VPC deletes successfully, manually delete the top level CloudFormation stack by selecting the exclude resource option.Vp
++
+image:../docs/deployment_guide/images/VPCManualDelete.PNG[VPCManualDelete]
+
+=== Input parameter failures
+
+* Problem
+** Invalid Availability Zones or Number of Availability Zones.
+** Invalid Remote Access CIDR provided.
+** EC2 Key pair does not show up in dropdown.
+
+* Cause
+** Using Availability Zones which are not present or restricted in the AWS region.
+** List of Availability Zones and Number of Availability Zones do not match.
+** Entering invalid or incorrectly formatted Remote Access CIDR.
+** Key pair does not exist.
+
+* Solution
+** Ensure Availability Zones are present in the AWS region the Quickstart is deploying to.
+** Ensure the List of Availability Zones and Number of Availability Zones match.
++
+image:../docs/deployment_guide/images/AvailabilityZones.PNG[AvailabilityZones]
++
+** Provide a valid Remote Access CIDR for your machine to connect to the Windows or Linux Bastion EC2 instance in the VPC.
++
+image:../docs/deployment_guide/images/RemoteCIDR.PNG[RemoteCIDR]
++
+** If a key pair exists, it can be used to SSH into the Linux Bastion EC2 instance in the VPC. If a key pair does not exist, create one and it will show up in the drop down.
++
+image:../docs/deployment_guide/images/KeyPair.PNG[KeyPair]
+
+=== RegionalSharedResources and AccountSharedResources not removed after Quickstart CloudFormation delete
+
+* Problem
+** RegionalSharedResources and AccountSharedResources CloudFormation stacks are not removed after QuickStart CFT is deleted.
+** RegionalSharedResources OR AccountSharedResources CFTs failed to deploy
+
+* Cause
+** AWS Resources created by RegionalSharedResources and the AccountSharedResources CFTs such as IAM Roles are left behind even after QuickStart CFT is deleted.
+
+* Solution
+** RegionalSharedResources stack creates AWS resources for each region Quickstart is deployed.
++
+image:../docs/deployment_guide/images/RegionalStack.PNG[RegionalStack]
++
+** AccountSharedResources stack creates AWS resources in a single region where Quickstart is deployed.
++
+image:../docs/deployment_guide/images/AccountStack.PNG[AccountStack]
++
+** RegionalSharedResources and AccountSharedResources stacks remain deployed by design and are meant to persist between Quickstart deployments.
+** If RegionalSharedResources or AccountSharedResources stacks failed to deploy, remove the IAM roles created by SharedResources stacks. Roles that include "qs" or "quickstart" are those created by SharedResources.
+** If multiple Quickstart stacks are running simultaneously in multiple regions, conflicting IAM roles may result in failure to deploy or clean up SharedResources stacks. Delete all IAM roles associated with the Quickstart and deploy a Quickstart in a single region. The SharedResources stacks will be newly created.
+
+=== CloudFormation IAM roles
+
+* Problem
+** IAM role is used to perform CloudFormation operations.
+
+* Cause
+** Using a custom role to deploy Quickstart.
+
+* Solution
+** Using a custom role is optional and not advised for deploying Quickstart.
++
+image:../docs/deployment_guide/images/QSIamRoleOptional.PNG[QSIamRoleOptional]
+
+=== TAP Workload deployment fails
+
+* Problem
+** CloudFormation and TAP installation succeeds but workload fails to run.
+
+* Cause
+** TAP workload URL is not accessible from the Linux or Windows Bastion EC2 instances.
+** TAP workload is not visible in the TAP GUI supply chain.
+
+* Solution
+** SSH to the 'VMwareLinuxBastionInstance' EC2 instance and run the below commands. They will provide the workload status and logs that contain error messages.
++
 ----
 tanzu apps workload list -n tap-workload
 tanzu apps workload tail tanzu-java-web-app-workload -n tap-workload --since 10m –timestamp
 ----
-
-If the logs are free of errors, check the DNS configuration.
-
-Go to Route53 console and ensure the private zone has the k8 cluster envoy-IP configured in the CNAME records.
-
-
-
-== Release Notes [[release-notes]]
++
+** If the status and logs do not contain errors, ensure DNS is correctly configured by checking Route53 and ensuring the private zone has the respective kubernetes cluster envoy-IP configured in CNAME records.
+** Route53 Single cluster configuration.
++
+image:../docs/deployment_guide/images/Route53Single.PNG[Route53Single]
++
+** Route53 Multi cluster configuration.
++
+image:../docs/deployment_guide/images/Route53Multi.PNG[Route53Multi]
 
 // git log --reverse origin/main...v1.4.0 -- ':!/ci/'
 
