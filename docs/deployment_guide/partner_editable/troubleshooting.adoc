@@ -46,10 +46,16 @@ tanzu package installed get <PACKAGE-NAME> --namespace tap-install
 /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c relocate
 ----
 +
-** Run the following command to install {partner-product-short-name}.
+** Run the following commands to reinstall {partner-product-short-name}.
 +
 ----
-/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install
+/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install single
+----
++
+** For the multi cluster install of Quickstart, run the command against the affected clusters. The cluster types for multi cluster are "view", "run", "iterate", or "build." Pass the cluster type into the install command.
++
+----
+/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install <cluster-type>
 ----
 
 === One or more {partner-product-short-name} packages failed to reconcile
@@ -92,7 +98,7 @@ tanzu package installed list -A
 ** As of June 23rd, 2022, Amazon EC2 Windows instances do not support ED25519 key pairs. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances^].
 
 * Solution
-** Verify that an RSA key pair used during deployment. If not, try the following options:
+** Verify that an RSA key pair used during deployment.
 ** If an RSA key pair has not been created, try the following steps: https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html[Reset the Windows administrator password using EC2Launch v2^]
 ** https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html[Update the CloudFormation stack^] to use an RSA key pair, which will replace all Amazon EC2 instances (Windows and Linux) and Amazon EKS nodes that use this key. For more information, refer to the https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname[documentation^].
 ** Customize the CloudFormation template to use a separate key pair for the Windows bastion host. Then update the CloudFormation stack. This option only replaces the Windows bastion host instance. Instructions for implementing this are beyond the scope of this guide.
@@ -147,24 +153,6 @@ image:../docs/deployment_guide/images/FailedStackEvents.PNG[FailedStackEvents]
 ** Correct the error if possible, then update the stack from the "Stack actions" dropdown on the top right corner of the console.
 ** If the CloudFormation stack is in "ROLLBACK_FAILED" state, delete the stack and redeploy Quickstart.
 
-=== Quickstart CloudFormation cleanup
-
-* Problem
-** Quickstart fails to delete.
-
-* Cause
-** Inability to completely delete Quickstart CloudFormation resources.
-** VPC does not delete after Quickstart CloudFormation delete operation.
-+
-image:../docs/deployment_guide/images/VpcDelete.PNG[VpcDelete]
-
-* Solution
-** There is a dependency on the security group which prevents the Quickstart VPC from deleting the first time.
-** Manually delete the VPC.
-** Once the VPC deletes successfully, manually delete the top level CloudFormation stack by selecting the exclude resource option.Vp
-+
-image:../docs/deployment_guide/images/VPCManualDelete.PNG[VPCManualDelete]
-
 === Input parameter failures
 
 * Problem
@@ -196,7 +184,7 @@ image:../docs/deployment_guide/images/KeyPair.PNG[KeyPair]
 
 * Problem
 ** RegionalSharedResources and AccountSharedResources CloudFormation stacks are not removed after QuickStart CFT is deleted.
-** RegionalSharedResources OR AccountSharedResources CFTs failed to deploy
+** RegionalSharedResources or AccountSharedResources CloudFormation stacks failed to deploy.
 
 * Cause
 ** AWS Resources created by RegionalSharedResources and the AccountSharedResources CFTs such as IAM Roles are left behind even after QuickStart CFT is deleted.
@@ -217,7 +205,7 @@ image:../docs/deployment_guide/images/AccountStack.PNG[AccountStack]
 === CloudFormation IAM roles
 
 * Problem
-** IAM role is used to perform CloudFormation operations.
+** IAM role is used to perform CloudFormation operations and deployment fails.
 
 * Cause
 ** Using a custom role to deploy Quickstart.
@@ -230,11 +218,11 @@ image:../docs/deployment_guide/images/QSIamRoleOptional.PNG[QSIamRoleOptional]
 === TAP Workload deployment fails
 
 * Problem
-** CloudFormation and TAP installation succeeds but workload fails to run.
-
-* Cause
 ** TAP workload URL is not accessible from the Linux or Windows Bastion EC2 instances.
 ** TAP workload is not visible in the TAP GUI supply chain.
+
+* Cause
+** CloudFormation and TAP installation succeeds but workload fails to run.
 
 * Solution
 ** SSH to the 'VMwareLinuxBastionInstance' EC2 instance and run the below commands. They will provide the workload status and logs that contain error messages.
