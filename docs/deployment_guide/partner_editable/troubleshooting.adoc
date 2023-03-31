@@ -75,7 +75,6 @@ tanzu package installed list -A
 ----
 +
 ** If the installation has stopped running, one or more reconciliations have likely failed.
-** If so, run the following command.
 ** For the single cluster install of Quickstart, run the following command.
 +
 ----
@@ -98,7 +97,7 @@ tanzu package installed list -A
 ** As of June 23rd, 2022, Amazon EC2 Windows instances do not support ED25519 key pairs. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances^].
 
 * Solution
-** Verify that an RSA key pair used during deployment.
+** Verify that an RSA key pair is used during deployment.
 ** If an RSA key pair has not been created, try the following steps: https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html[Reset the Windows administrator password using EC2Launch v2^]
 ** https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html[Update the CloudFormation stack^] to use an RSA key pair, which will replace all Amazon EC2 instances (Windows and Linux) and Amazon EKS nodes that use this key. For more information, refer to the https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname[documentation^].
 ** Customize the CloudFormation template to use a separate key pair for the Windows bastion host. Then update the CloudFormation stack. This option only replaces the Windows bastion host instance. Instructions for implementing this are beyond the scope of this guide.
@@ -108,11 +107,10 @@ tanzu package installed list -A
 
 * Problem
 ** A deployment takes over two hours to complete.
-** How to find logs to debugs Quickstart failures?
+** No notification of Quickstart deployment completion.
 
 * Cause
 ** CloudFormation fails.
-** No notifaction of Quickstart deployment completion.
 
 * Solution
 ** Sign in to the https://console.aws.amazon.com/console/home[AWS Management Console^], and open the CloudFormation console.
@@ -168,7 +166,7 @@ image:../docs/deployment_guide/images/FailedStackEvents.PNG[FailedStackEvents]
 
 * Solution
 ** Ensure Availability Zones are present in the AWS region the Quickstart is deploying to.
-** Ensure the List of Availability Zones and Number of Availability Zones match.
+** Ensure the size of the List of Availability Zones and Number of Availability Zones match.
 +
 image:../docs/deployment_guide/images/AvailabilityZones.PNG[AvailabilityZones]
 +
