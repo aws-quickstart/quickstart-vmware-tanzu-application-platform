@@ -621,14 +621,14 @@ Mappings:
       TAPWorkloadInstall:  "900" # 15m
       TAPTests:            "300" #  5m
     'Yes': #! single cluster deployment with relocation
-      CloudInit:          "4200" # 70m
-      TAPInstall:         "3300" # 55m
-      TAPWorkloadInstall:  "600" # 10m
+      CloudInit:          "4800" # 80m
+      TAPInstall:         "3600" # 60m
+      TAPWorkloadInstall:  "900" # 15m
       TAPTests:            "300" #  5m
   TimeoutsMultiCluster:
     'No': #! multi cluster deployment without relocation
-      CloudInit:          "3300" # 55m
-      TAPInstall:         "2100" # 35m
+      CloudInit:          "4500" # 75m
+      TAPInstall:         "3300" # 55m
       TAPWorkloadInstall:  "900" # 15m
       TAPTests:            "300" #  5m
     'Yes': #! multi cluster deployment with relocation
