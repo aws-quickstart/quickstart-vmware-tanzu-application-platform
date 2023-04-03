@@ -248,6 +248,11 @@ image:../docs/deployment_guide/images/Route53Multi.PNG[Route53Multi]
 :eks-1_24-cl: https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html#kubernetes-1.24
 :eksqs-5_0_0-cl: https://github.com/aws-quickstart/quickstart-amazon-eks/releases/tag/v5.0.0
 
+=== Version 1.4.2+aws.2
+* Bugfix: Timeout issues with cfn-signals during TAP install.
+* Added TAP-GUI self-Cert on Windows EC2 instance.
+* Added more use-cases to troubleshooting guide with images.
+
 === Version 1.4.2+aws.1
 * Bugfix: Relocation of the TAP images was broken, this release fixes that.
 * Removed the following configuration options:
