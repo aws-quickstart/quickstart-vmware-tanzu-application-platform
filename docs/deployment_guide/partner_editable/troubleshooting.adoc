@@ -251,7 +251,7 @@ image:../docs/deployment_guide/images/Route53Multi.PNG[Route53Multi]
 === Version 1.4.2+aws.2
 * Bugfix: Timeout issues with cfn-signals during TAP install.
 * Added TAP-GUI self-Cert on Windows EC2 instance.
-* Added more use-cases to troubleshooting guide with images.
+* Added more use cases to troubleshooting guide with images.
 
 === Version 1.4.2+aws.1
 * Bugfix: Relocation of the TAP images was broken, this release fixes that.
