@@ -490,6 +490,7 @@ Mappings:
       EKS: '1.24'
       #! https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
       Kubectl: 1.24.9/2023-01-11
+      WindowsKubectl: 1.24.10/2023-01-30
       ClusterEssentialsVersion: 1.4.1
       #! Note: this is not the hash of the tanzunet artifact, but rather the image hash for the bundle image;
       #! You can get it e.g. by
@@ -615,19 +616,19 @@ Mappings:
       MapName: TimeoutsSingleCluster
   TimeoutsSingleCluster:
     'No': #! single cluster deployment without relocation
-      CloudInit:          "1500" # 25m
-      TAPInstall:          "600" # 10m
-      TAPWorkloadInstall:  "600" # 10m
+      CloudInit:          "3300" # 55m
+      TAPInstall:         "2100" # 35m
+      TAPWorkloadInstall:  "900" # 15m
       TAPTests:            "300" #  5m
     'Yes': #! single cluster deployment with relocation
-      CloudInit:          "4200" # 70m
-      TAPInstall:         "3300" # 55m
-      TAPWorkloadInstall:  "600" # 10m
+      CloudInit:          "4800" # 80m
+      TAPInstall:         "3600" # 60m
+      TAPWorkloadInstall:  "900" # 15m
       TAPTests:            "300" #  5m
   TimeoutsMultiCluster:
     'No': #! multi cluster deployment without relocation
-      CloudInit:          "3300" # 55m
-      TAPInstall:         "2100" # 35m
+      CloudInit:          "4500" # 75m
+      TAPInstall:         "3300" # 55m
       TAPWorkloadInstall:  "900" # 15m
       TAPTests:            "300" #  5m
     'Yes': #! multi cluster deployment with relocation
@@ -784,7 +785,7 @@ Resources:
           - !Ref AWS::NoValue
         RemoteAccessCIDR: !Ref RemoteAccessCidr
         EKSPublicAccessEndpoint: Disabled
-        AdditionalEKSAdminRoleArn: !GetAtt LinuxBastionIamRole.Arn
+        AdditionalEKSAdminRoleArn: !GetAtt QSBastionIamRole.Arn
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
@@ -823,7 +824,7 @@ Resources:
           - !Ref AWS::NoValue
         RemoteAccessCIDR: !Ref RemoteAccessCidr
         EKSPublicAccessEndpoint: Disabled
-        AdditionalEKSAdminRoleArn: !GetAtt LinuxBastionIamRole.Arn
+        AdditionalEKSAdminRoleArn: !GetAtt QSBastionIamRole.Arn
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
@@ -861,7 +862,7 @@ Resources:
           - !Ref AWS::NoValue
         RemoteAccessCIDR: !Ref RemoteAccessCidr
         EKSPublicAccessEndpoint: Disabled
-        AdditionalEKSAdminRoleArn: !GetAtt LinuxBastionIamRole.Arn
+        AdditionalEKSAdminRoleArn: !GetAtt QSBastionIamRole.Arn
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
@@ -899,7 +900,7 @@ Resources:
           - !Ref AWS::NoValue
         RemoteAccessCIDR: !Ref RemoteAccessCidr
         EKSPublicAccessEndpoint: Disabled
-        AdditionalEKSAdminRoleArn: !GetAtt LinuxBastionIamRole.Arn
+        AdditionalEKSAdminRoleArn: !GetAtt QSBastionIamRole.Arn
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
@@ -937,7 +938,7 @@ Resources:
           - !Ref AWS::NoValue
         RemoteAccessCIDR: !Ref RemoteAccessCidr
         EKSPublicAccessEndpoint: Disabled
-        AdditionalEKSAdminRoleArn: !GetAtt LinuxBastionIamRole.Arn
+        AdditionalEKSAdminRoleArn: !GetAtt QSBastionIamRole.Arn
         KeyPairName: !Ref KeyPairName
         NumberOfNodes: !Ref NumberOfNodes
         MaxNumberOfNodes: !Ref MaxNumberOfNodes
@@ -961,7 +962,7 @@ Resources:
       Description: >-
         Allow SSH from the Linux bastion host / bootstrap instance to the EKS
         nodes.
-      GroupId: !Ref LinuxBastionSecurityGroup
+      GroupId: !Ref QSBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 22
       ToPort: 22
@@ -979,7 +980,7 @@ Resources:
       IpProtocol: tcp
       ToPort: 22
       FromPort: 22
-      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+      SourceSecurityGroupId: !Ref QSBastionSecurityGroup
   RunLinuxBastionK8sToApiEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
     Condition: CreateMultiCluster
@@ -989,7 +990,7 @@ Resources:
       Description: >-
         Allow the Linux bastion host / bootstrap instance to connect to the EKS
         control plane for Kubernetes API traffic.
-      GroupId: !Ref LinuxBastionSecurityGroup
+      GroupId: !Ref QSBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 443
       ToPort: 443
@@ -1007,7 +1008,7 @@ Resources:
       IpProtocol: tcp
       ToPort: 443
       FromPort: 443
-      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+      SourceSecurityGroupId: !Ref QSBastionSecurityGroup
   ViewLinuxBastionSshToNodesEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
     Condition: CreateMultiCluster
@@ -1017,7 +1018,7 @@ Resources:
       Description: >-
         Allow SSH from the Linux bastion host / bootstrap instance to the EKS
         nodes.
-      GroupId: !Ref LinuxBastionSecurityGroup
+      GroupId: !Ref QSBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 22
       ToPort: 22
@@ -1035,7 +1036,7 @@ Resources:
       IpProtocol: tcp
       ToPort: 22
       FromPort: 22
-      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+      SourceSecurityGroupId: !Ref QSBastionSecurityGroup
   ViewLinuxBastionK8sToApiEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
     Condition: CreateMultiCluster
@@ -1045,7 +1046,7 @@ Resources:
       Description: >-
         Allow the Linux bastion host / bootstrap instance to connect to the EKS
         control plane for Kubernetes API traffic.
-      GroupId: !Ref LinuxBastionSecurityGroup
+      GroupId: !Ref QSBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 443
       ToPort: 443
@@ -1063,7 +1064,7 @@ Resources:
       IpProtocol: tcp
       ToPort: 443
       FromPort: 443
-      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+      SourceSecurityGroupId: !Ref QSBastionSecurityGroup
   BuildLinuxBastionSshToNodesEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
     Condition: CreateMultiCluster
@@ -1073,7 +1074,7 @@ Resources:
       Description: >-
         Allow SSH from the Linux bastion host / bootstrap instance to the EKS
         nodes.
-      GroupId: !Ref LinuxBastionSecurityGroup
+      GroupId: !Ref QSBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 22
       ToPort: 22
@@ -1091,7 +1092,7 @@ Resources:
       IpProtocol: tcp
       ToPort: 22
       FromPort: 22
-      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+      SourceSecurityGroupId: !Ref QSBastionSecurityGroup
   BuildinuxBastionK8sToApiEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
     Condition: CreateMultiCluster
@@ -1101,7 +1102,7 @@ Resources:
       Description: >-
         Allow the Linux bastion host / bootstrap instance to connect to the EKS
         control plane for Kubernetes API traffic.
-      GroupId: !Ref LinuxBastionSecurityGroup
+      GroupId: !Ref QSBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 443
       ToPort: 443
@@ -1119,7 +1120,7 @@ Resources:
       IpProtocol: tcp
       ToPort: 443
       FromPort: 443
-      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+      SourceSecurityGroupId: !Ref QSBastionSecurityGroup
   IterateLinuxBastionSshToNodesEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
     Condition: CreateMultiCluster
@@ -1129,7 +1130,7 @@ Resources:
       Description: >-
         Allow SSH from the Linux bastion host / bootstrap instance to the EKS
         nodes.
-      GroupId: !Ref LinuxBastionSecurityGroup
+      GroupId: !Ref QSBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 22
       ToPort: 22
@@ -1147,7 +1148,7 @@ Resources:
       IpProtocol: tcp
       ToPort: 22
       FromPort: 22
-      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+      SourceSecurityGroupId: !Ref QSBastionSecurityGroup
   IterateLinuxBastionK8sToApiEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
     Condition: CreateMultiCluster
@@ -1157,7 +1158,7 @@ Resources:
       Description: >-
         Allow the Linux bastion host / bootstrap instance to connect to the EKS
         control plane for Kubernetes API traffic.
-      GroupId: !Ref LinuxBastionSecurityGroup
+      GroupId: !Ref QSBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 443
       ToPort: 443
@@ -1175,7 +1176,7 @@ Resources:
       IpProtocol: tcp
       ToPort: 443
       FromPort: 443
-      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+      SourceSecurityGroupId: !Ref QSBastionSecurityGroup
 #Rules for multi cluster end
   TAPLogGroup:
     Type: AWS::Logs::LogGroup
@@ -1193,7 +1194,7 @@ Resources:
       VpcId: !Ref VpcId
       Tags:
         - Key: Name
-          Value: VMwareLinuxBastionSecurityGroup
+          Value: LinuxBastionSecurityGroup
         - Key: Description
           Value: >-
             The VMware Tanzu Application Platform Linux bastion host /
@@ -1209,27 +1210,40 @@ Resources:
       CidrIp: !Ref RemoteAccessCidr
       FromPort: 22
       ToPort: 22
-  LinuxBastionDefaultEgressRule:
+  QSBastionSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: >-
+        The TAP bastion host / bootstrap instance security group.
+      VpcId: !Ref VpcId
+      Tags:
+        - Key: Name
+          Value: QSBastionSecurityGroup
+        - Key: Description
+          Value: >-
+            The VMware Tanzu Application Platform bastion host /
+            bootstrap instance security group.
+  QSBastionDefaultEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Properties:
       Description: Allow all egress.
-      GroupId: !Ref LinuxBastionSecurityGroup
+      GroupId: !Ref QSBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 0
       ToPort: 65535
       CidrIp: 0.0.0.0/0
-  LinuxBastionSshToNodesEgressRule:
+  QSBastionSshToNodesEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
     Condition: CreateSingleCluster
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Properties:
       Description: >-
-        Allow SSH from the Linux bastion host / bootstrap instance to the EKS
+        Allow SSH from the bastion host / bootstrap instance to the EKS
         nodes.
-      GroupId: !Ref LinuxBastionSecurityGroup
+      GroupId: !Ref QSBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 22
       ToPort: 22
@@ -1241,23 +1255,23 @@ Resources:
     DeletionPolicy: Delete
     Properties:
       Description: >-
-        Allow SSH from the Linux bastion host / bootstrap instance to the EKS
+        Allow SSH from the bastion host / bootstrap instance to the EKS
         nodes.
       GroupId: !GetAtt EKSQSStack.Outputs.NodeGroupSecurityGroup
       IpProtocol: tcp
       ToPort: 22
       FromPort: 22
-      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
-  LinuxBastionK8sToApiEgressRule:
+      SourceSecurityGroupId: !Ref QSBastionSecurityGroup
+  QSBastionK8sToApiEgressRule:
     Type: AWS::EC2::SecurityGroupEgress
     Condition: CreateSingleCluster
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Properties:
       Description: >-
-        Allow the Linux bastion host / bootstrap instance to connect to the EKS
+        Allow the bastion host / bootstrap instance to connect to the EKS
         control plane for Kubernetes API traffic.
-      GroupId: !Ref LinuxBastionSecurityGroup
+      GroupId: !Ref QSBastionSecurityGroup
       IpProtocol: tcp
       FromPort: 443
       ToPort: 443
@@ -1269,13 +1283,13 @@ Resources:
     DeletionPolicy: Delete
     Properties:
       Description: >-
-        Allow the Linux bastion host / bootstrap instance to connect to the EKS
+        Allow the bastion host / bootstrap instance to connect to the EKS
         control plane for Kubernetes API traffic.
       GroupId: !GetAtt EKSQSStack.Outputs.ControlPlaneSecurityGroup
       IpProtocol: tcp
       ToPort: 443
       FromPort: 443
-      SourceSecurityGroupId: !Ref LinuxBastionSecurityGroup
+      SourceSecurityGroupId: !Ref QSBastionSecurityGroup
   IterateEKSViewClusterApiIngressRule:
     Type: AWS::EC2::SecurityGroupIngress
     UpdateReplacePolicy: Delete
@@ -1325,13 +1339,13 @@ Resources:
       Tags:
         - Key: Name
           Value: VMwareLinuxBastionEIP
-  LinuxBastionIamRole:
+  QSBastionIamRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub
-        - VMwareLinuxBastionIamRole-${StackId}
+        - QSBastionIamRole-${StackId}
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: Linux bastion host / bootstrap instance IAM Role.
+      Description: QS bastion host / bootstrap instance IAM Role.
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -1470,7 +1484,7 @@ Resources:
         - VMwareLinuxBastionInstanceProfile-${StackId}
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Roles:
-        - !Ref LinuxBastionIamRole
+        - !Ref QSBastionIamRole
   TAPBuildServiceIamRole:
     Type: AWS::IAM::Role
     # Condition: UseEcr
@@ -2069,6 +2083,7 @@ Resources:
     Properties:
       LaunchTemplateData:
         SecurityGroupIds:
+          - !Ref QSBastionSecurityGroup
           - !Ref LinuxBastionSecurityGroup
         Monitoring:
           Enabled: true
@@ -2373,33 +2388,6 @@ Resources:
       FromPort: 3389
       ToPort: 3389
       CidrIp: !Ref RemoteAccessCidr
-  WindowsBastionDefaultEgressRule:
-    Type: AWS::EC2::SecurityGroupEgress
-    Properties:
-      Description: Windows bastion host default egress
-      GroupId: !Ref WindowsBastionSecurityGroup
-      IpProtocol: tcp
-      FromPort: 0
-      ToPort: 65535
-      CidrIp: 0.0.0.0/0
-  WindowsBastionIamRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: !Sub
-        - VMwareWindowsBastionIamRole-${StackId}
-        - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
-      Description: Windows bastion host IAM Role.
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: !Sub ec2.${AWS::URLSuffix}
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy
   WindowsBastionInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
@@ -2407,13 +2395,14 @@ Resources:
         - VMwareWindowsBastionInstanceProfile-${StackId}
         - StackId: !Select [2, !Split [/, !Ref AWS::StackId]]
       Roles:
-        - !Ref WindowsBastionIamRole
+        - !Ref QSBastionIamRole
   WindowsBastionLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
     Metadata: {}
     Properties:
       LaunchTemplateData:
         SecurityGroupIds:
+          - !Ref QSBastionSecurityGroup
           - !Ref WindowsBastionSecurityGroup
         KeyName: !Ref KeyPairName
         ImageId: !FindInMap [AwsAmiRegionMap, !Ref AWS::Region, WS2022FullBase]
@@ -2431,20 +2420,58 @@ Resources:
           HttpPutResponseHopLimit: 2
           HttpTokens: required
         UserData:
-          Fn::Base64: !Sub |
-            <powershell>
-            Write-Host -Object 'Setting AWS Region environment variables...'
-            [System.Environment]::SetEnvironmentVariable('AWS_REGION','${AWS::Region}',[System.EnvironmentVariableTarget]::System)
-            [System.Environment]::SetEnvironmentVariable('AWS_DEFAULT_REGION','${AWS::Region}',[System.EnvironmentVariableTarget]::System)
-            Write-Host -Object 'Installing Chocolatey...'
-            Set-ExecutionPolicy Bypass -Scope Process -Force
-            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-            Invoke-Expression -Command ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-            Write-Host -Object 'Installing Mozilla Firefox...'
-            choco install -y Firefox
-            </powershell>
+          Fn::Base64: !Sub
+            - |
+              <powershell>
+              Write-Host -Object 'Setting AWS Region environment variables...'
+              [System.Environment]::SetEnvironmentVariable('AWS_REGION','${AWS::Region}',[System.EnvironmentVariableTarget]::System)
+              [System.Environment]::SetEnvironmentVariable('AWS_DEFAULT_REGION','${AWS::Region}',[System.EnvironmentVariableTarget]::System)
+              Write-Host -Object 'Installing Chocolatey...'
+              Set-ExecutionPolicy Bypass -Scope Process -Force
+              [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+              Invoke-Expression -Command ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+              Write-Host -Object 'Installing tools ...'
+              choco install -y googlechrome jq base64
+              Write-Host -Object 'Installing AWS CLI...'
+              $WebClient = New-Object System.Net.WebClient
+              $WebClient.DownloadFile("https://awscli.amazonaws.com/AWSCLIV2.msi","awscliv2.msi")
+              Write-Host -Object "Downloaded the cli installer."
+              Start-Process msiexec.exe -Wait -ArgumentList '/i awscliv2.msi /qn /l*v aws-cli-install.log'
+              Start-Sleep -Seconds 60
+              $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+              Write-Host -Object "aws cli installed."
+              aws --version
+              aws sts get-caller-identity
+              Write-Host -Object 'Installing kubectl...'
+              Write-Host -Object  "AwsKubectlVersion ${AwsKubectlVersion} Arch ${Arch}"
+              Invoke-WebRequest -Uri "https://s3.us-west-2.amazonaws.com/amazon-eks/${AwsKubectlVersion}/bin/windows/${Arch}/kubectl.exe" -OutFile "kubectl.exe"
+              Invoke-WebRequest -Uri "https://s3.us-west-2.amazonaws.com/amazon-eks/${AwsKubectlVersion}/bin/windows/${Arch}/kubectl.exe.sha256" -OutFile "kubectl.exe.sha256"
+              # Get the file hashes
+              $hashSrc = (Get-FileHash kubectl.exe -Algorithm "SHA256").Hash
+              $hashDest = Get-Content -Path kubectl.exe.sha256
+              # Compare the hashes & note this in the log
+              If ($hashSrc.Hash -ne $hashDest.Hash)
+              {
+                Write-Output "The kubectl file Hashes are NOT EQUAL"
+                Write-Output "kubectl.exe File Hash: $hashSrc"
+                Write-Output "kubectl.exe.sha256 File Hash: $hashDest"
+                Exit 1
+              }
+              Move-Item -Path kubectl.exe -Destination C:\Windows\System32\kubectl.exe
+              $TmpCertFileName = "tap-ingress-selfsigned-root-ca-tls.crt"
+              Write-Output -Object 'Updating Kubeconfig for ClusterName ${ClusterName} ...'
+              aws eks update-kubeconfig --name ${ClusterName}
+              kubectl version
+              Write-Host -Object 'Importing TAP-GUI Cert to LocalMachine\Root Cert Store ...'
+              kubectl get secrets/tap-ingress-selfsigned-root-ca -n cert-manager -o json | jq -r '.data.\"tls.crt\"' | base64 -d > $TmpCertFileName
+              Import-Certificate -FilePath  $TmpCertFileName -CertStoreLocation Cert:\LocalMachine\Root
+              </powershell>
+            - AwsKubectlVersion: !FindInMap [ Versions, current, WindowsKubectl ]
+              Arch : amd64
+              ClusterName: !If [CreateMultiCluster, !GetAtt VIEWEKSQSStack.Outputs.EKSClusterName, !GetAtt EKSQSStack.Outputs.EKSClusterName]
   WindowsBastion:
     Type: AWS::EC2::Instance
+    DependsOn: PhaseTAPTests
     Properties:
       LaunchTemplate:
         LaunchTemplateId: !Ref WindowsBastionLaunchTemplate
