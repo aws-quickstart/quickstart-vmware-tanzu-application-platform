@@ -52,7 +52,7 @@ tanzu package installed get <PACKAGE-NAME> --namespace tap-install
 /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install single
 ----
 +
-** For the multi cluster install of Quickstart, run the command against the affected clusters. The cluster types for multi cluster are "view", "run", "iterate", or "build." Pass the cluster type into the install command.
+** For a multicluster installation of the Partner Solution, run the following command against the affected cluster type. Substitute `view`, `run`, `iterate`, or `build` for `<cluster-type>` in the command.
 +
 ----
 /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install <cluster-type>
@@ -75,13 +75,13 @@ tanzu package installed list -A
 ----
 +
 ** If the installation has stopped running, one or more reconciliations have likely failed.
-** For the single cluster install of Quickstart, run the following command.
+** For a single-cluster installation of the Partner Solution, run the following command.
 +
 ----
 /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install single
 ----
 +
-** For the multi cluster install of Quickstart, run the command against the cluster with packages not reconciling. The cluster types for multi cluster are "view", "run", "iterate", or "build." Pass the cluster type into the install command.
+** For a multicluster installation of the Partner Solution, run the following command against the affected cluster type. Substitute `view`, `run`, `iterate`, or `build` for `<cluster-type>` in the command.
 +
 ----
 /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install <cluster-type>
@@ -94,7 +94,7 @@ tanzu package installed list -A
 
 * Cause
 ** It is likely that during deployment an ED25519 key pair was used instead of an RSA key pair. If you select an ED25519 key pair for this deployment, the CloudFormation stack deploys successfully, but you will be unable to retrieve the automatically generated password for the Windows bastion host.
-** As of June 23rd, 2022, Amazon EC2 Windows instances do not support ED25519 key pairs. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances^].
+** Amazon EC2 Windows instances do not support ED25519 key pairs. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances^].
 
 * Solution
 ** Verify that an RSA key pair is used during deployment.
@@ -107,7 +107,7 @@ tanzu package installed list -A
 
 * Problem
 ** A deployment takes over two hours to complete.
-** No notification of Quickstart deployment completion.
+** No notification of Partner Solution deployment completion.
 
 * Cause
 ** CloudFormation fails.
@@ -116,7 +116,9 @@ tanzu package installed list -A
 ** Sign in to the https://console.aws.amazon.com/console/home[AWS Management Console^], and open the CloudFormation console.
 ** Select the Quickstart base stack and click the Outputs tab and copy the TAPLogGroupId.
 +
-image:../docs/deployment_guide/images/TAPLogGroupOutput.PNG[LogGroupOutput]
+[#architecture1]
+.Partner Solution single-cluster architecture for {partner-product-short-name} on AWS
+image::../docs/deployment_guide/images/TAPLogGroupOutput.PNG[LogGroupOutput]
 +
 ** Search the CloudWatch log groups for the TAPLogGroupId.
 +
