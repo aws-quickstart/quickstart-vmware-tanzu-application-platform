@@ -103,55 +103,50 @@ tanzu package installed list -A
 ** Customize the CloudFormation template to use a separate key pair for the Windows bastion host. Then update the CloudFormation stack. This option only replaces the Windows bastion host instance. Instructions for implementing this are beyond the scope of this guide.
 ** https://aws.amazon.com/contact-us/[Contact AWS technical support^].
 
-=== Search logs for deployment failures
+=== Troubleshoot deployment failures
 
-* Problem
-** A deployment takes over two hours to complete.
-** No notification of Partner Solution deployment completion.
+==== CloudWatch logs
 
-* Cause
-** CloudFormation fails.
+You can use CloudWatch logs to troubleshoot deployment problems. If the deployment takes over two hours to complete or you do not receive a notification that the Partner Solution has completed, do the following:
 
-* Solution
-** Sign in to the https://console.aws.amazon.com/console/home[AWS Management Console^], and open the CloudFormation console.
-** Select the Quickstart base stack and click the Outputs tab and copy the TAPLogGroupId.
+. Sign in to the https://console.aws.amazon.com/console/home[AWS Management Console^], and open the CloudFormation console.
+. Choose the Partner Solution base stack.
+. Choose the *Outputs* tab.
+. Copy the *TAPLogGroupId*.
 +
-[#architecture1]
-.Partner Solution single-cluster architecture for {partner-product-short-name} on AWS
+[#taploggroupoutput]
+.TAPLogGroupOutput
 image::../docs/deployment_guide/images/TAPLogGroupOutput.PNG[LogGroupOutput]
 +
-** Search the CloudWatch log groups for the TAPLogGroupId.
+. Search the CloudWatch log groups for the TAPLogGroupId.
 +
-image:../docs/deployment_guide/images/CloudWatchLogGroup.PNG[CloudWatchLogGroup]
+[#cloudwatchloggroup]
+.CloudWatchLogGroup
+image::../docs/deployment_guide/images/CloudWatchLogGroup.PNG[CloudWatchLogGroup]
 +
-** Select the log group to view the log streams file "/var/log/cloud-init-output.log" where the tap setup scripts output from the Linux Bastion EC2 instance is.
+. Choose the log group to view the log streams file `/var/log/cloud-init-output.log`. The TAP output scripts output from the Linux Bastion EC2 instance.
 +
-image:../docs/deployment_guide/images/CloudInitOutput.PNG[CloudInitOutput]
+[#cloudinitoutput]
+.CloudInitOutput
+image::../docs/deployment_guide/images/CloudInitOutput.PNG[CloudInitOutput]
 +
-** Logs can also be found in the `+/var/log/cloud-init-output.log+` file on the Linux bastion host.
+NOTE: Logs can also be found in the `+/var/log/cloud-init-output.log+` file on the Linux bastion host.
 
+==== Updating or redeploying the stack after a failure
+The deployment might fail because TAP packages fail to reconcile or `cloud-init` scripts fail.
 
-=== Debug CloudFormation deployment failures
-
-* Problem
-** Quickstart CloudFormation deployment fails.
-
-* Cause
-** TAP packages may have failed to reconcile.
-** Cloud-init scripts may have failed.
-
-* Solution
-** Select inner-most nested failed CloudFormation stack.
+. Sign in to the https://console.aws.amazon.com/console/home[AWS Management Console^], and open the CloudFormation console.
+. Select inner-most nested failed CloudFormation stack.
 +
 image:../docs/deployment_guide/images/NestedFailedStack.PNG[NestedFailedStack]
 +
-** Select the CloudFormation Events tab.
+. Select the CloudFormation Events tab.
 +
 image:../docs/deployment_guide/images/FailedStackEvents.PNG[FailedStackEvents]
 +
-** Find the error description in the "Status reason" column.
-** Correct the error if possible, then update the stack from the "Stack actions" dropdown on the top right corner of the console.
-** If the CloudFormation stack is in "ROLLBACK_FAILED" state, delete the stack and redeploy Quickstart.
+. Find the error description in the "Status reason" column.
+. Correct the error if possible, then update the stack from the "Stack actions" dropdown on the top right corner of the console.
+. If the CloudFormation stack is in "ROLLBACK_FAILED" state, delete the stack and redeploy Quickstart.
 
 === Input parameter failures
 
