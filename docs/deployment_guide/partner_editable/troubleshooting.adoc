@@ -9,56 +9,50 @@ Refer to the following resources to troubleshoot {partner-product-name}.
 * https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/troubleshooting-tap-troubleshoot-install-tap.html[Troubleshoot installing {partner-product-short-name}^]
 * https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/troubleshooting-tap-troubleshoot-using-tap.html[Troubleshoot using {partner-product-short-name}^]
 
-=== I can't access the {partner-product-short-name} user interface
+Troubleshooting stack deployment failures
 
-* Problem
-** Inability to access the {partner-product-short-name} user interface after deployment.
+You can verify CloudFormation stack deployment using the AWS Management Console. For more information, refer to https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-view-stack-data-resources.html[Viewing AWS CloudFormation stack data and resources on the AWS Management Console^].
 
-* Cause
-** The deployment failed to complete successfully.
-** You are attempting to accessing the site from a location that doesn't have connectivity to the {partner-product-short-name} GUI.
 
-* Solution
-** Verify that the CloudFormation stack deployment completed successfully.
-** If the stack deployed successfully, review the {partner-product-short-name} bootstrap logs.
-** The {partner-product-short-name} website GUI URL can only be accessed from endpoints with a route to the private VPC network, such as from the Amazon EC2 Windows bastion host instance.
+=== Cannot connect to {partner-product-short-name} console after deployment
+If you cannot access the {partner-product-short-name} console after deployment, do the following:
 
-=== {partner-product-short-name} installation failed with a EULA error
+* Ensure that you are attempting to access the {partner-product-short-name} console from a location that can connect to it. The {partner-product-short-name} website GUI URL can only be accessed from endpoints with a route to the private VPC network, such as from the Amazon EC2 Windows bastion host instance.
 
-* Problem
-** The deployment failed to complete successfully.
-
-* Cause
-** The EULA was not accepted.
-
-* Solution
-** You must accept the relevant EULAs before you can download the {partner-product-short-name} packages from the {partner-registry}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements^].
-** For more details about the `+.status.usefulErrorMessage+` error, connect to the Linux bastion host using SSH. Then run the following commands. For `<PACKAGE-NAME>`, substitute the name of the package to target.
+* Verify that the CloudFormation stack deployment completed successfully. For more information, refer to https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-view-stack-data-resources.html[Viewing AWS CloudFormation stack data and resources on the AWS Management Console^].
 +
+If the stack deployed successfully, review the {partner-product-short-name} bootstrap logs.
+
+=== {partner-product-short-name} installation fails with a EULA error
+You must accept the relevant EULAs before you can download the {partner-product-short-name} packages from the {partner-registry}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements^].
+
+For more details about the `+.status.usefulErrorMessage+` error, connect to the Linux bastion host using SSH. Then run the following commands. For `<PACKAGE-NAME>`, substitute the name of the package to target.
+
 ----
 tanzu package installed list -A
 tanzu package installed get <PACKAGE-NAME> --namespace tap-install
 ----
-+
-** If you have chosen to relocate {partner-product-short-name} images to Amazon ECR and this did not complete successfully, run the following command. This command takes 30–45 minutes to complete.
-+
+
+If you have chosen to relocate {partner-product-short-name} images to Amazon ECR and this did not complete successfully, run the following command. This command takes 30–45 minutes to complete.
+
 ----
 /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c relocate
 ----
-+
-** Run the following commands to reinstall {partner-product-short-name}.
-+
+
+Run the following commands to reinstall {partner-product-short-name}.
+
 ----
 /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install single
 ----
-+
-** For a multicluster installation of the Partner Solution, run the following command against the affected cluster type. Substitute `view`, `run`, `iterate`, or `build` for `<cluster-type>` in the command.
-+
+
+For a multicluster installation of the Partner Solution, run the following command against the affected cluster type. Substitute `view`, `run`, `iterate`, or `build` for `<cluster-type>` in the command.
+
 ----
 /home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install <cluster-type>
 ----
 
-=== One or more {partner-product-short-name} packages failed to reconcile
+
+=== One or more {partner-product-short-name} packages fail to reconcile
 
 * Problem
 ** {partner-product-short-name} packages fail to reconcile.
