@@ -23,13 +23,13 @@ If the deployment takes over two hours to complete or you do not receive a notif
 . Sign in to the https://console.aws.amazon.com/console/home[AWS Management Console^], and open the CloudFormation console.
 . Choose the Partner Solution base stack.
 . Choose the *Outputs* tab.
-. Copy the *TAPLogGroupId*.
+. Copy the ID of the `TAPLogGroup`.
 +
 [#taploggroupoutput]
 .TAPLogGroupOutput
 image::../docs/deployment_guide/images/TAPLogGroupOutput.PNG[LogGroupOutput]
 +
-. Search the CloudWatch log groups for the TAPLogGroupId.
+. Search the CloudWatch log groups for the `TAPLogGroup` ID.
 +
 [#cloudwatchloggroup]
 .CloudWatchLogGroup
@@ -47,17 +47,21 @@ NOTE: Logs can also be found in the `+/var/log/cloud-init-output.log+` file on t
 The deployment might fail because TAP packages fail to reconcile or `cloud-init` scripts fail.
 
 . Sign in to the https://console.aws.amazon.com/console/home[AWS Management Console^], and open the CloudFormation console.
-. Select inner-most nested failed CloudFormation stack.
+. Choose the innermost nested CloudFormation stack that failed.
 +
-image:../docs/deployment_guide/images/NestedFailedStack.PNG[NestedFailedStack]
+[#nestedfailedstack]
+.Nested failed stack
+image::../docs/deployment_guide/images/NestedFailedStack.PNG[NestedFailedStack]
 +
-. Select the CloudFormation Events tab.
+. Choose the *Events* tab.
+. Find and correct the error in the *Status reason* column.
 +
-image:../docs/deployment_guide/images/FailedStackEvents.PNG[FailedStackEvents]
+[#eventstab]
+.Events tab of failed stack
+image::../docs/deployment_guide/images/FailedStackEvents.PNG[FailedStackEvents]
 +
-. Find the error description in the "Status reason" column.
-. Correct the error if possible, then update the stack from the *Stack actions* dropdown on the top right corner of the console.
-. If the CloudFormation stack is in "ROLLBACK_FAILED" state, delete the stack and redeploy the Partner Solution.
+. Update the stack. For more information, refer to https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks.html[AWS CloudFormation stack updates^].
+. If the CloudFormation stack is in *UPDATE_ROLLBACK_FAILED* status, delete the stack and redeploy the Partner Solution. For more information, refer to https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-delete-stack.html[Deleting a stack on the AWS CloudFormation console^].
 
 === {partner-product-short-name} installation fails with a EULA error
 You must accept the relevant {partner-product-short-nam} EULAs during deployment before you can download the {partner-product-short-name} packages from the {partner-registry}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements^].
@@ -146,7 +150,7 @@ image::../docs/deployment_guide/images/AvailabilityZones.PNG[AvailabilityZones]
 .Remote access CIDR parameter
 image::../docs/deployment_guide/images/RemoteCIDR.PNG[RemoteCIDR]
 
-* If there is no key pair in the EC2 key pair name dropdown list, you must create one before deploying the Partner Solution. For more information, refer to link:#_create_an_rsa_key_pair[Create an RSA key pair], earlier in this guide.
+* You must create an RSA key pair before deploying the Partner Solution. For more information, refer to link:#_create_an_rsa_key_pair[Create an RSA key pair], earlier in this guide. During deployment, for *EC2 key pair name*, choose an RSA key pair.
 +
 [#ec2keypairname]
 .EC2 key pair name parameter
@@ -160,15 +164,15 @@ If `RegionalSharedResources` and `AccountSharedResources` fail to deploy, delete
 
 `RegionalSharedResources` and `AccountSharedResources` stacks remain deployed between Partner Solution deployments by design.
 
-=== Custome IAM roles
+=== Custom IAM roles
 
 The Partner Solution deployment might fail if you choose a role for the *IAM role—optional* parameter during deployment. It is not recommended to use a custom IAM role for this Partner Solution.
 
-[#ec2keypairname]
+[#iamroleparameter]
 .IAM role—optional parameter
 image::../docs/deployment_guide/images/QSIamRoleOptional.PNG[QSIamRoleOptional]
 
-=== TAP Workload deployment fails
+=== TAP workload deployment fails
 
 If you cannot access the {partner-product-acronym} URL from the Linux or Windows EC2 instances, or if the {partner-product-acronym} workload is not visible in the {partner-product-acronym} supply chain, do the following:
 
