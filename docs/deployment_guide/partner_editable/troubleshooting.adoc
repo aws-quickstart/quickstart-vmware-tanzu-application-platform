@@ -28,19 +28,21 @@ If the deployment takes over two hours to complete or you do not receive a notif
 [#taploggroupoutput]
 .TAPLogGroupOutput
 image::../docs/deployment_guide/images/TAPLogGroupOutput.PNG[LogGroupOutput]
-+
+
+[start=5]
 . Search the CloudWatch log groups for the `TAPLogGroup` ID.
 +
 [#cloudwatchloggroup]
 .CloudWatchLogGroup
 image::../docs/deployment_guide/images/CloudWatchLogGroup.PNG[CloudWatchLogGroup]
-+
+
+[start=6]
 . Choose the log group to view the log streams file `/var/log/cloud-init-output.log`. The TAP output scripts output from the Linux Bastion EC2 instance.
 +
 [#cloudinitoutput]
 .CloudInitOutput
 image::../docs/deployment_guide/images/CloudInitOutput.PNG[CloudInitOutput]
-+
+
 NOTE: Logs can also be found in the `+/var/log/cloud-init-output.log+` file on the Linux bastion host.
 
 === TAP package or cloud-init script failure
@@ -48,18 +50,21 @@ The deployment might fail because TAP packages fail to reconcile or `cloud-init`
 
 . Sign in to the https://console.aws.amazon.com/console/home[AWS Management Console^], and open the CloudFormation console.
 . Choose the innermost nested CloudFormation stack that failed.
+
 +
 [#nestedfailedstack]
 .Nested failed stack
-image::../docs/deployment_guide/images/NestedFailedStack.PNG[NestedFailedStack]
-+
+image::../docs/deployment_guide/images/NestedFailedStack.png[Nested failed stack]
+
+[start=3]
 . Choose the *Events* tab.
 . Find and correct the error in the *Status reason* column.
 +
-[#eventstab]
+[#failedstackevents]
 .Events tab of failed stack
 image::../docs/deployment_guide/images/FailedStackEvents.PNG[FailedStackEvents]
-+
+
+[start=5]
 . Update the stack. For more information, refer to https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks.html[AWS CloudFormation stack updates^].
 . If the CloudFormation stack is in *UPDATE_ROLLBACK_FAILED* status, delete the stack and redeploy the Partner Solution. For more information, refer to https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-delete-stack.html[Deleting a stack on the AWS CloudFormation console^].
 
@@ -140,7 +145,7 @@ You will encounter errors when entering deployment parameters if Availability Zo
 * Ensure that you configure Availability Zones in the deployment AWS Region before deployment.
 * The *Number of Availability Zones* parameter must match the *Availability Zones* parameter.
 +
-[#azparameters]
+[#availabiltyzones]
 .Availability Zones and Number of Availability Zones parameters
 image::../docs/deployment_guide/images/AvailabilityZones.PNG[AvailabilityZones]
 
@@ -151,7 +156,7 @@ image::../docs/deployment_guide/images/AvailabilityZones.PNG[AvailabilityZones]
 image::../docs/deployment_guide/images/RemoteCIDR.PNG[RemoteCIDR]
 
 * You must create an RSA key pair before deploying the Partner Solution. For more information, refer to link:#_create_an_rsa_key_pair[Create an RSA key pair], earlier in this guide. During deployment, for *EC2 key pair name*, choose an RSA key pair.
-+
+
 [#ec2keypairname]
 .EC2 key pair name parameter
 image::../docs/deployment_guide/images/KeyPair.PNG[KeyPair]
@@ -168,7 +173,7 @@ If `RegionalSharedResources` and `AccountSharedResources` fail to deploy, delete
 
 The Partner Solution deployment might fail if you choose a role for the *IAM role—optional* parameter during deployment. It is not recommended to use a custom IAM role for this Partner Solution.
 
-[#iamroleparameter]
+[#qsiamroleoptional]
 .IAM role—optional parameter
 image::../docs/deployment_guide/images/QSIamRoleOptional.PNG[QSIamRoleOptional]
 
