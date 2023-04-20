@@ -160,24 +160,19 @@ If `RegionalSharedResources` and `AccountSharedResources` fail to deploy, delete
 
 `RegionalSharedResources` and `AccountSharedResources` stacks remain deployed between Partner Solution deployments by design.
 
-=== CloudFormation IAM roles
+=== Custome IAM roles
 
-* Problem
-** IAM role is used to perform CloudFormation operations and deployment fails.
+The Partner Solution deployment might fail if you choose a role for the *IAM role—optional* parameter during deployment. It is not recommended to use a custom IAM role for this Partner Solution.
 
-* Cause
-** Using a custom role to deploy Quickstart.
-
-* Solution
-** Using a custom role is optional and not advised for deploying Quickstart.
-+
-image:../docs/deployment_guide/images/QSIamRoleOptional.PNG[QSIamRoleOptional]
+[#ec2keypairname]
+.IAM role—optional parameter
+image::../docs/deployment_guide/images/QSIamRoleOptional.PNG[QSIamRoleOptional]
 
 === TAP Workload deployment fails
 
 If you cannot access the {partner-product-acronym} URL from the Linux or Windows EC2 instances, or if the {partner-product-acronym} workload is not visible in the {partner-product-acronym} supply chain, do the following:
 
-. Connect to the 'VMwareLinuxBastionInstance' EC2 instance using SSH.
+. Connect to the `VMwareLinuxBastionInstance` EC2 instance using SSH.
 . Run the following commands. They will provide the workload status and logs that contain error messages.
 +
 ----
@@ -185,18 +180,15 @@ tanzu apps workload list -n tap-workload
 tanzu apps workload tail tanzu-java-web-app-workload -n tap-workload --since 10m –timestamp
 ----
 +
-If the status and logs do not contain errors, ensure that the DNS is correctly configured. Ensure that the private hosted zone has the respective kubernetes cluster `envoy-IP` configured in CNAME records.
+. If the status and logs do not contain errors, ensure that the DNS is correctly configured. In the Route53 console, ensure that the kubernetes cluster IP records have `CNAME` as the record type.
 
-** Route53 Single cluster configuration.
-+
-[#route53multi]
-.taskcat-single-east-1.com hosted zone
-image::../docs/deployment_guide/images/Route53Single.PNG[Route53Single]
-+
-** Route53 Multi cluster configuration.
 +
 [#route53single]
-.tap-qs-s3-try1.com hosted zone
+.Single-cluster configuration
+image::../docs/deployment_guide/images/Route53Single.PNG[Route53Single]
++
+[#route53multi]
+.Multicluster configuration
 image::../docs/deployment_guide/images/Route53Multi.PNG[Route53Multi]
 
 // git log --reverse origin/main...v1.4.0 -- ':!/ci/'
@@ -211,21 +203,21 @@ image::../docs/deployment_guide/images/Route53Multi.PNG[Route53Multi]
 == Release Notes
 
 === Version 1.4.2+aws.2
-* Bugfix: Timeout issues with cfn-signals during TAP install.
+* Fixed imeout issues with cfn-signals during TAP install.
 * Added TAP-GUI self-Cert on Windows EC2 instance.
 * Added more use cases to troubleshooting guide with images.
 
 === Version 1.4.2+aws.1
-* Bugfix: Relocation of the TAP images was broken, this release fixes that.
+* Fixed relocation of the TAP images was broken, this release fixes that.
 * Removed the following configuration options:
 ** EKS Cluster name.
 * The bastion hosts now use {imds-v2}[Instance Metadata Service Version 2 (IMDSv2)].
-* We changed how we check and deploy the shared resources stacks
+* Changed checking and deployment of the shared resources stacks.
   (`eks-quickstart-RegionalSharedResources` & `eks-quickstart-AccountSharedResources`) which results in slightly faster deployments
   and less chance to run into race-conditions.
 
 === Version 1.4.2+aws.0
-* The stack now reports the status of the  {partner-product-short-name} deployment and installation of the sample application  after all of the infrastructure has been deployed.
+* The stack now reports the status of the {partner-product-short-name} deployment and installation of the sample application  after all of the infrastructure has been deployed.
 * Fixed an issue that occurred when deleting VPCs because of stale security groups.
 * Upgraded the following versions:
 ** {tap-1_4_2-cl}[{partner-product-acronym}^] 1.4.2.
