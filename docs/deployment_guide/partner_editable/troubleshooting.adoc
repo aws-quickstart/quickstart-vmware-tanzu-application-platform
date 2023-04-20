@@ -130,32 +130,28 @@ Verify that an RSA key pair is used during deployment. If an RSA key pair has no
 ** Customize the CloudFormation template to use a separate key pair for the Windows bastion host. Then update the CloudFormation stack. This option only replaces the Windows bastion host instance. Instructions for implementing this are beyond the scope of this guide.
 ** https://aws.amazon.com/contact-us/[Contact AWS technical support^].
 
-=== Input parameter failures
+=== Deployment parameter errors
 
-* Problem
-** Invalid Availability Zones or Number of Availability Zones.
-** Invalid Remote Access CIDR provided.
-** EC2 Key pair does not show up in dropdown.
+You will encounter errors when entering deployment parameters if Availability Zones, remote access Classless Inter-Domain Routing (CIDR) range, or key pair are invalid, incorrectly configured, or absent.
 
-* Cause
-** Using Availability Zones which are not present or restricted in the AWS region.
-** List of Availability Zones and Number of Availability Zones do not match.
-** Entering invalid or incorrectly formatted Remote Access CIDR.
-** Key pair does not exist.
+* Ensure that you configure Availability Zones in the deployment AWS Region before deployment.
+* The *Number of Availability Zones* parameter must match the *Availability Zones* parameter.
++
+[#azparameters]
+.Availability Zones and Number of Availability Zones parameters
+image::../docs/deployment_guide/images/AvailabilityZones.PNG[AvailabilityZones]
 
-* Solution
-** Ensure Availability Zones are present in the AWS region the Quickstart is deploying to.
-** Ensure the size of the List of Availability Zones and Number of Availability Zones match.
+* For the *Remote access CIDR* parameter, ensure that you choose a valid remote access CIDR.
 +
-image:../docs/deployment_guide/images/AvailabilityZones.PNG[AvailabilityZones]
+[#remoteCIDR]
+.Remote access CIDR parameter
+image::../docs/deployment_guide/images/RemoteCIDR.PNG[RemoteCIDR]
+
+* If there is no key pair in the EC2 key pair name dropdown list, you must create one before deploying the Partner Solution. For more information, refer to link:#_create_an_rsa_key_pair[Create an RSA key pair], earlier in this guide.
 +
-** Provide a valid Remote Access CIDR for your machine to connect to the Windows or Linux Bastion EC2 instance in the VPC.
-+
-image:../docs/deployment_guide/images/RemoteCIDR.PNG[RemoteCIDR]
-+
-** If a key pair exists, it can be used to SSH into the Linux Bastion EC2 instance in the VPC. If a key pair does not exist, create one and it will show up in the drop down.
-+
-image:../docs/deployment_guide/images/KeyPair.PNG[KeyPair]
+[#ec2keypairname]
+.EC2 key pair name parameter
+image::../docs/deployment_guide/images/KeyPair.PNG[KeyPair]
 
 === RegionalSharedResources and AccountSharedResources not removed after Quickstart CloudFormation delete
 

@@ -4,9 +4,9 @@
 
 Before you launch the Partner Solution, review the following information and ensure that your account is properly configured. Otherwise, the deployment might fail.
 
-=== Create an Amazon EC2 RSA key pair
+=== Create an RSA key pair
 
-To deploy this Partner Solution, an RSA-type Amazon EC2 key pair is required. To create one, refer to https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html[Create key pairs]. Ensure that you choose RSA as the key pair type. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances^] and link:#_cannot_log_in_to_the_bastion_host[Cannot log in to the bastion host], later in this guide.
+To deploy this Partner Solution, an RSA-type Amazon EC2 key pair is required. To create one, refer to https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html[Create key pairs]. Ensure that you choose `RSA` as the key pair type. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances^] and link:#_cannot_log_in_to_the_bastion_host[Cannot log in to the bastion host], later in this guide.
 
 === Resource quotas
 
