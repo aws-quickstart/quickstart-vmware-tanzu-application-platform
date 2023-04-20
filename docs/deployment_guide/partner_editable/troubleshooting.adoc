@@ -194,11 +194,11 @@ tanzu apps workload tail tanzu-java-web-app-workload -n tap-workload --since 10m
 +
 [#route53single]
 .Single-cluster configuration
-image::../docs/deployment_guide/images/Route53Single.PNG[Route53 single cluster]
+image::../docs/deployment_guide/images/Route53Single.png[Route53 single cluster]
 +
 [#route53multi]
 .Multicluster configuration
-image::../docs/deployment_guide/images/Route53Multi.PNG[Route53 multicluster]
+image::../docs/deployment_guide/images/Route53Multi.png[Route53 multicluster]
 
 // git log --reverse origin/main...v1.4.0 -- ':!/ci/'
 
