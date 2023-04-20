@@ -2,7 +2,7 @@ This Partner Solution deploys {partner-product-name} ({partner-product-acronym} 
 
 [WARNING]
 ====
-This Partner Solution uses the https://github.com/aws-quickstart/quickstart-amazon-eks/releases/tag/v5.0.0[Amazon EKS on the AWS Cloud reference deployment] as a submodule. The Version 5.0.0 update to Amazon EKS on the AWS Cloud contains breaking changes. If you previously installed the {partner-company-short-name} {partner-product-short-name} Partner Solution or installed any resources using a version of the Amazon EKS reference deployment earlier than 5.0.0, you must delete the following CloudFormation stacks before upgrading:
+This Partner Solution uses the https://github.com/aws-quickstart/quickstart-amazon-eks/releases/tag/v5.0.0[Amazon EKS on the AWS Cloud reference deployment^] as a submodule. The Version 5.0.0 update to Amazon EKS on the AWS Cloud contains breaking changes. If you previously installed the {partner-company-short-name} {partner-product-short-name} Partner Solution or installed any resources using a version of the Amazon EKS reference deployment earlier than 5.0.0, you must delete the following CloudFormation stacks before upgrading:
 
 * `eks-quickstart-RegionalSharedResources` in all AWS Regions.
 * `eks-quickstart-AccountSharedResources`.

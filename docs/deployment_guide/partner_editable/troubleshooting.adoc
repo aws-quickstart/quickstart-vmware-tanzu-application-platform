@@ -120,15 +120,14 @@ For a multicluster installation of the Partner Solution, run the following comma
 
 === Cannot log in to the bastion host
 
-If you cannot log in to the Windows EC2 bastion host, it is likely that you provided a ED25519 key pair during deployment instead of an RSA key pair. If you select an ED25519 key pair for this deployment, the CloudFormation stack deploys successfully, but you will be unable to retrieve the automatically generated password for the Windows bastion host. Amazon EC2 Windows instances do not support ED25519 key pairs. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances^].
+If you cannot log in to the Windows EC2 bastion host, it is likely that you chose a ED25519 key pair during deployment instead of an RSA key pair. Amazon EC2 Windows instances do not support ED25519 key pairs. The CloudFormation stack deploys successfully, but you cannot retrieve the automatically generated password for the Windows bastion host. For more information, refer to https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html[Amazon EC2 key pairs and Windows instances^].
 
-Verify that an RSA key pair is used during deployment. If an RSA key pair has not been created, try the following steps:
+To troubleshoot, try the following options:
 
-. https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html[Reset the Windows administrator password using ECLaunch v2.]
-
-. https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html[Update the CloudFormation stack^] to use an RSA key pair, which will replace all Amazon EC2 instances (Windows and Linux) and Amazon EKS nodes that use this key. For more information, refer to the https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname[documentation^].
-** Customize the CloudFormation template to use a separate key pair for the Windows bastion host. Then update the CloudFormation stack. This option only replaces the Windows bastion host instance. Instructions for implementing this are beyond the scope of this guide.
-** https://aws.amazon.com/contact-us/[Contact AWS technical support^].
+* https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html[Reset the Windows administrator password using ECLaunch v2^].
+* https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html[Update the CloudFormation stack^] to use an RSA key pair. Doing this replaces all Amazon EC2 instances (Windows and Linux) and Amazon EKS nodes that use this key. For more information, refer to https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname[KeyName^].
+* Customize the CloudFormation template to use a separate key pair for the Windows bastion host. Then update the CloudFormation stack. This option only replaces the Windows bastion host instance. Instructions for implementing this are beyond the scope of this guide.
+* https://aws.amazon.com/contact-us/[Contact AWS technical support^].
 
 === Deployment parameter errors
 
@@ -153,27 +152,13 @@ image::../docs/deployment_guide/images/RemoteCIDR.PNG[RemoteCIDR]
 .EC2 key pair name parameter
 image::../docs/deployment_guide/images/KeyPair.PNG[KeyPair]
 
-=== RegionalSharedResources and AccountSharedResources not removed after Quickstart CloudFormation delete
+=== RegionalSharedResources and AccountSharedResources CloudFormation stacks fail to deploy
 
-* Problem
-** RegionalSharedResources and AccountSharedResources CloudFormation stacks are not removed after QuickStart CFT is deleted.
-** RegionalSharedResources or AccountSharedResources CloudFormation stacks failed to deploy.
+The `RegionalSharedResources` stack creates resources in each Region to which the Partner Solution is deployed. The `AccountSharedResources` stack creates resources in a single Region.
 
-* Cause
-** AWS Resources created by RegionalSharedResources and the AccountSharedResources CFTs such as IAM Roles are left behind even after QuickStart CFT is deleted.
+If `RegionalSharedResources` and `AccountSharedResources` fail to deploy, delete the IAM roles that they both create and deploy the Partner Solution to a single Region. Roles created by these stacks include `qs` or `quickstart`. For more information, refer to https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_manage_delete.html[Deleting roles or instance profiles^].
 
-* Solution
-** RegionalSharedResources stack creates AWS resources for each region Quickstart is deployed.
-+
-image:../docs/deployment_guide/images/RegionalStack.PNG[RegionalStack]
-+
-** AccountSharedResources stack creates AWS resources in a single region where Quickstart is deployed.
-+
-image:../docs/deployment_guide/images/AccountStack.PNG[AccountStack]
-+
-** RegionalSharedResources and AccountSharedResources stacks remain deployed by design and are meant to persist between Quickstart deployments.
-** If RegionalSharedResources or AccountSharedResources stacks failed to deploy, remove the IAM roles created by SharedResources stacks. Roles that include "qs" or "quickstart" are those created by SharedResources.
-** If multiple Quickstart stacks are running simultaneously in multiple regions, conflicting IAM roles may result in failure to deploy or clean up SharedResources stacks. Delete all IAM roles associated with the Quickstart and deploy a Quickstart in a single region. The SharedResources stacks will be newly created.
+`RegionalSharedResources` and `AccountSharedResources` stacks remain deployed between Partner Solution deployments by design.
 
 === CloudFormation IAM roles
 
@@ -190,29 +175,29 @@ image:../docs/deployment_guide/images/QSIamRoleOptional.PNG[QSIamRoleOptional]
 
 === TAP Workload deployment fails
 
-* Problem
-** TAP workload URL is not accessible from the Linux or Windows Bastion EC2 instances.
-** TAP workload is not visible in the TAP GUI supply chain.
+If you cannot access the {partner-product-acronym} URL from the Linux or Windows EC2 instances, or if the {partner-product-acronym} workload is not visible in the {partner-product-acronym} supply chain, do the following:
 
-* Cause
-** CloudFormation and TAP installation succeeds but workload fails to run.
-
-* Solution
-** SSH to the 'VMwareLinuxBastionInstance' EC2 instance and run the below commands. They will provide the workload status and logs that contain error messages.
+. Connect to the 'VMwareLinuxBastionInstance' EC2 instance using SSH.
+. Run the following commands. They will provide the workload status and logs that contain error messages.
 +
 ----
 tanzu apps workload list -n tap-workload
 tanzu apps workload tail tanzu-java-web-app-workload -n tap-workload --since 10m –timestamp
 ----
 +
-** If the status and logs do not contain errors, ensure DNS is correctly configured by checking Route53 and ensuring the private zone has the respective kubernetes cluster envoy-IP configured in CNAME records.
+If the status and logs do not contain errors, ensure that the DNS is correctly configured. Ensure that the private hosted zone has the respective kubernetes cluster `envoy-IP` configured in CNAME records.
+
 ** Route53 Single cluster configuration.
 +
-image:../docs/deployment_guide/images/Route53Single.PNG[Route53Single]
+[#route53multi]
+.taskcat-single-east-1.com hosted zone
+image::../docs/deployment_guide/images/Route53Single.PNG[Route53Single]
 +
 ** Route53 Multi cluster configuration.
 +
-image:../docs/deployment_guide/images/Route53Multi.PNG[Route53Multi]
+[#route53single]
+.tap-qs-s3-try1.com hosted zone
+image::../docs/deployment_guide/images/Route53Multi.PNG[Route53Multi]
 
 // git log --reverse origin/main...v1.4.0 -- ':!/ci/'
 
