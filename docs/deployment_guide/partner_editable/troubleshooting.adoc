@@ -27,21 +27,21 @@ If the deployment takes over two hours to complete or you do not receive a notif
 +
 [#taploggroupoutput]
 .TAPLogGroupOutput
-image::../docs/deployment_guide/images/TAPLogGroupOutput.PNG[LogGroupOutput]
+image::../docs/deployment_guide/images/TAPLogGroupOutput.png[LogGroupOutput]
 
 [start=5]
 . Search the CloudWatch log groups for the `TAPLogGroup` ID.
 +
 [#cloudwatchloggroup]
 .CloudWatchLogGroup
-image::../docs/deployment_guide/images/CloudWatchLogGroup.PNG[CloudWatchLogGroup]
+image::../docs/deployment_guide/images/CloudWatchLogGroup.png[CloudWatchLogGroup]
 
 [start=6]
 . Choose the log group to view the log streams file `/var/log/cloud-init-output.log`. The TAP output scripts output from the Linux Bastion EC2 instance.
 +
 [#cloudinitoutput]
 .CloudInitOutput
-image::../docs/deployment_guide/images/CloudInitOutput.PNG[CloudInitOutput]
+image::../docs/deployment_guide/images/CloudInitOutput.png[CloudInitOutput]
 
 NOTE: Logs can also be found in the `+/var/log/cloud-init-output.log+` file on the Linux bastion host.
 
@@ -62,7 +62,7 @@ image::../docs/deployment_guide/images/NestedFailedStack.png[Nested failed stack
 +
 [#failedstackevents]
 .Events tab of failed stack
-image::../docs/deployment_guide/images/FailedStackEvents.PNG[FailedStackEvents]
+image::../docs/deployment_guide/images/FailedStackEvents.png[Failed stack events]
 
 [start=5]
 . Update the stack. For more information, refer to https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks.html[AWS CloudFormation stack updates^].
@@ -147,19 +147,19 @@ You will encounter errors when entering deployment parameters if Availability Zo
 +
 [#availabiltyzones]
 .Availability Zones and Number of Availability Zones parameters
-image::../docs/deployment_guide/images/AvailabilityZones.PNG[AvailabilityZones]
+image::../docs/deployment_guide/images/AvailabilityZones.png[Availability Zones parameters]
 
 * For the *Remote access CIDR* parameter, ensure that you choose a valid remote access CIDR.
 +
 [#remoteCIDR]
 .Remote access CIDR parameter
-image::../docs/deployment_guide/images/RemoteCIDR.PNG[RemoteCIDR]
+image::../docs/deployment_guide/images/RemoteCIDR.png[Remote CIDR]
 
 * You must create an RSA key pair before deploying the Partner Solution. For more information, refer to link:#_create_an_rsa_key_pair[Create an RSA key pair], earlier in this guide. During deployment, for *EC2 key pair name*, choose an RSA key pair.
 
 [#ec2keypairname]
 .EC2 key pair name parameter
-image::../docs/deployment_guide/images/KeyPair.PNG[KeyPair]
+image::../docs/deployment_guide/images/KeyPair.png[Key pair]
 
 === RegionalSharedResources and AccountSharedResources CloudFormation stacks fail to deploy
 
@@ -175,7 +175,7 @@ The Partner Solution deployment might fail if you choose a role for the *IAM rol
 
 [#qsiamroleoptional]
 .IAM role—optional parameter
-image::../docs/deployment_guide/images/QSIamRoleOptional.PNG[QSIamRoleOptional]
+image::../docs/deployment_guide/images/QSIamRoleOptional.png[IAM role optional]
 
 === TAP workload deployment fails
 
@@ -194,11 +194,11 @@ tanzu apps workload tail tanzu-java-web-app-workload -n tap-workload --since 10m
 +
 [#route53single]
 .Single-cluster configuration
-image::../docs/deployment_guide/images/Route53Single.PNG[Route53Single]
+image::../docs/deployment_guide/images/Route53Single.PNG[Route53 single cluster]
 +
 [#route53multi]
 .Multicluster configuration
-image::../docs/deployment_guide/images/Route53Multi.PNG[Route53Multi]
+image::../docs/deployment_guide/images/Route53Multi.PNG[Route53 multicluster]
 
 // git log --reverse origin/main...v1.4.0 -- ':!/ci/'
 
