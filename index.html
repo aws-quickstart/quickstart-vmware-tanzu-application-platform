@@ -860,7 +860,8 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_deployment_options">Deployment options</a></li>
 <li><a href="#_predeployment_steps">Predeployment steps</a>
 <ul class="sectlevel2">
-<li><a href="#_technical_requirements">Technical requirements</a></li>
+<li><a href="#_create_an_rsa_key_pair">Create an RSA key pair</a></li>
+<li><a href="#_resource_quotas">Resource quotas</a></li>
 <li><a href="#_vmware_tanzu_network_account">VMware Tanzu Network account</a></li>
 <li><a href="#_accept_vmware_eulas">Accept VMware EULAs</a></li>
 <li><a href="#_vmware_customer_experience_improvement_program_ceip">VMware Customer Experience Improvement Program (CEIP)</a></li>
@@ -880,17 +881,21 @@ p.footer-text a{color:#d7d8d8}
 </li>
 <li><a href="#_troubleshooting">Troubleshooting</a>
 <ul class="sectlevel2">
-<li><a href="#_vmware_tanzu_application_platform_documentation">VMware Tanzu Application Platform documentation</a></li>
-<li><a href="#_i_cant_access_the_tanzu_application_platform_user_interface">I can&#8217;t access the Tanzu Application Platform user interface</a></li>
-<li><a href="#_tanzu_application_platform_installation_failed_with_a_eula_error">Tanzu Application Platform installation failed with a EULA error</a></li>
-<li><a href="#_one_or_more_tanzu_application_platform_packages_failed_to_reconcile">One or more Tanzu Application Platform packages failed to reconcile</a></li>
-<li><a href="#_its_been_more_than_four_minutes_and_the_windows_bastion_host_administrator_password_still_isnt_available">It&#8217;s been more than four minutes and the Windows bastion host administrator password still isn&#8217;t available</a></li>
-<li><a href="#_search_logs_for_deployment_failures">Search logs for deployment failures</a></li>
-<li><a href="#_debug_cloudformation_deployment_failures">Debug CloudFormation deployment failures</a></li>
-<li><a href="#_input_parameter_failures">Input parameter failures</a></li>
-<li><a href="#_regionalsharedresources_and_accountsharedresources_not_removed_after_quickstart_cloudformation_delete">RegionalSharedResources and AccountSharedResources not removed after Quickstart CloudFormation delete</a></li>
-<li><a href="#_cloudformation_iam_roles">CloudFormation IAM roles</a></li>
-<li><a href="#_tap_workload_deployment_fails">TAP Workload deployment fails</a></li>
+<li><a href="#_cannot_connect_to_tanzu_application_platform_console_after_deployment">Cannot connect to Tanzu Application Platform console after deployment</a></li>
+<li><a href="#_deployment_fails_to_complete_within_two_hours">Deployment fails to complete within two hours</a></li>
+<li><a href="#_tap_package_or_cloud_init_script_failure">TAP package or cloud-init script failure</a></li>
+<li><a href="#_tanzu_application_platform_installation_fails_with_a_eula_error">Tanzu Application Platform installation fails with a EULA error</a></li>
+<li><a href="#_relocation_of_images_to_amazon_ecr_does_not_complete">Relocation of images to Amazon ECR does not complete</a></li>
+<li><a href="#_one_or_more_tanzu_application_platform_packages_fail_to_reconcile">One or more Tanzu Application Platform packages fail to reconcile</a></li>
+<li><a href="#_cannot_log_in_to_the_bastion_host">Cannot log in to the bastion host</a></li>
+<li><a href="#_deployment_parameter_errors">Deployment parameter errors</a></li>
+<li><a href="#_regionalsharedresources_and_accountsharedresources_cloudformation_stacks_fail_to_deploy">RegionalSharedResources and AccountSharedResources CloudFormation stacks fail to deploy</a></li>
+<li><a href="#_custom_iam_roles">Custom IAM roles</a></li>
+<li><a href="#_tap_workload_deployment_fails">TAP workload deployment fails</a></li>
+</ul>
+</li>
+<li><a href="#_release_notes">Release Notes</a>
+<ul class="sectlevel2">
 <li><a href="#_version_1_4_2aws_2">Version 1.4.2+aws.2</a></li>
 <li><a href="#_version_1_4_2aws_1">Version 1.4.2+aws.1</a></li>
 <li><a href="#_version_1_4_2aws_0">Version 1.4.2+aws.0</a></li>
@@ -955,7 +960,7 @@ Refer to the <a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-
 </td>
 <td class="content">
 <div class="paragraph">
-<p>This Partner Solution uses the <a href="https://github.com/aws-quickstart/quickstart-amazon-eks/releases/tag/v5.0.0">Amazon EKS on the AWS Cloud reference deployment</a> as a submodule. The Version 5.0.0 update to Amazon EKS on the AWS Cloud contains breaking changes. If you previously installed the VMware Tanzu Application Platform Partner Solution or installed any resources using a version of the Amazon EKS reference deployment earlier than 5.0.0, you must delete the following CloudFormation stacks before upgrading:</p>
+<p>This Partner Solution uses the <a href="https://github.com/aws-quickstart/quickstart-amazon-eks/releases/tag/v5.0.0" target="_blank" rel="noopener">Amazon EKS on the AWS Cloud reference deployment</a> as a submodule. The Version 5.0.0 update to Amazon EKS on the AWS Cloud contains breaking changes. If you previously installed the VMware Tanzu Application Platform Partner Solution or installed any resources using a version of the Amazon EKS reference deployment earlier than 5.0.0, you must delete the following CloudFormation stacks before upgrading:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -975,7 +980,7 @@ Refer to the <a href="https://github.com/aws-quickstart/quickstart-vmware-tanzu-
 </table>
 </div>
 <div class="paragraph">
-<p>For more information about changes in this version of Tanzu Application Platform on AWS, refer to <a href="#release-notes">Release Notes</a>, later in this guide.</p>
+<p>For more information about changes in this version of Tanzu Application Platform on AWS, refer to <a href="#_release_notes">Release Notes</a>, later in this guide.</p>
 </div>
 </div>
 </div>
@@ -1120,27 +1125,17 @@ blocks, instance types, and Tanzu Application Platform settings. Deployment opti
 <div class="sect1">
 <h2 id="_predeployment_steps">Predeployment steps</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_technical_requirements">Technical requirements</h3>
 <div class="paragraph">
 <p>Before you launch the Partner Solution, review the following information and ensure that your account is properly configured. Otherwise, the deployment might fail.</p>
 </div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
+<div class="sect2">
+<h3 id="_create_an_rsa_key_pair">Create an RSA key pair</h3>
 <div class="paragraph">
-<p>An <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html" target="_blank" rel="noopener">Amazon EC2 Key Pair</a> is required for the deployment of this Partner Solution, and the key type must be RSA, not ED25519. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html" target="_blank" rel="noopener">Amazon EC2 key pairs and Windows instances</a> and <a href="#_troubleshooting" target="_blank" rel="noopener">Troubleshooting</a>, later in this guide.</p>
+<p>To deploy this Partner Solution, an RSA-type Amazon EC2 key pair is required. To create one, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html">Create key pairs</a>. Ensure that you choose <code>RSA</code> as the key pair type. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html" target="_blank" rel="noopener">Amazon EC2 key pairs and Windows instances</a> and <a href="#_cannot_log_in_to_the_bastion_host">Cannot log in to the bastion host</a>, later in this guide.</p>
 </div>
-</td>
-</tr>
-</table>
 </div>
-<div class="sect3">
-<h4 id="_resource_quotas">Resource quotas</h4>
+<div class="sect2">
+<h3 id="_resource_quotas">Resource quotas</h3>
 <div class="paragraph">
 <p>If necessary, request <a href="https://console.aws.amazon.com/servicequotas/home/" target="_blank" rel="noopener">service quota increases</a> for the following resources. You might need to request increases if your existing deployment currently uses these resources and if this Partner Solution deployment could result in exceeding the default quotas. The <a href="https://console.aws.amazon.com/servicequotas/home/" target="_blank" rel="noopener">Service Quotas console</a> displays your usage and quotas for some aspects of some services. For more information, refer to <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html" target="_blank" rel="noopener">What is Service Quotas?</a> and <a href="https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html" target="_blank" rel="noopener">AWS service quotas</a>.</p>
 </div>
@@ -1210,7 +1205,6 @@ blocks, instance types, and Tanzu Application Platform settings. Deployment opti
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 <div class="sect2">
 <h3 id="_vmware_tanzu_network_account">VMware Tanzu Network account</h3>
@@ -1703,8 +1697,9 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 <div class="paragraph">
 <p>For troubleshooting common Partner Solution issues, refer to the <a href="https://fwd.aws/rA69w?" target="_blank" rel="noopener">AWS Partner Solution General Information Guide</a> and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html" target="_blank" rel="noopener">Troubleshooting CloudFormation</a>.</p>
 </div>
-<div class="sect2">
-<h3 id="_vmware_tanzu_application_platform_documentation">VMware Tanzu Application Platform documentation</h3>
+<div class="paragraph">
+<p>You can verify CloudFormation stack deployment using the AWS Management Console. For more information, refer to <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-view-stack-data-resources.html" target="_blank" rel="noopener">Viewing AWS CloudFormation stack data and resources on the AWS Management Console</a>.</p>
+</div>
 <div class="paragraph">
 <p>Refer to the following resources to troubleshoot VMware Tanzu Application Platform.</p>
 </div>
@@ -1718,139 +1713,167 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 </li>
 </ul>
 </div>
-</div>
 <div class="sect2">
-<h3 id="_i_cant_access_the_tanzu_application_platform_user_interface">I can&#8217;t access the Tanzu Application Platform user interface</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>Problem</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Inability to access the Tanzu Application Platform user interface after deployment.</p>
-</li>
-</ul>
+<h3 id="_cannot_connect_to_tanzu_application_platform_console_after_deployment">Cannot connect to Tanzu Application Platform console after deployment</h3>
+<div class="paragraph">
+<p>If you cannot access the Tanzu Application Platform console after deployment, do the following:</p>
 </div>
-</li>
-<li>
-<p>Cause</p>
 <div class="ulist">
 <ul>
 <li>
-<p>The deployment failed to complete successfully.</p>
+<p>Ensure that you are attempting to access the Tanzu Application Platform URL from a location with internet connectivity. The Tanzu Application Platform website GUI URL can only be accessed from endpoints with a route to the private VPC network, such as from the Amazon EC2 Windows bastion host instance.</p>
 </li>
 <li>
-<p>You are attempting to accessing the site from a location that doesn&#8217;t have connectivity to the Tanzu Application Platform GUI.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Solution</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Verify that the CloudFormation stack deployment completed successfully.</p>
-</li>
-<li>
-<p>If the stack deployed successfully, review the Tanzu Application Platform bootstrap logs.</p>
-</li>
-<li>
-<p>The Tanzu Application Platform website GUI URL can only be accessed from endpoints with a route to the private VPC network, such as from the Amazon EC2 Windows bastion host instance.</p>
-</li>
-</ul>
-</div>
+<p>Verify that the CloudFormation stack deployment completed successfully. If the stack deployed successfully, review the Tanzu Application Platform bootstrap logs.</p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_tanzu_application_platform_installation_failed_with_a_eula_error">Tanzu Application Platform installation failed with a EULA error</h3>
-<div class="ulist">
-<ul>
+<h3 id="_deployment_fails_to_complete_within_two_hours">Deployment fails to complete within two hours</h3>
+<div class="paragraph">
+<p>If the deployment takes over two hours to complete or you do not receive a notification that the Partner Solution has completed, do the following:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
 <li>
-<p>Problem</p>
-<div class="ulist">
-<ul>
-<li>
-<p>The deployment failed to complete successfully.</p>
+<p>Sign in to the <a href="https://console.aws.amazon.com/console/home" target="_blank" rel="noopener">AWS Management Console</a>, and open the CloudFormation console.</p>
 </li>
-</ul>
+<li>
+<p>Choose the Partner Solution base stack.</p>
+</li>
+<li>
+<p>Choose the <strong>Outputs</strong> tab.</p>
+</li>
+<li>
+<p>Copy the ID of the <code>TAPLogGroup</code>.</p>
+<div id="taploggroupoutput" class="imageblock">
+<div class="content">
+<img src="docs/deployment_guide/images/TAPLogGroupOutput.PNG" alt="LogGroupOutput">
+</div>
+<div class="title">Figure 3. TAPLogGroupOutput</div>
 </div>
 </li>
 <li>
-<p>Cause</p>
-<div class="ulist">
-<ul>
-<li>
-<p>The EULA was not accepted.</p>
-</li>
-</ul>
+<p>Search the CloudWatch log groups for the <code>TAPLogGroup</code> ID.</p>
+<div id="cloudwatchloggroup" class="imageblock">
+<div class="content">
+<img src="docs/deployment_guide/images/CloudWatchLogGroup.PNG" alt="CloudWatchLogGroup">
+</div>
+<div class="title">Figure 4. CloudWatchLogGroup</div>
 </div>
 </li>
 <li>
-<p>Solution</p>
-<div class="ulist">
-<ul>
+<p>Choose the log group to view the log streams file <code>/var/log/cloud-init-output.log</code>. The TAP output scripts output from the Linux Bastion EC2 instance.</p>
+<div id="cloudinitoutput" class="imageblock">
+<div class="content">
+<img src="docs/deployment_guide/images/CloudInitOutput.PNG" alt="CloudInitOutput">
+</div>
+<div class="title">Figure 5. CloudInitOutput</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Logs can also be found in the <code>/var/log/cloud-init-output.log</code> file on the Linux bastion host.
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_tap_package_or_cloud_init_script_failure">TAP package or cloud-init script failure</h3>
+<div class="paragraph">
+<p>The deployment might fail because TAP packages fail to reconcile or <code>cloud-init</code> scripts fail.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
 <li>
-<p>You must accept the relevant EULAs before you can download the Tanzu Application Platform packages from the VMware Tanzu Network. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/install-tanzu-cli.html#accept-the-end-user-license-agreements-0" target="_blank" rel="noopener">Accept the End User License Agreements</a>.</p>
+<p>Sign in to the <a href="https://console.aws.amazon.com/console/home" target="_blank" rel="noopener">AWS Management Console</a>, and open the CloudFormation console.</p>
 </li>
 <li>
+<p>Choose the innermost nested CloudFormation stack that failed.</p>
+<div id="nestedfailedstack" class="imageblock">
+<div class="content">
+<img src="docs/deployment_guide/images/NestedFailedStack.PNG" alt="NestedFailedStack">
+</div>
+<div class="title">Figure 6. Nested failed stack</div>
+</div>
+</li>
+<li>
+<p>Choose the <strong>Events</strong> tab.</p>
+</li>
+<li>
+<p>Find and correct the error in the <strong>Status reason</strong> column.</p>
+<div id="eventstab" class="imageblock">
+<div class="content">
+<img src="docs/deployment_guide/images/FailedStackEvents.PNG" alt="FailedStackEvents">
+</div>
+<div class="title">Figure 7. Events tab of failed stack</div>
+</div>
+</li>
+<li>
+<p>Update the stack. For more information, refer to <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks.html" target="_blank" rel="noopener">AWS CloudFormation stack updates</a>.</p>
+</li>
+<li>
+<p>If the CloudFormation stack is in <strong>UPDATE_ROLLBACK_FAILED</strong> status, delete the stack and redeploy the Partner Solution. For more information, refer to <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-delete-stack.html" target="_blank" rel="noopener">Deleting a stack on the AWS CloudFormation console</a>.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_tanzu_application_platform_installation_fails_with_a_eula_error">Tanzu Application Platform installation fails with a EULA error</h3>
+<div class="paragraph">
+<p>You must accept the relevant {partner-product-short-nam} EULAs during deployment before you can download the Tanzu Application Platform packages from the VMware Tanzu Network. For more information, refer to <a href="https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/install-tanzu-cli.html#accept-the-end-user-license-agreements-0" target="_blank" rel="noopener">Accept the End User License Agreements</a>.</p>
+</div>
+<div class="paragraph">
 <p>For more details about the <code>.status.usefulErrorMessage</code> error, connect to the Linux bastion host using SSH. Then run the following commands. For <code>&lt;PACKAGE-NAME&gt;</code>, substitute the name of the package to target.</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre>tanzu package installed list -A
 tanzu package installed get &lt;PACKAGE-NAME&gt; --namespace tap-install</pre>
 </div>
 </div>
-</li>
-<li>
+</div>
+<div class="sect2">
+<h3 id="_relocation_of_images_to_amazon_ecr_does_not_complete">Relocation of images to Amazon ECR does not complete</h3>
+<div class="paragraph">
 <p>If you have chosen to relocate Tanzu Application Platform images to Amazon ECR and this did not complete successfully, run the following command. This command takes 30–45 minutes to complete.</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre>/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c relocate</pre>
 </div>
 </div>
-</li>
-<li>
+<div class="paragraph">
 <p>Run the following commands to reinstall Tanzu Application Platform.</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre>/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install single</pre>
 </div>
 </div>
-</li>
-<li>
-<p>For the multi cluster install of Quickstart, run the command against the affected clusters. The cluster types for multi cluster are "view", "run", "iterate", or "build." Pass the cluster type into the install command.</p>
+<div class="paragraph">
+<p>For a multicluster installation of the Partner Solution, run the following command against the affected cluster type. Substitute <code>view</code>, <code>run</code>, <code>iterate</code>, or <code>build</code> for <code>&lt;cluster-type&gt;</code> in the command.</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre>/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install &lt;cluster-type&gt;</pre>
 </div>
 </div>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
 </div>
 <div class="sect2">
-<h3 id="_one_or_more_tanzu_application_platform_packages_failed_to_reconcile">One or more Tanzu Application Platform packages failed to reconcile</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>Problem</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Tanzu Application Platform packages fail to reconcile.</p>
-</li>
-</ul>
+<h3 id="_one_or_more_tanzu_application_platform_packages_fail_to_reconcile">One or more Tanzu Application Platform packages fail to reconcile</h3>
+<div class="paragraph">
+<p>The following issues might cause the Tanzu Application Platform packages fail to reconcile.</p>
 </div>
-</li>
-<li>
-<p>Cause</p>
 <div class="ulist">
 <ul>
 <li>
@@ -1861,11 +1884,11 @@ tanzu package installed get &lt;PACKAGE-NAME&gt; --namespace tap-install</pre>
 </li>
 </ul>
 </div>
-</li>
-<li>
-<p>Solution</p>
-<div class="ulist">
-<ul>
+<div class="paragraph">
+<p>To troubleshoot, do the following:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
 <li>
 <p>Connect to the Linux bastion host using SSH. Then run the following command to verify the installation status.</p>
 <div class="listingblock">
@@ -1875,69 +1898,39 @@ tanzu package installed get &lt;PACKAGE-NAME&gt; --namespace tap-install</pre>
 </div>
 </li>
 <li>
-<p>If the installation has stopped running, one or more reconciliations have likely failed.</p>
-</li>
-<li>
-<p>For the single cluster install of Quickstart, run the following command.</p>
+<p>If the installation has stopped running, one or more reconciliations have likely failed. For a single-cluster installation of the Partner Solution, run the following command.</p>
 <div class="listingblock">
 <div class="content">
 <pre>/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install single</pre>
 </div>
 </div>
-</li>
-<li>
-<p>For the multi cluster install of Quickstart, run the command against the cluster with packages not reconciling. The cluster types for multi cluster are "view", "run", "iterate", or "build." Pass the cluster type into the install command.</p>
+<div class="paragraph">
+<p>For a multicluster installation of the Partner Solution, run the following command against the affected cluster type. Substitute <code>view</code>, <code>run</code>, <code>iterate</code>, or <code>build</code> for <code>&lt;cluster-type&gt;</code> in the command.</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre>/home/ubuntu/tap-setup-scripts/src/tap-main.sh -c install &lt;cluster-type&gt;</pre>
 </div>
 </div>
 </li>
-</ul>
-</div>
-</li>
-</ul>
+</ol>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_its_been_more_than_four_minutes_and_the_windows_bastion_host_administrator_password_still_isnt_available">It&#8217;s been more than four minutes and the Windows bastion host administrator password still isn&#8217;t available</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>Problem</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Inability to log into Windows bastion EC2 instance</p>
-</li>
-</ul>
+<h3 id="_cannot_log_in_to_the_bastion_host">Cannot log in to the bastion host</h3>
+<div class="paragraph">
+<p>If you cannot log in to the Windows EC2 bastion host, it is likely that you chose a ED25519 key pair during deployment instead of an RSA key pair. Amazon EC2 Windows instances do not support ED25519 key pairs. The CloudFormation stack deploys successfully, but you cannot retrieve the automatically generated password for the Windows bastion host. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html" target="_blank" rel="noopener">Amazon EC2 key pairs and Windows instances</a>.</p>
 </div>
-</li>
-<li>
-<p>Cause</p>
-<div class="ulist">
-<ul>
-<li>
-<p>It is likely that during deployment an ED25519 key pair was used instead of an RSA key pair. If you select an ED25519 key pair for this deployment, the CloudFormation stack deploys successfully, but you will be unable to retrieve the automatically generated password for the Windows bastion host.</p>
-</li>
-<li>
-<p>As of June 23rd, 2022, Amazon EC2 Windows instances do not support ED25519 key pairs. For more information, refer to <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-key-pairs.html" target="_blank" rel="noopener">Amazon EC2 key pairs and Windows instances</a>.</p>
-</li>
-</ul>
+<div class="paragraph">
+<p>To troubleshoot, try the following options:</p>
 </div>
-</li>
-<li>
-<p>Solution</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Verify that an RSA key pair is used during deployment.</p>
+<p><a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html" target="_blank" rel="noopener">Reset the Windows administrator password using ECLaunch v2</a>.</p>
 </li>
 <li>
-<p>If an RSA key pair has not been created, try the following steps: <a href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ResettingAdminPassword_EC2Launchv2.html" target="_blank" rel="noopener">Reset the Windows administrator password using EC2Launch v2</a></p>
-</li>
-<li>
-<p><a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html" target="_blank" rel="noopener">Update the CloudFormation stack</a> to use an RSA key pair, which will replace all Amazon EC2 instances (Windows and Linux) and Amazon EKS nodes that use this key. For more information, refer to the <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname" target="_blank" rel="noopener">documentation</a>.</p>
+<p><a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-direct.html" target="_blank" rel="noopener">Update the CloudFormation stack</a> to use an RSA key pair. Doing this replaces all Amazon EC2 instances (Windows and Linux) and Amazon EKS nodes that use this key. For more information, refer to <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-keyname" target="_blank" rel="noopener">KeyName</a>.</p>
 </li>
 <li>
 <p>Customize the CloudFormation template to use a separate key pair for the Windows bastion host. Then update the CloudFormation stack. This option only replaces the Windows bastion host instance. Instructions for implementing this are beyond the scope of this guide.</p>
@@ -1947,330 +1940,83 @@ tanzu package installed get &lt;PACKAGE-NAME&gt; --namespace tap-install</pre>
 </li>
 </ul>
 </div>
-</li>
-</ul>
-</div>
 </div>
 <div class="sect2">
-<h3 id="_search_logs_for_deployment_failures">Search logs for deployment failures</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>Problem</p>
-<div class="ulist">
-<ul>
-<li>
-<p>A deployment takes over two hours to complete.</p>
-</li>
-<li>
-<p>No notification of Quickstart deployment completion.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Cause</p>
-<div class="ulist">
-<ul>
-<li>
-<p>CloudFormation fails.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Solution</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Sign in to the <a href="https://console.aws.amazon.com/console/home" target="_blank" rel="noopener">AWS Management Console</a>, and open the CloudFormation console.</p>
-</li>
-<li>
-<p>Select the Quickstart base stack and click the Outputs tab and copy the TAPLogGroupId.</p>
+<h3 id="_deployment_parameter_errors">Deployment parameter errors</h3>
 <div class="paragraph">
-<p><span class="image"><img src="docs/deployment_guide/images/TAPLogGroupOutput.PNG" alt="LogGroupOutput"></span></p>
+<p>You will encounter errors when entering deployment parameters if Availability Zones, remote access Classless Inter-Domain Routing (CIDR) range, or key pair are invalid, incorrectly configured, or absent.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Ensure that you configure Availability Zones in the deployment AWS Region before deployment.</p>
+</li>
+<li>
+<p>The <strong>Number of Availability Zones</strong> parameter must match the <strong>Availability Zones</strong> parameter.</p>
+<div id="azparameters" class="imageblock">
+<div class="content">
+<img src="docs/deployment_guide/images/AvailabilityZones.PNG" alt="AvailabilityZones">
+</div>
+<div class="title">Figure 8. Availability Zones and Number of Availability Zones parameters</div>
 </div>
 </li>
 <li>
-<p>Search the CloudWatch log groups for the TAPLogGroupId.</p>
-<div class="paragraph">
-<p><span class="image"><img src="docs/deployment_guide/images/CloudWatchLogGroup.PNG" alt="CloudWatchLogGroup"></span></p>
+<p>For the <strong>Remote access CIDR</strong> parameter, ensure that you choose a valid remote access CIDR.</p>
+<div id="remoteCIDR" class="imageblock">
+<div class="content">
+<img src="docs/deployment_guide/images/RemoteCIDR.PNG" alt="RemoteCIDR">
+</div>
+<div class="title">Figure 9. Remote access CIDR parameter</div>
 </div>
 </li>
 <li>
-<p>Select the log group to view the log streams file "/var/log/cloud-init-output.log" where the tap setup scripts output from the Linux Bastion EC2 instance is.</p>
-<div class="paragraph">
-<p><span class="image"><img src="docs/deployment_guide/images/CloudInitOutput.PNG" alt="CloudInitOutput"></span></p>
+<p>You must create an RSA key pair before deploying the Partner Solution. For more information, refer to <a href="#_create_an_rsa_key_pair">Create an RSA key pair</a>, earlier in this guide. During deployment, for <strong>EC2 key pair name</strong>, choose an RSA key pair.</p>
+<div id="ec2keypairname" class="imageblock">
+<div class="content">
+<img src="docs/deployment_guide/images/KeyPair.PNG" alt="KeyPair">
 </div>
-</li>
-<li>
-<p>Logs can also be found in the <code>/var/log/cloud-init-output.log</code> file on the Linux bastion host.</p>
-</li>
-</ul>
+<div class="title">Figure 10. EC2 key pair name parameter</div>
 </div>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_debug_cloudformation_deployment_failures">Debug CloudFormation deployment failures</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>Problem</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Quickstart CloudFormation deployment fails.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Cause</p>
-<div class="ulist">
-<ul>
-<li>
-<p>TAP packages may have failed to reconcile.</p>
-</li>
-<li>
-<p>Cloud-init scripts may have failed.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Solution</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Select inner-most nested failed CloudFormation stack.</p>
+<h3 id="_regionalsharedresources_and_accountsharedresources_cloudformation_stacks_fail_to_deploy">RegionalSharedResources and AccountSharedResources CloudFormation stacks fail to deploy</h3>
 <div class="paragraph">
-<p><span class="image"><img src="docs/deployment_guide/images/NestedFailedStack.PNG" alt="NestedFailedStack"></span></p>
+<p>The <code>RegionalSharedResources</code> stack creates resources in each Region to which the Partner Solution is deployed. The <code>AccountSharedResources</code> stack creates resources in a single Region.</p>
 </div>
-</li>
-<li>
-<p>Select the CloudFormation Events tab.</p>
 <div class="paragraph">
-<p><span class="image"><img src="docs/deployment_guide/images/FailedStackEvents.PNG" alt="FailedStackEvents"></span></p>
+<p>If <code>RegionalSharedResources</code> and <code>AccountSharedResources</code> fail to deploy, delete the IAM roles that they both create and deploy the Partner Solution to a single Region. Roles created by these stacks include <code>qs</code> or <code>quickstart</code>. For more information, refer to <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_manage_delete.html" target="_blank" rel="noopener">Deleting roles or instance profiles</a>.</p>
 </div>
-</li>
-<li>
-<p>Find the error description in the "Status reason" column.</p>
-</li>
-<li>
-<p>Correct the error if possible, then update the stack from the "Stack actions" dropdown on the top right corner of the console.</p>
-</li>
-<li>
-<p>If the CloudFormation stack is in "ROLLBACK_FAILED" state, delete the stack and redeploy Quickstart.</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
+<div class="paragraph">
+<p><code>RegionalSharedResources</code> and <code>AccountSharedResources</code> stacks remain deployed between Partner Solution deployments by design.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_input_parameter_failures">Input parameter failures</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>Problem</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Invalid Availability Zones or Number of Availability Zones.</p>
-</li>
-<li>
-<p>Invalid Remote Access CIDR provided.</p>
-</li>
-<li>
-<p>EC2 Key pair does not show up in dropdown.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Cause</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Using Availability Zones which are not present or restricted in the AWS region.</p>
-</li>
-<li>
-<p>List of Availability Zones and Number of Availability Zones do not match.</p>
-</li>
-<li>
-<p>Entering invalid or incorrectly formatted Remote Access CIDR.</p>
-</li>
-<li>
-<p>Key pair does not exist.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Solution</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Ensure Availability Zones are present in the AWS region the Quickstart is deploying to.</p>
-</li>
-<li>
-<p>Ensure the size of the List of Availability Zones and Number of Availability Zones match.</p>
+<h3 id="_custom_iam_roles">Custom IAM roles</h3>
 <div class="paragraph">
-<p><span class="image"><img src="docs/deployment_guide/images/AvailabilityZones.PNG" alt="AvailabilityZones"></span></p>
+<p>The Partner Solution deployment might fail if you choose a role for the <strong>IAM role—optional</strong> parameter during deployment. It is not recommended to use a custom IAM role for this Partner Solution.</p>
 </div>
-</li>
-<li>
-<p>Provide a valid Remote Access CIDR for your machine to connect to the Windows or Linux Bastion EC2 instance in the VPC.</p>
-<div class="paragraph">
-<p><span class="image"><img src="docs/deployment_guide/images/RemoteCIDR.PNG" alt="RemoteCIDR"></span></p>
+<div id="iamroleparameter" class="imageblock">
+<div class="content">
+<img src="docs/deployment_guide/images/QSIamRoleOptional.PNG" alt="QSIamRoleOptional">
 </div>
-</li>
-<li>
-<p>If a key pair exists, it can be used to SSH into the Linux Bastion EC2 instance in the VPC. If a key pair does not exist, create one and it will show up in the drop down.</p>
-<div class="paragraph">
-<p><span class="image"><img src="docs/deployment_guide/images/KeyPair.PNG" alt="KeyPair"></span></p>
-</div>
-</li>
-</ul>
-</div>
-</li>
-</ul>
+<div class="title">Figure 11. IAM role—optional parameter</div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_regionalsharedresources_and_accountsharedresources_not_removed_after_quickstart_cloudformation_delete">RegionalSharedResources and AccountSharedResources not removed after Quickstart CloudFormation delete</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>Problem</p>
-<div class="ulist">
-<ul>
-<li>
-<p>RegionalSharedResources and AccountSharedResources CloudFormation stacks are not removed after QuickStart CFT is deleted.</p>
-</li>
-<li>
-<p>RegionalSharedResources or AccountSharedResources CloudFormation stacks failed to deploy.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Cause</p>
-<div class="ulist">
-<ul>
-<li>
-<p>AWS Resources created by RegionalSharedResources and the AccountSharedResources CFTs such as IAM Roles are left behind even after QuickStart CFT is deleted.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Solution</p>
-<div class="ulist">
-<ul>
-<li>
-<p>RegionalSharedResources stack creates AWS resources for each region Quickstart is deployed.</p>
+<h3 id="_tap_workload_deployment_fails">TAP workload deployment fails</h3>
 <div class="paragraph">
-<p><span class="image"><img src="docs/deployment_guide/images/RegionalStack.PNG" alt="RegionalStack"></span></p>
+<p>If you cannot access the TAP URL from the Linux or Windows EC2 instances, or if the TAP workload is not visible in the TAP supply chain, do the following:</p>
 </div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Connect to the <code>VMwareLinuxBastionInstance</code> EC2 instance using SSH.</p>
 </li>
 <li>
-<p>AccountSharedResources stack creates AWS resources in a single region where Quickstart is deployed.</p>
-<div class="paragraph">
-<p><span class="image"><img src="docs/deployment_guide/images/AccountStack.PNG" alt="AccountStack"></span></p>
-</div>
-</li>
-<li>
-<p>RegionalSharedResources and AccountSharedResources stacks remain deployed by design and are meant to persist between Quickstart deployments.</p>
-</li>
-<li>
-<p>If RegionalSharedResources or AccountSharedResources stacks failed to deploy, remove the IAM roles created by SharedResources stacks. Roles that include "qs" or "quickstart" are those created by SharedResources.</p>
-</li>
-<li>
-<p>If multiple Quickstart stacks are running simultaneously in multiple regions, conflicting IAM roles may result in failure to deploy or clean up SharedResources stacks. Delete all IAM roles associated with the Quickstart and deploy a Quickstart in a single region. The SharedResources stacks will be newly created.</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_cloudformation_iam_roles">CloudFormation IAM roles</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>Problem</p>
-<div class="ulist">
-<ul>
-<li>
-<p>IAM role is used to perform CloudFormation operations and deployment fails.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Cause</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Using a custom role to deploy Quickstart.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Solution</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Using a custom role is optional and not advised for deploying Quickstart.</p>
-<div class="paragraph">
-<p><span class="image"><img src="docs/deployment_guide/images/QSIamRoleOptional.PNG" alt="QSIamRoleOptional"></span></p>
-</div>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_tap_workload_deployment_fails">TAP Workload deployment fails</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>Problem</p>
-<div class="ulist">
-<ul>
-<li>
-<p>TAP workload URL is not accessible from the Linux or Windows Bastion EC2 instances.</p>
-</li>
-<li>
-<p>TAP workload is not visible in the TAP GUI supply chain.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Cause</p>
-<div class="ulist">
-<ul>
-<li>
-<p>CloudFormation and TAP installation succeeds but workload fails to run.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Solution</p>
-<div class="ulist">
-<ul>
-<li>
-<p>SSH to the 'VMwareLinuxBastionInstance' EC2 instance and run the below commands. They will provide the workload status and logs that contain error messages.</p>
+<p>Run the following commands. They will provide the workload status and logs that contain error messages.</p>
 <div class="listingblock">
 <div class="content">
 <pre>tanzu apps workload list -n tap-workload
@@ -2279,32 +2025,34 @@ tanzu apps workload tail tanzu-java-web-app-workload -n tap-workload --since 10m
 </div>
 </li>
 <li>
-<p>If the status and logs do not contain errors, ensure DNS is correctly configured by checking Route53 and ensuring the private zone has the respective kubernetes cluster envoy-IP configured in CNAME records.</p>
-</li>
-<li>
-<p>Route53 Single cluster configuration.</p>
-<div class="paragraph">
-<p><span class="image"><img src="docs/deployment_guide/images/Route53Single.PNG" alt="Route53Single"></span></p>
+<p>If the status and logs do not contain errors, ensure that the DNS is correctly configured. In the Route53 console, ensure that the kubernetes cluster IP records have <code>CNAME</code> as the record type.</p>
+<div id="route53single" class="imageblock">
+<div class="content">
+<img src="docs/deployment_guide/images/Route53Single.PNG" alt="Route53Single">
+</div>
+<div class="title">Figure 12. Single-cluster configuration</div>
+</div>
+<div id="route53multi" class="imageblock">
+<div class="content">
+<img src="docs/deployment_guide/images/Route53Multi.PNG" alt="Route53Multi">
+</div>
+<div class="title">Figure 13. Multicluster configuration</div>
 </div>
 </li>
-<li>
-<p>Route53 Multi cluster configuration.</p>
-<div class="paragraph">
-<p><span class="image"><img src="docs/deployment_guide/images/Route53Multi.PNG" alt="Route53Multi"></span></p>
-</div>
-</li>
-</ul>
-</div>
-</li>
-</ul>
+</ol>
 </div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_notes">Release Notes</h2>
+<div class="sectionbody">
 <div class="sect2">
 <h3 id="_version_1_4_2aws_2">Version 1.4.2+aws.2</h3>
 <div class="ulist">
 <ul>
 <li>
-<p>Bugfix: Timeout issues with cfn-signals during TAP install.</p>
+<p>Fixed imeout issues with cfn-signals during TAP install.</p>
 </li>
 <li>
 <p>Added TAP-GUI self-Cert on Windows EC2 instance.</p>
@@ -2320,7 +2068,7 @@ tanzu apps workload tail tanzu-java-web-app-workload -n tap-workload --since 10m
 <div class="ulist">
 <ul>
 <li>
-<p>Bugfix: Relocation of the TAP images was broken, this release fixes that.</p>
+<p>Fixed relocation of the TAP images was broken, this release fixes that.</p>
 </li>
 <li>
 <p>Removed the following configuration options:</p>
@@ -2336,7 +2084,7 @@ tanzu apps workload tail tanzu-java-web-app-workload -n tap-workload --since 10m
 <p>The bastion hosts now use <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html">Instance Metadata Service Version 2 (IMDSv2)</a>.</p>
 </li>
 <li>
-<p>We changed how we check and deploy the shared resources stacks
+<p>Changed checking and deployment of the shared resources stacks.
 (<code>eks-quickstart-RegionalSharedResources</code> &amp; <code>eks-quickstart-AccountSharedResources</code>) which results in slightly faster deployments
 and less chance to run into race-conditions.</p>
 </li>
@@ -2348,7 +2096,7 @@ and less chance to run into race-conditions.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>The stack now reports the status of the  Tanzu Application Platform deployment and installation of the sample application  after all of the infrastructure has been deployed.</p>
+<p>The stack now reports the status of the Tanzu Application Platform deployment and installation of the sample application  after all of the infrastructure has been deployed.</p>
 </li>
 <li>
 <p>Fixed an issue that occurred when deleting VPCs because of stale security groups.</p>
@@ -2468,7 +2216,7 @@ and less chance to run into race-conditions.</p>
 </html>
 <!--
 repo commit:
-602e2dde44b23b4d5f5838cf385d2657e27442a5
+68cda8530c7d43509025887c52eb9e608c01774b
 
 submodule config:
  7fa56a2f3f3ee511f887dd638f655e0c141bc19b docs/boilerplate (7fa56a2)
