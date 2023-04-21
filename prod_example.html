@@ -1749,27 +1749,38 @@ Unless you&#8217;re customizing the Partner Solution templates or are instructed
 <p>Copy the ID of the <code>TAPLogGroup</code>.</p>
 <div id="taploggroupoutput" class="imageblock">
 <div class="content">
-<img src="docs/deployment_guide/images/TAPLogGroupOutput.PNG" alt="LogGroupOutput">
+<img src="docs/deployment_guide/images/TAPLogGroupOutput.png" alt="LogGroupOutput">
 </div>
 <div class="title">Figure 3. TAPLogGroupOutput</div>
 </div>
 </li>
+</ol>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="5">
 <li>
 <p>Search the CloudWatch log groups for the <code>TAPLogGroup</code> ID.</p>
 <div id="cloudwatchloggroup" class="imageblock">
 <div class="content">
-<img src="docs/deployment_guide/images/CloudWatchLogGroup.PNG" alt="CloudWatchLogGroup">
+<img src="docs/deployment_guide/images/CloudWatchLogGroup.png" alt="CloudWatchLogGroup">
 </div>
 <div class="title">Figure 4. CloudWatchLogGroup</div>
 </div>
 </li>
+</ol>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="6">
 <li>
 <p>Choose the log group to view the log streams file <code>/var/log/cloud-init-output.log</code>. The TAP output scripts output from the Linux Bastion EC2 instance.</p>
 <div id="cloudinitoutput" class="imageblock">
 <div class="content">
-<img src="docs/deployment_guide/images/CloudInitOutput.PNG" alt="CloudInitOutput">
+<img src="docs/deployment_guide/images/CloudInitOutput.png" alt="CloudInitOutput">
 </div>
 <div class="title">Figure 5. CloudInitOutput</div>
+</div>
+</li>
+</ol>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1782,9 +1793,6 @@ Logs can also be found in the <code>/var/log/cloud-init-output.log</code> file o
 </td>
 </tr>
 </table>
-</div>
-</li>
-</ol>
 </div>
 </div>
 <div class="sect2">
@@ -1801,23 +1809,31 @@ Logs can also be found in the <code>/var/log/cloud-init-output.log</code> file o
 <p>Choose the innermost nested CloudFormation stack that failed.</p>
 <div id="nestedfailedstack" class="imageblock">
 <div class="content">
-<img src="docs/deployment_guide/images/NestedFailedStack.PNG" alt="NestedFailedStack">
+<img src="docs/deployment_guide/images/NestedFailedStack.png" alt="Nested failed stack">
 </div>
 <div class="title">Figure 6. Nested failed stack</div>
 </div>
 </li>
+</ol>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="3">
 <li>
 <p>Choose the <strong>Events</strong> tab.</p>
 </li>
 <li>
 <p>Find and correct the error in the <strong>Status reason</strong> column.</p>
-<div id="eventstab" class="imageblock">
+<div id="failedstackevents" class="imageblock">
 <div class="content">
-<img src="docs/deployment_guide/images/FailedStackEvents.PNG" alt="FailedStackEvents">
+<img src="docs/deployment_guide/images/FailedStackEvents.png" alt="Failed stack events">
 </div>
 <div class="title">Figure 7. Events tab of failed stack</div>
 </div>
 </li>
+</ol>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="5">
 <li>
 <p>Update the stack. For more information, refer to <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks.html" target="_blank" rel="noopener">AWS CloudFormation stack updates</a>.</p>
 </li>
@@ -1953,9 +1969,9 @@ tanzu package installed get &lt;PACKAGE-NAME&gt; --namespace tap-install</pre>
 </li>
 <li>
 <p>The <strong>Number of Availability Zones</strong> parameter must match the <strong>Availability Zones</strong> parameter.</p>
-<div id="azparameters" class="imageblock">
+<div id="availabiltyzones" class="imageblock">
 <div class="content">
-<img src="docs/deployment_guide/images/AvailabilityZones.PNG" alt="AvailabilityZones">
+<img src="docs/deployment_guide/images/AvailabilityZones.png" alt="Availability Zones parameters">
 </div>
 <div class="title">Figure 8. Availability Zones and Number of Availability Zones parameters</div>
 </div>
@@ -1964,21 +1980,21 @@ tanzu package installed get &lt;PACKAGE-NAME&gt; --namespace tap-install</pre>
 <p>For the <strong>Remote access CIDR</strong> parameter, ensure that you choose a valid remote access CIDR.</p>
 <div id="remoteCIDR" class="imageblock">
 <div class="content">
-<img src="docs/deployment_guide/images/RemoteCIDR.PNG" alt="RemoteCIDR">
+<img src="docs/deployment_guide/images/RemoteCIDR.png" alt="Remote CIDR">
 </div>
 <div class="title">Figure 9. Remote access CIDR parameter</div>
 </div>
 </li>
 <li>
 <p>You must create an RSA key pair before deploying the Partner Solution. For more information, refer to <a href="#_create_an_rsa_key_pair">Create an RSA key pair</a>, earlier in this guide. During deployment, for <strong>EC2 key pair name</strong>, choose an RSA key pair.</p>
-<div id="ec2keypairname" class="imageblock">
-<div class="content">
-<img src="docs/deployment_guide/images/KeyPair.PNG" alt="KeyPair">
-</div>
-<div class="title">Figure 10. EC2 key pair name parameter</div>
-</div>
 </li>
 </ul>
+</div>
+<div id="ec2keypairname" class="imageblock">
+<div class="content">
+<img src="docs/deployment_guide/images/KeyPair.png" alt="Key pair">
+</div>
+<div class="title">Figure 10. EC2 key pair name parameter</div>
 </div>
 </div>
 <div class="sect2">
@@ -1998,9 +2014,9 @@ tanzu package installed get &lt;PACKAGE-NAME&gt; --namespace tap-install</pre>
 <div class="paragraph">
 <p>The Partner Solution deployment might fail if you choose a role for the <strong>IAM role—optional</strong> parameter during deployment. It is not recommended to use a custom IAM role for this Partner Solution.</p>
 </div>
-<div id="iamroleparameter" class="imageblock">
+<div id="qsiamroleoptional" class="imageblock">
 <div class="content">
-<img src="docs/deployment_guide/images/QSIamRoleOptional.PNG" alt="QSIamRoleOptional">
+<img src="docs/deployment_guide/images/QSIamRoleOptional.png" alt="IAM role optional">
 </div>
 <div class="title">Figure 11. IAM role—optional parameter</div>
 </div>
@@ -2028,13 +2044,13 @@ tanzu apps workload tail tanzu-java-web-app-workload -n tap-workload --since 10m
 <p>If the status and logs do not contain errors, ensure that the DNS is correctly configured. In the Route53 console, ensure that the kubernetes cluster IP records have <code>CNAME</code> as the record type.</p>
 <div id="route53single" class="imageblock">
 <div class="content">
-<img src="docs/deployment_guide/images/Route53Single.PNG" alt="Route53Single">
+<img src="docs/deployment_guide/images/Route53Single.png" alt="Route53 single cluster">
 </div>
 <div class="title">Figure 12. Single-cluster configuration</div>
 </div>
 <div id="route53multi" class="imageblock">
 <div class="content">
-<img src="docs/deployment_guide/images/Route53Multi.PNG" alt="Route53Multi">
+<img src="docs/deployment_guide/images/Route53Multi.png" alt="Route53 multicluster">
 </div>
 <div class="title">Figure 13. Multicluster configuration</div>
 </div>
