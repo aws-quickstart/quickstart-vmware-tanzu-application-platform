@@ -486,16 +486,16 @@ Parameters:
 Mappings:
   Versions:
     current:
-      TAP: 1.4.2
+      TAP: 1.5.0
       EKS: '1.24'
       #! https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
       Kubectl: 1.24.9/2023-01-11
       WindowsKubectl: 1.24.10/2023-01-30
-      ClusterEssentialsVersion: 1.4.1
+      ClusterEssentialsVersion: 1.5.0
       #! Note: this is not the hash of the tanzunet artifact, but rather the image hash for the bundle image;
       #! You can get it e.g. by
-      #!   docker pull registry.tanzu.vmware.com/tanzu-cluster-essentials/cluster-essentials-bundle:1.4.1
-      ClusterEssentialsHash: sha256:2354688e46d4bb4060f74fca069513c9b42ffa17a0a6d5b0dbb81ed52242ea44
+      #!   docker pull registry.tanzu.vmware.com/tanzu-cluster-essentials/cluster-essentials-bundle:1.5.0
+      ClusterEssentialsHash: sha256:79abddbc3b49b44fc368fede0dab93c266ff7c1fe305e2d555ed52d00361b446
       OmCLI: 7.9.0
       DockerCredPass:  0.7.0
   AwsAmiRegionMap:
