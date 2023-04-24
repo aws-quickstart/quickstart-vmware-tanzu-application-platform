@@ -486,17 +486,19 @@ Parameters:
 Mappings:
   Versions:
     current:
-      TAP: 1.4.2
+      TAP: 1.5.2-rc.3
       EKS: '1.24'
       #! https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
-      Kubectl: 1.24.9/2023-01-11
-      WindowsKubectl: 1.24.10/2023-01-30
-      ClusterEssentialsVersion: 1.4.1
+      Kubectl: 1.24.13/2023-05-11
+      WindowsKubectl: 1.24.13/2023-05-11
+      ClusterEssentialsVersion: 1.5.1
       #! Note: this is not the hash of the tanzunet artifact, but rather the image hash for the bundle image;
       #! You can get it e.g. by
-      #!   docker pull registry.tanzu.vmware.com/tanzu-cluster-essentials/cluster-essentials-bundle:1.4.1
-      ClusterEssentialsHash: sha256:2354688e46d4bb4060f74fca069513c9b42ffa17a0a6d5b0dbb81ed52242ea44
+      #!   docker pull registry.tanzu.vmware.com/tanzu-cluster-essentials/cluster-essentials-bundle:1.5.1
+      ClusterEssentialsHash: sha256:c7b0988cf3e982625287b241db5d78c30780886dfe9ada01559bb5cd341e6181
+      #! You can find version here https://github.com/pivotal-cf/om/releases
       OmCLI: 7.9.0
+      #! You can find the versions here https://github.com/docker/docker-credential-helpers/releases
       DockerCredPass:  0.7.0
   AwsAmiRegionMap:
     af-south-1:
