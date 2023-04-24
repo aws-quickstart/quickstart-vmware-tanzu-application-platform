@@ -5,7 +5,6 @@ ceip_policy_disclosed: true # Installation fails if this is set to 'false'
 buildservice:
   kp_default_repository: #@ data.values.repositories.build_service
   kp_default_repository_aws_iam_role_arn: #@ data.values.buildservice.iterate_cluster_arn
-  enable_automatic_dependency_updates: false
 
 supply_chain: testing
 
