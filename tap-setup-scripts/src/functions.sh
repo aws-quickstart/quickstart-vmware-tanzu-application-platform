@@ -498,7 +498,7 @@ function tapInstallFull {
   TAP_VALUES_FILE=$1
   banner "Installing TAP values from $GENERATED/$TAP_VALUES_FILE for TAP_VERSION $TAP_VERSION ..."
 
-  first_time=$(tanzu package installed get $TAP_PACKAGE_NAME -n $TAP_NAMESPACE -o json 2>/dev/null)
+  first_time="$(tanzu package installed get $TAP_PACKAGE_NAME -n $TAP_NAMESPACE -o json 2>/dev/null || true)"
 
   ensurePackageOverlays "$TAP_VERSION" "$TAP_NAMESPACE" "$RESOURCES" "${GENERATED}/${TAP_VALUES_FILE}"
 
