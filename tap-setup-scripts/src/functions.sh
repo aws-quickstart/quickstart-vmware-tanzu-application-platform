@@ -409,8 +409,20 @@ function createTapNamespace {
 
   banner "Creating $DEVELOPER_NAMESPACE namespace"
 
-  (kubectl get ns $DEVELOPER_NAMESPACE 2> /dev/null) ||
-    kubectl create ns $DEVELOPER_NAMESPACE
+  ensureDevNamespace "$DEVELOPER_NAMESPACE"
+}
+
+ensureDevNamespace() {
+  local name="$1"
+
+  kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: $name
+  labels:
+    apps.tanzu.vmware.com/tap-ns: ""
+EOF
 }
 
 function loadPackageRepository {
@@ -827,17 +839,7 @@ function tapPrepWorkloadInstall {
   requireValue DEVELOPER_NAMESPACE SAMPLE_APP_NAME
 
   banner "Creating $DEVELOPER_NAMESPACE namespace"
-  (kubectl get ns $DEVELOPER_NAMESPACE 2> /dev/null) ||
-    kubectl create ns $DEVELOPER_NAMESPACE
-
-  kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/developer-namespace.yaml
-}
-
-function tapPrepWorkloadUninstall {
-  requireValue DEVELOPER_NAMESPACE SAMPLE_APP_NAME
-
-  banner "Removing $DEVELOPER_NAMESPACE namespace"
-  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/developer-namespace.yaml || true
+  ensureDevNamespace "$DEVELOPER_NAMESPACE"
 }
 
 function tapWorkloadGenerateDeliverable {
@@ -856,8 +858,7 @@ function tapWorkloadApplyDeliverable {
 
   banner "Creating $DEVELOPER_NAMESPACE namespace"
 
-  (kubectl get ns $DEVELOPER_NAMESPACE 2> /dev/null) ||
-    kubectl create ns $DEVELOPER_NAMESPACE
+  ensureDevNamespace "$DEVELOPER_NAMESPACE"
 
   echo "Applying ${GENERATED}/${SAMPLE_APP_NAME}-delivery.yaml "
 

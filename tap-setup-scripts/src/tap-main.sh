@@ -203,7 +203,6 @@ function tapUninstallWorkloadMain {
       ;;
     run)
   esac
-  tapPrepWorkloadUninstall
 }
 
 function tapTestPreReqs {
