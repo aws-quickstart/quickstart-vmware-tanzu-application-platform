@@ -6,12 +6,12 @@
 :partner-product-short-name: {partner-product-family} Application Platform
 :partner-product-name: {partner-company-short-name} {partner-product-short-name}
 :partner-product-acronym: TAP
-:partner-product-version: 1.4.2
+:partner-product-version: 1.5.2
 :partner-company-name: VMware, Inc.
 :partner-registry: {partner-product-family-full} Network
-:doc-month: March
+:doc-month: June
 :doc-year: 2023
-:partner-contributors: Satya Dillikar and Siteng Yu, {partner-company-name}
+:partner-contributors: Stephani LeClaire, Siteng Yu, and Hannes Hörl {partner-company-name}
 // :other-contributors: Akua Mansa, Trek10
 :aws-contributors: Elvis Pappachen, AWS VMware Partner team
 :aws-ia-contributors: Troy Lindsay, AWS Integration & Automation team
