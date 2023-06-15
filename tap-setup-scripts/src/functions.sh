@@ -409,8 +409,20 @@ function createTapNamespace {
 
   banner "Creating $DEVELOPER_NAMESPACE namespace"
 
-  (kubectl get ns $DEVELOPER_NAMESPACE 2> /dev/null) ||
-    kubectl create ns $DEVELOPER_NAMESPACE
+  ensureDevNamespace "$DEVELOPER_NAMESPACE"
+}
+
+ensureDevNamespace() {
+  local name="$1"
+
+  kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: $name
+  labels:
+    apps.tanzu.vmware.com/tap-ns: ""
+EOF
 }
 
 function loadPackageRepository {
@@ -423,22 +435,23 @@ function loadPackageRepository {
     echo "Changed TAP_REGISTRY_REPOSITORY to ECR Repository"
     TAP_REGISTRY_REPOSITORY=$TAP_ECR_REGISTRY_REPOSITORY
   fi
-  banner "Removing any current TAP package repository"
 
-  tanzu package repository delete tanzu-tap-repository -n $TAP_NAMESPACE --yes || true
-  waitForRemoval tanzu package repository get tanzu-tap-repository -n $TAP_NAMESPACE -o json
+  kubectl -n "$TAP_NAMESPACE" apply -f - <<EOF
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageRepository
+metadata:
+  name: tanzu-tap-repository
+spec:
+  fetch:
+    imgpkgBundle:
+      image: ${TAP_REGISTRY_REPOSITORY}:${TAP_VERSION}
+EOF
 
-  banner "Adding TAP package repository"
+  sleep 3s
 
-  tanzu package repository add tanzu-tap-repository \
-      --url $TAP_REGISTRY_REPOSITORY:$TAP_VERSION \
-      --namespace $TAP_NAMESPACE
-  tanzu package repository get tanzu-tap-repository --namespace $TAP_NAMESPACE
-  while [[ $(tanzu package available list --namespace $TAP_NAMESPACE -o json) == '[]' ]]
-  do
-    message "Waiting for packages..."
-    sleep 5
-  done
+  kubectl -n "$TAP_NAMESPACE" wait PackageRepository/tanzu-tap-repository --for=condition=ReconcileSucceeded=true
+
+  echo 'TAP repository updated & reconciled'
 }
 
 function createTapRegistrySecret {
@@ -498,15 +511,24 @@ function tapInstallFull {
   TAP_VALUES_FILE=$1
   banner "Installing TAP values from $GENERATED/$TAP_VALUES_FILE for TAP_VERSION $TAP_VERSION ..."
 
-  first_time=$(tanzu package installed get $TAP_PACKAGE_NAME -n $TAP_NAMESPACE -o json 2>/dev/null)
+  first_time="$(tanzu package installed get $TAP_PACKAGE_NAME -n $TAP_NAMESPACE -o json 2>/dev/null || true)"
 
   ensurePackageOverlays "$TAP_VERSION" "$TAP_NAMESPACE" "$RESOURCES" "${GENERATED}/${TAP_VALUES_FILE}"
 
+  local installArgs=(
+    --package tap.tanzu.vmware.com
+    --version "${TAP_VERSION}"
+    --values-file "${GENERATED}/${TAP_VALUES_FILE}"
+    --namespace "${TAP_NAMESPACE}"
+  )
+
   if [[ -z $first_time ]]
   then
-    tanzu package install $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/$TAP_VALUES_FILE -n $TAP_NAMESPACE || true
+    tanzu package install "${TAP_PACKAGE_NAME}" "${installArgs[@]}" \
+      || true
   else
-    tanzu package installed update $TAP_PACKAGE_NAME -p tap.tanzu.vmware.com -v $TAP_VERSION --values-file $GENERATED/$TAP_VALUES_FILE -n $TAP_NAMESPACE || true
+    tanzu package installed update "${TAP_PACKAGE_NAME}" "${installArgs[@]}" \
+      || true
   fi
 
   banner "Checking state of all packages"
@@ -615,6 +637,7 @@ function relocateTAPPackages {
   echo "Relocating TAP packages"
   imgpkg copy --concurrency 1 -b ${TAP_URI} --to-repo ${TAP_ECR_REGISTRY_REPOSITORY}
   echo "Ignore the non-distributable skipped layer warning- non-issue"
+
 }
 
 function createRoute53Record {
@@ -772,7 +795,7 @@ function tapPrepBuildClusterToken {
   kubectl apply -f $GENERATED/store_ca.yaml
   METADATA_STORE_ACCESS_TOKEN=`cat $GENERATED/view-cluster-metadata-token.txt`
   kubectl delete secret store-auth-token -n metadata-store-secrets || true
-  kubectl create secret generic store-auth-token --from-literal=auth_token=$METADATA_STORE_ACCESS_TOKEN -n metadata-store-secrets 
+  kubectl create secret generic store-auth-token --from-literal=auth_token=$METADATA_STORE_ACCESS_TOKEN -n metadata-store-secrets
 
 }
 
@@ -816,17 +839,7 @@ function tapPrepWorkloadInstall {
   requireValue DEVELOPER_NAMESPACE SAMPLE_APP_NAME
 
   banner "Creating $DEVELOPER_NAMESPACE namespace"
-  (kubectl get ns $DEVELOPER_NAMESPACE 2> /dev/null) ||
-    kubectl create ns $DEVELOPER_NAMESPACE
-
-  kubectl -n $DEVELOPER_NAMESPACE apply -f $RESOURCES/developer-namespace.yaml
-}
-
-function tapPrepWorkloadUninstall {
-  requireValue DEVELOPER_NAMESPACE SAMPLE_APP_NAME
-
-  banner "Removing $DEVELOPER_NAMESPACE namespace"
-  kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/developer-namespace.yaml || true
+  ensureDevNamespace "$DEVELOPER_NAMESPACE"
 }
 
 function tapWorkloadGenerateDeliverable {
@@ -845,8 +858,7 @@ function tapWorkloadApplyDeliverable {
 
   banner "Creating $DEVELOPER_NAMESPACE namespace"
 
-  (kubectl get ns $DEVELOPER_NAMESPACE 2> /dev/null) ||
-    kubectl create ns $DEVELOPER_NAMESPACE
+  ensureDevNamespace "$DEVELOPER_NAMESPACE"
 
   echo "Applying ${GENERATED}/${SAMPLE_APP_NAME}-delivery.yaml "
 

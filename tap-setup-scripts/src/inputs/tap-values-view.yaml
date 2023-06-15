@@ -38,27 +38,35 @@ tap_gui:
       clusterLocatorMethods:
         - type: "config"
           clusters:
-            ## Cluster: Run
+            #@ if '{}{}'.format(data.values.cluster.run.url, data.values.cluster.run.token) != "":
+            #! Cluster: Run
             - url: #@ data.values.cluster.run.url
               name: #@ "{}-run".format(data.values.cluster.name)
               authProvider: serviceAccount
               skipTLSVerify: true
               skipMetricsLookup: true
               serviceAccountToken: #@ data.values.cluster.run.token
-            ## Cluster: Build
+            #@ end
+
+            #@ if '{}{}'.format(data.values.cluster.build.url, data.values.cluster.build.token) != "":
+            #! Cluster: Build
             - url: #@ data.values.cluster.build.url
               name: #@ "{}-build".format(data.values.cluster.name)
               authProvider: serviceAccount
               skipTLSVerify: true
               skipMetricsLookup: true
               serviceAccountToken: #@ data.values.cluster.build.token
-            ## Cluster: Iterate
+            #@ end
+
+            #@ if '{}{}'.format(data.values.cluster.iterate.url, data.values.cluster.iterate.token) != "":
+            #! Cluster: Iterate
             - url: #@ data.values.cluster.iterate.url
               name: #@ "{}-iterate".format(data.values.cluster.name)
               authProvider: serviceAccount
               skipTLSVerify: true
               skipMetricsLookup: true
               serviceAccountToken: #@ data.values.cluster.iterate.token
+            #@ end
 metadata_store:
   app_service_type: LoadBalancer
   ns_for_export_app_cert: #@ data.values.repositories.workload.namespace

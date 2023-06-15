@@ -20,5 +20,5 @@ cnrs:
 
 appliveview_connector:
   backend:
-    sslDisabled: "true"
+    sslDeactivated: "true"
     host:  #@ "appliveview_connector.run.{}".format(data.values.dns.domain_name)
