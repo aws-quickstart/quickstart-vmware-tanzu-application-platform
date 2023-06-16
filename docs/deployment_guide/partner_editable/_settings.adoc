@@ -6,7 +6,11 @@
 :partner-product-short-name: {partner-product-family} Application Platform
 :partner-product-name: {partner-company-short-name} {partner-product-short-name}
 :partner-product-acronym: TAP
-:partner-product-version: 1.5.2
+:partner-product-version-major: 1
+:partner-product-version-minor: 5
+:partner-product-version-patch: 2
+:partner-product-version-majmin: {partner-product-version-major}.{partner-product-version-minor}
+:partner-product-version: {partner-product-version-majmin}.{partner-product-version-patch}
 :partner-company-name: VMware, Inc.
 :partner-registry: {partner-product-family-full} Network
 :doc-month: June
