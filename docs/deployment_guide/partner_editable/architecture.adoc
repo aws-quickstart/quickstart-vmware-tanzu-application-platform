@@ -36,4 +36,4 @@ As shown in <<architecture2>>, the multicluster version of this Partner Solution
 ** In three of the Amazon EKS clusters, a Network Load Balancer, Contour Envoy ingress controller pods, and TAP installations with Run, View, and Iterate TAP installation profiles.
 ** In one Amazon EKS cluster, a TAP installation with a Build TAP installation profile. 
 
-For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/multicluster-about.html[Multicluster {partner-product-short-name} Overview^]
+For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/{partner-product-version-majmin}/tap/multicluster-about.html[Multicluster {partner-product-short-name} Overview^].

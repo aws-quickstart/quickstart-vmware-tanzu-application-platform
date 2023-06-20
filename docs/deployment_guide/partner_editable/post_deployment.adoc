@@ -203,4 +203,4 @@ To retrieve the password for the Windows bastion host instance, refer to https:/
 
 The {partner-product-name} user interface is not available as a public URL. You can use https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html[Site&#8209;to&#8209;Site VPN^] or https://aws.amazon.com/directconnect/[AWS Direct Connect^] to configure direct access to the VPC from your enterprise network.
 
-To learn more about deploying the first application to {partner-product-name}, visit https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/getting-started-deploy-first-app.html[the how-to guides for developers].
+To learn more about deploying the first application to {partner-product-name}, visit https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/{partner-product-version-majmin}/tap/getting-started-deploy-first-app.html[the how-to guides for developers].
