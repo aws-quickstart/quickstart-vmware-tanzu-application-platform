@@ -168,7 +168,6 @@ function tapInstallWorkloadMain {
       banner "Installing Sample Workload in Single Cluster"
       tanzu apps workload apply -f $RESOURCES/workload-aws.yaml -n $DEVELOPER_NAMESPACE --yes
       ;;
-    run)
   esac
 }
 
@@ -201,9 +200,7 @@ function tapUninstallWorkloadMain {
       kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/pipeline.yaml || true
       kubectl -n $DEVELOPER_NAMESPACE delete -f $RESOURCES/scan-policy.yaml || true
       ;;
-    run)
   esac
-  tapPrepWorkloadUninstall
 }
 
 function tapTestPreReqs {
