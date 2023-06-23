@@ -56,7 +56,7 @@ resources:
   source:
     repository: ((repo.slug))
     access_token: ((ci/pr-resource.token))
-    disable_forks: false
+    disable_forks: true
     base_branch: main
     ignore_paths:
     - ci/

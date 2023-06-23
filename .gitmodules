@@ -1,4 +1,4 @@
 [submodule "submodules/quickstart-amazon-eks"]
 	path = submodules/quickstart-amazon-eks
-	url = https://github.com/aws-quickstart/quickstart-amazon-eks.git
-	branch = main
+	url = https://github.com/vmware-tap-on-public-cloud/quickstart-amazon-eks.git
+	branch = tmp-rollback
