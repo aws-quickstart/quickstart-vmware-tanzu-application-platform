@@ -6,8 +6,8 @@ You can verify CloudFormation stack deployment using the AWS Management Console.
 
 Refer to the following resources to troubleshoot {partner-product-name}.
 
-* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/troubleshooting-tap-troubleshoot-install-tap.html[Troubleshoot installing {partner-product-short-name}^]
-* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/troubleshooting-tap-troubleshoot-using-tap.html[Troubleshoot using {partner-product-short-name}^]
+* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/{partner-product-version-majmin}/tap/troubleshooting-tap-troubleshoot-install-tap.html[Troubleshoot installing {partner-product-short-name}^]
+* https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/{partner-product-version-majmin}/tap/troubleshooting-tap-troubleshoot-using-tap.html[Troubleshoot using {partner-product-short-name}^]
 
 === Cannot connect to {partner-product-short-name} console after deployment
 If you cannot access the {partner-product-short-name} console after deployment, do the following:
@@ -69,7 +69,7 @@ image::../docs/deployment_guide/images/FailedStackEvents.png[Failed stack events
 . If the CloudFormation stack is in *UPDATE_ROLLBACK_FAILED* status, delete the stack and redeploy the Partner Solution. For more information, refer to https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-delete-stack.html[Deleting a stack on the AWS CloudFormation console^].
 
 === {partner-product-short-name} installation fails with a EULA error
-You must accept the relevant {partner-product-short-nam} EULAs during deployment before you can download the {partner-product-short-name} packages from the {partner-registry}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.4/tap/install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements^].
+You must accept the relevant {partner-product-short-nam} EULAs during deployment before you can download the {partner-product-short-name} packages from the {partner-registry}. For more information, refer to https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/{partner-product-version-majmin}/tap/install-tanzu-cli.html#accept-the-end-user-license-agreements-0[Accept the End User License Agreements^].
 
 
 For more details about the `+.status.usefulErrorMessage+` error, connect to the Linux bastion host using SSH. Then run the following commands. For `<PACKAGE-NAME>`, substitute the name of the package to target.
@@ -200,6 +200,7 @@ image::../docs/deployment_guide/images/Route53Single.png[Route53 single cluster]
 .Multicluster configuration
 image::../docs/deployment_guide/images/Route53Multi.png[Route53 multicluster]
 
+== Release Notes
 // git log --reverse origin/main...v1.4.0 -- ':!/ci/'
 
 // Changelog links
@@ -209,7 +210,20 @@ image::../docs/deployment_guide/images/Route53Multi.png[Route53 multicluster]
 :eks-1_24-cl: https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html#kubernetes-1.24
 :eksqs-5_0_0-cl: https://github.com/aws-quickstart/quickstart-amazon-eks/releases/tag/v5.0.0
 
-== Release Notes
+:tap-1_5_2-cl: https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.5/tap/release-notes.html#v152-0
+:ce-1_5_1-cl: https://docs.vmware.com/en/Cluster-Essentials-for-VMware-Tanzu/1.5/cluster-essentials/release-notes.html#v151-0
+:nsp: https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.5/tap/namespace-provisioner-about.html
+:eks_qs_fork: https://github.com/vmware-tap-on-public-cloud/quickstart-amazon-eks/tree/tmp-rollback
+
+=== Version 1.5.2+aws.3
+* Upgraded the following versions:
+** {tap-1_5_2-cl}[{partner-product-acronym}^] 1.5.2.
+** {ce-1_5_1-cl}[ClusterEssentials^] 1.5.1.
+* Switched to the {nsp}[Namespace provisioner^] to create and manage the developer namespace(s).
+* Switched to {eks_qs_fork}[a fork^] of the
+  https://github.com/aws-quickstart/quickstart-amazon-eks[Amazon EKS on the AWS Cloud reference deployment^]
+  because the deprecation of Amazon EKS reference
+  deployment introduced some breaking changes for {partner-product-name}.
 
 === Version 1.4.2+aws.2
 * Fixed imeout issues with cfn-signals during TAP install.
