@@ -13,7 +13,7 @@
 :partner-product-version: {partner-product-version-majmin}.{partner-product-version-patch}
 :partner-company-name: VMware, Inc.
 :partner-registry: {partner-product-family-full} Network
-:doc-month: June
+:doc-month: October
 :doc-year: 2023
 :partner-contributors: Stephani LeClaire, Siteng Yu, and Hannes Hörl {partner-company-name}
 // :other-contributors: Akua Mansa, Trek10
@@ -23,3 +23,4 @@
 :default_deployment_region: us-east-1
 // :private_repo:
 :eks-version: 1.24
+:deprecation: This Partner Solution is deprecated and is not maintained anymore.
