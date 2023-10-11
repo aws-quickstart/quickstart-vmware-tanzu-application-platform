@@ -201,6 +201,14 @@ image::../docs/deployment_guide/images/Route53Single.png[Route53 single cluster]
 image::../docs/deployment_guide/images/Route53Multi.png[Route53 multicluster]
 
 == Release Notes
+
+ifdef::deprecation[]
+[IMPORTANT]
+====
+{deprecation}
+====
+endif::deprecation[]
+
 // git log --reverse origin/main...v1.4.0 -- ':!/ci/'
 
 // Changelog links
